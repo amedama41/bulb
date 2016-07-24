@@ -126,6 +126,12 @@ namespace actions {
             return validate(set_field(std::forward<Args>(args)...));
         }
 
+        static auto create_from_match_field(OXMMatchField field)
+            -> set_field
+        {
+            return set_field{std::move(field)};
+        }
+
         static void validate_set_field(raw_ofp_type const& set_field)
         {
             auto const oxm_header = extract_oxm_header(set_field);
