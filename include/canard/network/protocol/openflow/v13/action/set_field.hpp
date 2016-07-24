@@ -161,6 +161,13 @@ namespace actions {
             return lhs.field_ == rhs.field_;
         }
 
+        friend auto equivalent(
+                set_field const& lhs, set_field const& rhs) noexcept
+            -> bool
+        {
+            return lhs == rhs;
+        }
+
     private:
         set_field(OXMMatchField&& field)
             : field_(std::move(field))
