@@ -147,6 +147,8 @@ This type may check the length field.
 This is because in order to satisfy above binary length requirements, the caller of ``decode`` 
 shall already check the length field in advance. (Copy binary to a common structured type 
 object, and then check the length field and compare the field to the length of binary).
+The type field is also not checked. If the type and/or the length fields are invalid, the 
+behavior is undefined.
 
 **********
 Copyrights
