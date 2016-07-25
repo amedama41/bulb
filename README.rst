@@ -139,7 +139,7 @@ Which type checks depends on a kind of the type.
 
 **Unique type** is a type which corresponds to an OpenFlow structured type with no type field 
 (e.g. ofp_packet_queue, ofp_flow_stats).
-This type does not check the length field.
+This type may check the length field.
 
 **Variant type** is a type which corresponds to an OpenFlow structured type with type field 
 (e.g. ofp_output, ofp_apply_actions, oxm_header).
