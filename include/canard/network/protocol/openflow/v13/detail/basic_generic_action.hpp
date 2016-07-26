@@ -1,6 +1,7 @@
 #ifndef CANARD_NETWORK_OPENFLOW_DETAIL_V13_BASIC_GENERIC_ACTION_HPP
 #define CANARD_NETWORK_OPENFLOW_DETAIL_V13_BASIC_GENERIC_ACTION_HPP
 
+#include <canard/network/protocol/openflow/detail/memcmp.hpp>
 #include <canard/network/protocol/openflow/v13/detail/basic_action.hpp>
 #include <canard/network/protocol/openflow/v13/openflow.hpp>
 
@@ -20,7 +21,13 @@ namespace v13 {
     public:
         using raw_ofp_type = typename base_type::raw_ofp_type;
 
-        friend auto operator==(T const&, T const&) noexcept
+        friend auto operator==(T const& lhs, T const& rhs) noexcept
+            -> bool
+        {
+            return detail::memcmp(lhs.action_header_, rhs.action_header_);
+        }
+
+        friend auto equivalent(T const&, T const&) noexcept
             -> bool
         {
             return true;

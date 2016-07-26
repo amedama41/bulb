@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <stdexcept>
+#include <canard/network/protocol/openflow/detail/memcmp.hpp>
 #include <canard/network/protocol/openflow/v13/detail/basic_action.hpp>
 #include <canard/network/protocol/openflow/v13/openflow.hpp>
 
@@ -34,6 +35,12 @@ namespace actions {
             return action_group_.group_id;
         }
 
+        friend auto operator==(group const& lhs, group const& rhs) noexcept
+            -> bool
+        {
+            return detail::memcmp(lhs.action_group_, rhs.action_group_);
+        }
+
     private:
         friend basic_action;
 
@@ -60,7 +67,7 @@ namespace actions {
         raw_ofp_type action_group_;
     };
 
-    inline auto operator==(group const& lhs, group const& rhs) noexcept
+    inline auto equivalent(group const& lhs, group const& rhs) noexcept
         -> bool
     {
         return lhs.group_id() == rhs.group_id();
