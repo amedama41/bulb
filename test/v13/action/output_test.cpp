@@ -110,20 +110,99 @@ BOOST_AUTO_TEST_SUITE(output_test)
         BOOST_TEST(sut.max_length() == length);
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
         auto const sut = actions::output{1, 0};
-        auto const same_port_and_same_len = actions::output{1, 0};
-        auto const same_port_and_diff_len = actions::output{1, 9};
-        auto const diff_port_and_same_len = actions::output{2, 0};
-        auto const diff_port_and_diff_len = actions::output{2, 9};
 
         BOOST_TEST((sut == sut));
-        BOOST_TEST((sut == same_port_and_same_len));
-        BOOST_TEST((sut != same_port_and_diff_len));
-        BOOST_TEST((sut != diff_port_and_same_len));
-        BOOST_TEST((sut != diff_port_and_diff_len));
-    }
+      }
+      BOOST_AUTO_TEST_CASE(true_if_port_and_len_are_equal)
+      {
+        auto const sut1 = actions::output{1, 0};
+        auto const sut2 = actions::output{1, 0};
+
+        BOOST_TEST((sut1 == sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_port_is_not_equal)
+      {
+        auto const sut1 = actions::output{1, 0};
+        auto const sut2 = actions::output{2, 0};
+
+        BOOST_TEST((sut1 != sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_len_is_not_equal)
+      {
+        auto const sut1 = actions::output{1, 0};
+        auto const sut2 = actions::output{1, 9};
+
+        BOOST_TEST((sut1 != sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_port_and_len_are_not_equal)
+      {
+        auto const sut1 = actions::output{1, 0};
+        auto const sut2 = actions::output{2, 9};
+
+        BOOST_TEST((sut1 != sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_pad_is_not_equal)
+      {
+        auto const binary
+          = "\x00\x00\x00\x10\x12\x34\x56\x78""\x12\x34\x00\x00\x00\x00\x00\x01"_bin;
+        auto it = binary.begin();
+        auto const sut1 = actions::output{0x12345678, 0x1234};
+        auto const sut2 = actions::output::decode(it, binary.end());
+
+        BOOST_TEST((sut1 != sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = actions::output{1, 0};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_port_and_len_are_equal)
+      {
+        auto const sut1 = actions::output{1, 0};
+        auto const sut2 = actions::output{1, 0};
+
+        BOOST_TEST(equivalent(sut1, sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_port_is_not_equal)
+      {
+        auto const sut1 = actions::output{1, 0};
+        auto const sut2 = actions::output{2, 0};
+
+        BOOST_TEST(!equivalent(sut1, sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_len_is_not_equal)
+      {
+        auto const sut1 = actions::output{1, 0};
+        auto const sut2 = actions::output{1, 9};
+
+        BOOST_TEST(!equivalent(sut1, sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_port_and_len_are_not_equal)
+      {
+        auto const sut1 = actions::output{1, 0};
+        auto const sut2 = actions::output{2, 9};
+
+        BOOST_TEST(!equivalent(sut1, sut2));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_pad_is_not_equal)
+      {
+        auto const binary
+          = "\x00\x00\x00\x10\x12\x34\x56\x78""\x12\x34\x12\x34\x56\x78\x9a\xbc"_bin;
+        auto it = binary.begin();
+        auto const sut1 = actions::output{0x12345678, 0x1234};
+        auto const sut2 = actions::output::decode(it, binary.end());
+
+        BOOST_TEST(equivalent(sut1, sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(encode_test, output_fixture)
     {

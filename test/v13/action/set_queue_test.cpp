@@ -67,16 +67,51 @@ BOOST_AUTO_TEST_SUITE(set_queue_test)
                 actions::set_queue::create(queue_id), std::runtime_error);
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
         auto const sut = actions::set_queue{0};
-        auto const same_id = actions::set_queue{0};
-        auto const diff_id = actions::set_queue{1};
 
         BOOST_TEST((sut == sut));
-        BOOST_TEST((sut == same_id));
-        BOOST_TEST((sut != diff_id));
-    }
+      }
+      BOOST_AUTO_TEST_CASE(true_if_queue_id_is_equal)
+      {
+        auto const sut1 = actions::set_queue{1};
+        auto const sut2 = actions::set_queue{1};
+
+        BOOST_TEST((sut1 == sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_queue_id_is_not_equal)
+      {
+        auto const sut1 = actions::set_queue{2};
+        auto const sut2 = actions::set_queue{3};
+
+        BOOST_TEST((sut1 != sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = actions::set_queue{0};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_queue_id_is_equal)
+      {
+        auto const sut1 = actions::set_queue{1};
+        auto const sut2 = actions::set_queue{1};
+
+        BOOST_TEST(equivalent(sut1, sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_queue_id_is_not_equal)
+      {
+        auto const sut1 = actions::set_queue{2};
+        auto const sut2 = actions::set_queue{3};
+
+        BOOST_TEST(!equivalent(sut1, sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(encode_test, set_queue_fixture)
     {

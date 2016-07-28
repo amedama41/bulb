@@ -82,15 +82,69 @@ BOOST_AUTO_TEST_SUITE(push_mpls_test)
                 actions::push_mpls::create(ethertype), std::runtime_error);
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
-        auto const unicast = actions::push_mpls::unicast();
-        auto const multicast = actions::push_mpls::multicast();
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = actions::push_mpls::unicast();
 
-        BOOST_TEST((unicast == unicast));
-        BOOST_TEST((multicast == multicast));
-        BOOST_TEST((unicast != multicast));
-    }
+        BOOST_TEST((sut == sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_ethertype_and_pad_are_equal)
+      {
+        auto const sut1 = actions::push_mpls::multicast();
+        auto const sut2 = actions::push_mpls{0x8848};
+
+        BOOST_TEST((sut1 == sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_ethertype_is_not_equal)
+      {
+        auto const sut1 = actions::push_mpls::unicast();
+        auto const sut2 = actions::push_mpls::multicast();
+
+        BOOST_TEST((sut1 != sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_pad_is_not_equal)
+      {
+        auto const binary = "\x00\x13\x00\x08\x88\x47\x00\x01"_bin;
+        auto it = binary.begin();
+        auto const sut1 = actions::push_mpls{0x8847};
+        auto const sut2 = actions::push_mpls::decode(it, binary.end());
+
+        BOOST_TEST((sut1 != sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = actions::push_mpls::unicast();
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_ethertype_and_pad_are_equal)
+      {
+        auto const sut1 = actions::push_mpls::multicast();
+        auto const sut2 = actions::push_mpls{0x8848};
+
+        BOOST_TEST(equivalent(sut1, sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_ethertype_is_not_equal)
+      {
+        auto const sut1 = actions::push_mpls::unicast();
+        auto const sut2 = actions::push_mpls::multicast();
+
+        BOOST_TEST(!equivalent(sut1, sut2));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_pad_is_not_equal)
+      {
+        auto const binary = "\x00\x13\x00\x08\x88\x47\xab\xcd"_bin;
+        auto it = binary.begin();
+        auto const sut1 = actions::push_mpls{0x8847};
+        auto const sut2 = actions::push_mpls::decode(it, binary.end());
+
+        BOOST_TEST(equivalent(sut1, sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(encode_test, push_mpls_fixture)
     {

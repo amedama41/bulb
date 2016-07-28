@@ -68,16 +68,51 @@ BOOST_AUTO_TEST_SUITE(group_test)
         BOOST_CHECK_THROW(actions::group::create(group_id), std::runtime_error);
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
         auto const sut = actions::group{protocol::OFPG_MAX};
-        auto const same_id = actions::group{protocol::OFPG_MAX};
-        auto const diff_id = actions::group{0};
 
         BOOST_TEST((sut == sut));
-        BOOST_TEST((sut == same_id));
-        BOOST_TEST((sut != diff_id));
-    }
+      }
+      BOOST_AUTO_TEST_CASE(true_if_group_id_is_equal)
+      {
+        auto const sut1 = actions::group{1};
+        auto const sut2 = actions::group{1};
+
+        BOOST_TEST((sut1 == sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_group_id_not_equal)
+      {
+        auto const sut1 = actions::group{protocol::OFPG_MAX};
+        auto const sut2 = actions::group{0};
+
+        BOOST_TEST((sut1 != sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = actions::group{protocol::OFPG_MAX};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_group_id_is_equal)
+      {
+        auto const sut1 = actions::group{1};
+        auto const sut2 = actions::group{1};
+
+        BOOST_TEST(equivalent(sut1, sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_group_id_not_equal)
+      {
+        auto const sut1 = actions::group{protocol::OFPG_MAX};
+        auto const sut2 = actions::group{0};
+
+        BOOST_TEST(!equivalent(sut1, sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(encode_test, group_fixture)
     {
