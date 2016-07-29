@@ -18,7 +18,6 @@ LINKED_LIBRARIES = $(foreach dir,$(SUB_DIRECTORIES),-L./$(dir) -l$(dir)_test)
 LIBRARIES_RPATH = $(foreach dir,$(SUB_DIRECTORIES),-rpath @executable_path/./$(dir))
 
 UTILITY_TEST_SRCS = byteorder_test.cpp \
-					any_action_test.cpp \
 					packet_queue_test.cpp \
 					port_test.cpp
 UTILITY_TEST_OBJS = $(UTILITY_TEST_SRCS:.cpp=.o)
