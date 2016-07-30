@@ -70,12 +70,13 @@ namespace instructions {
         raw_ofp_type instruction_write_metadata_;
     };
 
-    inline auto operator==(
+    inline auto equivalent(
             write_metadata const& lhs, write_metadata const& rhs) noexcept
         -> bool
     {
-        return lhs.metadata() == rhs.metadata()
-            && lhs.metadata_mask() == rhs.metadata_mask();
+        return lhs.metadata_mask() == rhs.metadata_mask()
+            && ((lhs.metadata() & lhs.metadata_mask())
+                    == (rhs.metadata() & lhs.metadata_mask()));
     }
 
 } // namespace instructions
