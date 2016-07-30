@@ -5,6 +5,7 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
+#include <boost/mpl/contains.hpp>
 #include <boost/operators.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/get.hpp>
@@ -26,6 +27,11 @@ namespace detail {
         using action_type_list = typename ActionDecoder::action_type_list;
         using action_variant
             = typename boost::make_variant_over<action_type_list>::type;
+
+        template <class Action>
+        using containable_if_t = typename std::enable_if<
+            boost::mpl::contains<action_type_list, Action>::value
+        >::type;
 
     public:
         template <
@@ -102,6 +108,56 @@ namespace detail {
             -> bool
         {
             return lhs.variant_ == rhs.variant_;
+        }
+
+        template <class Action, class = containable_if_t<Action>>
+        friend auto operator==(any_action const& lhs, Action const& rhs)
+            -> bool
+        {
+            if (auto const action = boost::get<Action>(&lhs.variant_)) {
+                return *action == rhs;
+            }
+            return false;
+        }
+
+        template <class Action, class = containable_if_t<Action>>
+        friend auto operator==(Action const& lhs, any_action const& rhs)
+            -> bool
+        {
+            if (auto const action = boost::get<Action>(&rhs.variant_)) {
+                return lhs == *action;
+            }
+            return false;
+        }
+
+        friend auto equivalent(
+                any_action const& lhs, any_action const& rhs) noexcept
+            -> bool
+        {
+            auto visitor = detail::equivalent_visitor{};
+            return boost::apply_visitor(visitor, lhs.variant_, rhs.variant_);
+        }
+
+        template <class Action, class = containable_if_t<Action>>
+        friend auto equivalent(
+                any_action const& lhs, Action const& rhs) noexcept
+            -> bool
+        {
+            if (auto const action = boost::get<Action>(&lhs.variant_)) {
+                return equivalent(*action, rhs);
+            }
+            return false;
+        }
+
+        template <class Action, class = containable_if_t<Action>>
+        friend auto equivalent(
+                Action const& lhs, any_action const& rhs) noexcept
+            -> bool
+        {
+            if (auto const action = boost::get<Action>(&rhs.variant_)) {
+                return equivalent(lhs, *action);
+            }
+            return false;
         }
 
         template <class T, class Decoder>
