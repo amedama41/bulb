@@ -125,7 +125,8 @@ namespace detail {
         friend auto operator==(any_action const& lhs, Action const& rhs)
             -> bool
         {
-            if (auto const action = boost::get<Action>(&lhs.variant_)) {
+            if (auto const action
+                    = boost::get<Action>(std::addressof(lhs.variant_))) {
                 return *action == rhs;
             }
             return false;
@@ -135,7 +136,8 @@ namespace detail {
         friend auto operator==(Action const& lhs, any_action const& rhs)
             -> bool
         {
-            if (auto const action = boost::get<Action>(&rhs.variant_)) {
+            if (auto const action
+                    = boost::get<Action>(std::addressof(rhs.variant_))) {
                 return lhs == *action;
             }
             return false;
@@ -154,7 +156,8 @@ namespace detail {
                 any_action const& lhs, Action const& rhs) noexcept
             -> bool
         {
-            if (auto const action = boost::get<Action>(&lhs.variant_)) {
+            if (auto const action
+                    = boost::get<Action>(std::addressof(lhs.variant_))) {
                 return equivalent(*action, rhs);
             }
             return false;
@@ -165,7 +168,8 @@ namespace detail {
                 Action const& lhs, any_action const& rhs) noexcept
             -> bool
         {
-            if (auto const action = boost::get<Action>(&rhs.variant_)) {
+            if (auto const action
+                    = boost::get<Action>(std::addressof(rhs.variant_))) {
                 return equivalent(lhs, *action);
             }
             return false;
