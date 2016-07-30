@@ -1,6 +1,7 @@
 #ifndef CANARD_NETWORK_OPENFLOW_DETAIL_ANY_ACTION_HPP
 #define CANARD_NETWORK_OPENFLOW_DETAIL_ANY_ACTION_HPP
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <type_traits>
