@@ -10,6 +10,7 @@
 #include <canard/network/protocol/openflow/detail/decode.hpp>
 #include <canard/network/protocol/openflow/detail/encode.hpp>
 #include <canard/network/protocol/openflow/detail/is_same_value_type.hpp>
+#include <canard/network/protocol/openflow/detail/memcmp.hpp>
 #include <canard/network/protocol/openflow/v13/action_list.hpp>
 #include <canard/network/protocol/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/protocol/openflow/v13/openflow.hpp>
@@ -98,7 +99,9 @@ namespace v13 {
         friend auto operator==(T const& lhs, T const& rhs)
             -> bool
         {
-            return lhs.actions() == rhs.actions();
+            return detail::memcmp(
+                    lhs.instruction_actions_, rhs.instruction_actions_)
+                && lhs.actions() == rhs.actions();
         }
 
     protected:
