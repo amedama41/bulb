@@ -193,24 +193,180 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
         BOOST_TEST(src.actions().empty());
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
         auto const sut = instructions::write_actions{
-            actions::output{1}, actions::set_queue{2}
+          actions::output{1}, actions::set_queue{2}
         };
-        auto const diff_value = instructions::write_actions{
-            actions::output{2}, actions::set_queue{1}
-        };
-        auto const diff_type = instructions::write_actions{
-            actions::group{1}, actions::set_queue{2}
-        };
-        auto const empty = instructions::write_actions{};
 
         BOOST_TEST((sut == sut));
-        BOOST_TEST((sut != diff_value));
-        BOOST_TEST((sut != diff_type));
-        BOOST_TEST((sut != empty));
-    }
+      }
+      BOOST_AUTO_TEST_CASE(true_if_actinos_are_equal)
+      {
+        BOOST_TEST(
+            (instructions::write_actions{ actions::output{1}, actions::set_queue{2} }
+             == instructions::write_actions{ actions::output{1}, actions::set_queue{2} }));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_both_actions_are_empty)
+      {
+        BOOST_TEST(
+            (instructions::write_actions{} == instructions::write_actions{}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_actions_size_is_not_equal)
+      {
+        BOOST_TEST(
+            (instructions::write_actions{ actions::output{1} }
+             != instructions::write_actions{ actions::output{1}, actions::group{2} }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_actions_order_is_not_equal)
+      {
+        BOOST_TEST(
+            (instructions::write_actions{
+              v13::action_list{ actions::pop_pbb{}, actions::pop_vlan{} } }
+             != instructions::write_actions{
+              v13::action_list{ actions::pop_vlan{}, actions::pop_pbb{} } }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_contained_action_value_is_not_equal)
+      {
+        BOOST_TEST(
+            (instructions::write_actions{ actions::pop_pbb{}, actions::set_nw_ttl{2} }
+             != instructions::write_actions{ actions::pop_pbb{}, actions::set_nw_ttl{3} }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_contained_action_type_is_not_equal)
+      {
+        BOOST_TEST(
+            (instructions::write_actions{ actions::pop_pbb{}, actions::set_ip_ecn{1} }
+             != instructions::write_actions{ actions::pop_pbb{}, actions::set_arp_op{1} }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_one_contains_duplicated_action)
+      {
+        BOOST_TEST(
+            (instructions::write_actions{
+               v13::action_list{ actions::pop_pbb{}, actions::pop_pbb{} } }
+             != instructions::write_actions{ actions::pop_pbb{} }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_pad_is_not_equal)
+      {
+        auto const binary = "\x00\x03\x00\x08\x00\x00\x00\x01"_bin;
+        auto it = binary.begin();
+        auto const nonzero_pad
+          = instructions::write_actions::decode(it, binary.end());
+
+        BOOST_TEST((instructions::write_actions{} != nonzero_pad));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_contained_actions_are_not_equal_but_equivalent)
+      {
+        auto const binary = "\x00\x12\x00\x08\x10\x20\x30\x40"_bin;
+        auto it = binary.begin();
+        auto const nonzero_pad_pop_vlan
+          = actions::pop_vlan::decode(it, binary.end());
+
+        BOOST_TEST(
+            (instructions::write_actions{ actions::pop_vlan{} }
+             != instructions::write_actions{ nonzero_pad_pop_vlan }));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = instructions::write_actions{
+          actions::output{1}, actions::set_queue{2}
+        };
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_actinos_are_equal)
+      {
+        BOOST_TEST(
+            equivalent(
+                instructions::write_actions{
+                  actions::output{1}, actions::set_queue{2} }
+              , instructions::write_actions{
+                  actions::output{1}, actions::set_queue{2} }));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_both_actions_are_empty)
+      {
+        BOOST_TEST(
+            equivalent(
+              instructions::write_actions{}, instructions::write_actions{}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_actions_size_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                instructions::write_actions{ actions::output{1} }
+              , instructions::write_actions{ actions::output{1}, actions::group{2} }));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_actions_order_is_not_equal)
+      {
+        BOOST_TEST(
+            equivalent(
+                instructions::write_actions{
+                  v13::action_list{ actions::pop_pbb{}, actions::pop_vlan{} } }
+              , instructions::write_actions{
+                  v13::action_list{ actions::pop_vlan{}, actions::pop_pbb{} } }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_contained_action_value_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                instructions::write_actions{
+                  actions::pop_pbb{}, actions::set_nw_ttl{2} }
+              , instructions::write_actions{
+                  actions::pop_pbb{}, actions::set_nw_ttl{3} }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_contained_action_type_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                instructions::write_actions{
+                  actions::pop_pbb{}, actions::set_ip_ecn{1} }
+              , instructions::write_actions{
+                  actions::pop_pbb{}, actions::set_arp_op{1} }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_one_contains_duplicated_action)
+      {
+        BOOST_TEST(
+            !equivalent(
+                instructions::write_actions{
+                  v13::action_list{ actions::pop_pbb{}, actions::pop_pbb{} } }
+              , instructions::write_actions{ actions::pop_pbb{} }));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_both_contain_duplicated_action)
+      {
+        BOOST_TEST(
+            equivalent(
+                instructions::write_actions{
+                  v13::action_list{
+                    actions::pop_pbb{}, actions::pop_pbb{}, actions::pop_vlan{} } }
+              , instructions::write_actions{
+                  v13::action_list{
+                    actions::pop_pbb{}, actions::pop_vlan{}, actions::pop_pbb{} } }));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_pad_is_not_equal)
+      {
+        auto const binary = "\x00\x03\x00\x08\x00\x00\x00\x01"_bin;
+        auto it = binary.begin();
+        auto const nonzero_pad
+          = instructions::write_actions::decode(it, binary.end());
+
+        BOOST_TEST(equivalent(instructions::write_actions{}, nonzero_pad));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_contained_actions_are_not_equal_but_equivalent)
+      {
+        auto const binary = "\x00\x12\x00\x08\x10\x20\x30\x40"_bin;
+        auto it = binary.begin();
+        auto const nonzero_pad_pop_vlan
+          = actions::pop_vlan::decode(it, binary.end());
+
+        BOOST_TEST(
+            equivalent(
+                instructions::write_actions{ actions::pop_vlan{} }
+              , instructions::write_actions{ nonzero_pad_pop_vlan }));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(encode_test, write_actions_fixture)
     {

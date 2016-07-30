@@ -44,14 +44,49 @@ BOOST_AUTO_TEST_SUITE(clear_actions_test)
         BOOST_CHECK_NO_THROW(instructions::clear_actions::create());
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
-        auto const sut1 = instructions::clear_actions{};
-        auto const sut2 = instructions::clear_actions{};
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = instructions::clear_actions{};
 
-        BOOST_TEST((sut1 == sut1));
-        BOOST_TEST((sut1 == sut2));
-    }
+        BOOST_TEST((sut == sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_pad_is_equal)
+      {
+        BOOST_TEST(
+            (instructions::clear_actions{} == instructions::clear_actions{}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_pad_is_not_equal)
+      {
+        auto const binary = "\x00\x05\x00\x08\x00\x00\x00\x01"_bin;
+        auto it = binary.begin();
+        auto const nonzero_pad = instructions::clear_actions::decode(it, binary.end());
+
+        BOOST_TEST((instructions::clear_actions{} != nonzero_pad));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = instructions::clear_actions{};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_pad_is_equal)
+      {
+        BOOST_TEST(
+            equivalent(instructions::clear_actions{}, instructions::clear_actions{}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_pad_is_not_equal)
+      {
+        auto const binary = "\x00\x05\x00\x08\x12\x34\x56\x78"_bin;
+        auto it = binary.begin();
+        auto const nonzero_pad = instructions::clear_actions::decode(it, binary.end());
+
+        BOOST_TEST(equivalent(instructions::clear_actions{}, nonzero_pad));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(encode_test, clear_actions_fixture)
     {

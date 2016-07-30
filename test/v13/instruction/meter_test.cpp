@@ -71,15 +71,39 @@ BOOST_AUTO_TEST_SUITE(meter_test)
                 , std::runtime_error);
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
-        auto const sut1 = instructions::meter{1};
-        auto const sut2 = instructions::meter{2};
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = instructions::meter{1};
 
-        BOOST_TEST((sut1 == sut1));
-        BOOST_TEST((sut1 != sut2));
-        BOOST_TEST((sut2 == sut2));
-    }
+        BOOST_TEST((sut == sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_meter_id_is_equal)
+      {
+        BOOST_TEST((instructions::meter{2} == instructions::meter{2}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_meter_id_is_not_equal)
+      {
+        BOOST_TEST((instructions::meter{3} != instructions::meter{4}));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = instructions::meter{1};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_meter_id_is_equal)
+      {
+        BOOST_TEST(equivalent(instructions::meter{2}, instructions::meter{2}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_meter_id_is_not_equal)
+      {
+        BOOST_TEST(!equivalent(instructions::meter{3}, instructions::meter{4}));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(encode_test, meter_fixture)
     {
