@@ -6,6 +6,7 @@
 #include <type_traits>
 #include <utility>
 #include <boost/mpl/contains.hpp>
+#include <boost/mpl/size.hpp>
 #include <boost/operators.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/get.hpp>
@@ -34,6 +35,9 @@ namespace detail {
         >::type;
 
     public:
+        static constexpr std::size_t number_of_types
+            = boost::mpl::size<action_type_list>::type::value;
+
         template <
               class Action
             , typename std::enable_if<
@@ -70,6 +74,12 @@ namespace detail {
         {
             auto visitor = detail::length_visitor{};
             return boost::apply_visitor(visitor, variant_);
+        }
+
+        auto index() const noexcept
+            -> std::size_t
+        {
+            return variant_.which();
         }
 
         template <class Container>
