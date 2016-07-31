@@ -121,9 +121,7 @@ BOOST_AUTO_TEST_SUITE(max_rate_test)
         auto const max_rate = queue_props::max_rate::decode(it, it_end);
 
         BOOST_TEST((it == it_end));
-        BOOST_TEST(max_rate.property() == sut.property());
-        BOOST_TEST(max_rate.length() == sut.length());
-        BOOST_TEST(max_rate.rate() == sut.rate());
+        BOOST_TEST((max_rate == sut));
     }
 
 BOOST_AUTO_TEST_SUITE_END() // max_rate_test

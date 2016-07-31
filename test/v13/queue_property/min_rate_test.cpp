@@ -121,9 +121,7 @@ BOOST_AUTO_TEST_SUITE(min_rate_test)
         auto const min_rate = queue_props::min_rate::decode(it, it_end);
 
         BOOST_TEST((it == it_end));
-        BOOST_TEST(min_rate.property() == sut.property());
-        BOOST_TEST(min_rate.length() == sut.length());
-        BOOST_TEST(min_rate.rate() == sut.rate());
+        BOOST_TEST((min_rate == sut));
     }
 
 BOOST_AUTO_TEST_SUITE_END() // min_rate_test
