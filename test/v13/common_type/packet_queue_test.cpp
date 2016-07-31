@@ -108,6 +108,209 @@ BOOST_AUTO_TEST_SUITE(packet_queue_test)
         BOOST_TEST(src.properties().size() == 0);
     }
 
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = v13::packet_queue{0, 1, {
+            v13::any_queue_property{queue_props::min_rate{0}}
+          , v13::any_queue_property{queue_props::max_rate{0}}
+        }};
+
+        BOOST_TEST((sut == sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_queue_id_and_properties_are_equal)
+      {
+        auto const queue_id = of::queue_id{1, 2};
+        auto const properties = {
+            v13::any_queue_property{queue_props::min_rate{1}}
+          , v13::any_queue_property{queue_props::max_rate{2}}
+        };
+
+        BOOST_TEST(
+            (v13::packet_queue{queue_id, properties}
+             == v13::packet_queue{queue_id, properties}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_both_properties_are_empty)
+      {
+        auto const queue_id = of::queue_id{1, 2};
+
+        BOOST_TEST(
+            (v13::packet_queue{queue_id, {}} == v13::packet_queue{queue_id, {}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_queue_id_is_not_equal)
+      {
+        auto const port_no = std::uint32_t{32};
+        auto const properties = {
+            v13::any_queue_property{queue_props::min_rate{2}}
+          , v13::any_queue_property{queue_props::max_rate{3}}
+        };
+
+        BOOST_TEST(
+            (v13::packet_queue{1, port_no, properties}
+             != v13::packet_queue{2, port_no, properties}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_port_no_is_not_equal)
+      {
+        auto const queue_id = std::uint32_t{2};
+        auto const properties = {
+            v13::any_queue_property{queue_props::min_rate{2}}
+          , v13::any_queue_property{queue_props::max_rate{3}}
+        };
+
+        BOOST_TEST(
+            (v13::packet_queue{queue_id, 1, properties}
+             != v13::packet_queue{queue_id, 2, properties}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_properties_value_is_not_equal)
+      {
+        auto const queue_id = of::queue_id{1, 2};
+        auto const min_rate
+          = v13::any_queue_property{queue_props::min_rate{2}};
+        auto const max_rate1
+          = v13::any_queue_property{queue_props::max_rate{1}};
+        auto const max_rate2
+          = v13::any_queue_property{queue_props::max_rate{2}};
+
+        BOOST_TEST(
+            (v13::packet_queue{queue_id, { min_rate, max_rate1 }}
+             != v13::packet_queue{queue_id, { min_rate, max_rate2 }}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_properties_size_is_not_equal)
+      {
+        auto const queue_id = of::queue_id{1, 2};
+        auto const min_rate
+          = v13::any_queue_property{queue_props::min_rate{2}};
+        auto const max_rate
+          = v13::any_queue_property{queue_props::max_rate{3}};
+
+        BOOST_TEST(
+            (v13::packet_queue{queue_id, { min_rate, max_rate }}
+             != v13::packet_queue{queue_id, { min_rate }}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_properties_is_not_equal_but_equivalent)
+      {
+        auto const queue_id = of::queue_id{1, 2};
+        auto const zero_pad_min_rate
+          = v13::any_queue_property{queue_props::min_rate{0x234}};
+        auto const binary
+          = "\x00\x01\x00\x10\x00\x00\x00\x00""\x02\x34\x00\x00\x00\x00\x00\x01"
+            ""_bin;
+        auto it = binary.begin();
+        auto const nonzero_pad_min_rate = v13::any_queue_property{
+          queue_props::min_rate::decode(it, binary.end())
+        };
+
+        BOOST_TEST(
+            (v13::packet_queue{queue_id, { zero_pad_min_rate }}
+             != v13::packet_queue{queue_id, { nonzero_pad_min_rate }}));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = v13::packet_queue{0, 1, {
+            v13::any_queue_property{queue_props::min_rate{0}}
+          , v13::any_queue_property{queue_props::max_rate{0}}
+        }};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_queue_id_and_properties_are_equal)
+      {
+        auto const queue_id = of::queue_id{1, 2};
+        auto const properties = {
+            v13::any_queue_property{queue_props::min_rate{1}}
+          , v13::any_queue_property{queue_props::max_rate{2}}
+        };
+
+        BOOST_TEST(
+            equivalent(
+                v13::packet_queue{queue_id, properties}
+              , v13::packet_queue{queue_id, properties}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_both_properties_are_empty)
+      {
+        auto const queue_id = of::queue_id{1, 2};
+
+        BOOST_TEST(
+            equivalent(
+              v13::packet_queue{queue_id, {}}, v13::packet_queue{queue_id, {}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_queue_id_is_not_equal)
+      {
+        auto const port_no = std::uint32_t{32};
+        auto const properties = {
+            v13::any_queue_property{queue_props::min_rate{2}}
+          , v13::any_queue_property{queue_props::max_rate{3}}
+        };
+
+        BOOST_TEST(
+            !equivalent(
+                v13::packet_queue{1, port_no, properties}
+              , v13::packet_queue{2, port_no, properties}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_port_no_is_not_equal)
+      {
+        auto const queue_id = std::uint32_t{2};
+        auto const properties = {
+            v13::any_queue_property{queue_props::min_rate{2}}
+          , v13::any_queue_property{queue_props::max_rate{3}}
+        };
+
+        BOOST_TEST(
+            !equivalent(
+                v13::packet_queue{queue_id, 1, properties}
+              , v13::packet_queue{queue_id, 2, properties}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_properties_value_is_not_equal)
+      {
+        auto const queue_id = of::queue_id{1, 2};
+        auto const min_rate
+          = v13::any_queue_property{queue_props::min_rate{2}};
+        auto const max_rate1
+          = v13::any_queue_property{queue_props::max_rate{1}};
+        auto const max_rate2
+          = v13::any_queue_property{queue_props::max_rate{2}};
+
+        BOOST_TEST(
+            !equivalent(
+                v13::packet_queue{queue_id, { min_rate, max_rate1 }}
+              , v13::packet_queue{queue_id, { min_rate, max_rate2 }}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_properties_size_is_not_equal)
+      {
+        auto const queue_id = of::queue_id{1, 2};
+        auto const min_rate
+          = v13::any_queue_property{queue_props::min_rate{2}};
+        auto const max_rate
+          = v13::any_queue_property{queue_props::max_rate{3}};
+
+        BOOST_TEST(
+            !equivalent(
+                v13::packet_queue{queue_id, { min_rate, max_rate }}
+              , v13::packet_queue{queue_id, { min_rate }}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_properties_is_not_equal_but_equivalent)
+      {
+        auto const queue_id = of::queue_id{1, 2};
+        auto const zero_pad_min_rate
+          = v13::any_queue_property{queue_props::min_rate{0x234}};
+        auto const binary
+          = "\x00\x01\x00\x10\x00\x00\x00\x00""\x02\x34\x00\x00\x00\x00\x00\x01"
+            ""_bin;
+        auto it = binary.begin();
+        auto const nonzero_pad_min_rate = v13::any_queue_property{
+          queue_props::min_rate::decode(it, binary.end())
+        };
+
+        BOOST_TEST(
+            equivalent(
+                v13::packet_queue{queue_id, { zero_pad_min_rate }}
+              , v13::packet_queue{queue_id, { nonzero_pad_min_rate }}));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
+
     BOOST_FIXTURE_TEST_CASE(encode_test, packet_queue_fixture)
     {
         auto buffer = std::vector<std::uint8_t>{};
