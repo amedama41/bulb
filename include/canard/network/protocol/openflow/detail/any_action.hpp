@@ -143,6 +143,20 @@ namespace detail {
             return false;
         }
 
+        template <class Action, class = containable_if_t<Action>>
+        friend auto operator!=(any_action const& lhs, Action const& rhs)
+            -> bool
+        {
+            return !(lhs == rhs);
+        }
+
+        template <class Action, class = containable_if_t<Action>>
+        friend auto operator!=(Action const& lhs, any_action const& rhs)
+            -> bool
+        {
+            return !(lhs == rhs);
+        }
+
         friend auto equivalent(
                 any_action const& lhs, any_action const& rhs) noexcept
             -> bool

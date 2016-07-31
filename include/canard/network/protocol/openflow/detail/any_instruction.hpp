@@ -151,6 +151,22 @@ namespace detail {
             return false;
         }
 
+        template <class Instruction, class = containable_if_t<Instruction>>
+        friend auto operator!=(
+                any_instruction const& lhs, Instruction const& rhs)
+            -> bool
+        {
+            return !(lhs == rhs);
+        }
+
+        template <class Instruction, class = containable_if_t<Instruction>>
+        friend auto operator!=(
+                Instruction const& lhs, any_instruction const& rhs)
+            -> bool
+        {
+            return !(lhs == rhs);
+        }
+
         friend auto equivalent(
                 any_instruction const& lhs, any_instruction const& rhs) noexcept
             -> bool
