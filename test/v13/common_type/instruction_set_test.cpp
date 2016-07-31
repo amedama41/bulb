@@ -365,7 +365,7 @@ BOOST_AUTO_TEST_SUITE(instruction_set_test)
         auto const result = sut.assign(write_metadata);
 
         BOOST_TEST(!result.second);
-        BOOST_TEST((*result.first != write_metadata));
+        BOOST_TEST((result.first == sut.end()));
         BOOST_TEST(sut.size() == before_size);
         BOOST_TEST(sut.length() == before_length);
         BOOST_TEST(!(sut.find<instructions::write_metadata>()));
