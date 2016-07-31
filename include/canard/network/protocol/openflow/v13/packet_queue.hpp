@@ -8,10 +8,13 @@
 #include <stdexcept>
 #include <utility>
 #include <vector>
+#include <boost/operators.hpp>
+#include <boost/range/algorithm/equal.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/numeric.hpp>
 #include <canard/network/protocol/openflow/detail/decode.hpp>
 #include <canard/network/protocol/openflow/detail/encode.hpp>
+#include <canard/network/protocol/openflow/detail/memcmp.hpp>
 #include <canard/network/protocol/openflow/queue_id.hpp>
 #include <canard/network/protocol/openflow/v13/any_queue_property.hpp>
 #include <canard/network/protocol/openflow/v13/detail/byteorder.hpp>
@@ -23,6 +26,7 @@ namespace openflow {
 namespace v13 {
 
     class packet_queue
+        : private boost::equality_comparable<packet_queue>
     {
         static constexpr std::size_t base_packet_queue_size
             = sizeof(v13_detail::ofp_packet_queue);
@@ -151,6 +155,13 @@ namespace v13 {
             return packet_queue{pkt_queue, std::move(properties)};
         }
 
+        friend auto operator==(packet_queue const& lhs, packet_queue const& rhs)
+            -> bool
+        {
+            return detail::memcmp(lhs.packet_queue_, rhs.packet_queue_)
+                && lhs.properties() == rhs.properties();
+        }
+
     private:
         packet_queue(v13_detail::ofp_packet_queue const& pkt_queue
                    , properties_type&& properties)
@@ -178,6 +189,19 @@ namespace v13 {
         v13_detail::ofp_packet_queue packet_queue_;
         properties_type properties_;
     };
+
+    inline auto equivalent(
+            packet_queue const& lhs, packet_queue const& rhs) noexcept
+        -> bool
+    {
+        using const_reference = packet_queue::properties_type::const_reference;
+        return lhs.queue_id() == rhs.queue_id()
+            && lhs.port_no() == rhs.port_no()
+            && boost::equal(
+                      lhs.properties(), rhs.properties()
+                    , [](const_reference lhs_prop, const_reference rhs_prop)
+                      { return equivalent(lhs_prop, rhs_prop); });
+    }
 
 } // namespace v13
 } // namespace openflow
