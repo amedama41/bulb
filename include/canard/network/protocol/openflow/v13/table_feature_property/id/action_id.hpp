@@ -81,6 +81,12 @@ namespace v13 {
         return lhs.type() == rhs.type();
     }
 
+    inline auto equivalent(action_id const& lhs, action_id const& rhs) noexcept
+        -> bool
+    {
+        return lhs.type() == rhs.type();
+    }
+
 
     class action_experimenter_id
         : private boost::equality_comparable<action_experimenter_id>
@@ -178,6 +184,15 @@ namespace v13 {
     };
 
     inline auto operator==(
+              action_experimenter_id const& lhs
+            , action_experimenter_id const& rhs) noexcept
+        -> bool
+    {
+        return lhs.experimenter() == rhs.experimenter()
+            && lhs.data() == rhs.data();
+    }
+
+    inline auto equivalent(
               action_experimenter_id const& lhs
             , action_experimenter_id const& rhs) noexcept
         -> bool

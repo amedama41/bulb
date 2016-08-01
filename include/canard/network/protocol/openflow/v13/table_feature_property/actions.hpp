@@ -10,6 +10,7 @@
 #include <vector>
 #include <boost/operators.hpp>
 #include <boost/range/numeric.hpp>
+#include <boost/range/algorithm/find_if.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <canard/network/protocol/openflow/detail/decode.hpp>
 #include <canard/network/protocol/openflow/detail/encode.hpp>
@@ -175,7 +176,30 @@ namespace table_feature_properties {
                 basic_prop_actions const& lhs, basic_prop_actions const& rhs)
             -> bool
         {
-            return lhs.action_ids_ == rhs.action_ids_;
+            return lhs.action_ids() == rhs.action_ids();
+        }
+
+        friend auto equivalent(
+                  basic_prop_actions const& lhs
+                , basic_prop_actions const& rhs) noexcept
+            -> bool
+        {
+            auto const& lhs_action_ids = lhs.action_ids();
+            auto const& rhs_action_ids = rhs.action_ids();
+            if (lhs_action_ids.size() != rhs_action_ids.size()) {
+                return false;
+            }
+            for (auto const& lhs_id : lhs_action_ids) {
+                using const_reference = action_id_container::const_reference;
+                if (boost::find_if(
+                              rhs_action_ids
+                            , [&lhs_id](const_reference rhs_id)
+                              { return equivalent(lhs_id, rhs_id); })
+                        == rhs_action_ids.end()) {
+                    return false;
+                }
+            }
+            return true;
         }
 
     private:
