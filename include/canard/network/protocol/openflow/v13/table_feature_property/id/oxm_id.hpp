@@ -102,6 +102,12 @@ namespace v13 {
         return lhs.oxm_header() == rhs.oxm_header();
     }
 
+    inline auto equivalent(oxm_id const& lhs, oxm_id const& rhs) noexcept
+        -> bool
+    {
+        return lhs.oxm_header() == rhs.oxm_header();
+    }
+
 
     class oxm_experimenter_id
         : private boost::equality_comparable<oxm_experimenter_id>
@@ -200,6 +206,15 @@ namespace v13 {
     };
 
     inline auto operator==(
+              oxm_experimenter_id const& lhs
+            , oxm_experimenter_id const& rhs) noexcept
+        -> bool
+    {
+        return lhs.oxm_header() == rhs.oxm_header()
+            && lhs.experimenter() == rhs.experimenter();
+    }
+
+    inline auto equivalent(
               oxm_experimenter_id const& lhs
             , oxm_experimenter_id const& rhs) noexcept
         -> bool
