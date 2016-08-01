@@ -3,11 +3,15 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <array>
 #include <initializer_list>
 #include <iterator>
+#include <limits>
 #include <utility>
 #include <vector>
+#include <boost/algorithm/cxx11/all_of.hpp>
 #include <boost/operators.hpp>
+#include <boost/range/algorithm/for_each.hpp>
 #include <canard/network/protocol/openflow/detail/decode.hpp>
 #include <canard/network/protocol/openflow/detail/encode.hpp>
 #include <canard/network/protocol/openflow/detail/padding.hpp>
@@ -157,6 +161,26 @@ namespace table_feature_properties {
             -> bool
         {
             return lhs.next_table_ids_ == rhs.next_table_ids_;
+        }
+
+        friend auto equivalent(
+                  basic_prop_next_tables const& lhs
+                , basic_prop_next_tables const& rhs) noexcept
+            -> bool
+        {
+            if (lhs.next_table_ids().size() != rhs.next_table_ids().size()) {
+                return false;
+            }
+            using value_type = next_table_id_container::value_type;
+            constexpr auto array_size
+                = std::size_t{std::numeric_limits<value_type>::max() + 1};
+            auto bitmap = std::array<bool, array_size>{};
+            boost::for_each(
+                      lhs.next_table_ids()
+                    , [&bitmap](value_type id) { bitmap[id] = true; });
+            return boost::algorithm::all_of(
+                      rhs.next_table_ids()
+                    , [&bitmap](value_type id) { return bitmap[id]; });
         }
 
     private:
