@@ -143,60 +143,187 @@ BOOST_AUTO_TEST_SUITE(instructions_test)
         BOOST_TEST(src.instruction_ids().empty());
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
         auto const sut = table_feature_properties::instructions{
-              v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
-            , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
-            , v13::instruction_experimenter_id{0x12345678}
+            v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
+          , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
+          , v13::instruction_experimenter_id{0x12345678}
         };
-        auto const diff_order = table_feature_properties::instructions{
-              v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
-            , v13::instruction_experimenter_id{0x12345678}
-            , v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
-        };
-        auto const diff_value = table_feature_properties::instructions{
-              v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
-            , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
-            , v13::instruction_experimenter_id{0x87654321}
-        };
-        auto const diff_type = table_feature_properties::instructions{
-              v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
-            , v13::instruction_id{protocol::OFPIT_APPLY_ACTIONS}
-            , v13::instruction_experimenter_id{0x12345678}
-        };
-        auto const diff_num1 = table_feature_properties::instructions{
-              v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
-            , v13::instruction_experimenter_id{0x12345678}
-        };
-        auto const diff_num2 = table_feature_properties::instructions{
-              v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
-            , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
-        };
-        auto const diff_num3 = table_feature_properties::instructions{
-              v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
-            , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
-            , v13::instruction_experimenter_id{0x12345678}
-            , v13::instruction_id{protocol::OFPIT_CLEAR_ACTIONS}
-        };
-        auto const diff_num4 = table_feature_properties::instructions{
-              v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
-            , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
-            , v13::instruction_experimenter_id{0x12345678}
-            , v13::instruction_experimenter_id{0x87654321}
-        };
-        auto const empty = table_feature_properties::instructions{};
 
         BOOST_TEST((sut == sut));
-        BOOST_TEST((sut != diff_order));
-        BOOST_TEST((sut != diff_value));
-        BOOST_TEST((sut != diff_type));
-        BOOST_TEST((sut != diff_num1));
-        BOOST_TEST((sut != diff_num2));
-        BOOST_TEST((sut != diff_num3));
-        BOOST_TEST((sut != diff_num4));
-        BOOST_TEST((sut != empty));
-    }
+      }
+      BOOST_AUTO_TEST_CASE(true_if_instruction_ids_are_equal)
+      {
+        BOOST_TEST(
+            (table_feature_properties::instructions{
+                v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
+              , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
+              , v13::instruction_experimenter_id{0x12345678}
+             }
+             == table_feature_properties::instructions{
+                v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
+              , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
+              , v13::instruction_experimenter_id{0x12345678}
+             }));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_both_instruction_ids_are_emtpy)
+      {
+        BOOST_TEST(
+            (table_feature_properties::instructions{}
+             == table_feature_properties::instructions{}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_instruction_id_value_is_not_equal)
+      {
+        BOOST_TEST(
+            (table_feature_properties::instructions{
+                v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
+              , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
+              , v13::instruction_experimenter_id{0x12345678}
+             }
+             != table_feature_properties::instructions{
+                v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
+              , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
+              , v13::instruction_experimenter_id{0x87654321}
+             }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_instruction_id_type_is_not_equal)
+      {
+        BOOST_TEST(
+            (table_feature_properties::instructions{
+                v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
+              , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
+              , v13::instruction_experimenter_id{0x12345678}
+            }
+            != table_feature_properties::instructions{
+                v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
+              , v13::instruction_id{protocol::OFPIT_APPLY_ACTIONS}
+              , v13::instruction_experimenter_id{0x12345678}
+            }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_instruction_id_order_is_not_equal)
+      {
+        BOOST_TEST(
+           (table_feature_properties::instructions{
+                v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
+              , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
+              , v13::instruction_experimenter_id{0x12345678}
+            }
+            != table_feature_properties::instructions{
+                v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
+              , v13::instruction_experimenter_id{0x12345678}
+              , v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
+            }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_instruction_id_number_is_not_equal)
+      {
+        BOOST_TEST(
+            (table_feature_properties::instructions{
+                v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
+              , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
+              , v13::instruction_experimenter_id{0x12345678}
+            }
+            != table_feature_properties::instructions{
+                v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
+              , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
+            }));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = table_feature_properties::instructions{
+            v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
+          , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
+          , v13::instruction_experimenter_id{0x12345678}
+        };
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_instruction_ids_are_equal)
+      {
+        BOOST_TEST(
+            equivalent(
+                table_feature_properties::instructions{
+                    v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
+                  , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
+                  , v13::instruction_experimenter_id{0x12345678}
+                }
+              , table_feature_properties::instructions{
+                    v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
+                  , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
+                  , v13::instruction_experimenter_id{0x12345678}
+                }));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_both_instruction_ids_are_emtpy)
+      {
+        BOOST_TEST(
+            equivalent(
+                table_feature_properties::instructions{}
+              , table_feature_properties::instructions{}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_instruction_id_value_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                table_feature_properties::instructions{
+                    v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
+                  , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
+                  , v13::instruction_experimenter_id{0x12345678}
+                }
+              , table_feature_properties::instructions{
+                    v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
+                  , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
+                  , v13::instruction_experimenter_id{0x87654321}
+                }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_instruction_id_type_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                table_feature_properties::instructions{
+                    v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
+                  , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
+                  , v13::instruction_experimenter_id{0x12345678}
+                }
+              , table_feature_properties::instructions{
+                    v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
+                  , v13::instruction_id{protocol::OFPIT_APPLY_ACTIONS}
+                  , v13::instruction_experimenter_id{0x12345678}
+                }));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_instruction_id_order_is_not_equal)
+      {
+        BOOST_TEST(
+            equivalent(
+                table_feature_properties::instructions{
+                    v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
+                  , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
+                  , v13::instruction_experimenter_id{0x12345678}
+                }
+              , table_feature_properties::instructions{
+                    v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
+                  , v13::instruction_experimenter_id{0x12345678}
+                  , v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
+                }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_instruction_id_number_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                table_feature_properties::instructions{
+                    v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
+                  , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
+                  , v13::instruction_experimenter_id{0x12345678}
+                }
+              , table_feature_properties::instructions{
+                    v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
+                  , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
+                }));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(encode_test, instructions_fixture)
     {
