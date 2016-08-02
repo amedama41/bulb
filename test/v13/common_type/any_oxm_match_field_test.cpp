@@ -192,20 +192,75 @@ BOOST_AUTO_TEST_SUITE(any_oxm_match_field_test)
         BOOST_TEST((v13::any_cast<match::ipv6_src>(sut) == field2));
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
         auto const sut = v13::any_oxm_match_field{match::tcp_src{1}};
-        auto const same_value = v13::any_oxm_match_field{match::tcp_src{1}};
-        auto const diff_value = v13::any_oxm_match_field{match::tcp_src{2}};
-        auto const has_mask = v13::any_oxm_match_field{match::tcp_src{1, 1}};
-        auto const diff_type = v13::any_oxm_match_field{match::udp_dst{1}};
 
         BOOST_TEST((sut == sut));
-        BOOST_TEST((sut == same_value));
-        BOOST_TEST((sut != diff_value));
-        BOOST_TEST((sut != has_mask));
-        BOOST_TEST((sut != diff_type));
-    }
+      }
+      BOOST_AUTO_TEST_CASE(true_if_oxm_match_field_is_equal)
+      {
+        BOOST_TEST(
+            (v13::any_oxm_match_field{match::tcp_src{1}}
+             == v13::any_oxm_match_field{match::tcp_src{1}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_oxm_match_field_is_not_equal)
+      {
+        BOOST_TEST(
+            (v13::any_oxm_match_field{match::tcp_src{1}}
+             != v13::any_oxm_match_field{match::tcp_src{1, 1}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_oxm_match_field_is_not_equal_but_equivalent)
+      {
+        BOOST_TEST(
+            (v13::any_oxm_match_field{match::tcp_src{1}}
+             != v13::any_oxm_match_field{match::tcp_src{1, 0xffff}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_oxm_type_is_not_equal)
+      {
+        BOOST_TEST(
+            (v13::any_oxm_match_field{match::tcp_src{1}}
+             != v13::any_oxm_match_field{match::udp_src{1}}));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = v13::any_oxm_match_field{match::tcp_src{1}};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_oxm_match_field_is_equal)
+      {
+        BOOST_TEST(
+            equivalent(
+                v13::any_oxm_match_field{match::tcp_src{1}}
+              , v13::any_oxm_match_field{match::tcp_src{1}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_oxm_match_field_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                v13::any_oxm_match_field{match::tcp_src{1}}
+              , v13::any_oxm_match_field{match::tcp_src{1, 1}}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_oxm_match_field_is_not_equal_but_equivalent)
+      {
+        BOOST_TEST(
+            equivalent(
+                v13::any_oxm_match_field{match::tcp_src{1}}
+              , v13::any_oxm_match_field{match::tcp_src{1, 0xffff}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_oxm_type_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                v13::any_oxm_match_field{match::tcp_src{1}}
+              , v13::any_oxm_match_field{match::udp_src{1}}));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_DATA_TEST_CASE(
               encode_test
