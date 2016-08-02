@@ -138,6 +138,11 @@ namespace v13 {
                 any_oxm_match_field const& lhs, any_oxm_match_field const& rhs)
             -> bool;
 
+        friend auto equivalent(
+                  any_oxm_match_field const& lhs
+                , any_oxm_match_field const& rhs) noexcept
+            -> bool;
+
         template <class T>
         friend auto any_cast(any_oxm_match_field const& field)
             -> T const&;
@@ -155,6 +160,15 @@ namespace v13 {
         -> bool
     {
         return lhs.variant_ == rhs.variant_;
+    }
+
+    inline auto equivalent(
+              any_oxm_match_field const& lhs
+            , any_oxm_match_field const& rhs) noexcept
+        -> bool
+    {
+        auto visitor = detail::equivalent_visitor{};
+        return boost::apply_visitor(visitor, lhs.variant_, rhs.variant_);
     }
 
     template <class T>
