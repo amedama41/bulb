@@ -12,6 +12,7 @@
 #include <utility>
 #include <boost/operators.hpp>
 #include <boost/optional/optional.hpp>
+#include <boost/range/algorithm/equal.hpp>
 #include <boost/range/algorithm/fill.hpp>
 #include <boost/range/algorithm/find_if.hpp>
 #include <boost/range/algorithm/lower_bound.hpp>
@@ -325,6 +326,15 @@ namespace v13 {
             -> bool
         {
             return lhs.to_list() == rhs.to_list();
+        }
+
+        friend auto equivalent(action_set const& lhs, action_set const& rhs)
+            -> bool
+        {
+            return boost::equal(
+                      lhs, rhs
+                    , [](const_reference lhs_action, const_reference rhs_action)
+                      { return equivalent(lhs_action, rhs_action); });
         }
 
         static auto is_action_set(action_list const& actions)
