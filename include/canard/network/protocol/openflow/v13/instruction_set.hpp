@@ -12,6 +12,7 @@
 #include <boost/optional/optional.hpp>
 #include <boost/range/adaptor/map.hpp>
 #include <boost/range/adaptor/transformed.hpp>
+#include <boost/range/algorithm/equal.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/iterator.hpp>
 #include <boost/range/numeric.hpp>
@@ -248,6 +249,16 @@ namespace v13 {
             -> bool
         {
             return lhs.instructions_ == rhs.instructions_;
+        }
+
+        friend auto equivalent(
+                instruction_set const& lhs, instruction_set const& rhs) noexcept
+            -> bool
+        {
+            return boost::equal(
+                      lhs, rhs
+                    , [](const_reference lhs_inst, const_reference rhs_inst)
+                      { return equivalent(lhs_inst, rhs_inst); });
         }
 
     private:
