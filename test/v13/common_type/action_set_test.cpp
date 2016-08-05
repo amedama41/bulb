@@ -148,48 +148,197 @@ BOOST_AUTO_TEST_SUITE(action_set_test)
         BOOST_TEST((sut.get<actions::set_ipv4_src>() == set_ipv4_src));
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
         auto const sut = v13::action_set{
-              actions::pop_mpls::ipv4()
-            , actions::set_eth_type{0x0800}
-            , actions::set_sctp_dst{6653}
+            actions::pop_mpls::ipv4()
+          , actions::set_eth_type{0x0800}
+          , actions::set_sctp_dst{6653}
         };
-        auto const diff_order = v13::action_set{
-              actions::set_sctp_dst{6653}
-            , actions::set_eth_type{0x0800}
-            , actions::pop_mpls::ipv4()
-        };
-        auto const diff_types = v13::action_set{
-              actions::pop_pbb{}
-            , actions::set_eth_type{0x0800}
-            , actions::set_sctp_src{6653}
-        };
-        auto const diff_value = v13::action_set{
-              actions::pop_mpls::unicast()
-            , actions::set_eth_type{0x8100}
-            , actions::set_sctp_dst{6633}
-        };
-        auto const less_size = v13::action_set{
-              actions::pop_mpls::ipv4()
-            , actions::set_eth_type{0x0800}
-        };
-        auto const grater_size = v13::action_set{
-              actions::pop_mpls::ipv4()
-            , actions::set_eth_type{0x0800}
-            , actions::set_sctp_dst{6653}
-            , actions::output::to_controller()
-        };
-        auto const empty = v13::action_set{};
 
         BOOST_TEST((sut == sut));
-        BOOST_TEST((sut == diff_order));
-        BOOST_TEST((sut != diff_types));
-        BOOST_TEST((sut != diff_value));
-        BOOST_TEST((sut != less_size));
-        BOOST_TEST((sut != grater_size));
-        BOOST_TEST((sut != empty));
-    }
+      }
+      BOOST_AUTO_TEST_CASE(true_if_actions_are_equal)
+      {
+        BOOST_TEST(
+            (v13::action_set{
+               actions::pop_mpls::ipv4(), actions::set_eth_type{0x0800}
+             , actions::set_sctp_dst{6653}
+             }
+             == v13::action_set{
+               actions::pop_mpls::ipv4(), actions::set_eth_type{0x0800}
+             , actions::set_sctp_dst{6653}
+             }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_action_value_is_not_equal)
+      {
+        BOOST_TEST(
+            (v13::action_set{
+               actions::pop_mpls::ipv4(), actions::set_eth_type{0x0800}
+             , actions::set_sctp_dst{6653}
+             }
+             != v13::action_set{
+               actions::pop_mpls::ipv4(), actions::set_eth_type{0x8100}
+             , actions::set_sctp_dst{6653}
+             }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_action_is_not_equal_but_equivalent)
+      {
+        auto const binary = "\x00\x14\x00\x08\x08\x00\x00\x01"_bin;
+        auto it = binary.begin();
+        auto const equivalent_pop_mpls
+          = actions::pop_mpls::decode(it, binary.end());
+
+        BOOST_TEST(
+            (v13::action_set{
+               actions::pop_mpls::ipv4(), actions::set_eth_type{0x0800}
+             , actions::set_sctp_dst{6653}
+             }
+             != v13::action_set{
+               equivalent_pop_mpls, actions::set_eth_type{0x0800}
+             , actions::set_sctp_dst{6653}
+             }));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_both_actions_are_empty)
+      {
+        BOOST_TEST((v13::action_set{} == v13::action_set{}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_action_order_is_not_equal)
+      {
+        BOOST_TEST(
+            (v13::action_set{
+               actions::pop_mpls::ipv4(), actions::set_eth_type{0x0800}
+             , actions::set_sctp_dst{6653}
+             }
+             == v13::action_set{
+               actions::set_sctp_dst{6653}, actions::pop_mpls::ipv4()
+             , actions::set_eth_type{0x0800}
+             }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_action_type_is_not_equal)
+      {
+        BOOST_TEST(
+            (v13::action_set{
+               actions::pop_mpls::ipv4(), actions::set_eth_type{0x0800}
+             , actions::set_sctp_dst{6653}
+             }
+             != v13::action_set{
+               actions::pop_mpls::ipv4(), actions::set_eth_type{0x0800}
+             , actions::set_sctp_src{6653}
+             }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_action_number_is_not_equal)
+      {
+        BOOST_TEST(
+            (v13::action_set{
+               actions::pop_mpls::ipv4(), actions::set_eth_type{0x0800}
+             , actions::set_sctp_dst{6653}
+             }
+             != v13::action_set{
+               actions::pop_mpls::ipv4(), actions::set_eth_type{0x0800}
+             }));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = v13::action_set{
+            actions::pop_mpls::ipv4()
+          , actions::set_eth_type{0x0800}
+          , actions::set_sctp_dst{6653}
+        };
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_actions_are_equal)
+      {
+        BOOST_TEST(
+            equivalent(
+                v13::action_set{
+                  actions::pop_mpls::ipv4(), actions::set_eth_type{0x0800}
+                , actions::set_sctp_dst{6653}
+                }
+              , v13::action_set{
+                  actions::pop_mpls::ipv4(), actions::set_eth_type{0x0800}
+                , actions::set_sctp_dst{6653}
+                }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_action_value_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                v13::action_set{
+                  actions::pop_mpls::ipv4(), actions::set_eth_type{0x0800}
+                , actions::set_sctp_dst{6653}
+                }
+              , v13::action_set{
+                  actions::pop_mpls::ipv4(), actions::set_eth_type{0x8100}
+                , actions::set_sctp_dst{6653}
+                }));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_action_is_not_equal_but_equivalent)
+      {
+        auto const binary = "\x00\x14\x00\x08\x08\x00\x00\x01"_bin;
+        auto it = binary.begin();
+        auto const equivalent_pop_mpls
+          = actions::pop_mpls::decode(it, binary.end());
+
+        BOOST_TEST(
+            equivalent(
+                v13::action_set{
+                  actions::pop_mpls::ipv4(), actions::set_eth_type{0x0800}
+                , actions::set_sctp_dst{6653}
+                }
+              , v13::action_set{
+                  equivalent_pop_mpls, actions::set_eth_type{0x0800}
+                , actions::set_sctp_dst{6653}
+                }));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_both_actions_are_empty)
+      {
+        BOOST_TEST(equivalent(v13::action_set{}, v13::action_set{}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_action_order_is_not_equal)
+      {
+        BOOST_TEST(
+            equivalent(
+                v13::action_set{
+                  actions::pop_mpls::ipv4(), actions::set_eth_type{0x0800}
+                , actions::set_sctp_dst{6653}
+                }
+              , v13::action_set{
+                  actions::set_sctp_dst{6653}, actions::pop_mpls::ipv4()
+                , actions::set_eth_type{0x0800}
+                }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_action_type_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                v13::action_set{
+                  actions::pop_mpls::ipv4(), actions::set_eth_type{0x0800}
+                , actions::set_sctp_dst{6653}
+                }
+              , v13::action_set{
+                  actions::pop_mpls::ipv4(), actions::set_eth_type{0x0800}
+                , actions::set_sctp_src{6653}
+                }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_action_number_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                v13::action_set{
+                  actions::pop_mpls::ipv4(), actions::set_eth_type{0x0800}
+                , actions::set_sctp_dst{6653}
+                }
+              , v13::action_set{
+                  actions::pop_mpls::ipv4(), actions::set_eth_type{0x0800}
+                }));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(insert_new_action_test, action_set_fixture)
     {

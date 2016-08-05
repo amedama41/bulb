@@ -45,6 +45,64 @@ BOOST_AUTO_TEST_SUITE(min_rate_test)
         BOOST_TEST(sut.rate() == rate);
     }
 
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = queue_props::min_rate{1};
+
+        BOOST_TEST((sut == sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_rate_is_equal)
+      {
+        BOOST_TEST((queue_props::min_rate{2} == queue_props::min_rate{2}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_rate_is_not_equal)
+      {
+        BOOST_TEST((queue_props::min_rate{3} != queue_props::min_rate{4}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_pad_is_not_equal)
+      {
+        auto const binary
+          = "\x00\x01\x00\x10\x00\x00\x00\x00""\x02\x34\x00\x00\x00\x00\x00\x01"
+            ""_bin;
+        auto it = binary.begin();
+        auto const nonzero_pad
+          = queue_props::min_rate::decode(it, binary.end());
+
+        BOOST_TEST((queue_props::min_rate{0x234} != nonzero_pad));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = queue_props::min_rate{1};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_rate_is_equal)
+      {
+        BOOST_TEST(
+            equivalent(queue_props::min_rate{2}, queue_props::min_rate{2}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_rate_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(queue_props::min_rate{3}, queue_props::min_rate{4}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_pad_is_not_equal)
+      {
+        auto const binary
+          = "\x00\x01\x00\x10\x00\x00\x00\x00""\x02\x34\x00\x00\x00\x00\x00\x01"
+            ""_bin;
+        auto it = binary.begin();
+        auto const nonzero_pad
+          = queue_props::min_rate::decode(it, binary.end());
+
+        BOOST_TEST(equivalent(queue_props::min_rate{0x234}, nonzero_pad));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
+
     BOOST_FIXTURE_TEST_CASE(encode_test, min_rate_fixture)
     {
         auto buffer = std::vector<std::uint8_t>{};
@@ -63,9 +121,7 @@ BOOST_AUTO_TEST_SUITE(min_rate_test)
         auto const min_rate = queue_props::min_rate::decode(it, it_end);
 
         BOOST_TEST((it == it_end));
-        BOOST_TEST(min_rate.property() == sut.property());
-        BOOST_TEST(min_rate.length() == sut.length());
-        BOOST_TEST(min_rate.rate() == sut.rate());
+        BOOST_TEST((min_rate == sut));
     }
 
 BOOST_AUTO_TEST_SUITE_END() // min_rate_test

@@ -64,6 +64,21 @@ namespace v13 {
         {
         }
 
+        bucket(std::uint16_t const weight
+             , std::uint32_t const watch_port
+             , std::uint32_t const watch_group
+             , action_list actions)
+            : bucket_{
+                  std::uint16_t(sizeof(bucket_) + actions.length())
+                , weight
+                , watch_port
+                , watch_group
+                , { 0, 0, 0, 0 }
+              }
+            , actions_(std::move(actions))
+        {
+        }
+
         bucket(bucket const&) = default;
 
         bucket(bucket&& other)
@@ -188,6 +203,13 @@ namespace v13 {
             return validate(bucket(std::forward<Args>(args)...));
         }
 
+        friend auto operator==(bucket const& lhs, bucket const& rhs)
+            -> bool
+        {
+            return detail::memcmp(lhs.bucket_, rhs.bucket_)
+                && lhs.actions() == rhs.actions();
+        }
+
     private:
         bucket(raw_ofp_type const& bkt, action_list&& actions)
             : bucket_(bkt)
@@ -200,14 +222,15 @@ namespace v13 {
         action_list actions_;
     };
 
-    inline auto operator==(bucket const& lhs, bucket const& rhs)
+    inline auto equivalent(bucket const& lhs, bucket const& rhs)
         -> bool
     {
         return lhs.length() == rhs.length()
             && lhs.weight() == rhs.weight()
             && lhs.watch_port() == rhs.watch_port()
             && lhs.watch_group() == rhs.watch_group()
-            && lhs.actions() == rhs.actions();
+            && action_set::equivalent_as_action_set(
+                    lhs.actions(), rhs.actions());
     }
 
 } // namespace v13

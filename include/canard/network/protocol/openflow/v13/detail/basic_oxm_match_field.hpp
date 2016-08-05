@@ -165,14 +165,20 @@ namespace v13 {
         friend auto operator==(T const& lhs, T const& rhs) noexcept
             -> bool
         {
+            return lhs.oxm_mask() == rhs.oxm_mask()
+                && lhs.oxm_value() == rhs.oxm_value();
+        }
+
+        friend auto equivalent(T const& lhs, T const& rhs) noexcept
+            -> bool
+        {
             if (lhs.is_wildcard()) {
                 return rhs.is_wildcard();
             }
             if (lhs.is_exact()) {
                 return rhs.is_exact() && lhs.oxm_value() == rhs.oxm_value();
             }
-            return lhs.oxm_mask() == rhs.oxm_mask()
-                && lhs.oxm_value() == rhs.oxm_value();
+            return lhs == rhs;
         }
 
     private:

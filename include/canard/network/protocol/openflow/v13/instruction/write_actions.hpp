@@ -1,7 +1,6 @@
 #ifndef CANARD_NETWORK_OPENFLOW_V13_INSTRUCTIONS_WRITE_ACTIONS_HPP
 #define CANARD_NETWORK_OPENFLOW_V13_INSTRUCTIONS_WRITE_ACTIONS_HPP
 
-#include <cstdint>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
@@ -61,6 +60,18 @@ namespace instructions {
             }
         }
     };
+
+    inline auto equivalent(
+            write_actions const& lhs, write_actions const& rhs) noexcept
+        -> bool
+    {
+        if (lhs.actions().size() != rhs.actions().size()) {
+            return false;
+        }
+
+        return action_set::equivalent_as_action_set(
+                lhs.actions(), rhs.actions());
+    }
 
 } // namespace instructions
 } // namespace v13

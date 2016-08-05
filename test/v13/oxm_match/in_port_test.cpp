@@ -109,18 +109,70 @@ BOOST_AUTO_TEST_SUITE(in_port_test)
         BOOST_TEST(sut.is_exact());
     }
 
-    BOOST_AUTO_TEST_CASE(no_mask_equality_test)
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_value_is_same_and_no_mask)
+      {
+        auto const sut1 = match::in_port{proto::OFPP_CONTROLLER};
+        auto const sut2 = match::in_port{proto::OFPP_CONTROLLER};
+
+        BOOST_TEST((sut1 == sut2));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_value_and_mask_are_same)
+      {
+        auto const sut1 = match::in_port{1, 0x0000ffff};
+        auto const sut2 = match::in_port{1, 0x0000ffff};
+
+        BOOST_TEST((sut1 == sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_value_is_diff_and_no_mask)
+      {
+        auto const sut1 = match::in_port{2};
+        auto const sut2 = match::in_port{3};
+
+        BOOST_TEST((sut1 != sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_value_is_diff_and_mask_is_same)
+      {
+        auto const sut1 = match::in_port{4, 0x0000f0f0};
+        auto const sut2 = match::in_port{5, 0x0000f0f0};
+
+        BOOST_TEST((sut1 != sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_value_is_same_and_mask_is_diff)
+      {
+        auto const sut1 = match::in_port{6, 0x00000f0f};
+        auto const sut2 = match::in_port{6, 0x0000f0f0};
+
+        BOOST_TEST((sut1 != sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_value_and_mask_are_diff)
+      {
+        auto const sut1 = match::in_port{7, 0x00000f0f};
+        auto const sut2 = match::in_port{8, 0x0000f0f0};
+
+        BOOST_TEST((sut1 != sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_equivalent_but_one_has_no_mask_and_another_has_mask)
+      {
+        auto const sut1 = match::in_port{7};
+        auto const sut2 = match::in_port{7, 0xffffffff};
+
+        BOOST_TEST((sut1 != sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_CASE(no_mask_equivalent_test)
     {
         auto const sut = match::in_port{proto::OFPP_LOCAL};
         auto const same_value = match::in_port{proto::OFPP_LOCAL};
         auto const diff_value = match::in_port{proto::OFPP_CONTROLLER};
 
-        BOOST_TEST((sut == sut));
-        BOOST_TEST((sut == same_value));
-        BOOST_TEST((sut != diff_value));
+        BOOST_TEST(equivalent(sut, sut));
+        BOOST_TEST(equivalent(sut, same_value));
+        BOOST_TEST(!equivalent(sut, diff_value));
     }
 
-    BOOST_AUTO_TEST_CASE(has_mask_equality_test)
+    BOOST_AUTO_TEST_CASE(has_mask_equivalent_test)
     {
         auto const sut = match::in_port{1, 0x0000ffff};
         auto const same_value_and_same_mask = match::in_port{1, 0x0000ffff};
@@ -128,24 +180,24 @@ BOOST_AUTO_TEST_SUITE(in_port_test)
         auto const diff_value_and_same_mask = match::in_port{2, 0x0000ffff};
         auto const diff_value_and_diff_mask = match::in_port{2, 0xffff0000};
 
-        BOOST_TEST((sut == sut));
-        BOOST_TEST((sut == same_value_and_same_mask));
-        BOOST_TEST((sut != same_value_and_diff_mask));
-        BOOST_TEST((sut != diff_value_and_same_mask));
-        BOOST_TEST((sut != diff_value_and_diff_mask));
+        BOOST_TEST(equivalent(sut, sut));
+        BOOST_TEST(equivalent(sut, same_value_and_same_mask));
+        BOOST_TEST(!equivalent(sut, same_value_and_diff_mask));
+        BOOST_TEST(!equivalent(sut, diff_value_and_same_mask));
+        BOOST_TEST(!equivalent(sut, diff_value_and_diff_mask));
     }
 
-    BOOST_AUTO_TEST_CASE(no_mask_and_has_mask_equality_test)
+    BOOST_AUTO_TEST_CASE(no_mask_and_has_mask_equivalent_test)
     {
         auto const sut = match::in_port{3};
         auto const same_value_and_mask = match::in_port{3, 0x0f0f0f0f};
         auto const diff_value_and_mask = match::in_port{4, 0x0f0f0f0f};
 
-        BOOST_TEST((sut != same_value_and_mask));
-        BOOST_TEST((sut != diff_value_and_mask));
+        BOOST_TEST(!equivalent(sut, same_value_and_mask));
+        BOOST_TEST(!equivalent(sut, diff_value_and_mask));
     }
 
-    BOOST_AUTO_TEST_CASE(exact_and_wildcard_equality_test)
+    BOOST_AUTO_TEST_CASE(exact_and_wildcard_equivalent_test)
     {
         auto const sut = match::in_port{3};
         auto const same_value_and_all_zero_mask = match::in_port{3, 0x00000000};
@@ -153,10 +205,10 @@ BOOST_AUTO_TEST_SUITE(in_port_test)
         auto const diff_value_and_all_zero_mask = match::in_port{4, 0x00000000};
         auto const diff_value_and_all_one_mask = match::in_port{4, 0xffffffff};
 
-        BOOST_TEST((sut != same_value_and_all_zero_mask));
-        BOOST_TEST((sut == same_value_and_all_one_mask));
-        BOOST_TEST((sut != diff_value_and_all_zero_mask));
-        BOOST_TEST((sut != diff_value_and_all_one_mask));
+        BOOST_TEST(!equivalent(sut, same_value_and_all_zero_mask));
+        BOOST_TEST(equivalent(sut, same_value_and_all_one_mask));
+        BOOST_TEST(!equivalent(sut, diff_value_and_all_zero_mask));
+        BOOST_TEST(!equivalent(sut, diff_value_and_all_one_mask));
     }
 
     BOOST_DATA_TEST_CASE(

@@ -112,70 +112,121 @@ BOOST_AUTO_TEST_SUITE(action_list_test)
         BOOST_TEST((sut.at(2) == output2));
     }
 
-    BOOST_AUTO_TEST_SUITE(equality_test)
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut
+            = v13::action_list{ actions::output{1}, actions::set_queue{2} };
 
-        BOOST_AUTO_TEST_CASE(different_action_value_test)
-        {
-            auto const sut1
-                = v13::action_list{actions::output{1}, actions::group{1}};
-            auto const sut2
-                = v13::action_list{actions::output{1}, actions::group{2}};
-            auto const sut3
-                = v13::action_list{actions::output{2}, actions::group{1}};
-            auto const sut4
-                = v13::action_list{actions::output{2}, actions::group{2}};
+        BOOST_TEST((sut == sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_action_list_is_equal)
+      {
+        BOOST_TEST(
+            (v13::action_list{ actions::output{1}, actions::set_queue{2} }
+             == v13::action_list{ actions::output{1}, actions::set_queue{2} }));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_both_action_lists_are_empty)
+      {
+        BOOST_TEST((v13::action_list{} == v13::action_list{}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_action_list_size_is_not_equal)
+      {
+        BOOST_TEST(
+            (v13::action_list{ actions::output{1} }
+             != v13::action_list{ actions::output{1}, actions::group{2} }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_action_list_order_is_not_equal)
+      {
+        BOOST_TEST(
+            (v13::action_list{ actions::pop_pbb{}, actions::pop_vlan{} }
+             != v13::action_list{ actions::pop_vlan{}, actions::pop_pbb{} }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_contained_action_value_is_not_equal)
+      {
+        BOOST_TEST(
+            (v13::action_list{ actions::pop_pbb{}, actions::set_nw_ttl{2} }
+             != v13::action_list{ actions::pop_pbb{}, actions::set_nw_ttl{3} }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_contained_action_type_is_not_equal)
+      {
+        BOOST_TEST(
+            (v13::action_list{ actions::pop_pbb{}, actions::copy_ttl_out{} }
+             != v13::action_list{ actions::pop_pbb{}, actions::copy_ttl_in{} }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_contained_actions_are_not_equal_but_equivalent)
+      {
+        auto const binary = "\x00\x12\x00\x08\x10\x20\x30\x40"_bin;
+        auto it = binary.begin();
+        auto const nonzero_pad_pop_vlan
+          = actions::pop_vlan::decode(it, binary.end());
 
-            BOOST_TEST((sut1 == sut1));
-            BOOST_TEST((sut1 != sut2));
-            BOOST_TEST((sut1 != sut3));
-            BOOST_TEST((sut1 != sut4));
-        }
+        BOOST_TEST(
+            (v13::action_list{ actions::pop_vlan{} }
+             != v13::action_list{ nonzero_pad_pop_vlan }));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
 
-        BOOST_AUTO_TEST_CASE(different_size_test)
-        {
-            auto const sut1
-                = v13::action_list{actions::push_pbb{}, actions::set_queue{1}};
-            auto const sut2
-                = v13::action_list{actions::push_pbb{}};
-            auto const sut3 = v13::action_list{
-                actions::push_pbb{}, actions::set_queue{1}, actions::push_pbb{}
-            };
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut
+            = v13::action_list{ actions::output{1}, actions::set_queue{2} };
 
-            BOOST_TEST((sut1 == sut1));
-            BOOST_TEST((sut1 != sut2));
-            BOOST_TEST((sut1 != sut3));
-        }
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_action_list_is_equal)
+      {
+        BOOST_TEST(
+            equivalent(
+                v13::action_list{ actions::output{1}, actions::set_queue{2} }
+              , v13::action_list{ actions::output{1}, actions::set_queue{2} }));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_both_action_lists_are_empty)
+      {
+        BOOST_TEST(equivalent(v13::action_list{}, v13::action_list{}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_action_list_size_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                v13::action_list{ actions::output{1} }
+              , v13::action_list{ actions::output{1}, actions::group{2} }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_action_list_order_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                v13::action_list{ actions::pop_pbb{}, actions::pop_vlan{} }
+              , v13::action_list{ actions::pop_vlan{}, actions::pop_pbb{} }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_contained_action_value_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                v13::action_list{ actions::pop_pbb{}, actions::set_nw_ttl{2} }
+              , v13::action_list{ actions::pop_pbb{}, actions::set_nw_ttl{3} }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_contained_action_type_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                v13::action_list{ actions::pop_pbb{}, actions::copy_ttl_out{} }
+              , v13::action_list{ actions::pop_pbb{}, actions::copy_ttl_in{} }));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_contained_actions_are_not_equal_but_equivalent)
+      {
+        auto const binary = "\x00\x12\x00\x08\x10\x20\x30\x40"_bin;
+        auto it = binary.begin();
+        auto const nonzero_pad_pop_vlan
+          = actions::pop_vlan::decode(it, binary.end());
 
-        BOOST_AUTO_TEST_CASE(different_order_test)
-        {
-            auto const output = actions::output{1};
-            auto const set_eth_type = actions::set_eth_type{0x8100};
-            auto const pop_pbb = actions::pop_pbb{};
-            auto const sut1 = v13::action_list{output, set_eth_type, pop_pbb};
-            auto const sut2 = v13::action_list{output, pop_pbb, set_eth_type};
-            auto const sut3 = v13::action_list{set_eth_type, output, pop_pbb};
-            auto const sut4 = v13::action_list{set_eth_type, pop_pbb, output};
-            auto const sut5 = v13::action_list{pop_pbb, output, set_eth_type};
-            auto const sut6 = v13::action_list{pop_pbb, set_eth_type, output};
-
-            BOOST_TEST((sut1 == sut1));
-            BOOST_TEST((sut1 != sut2));
-            BOOST_TEST((sut1 != sut3));
-            BOOST_TEST((sut1 != sut4));
-            BOOST_TEST((sut1 != sut5));
-            BOOST_TEST((sut1 != sut6));
-        }
-
-        BOOST_AUTO_TEST_CASE(empty_action_list_test)
-        {
-            auto const sut1 = v13::action_list{};
-            auto const sut2 = v13::action_list{actions::pop_vlan{}};
-
-            BOOST_TEST((sut1 == sut1));
-            BOOST_TEST((sut1 != sut2));
-        }
-
-    BOOST_AUTO_TEST_SUITE_END() // equality_test
+        BOOST_TEST(
+            equivalent(
+                v13::action_list{ actions::pop_vlan{} }
+              , v13::action_list{ nonzero_pad_pop_vlan }));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(encode_test, action_list_fixture)
     {

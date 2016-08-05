@@ -53,12 +53,55 @@ BOOST_AUTO_TEST_SUITE(pop_vlan_test)
         BOOST_TEST(((void)sut, true));
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
         auto const sut = actions::pop_vlan{};
 
         BOOST_TEST((sut == sut));
-    }
+      }
+      BOOST_AUTO_TEST_CASE(true_if_pad_is_equal)
+      {
+        auto const sut1 = actions::pop_vlan{};
+        auto const sut2 = actions::pop_vlan{};
+
+        BOOST_TEST((sut1 == sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_pad_is_not_equal)
+      {
+        auto const binary = "\x00\x12\x00\x08\x00\x00\x00\x01"_bin;
+        auto it = binary.begin();
+        auto const sut1 = actions::pop_vlan{};
+        auto const sut2 = actions::pop_vlan::decode(it, binary.end());
+
+        BOOST_TEST((sut1 != sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = actions::pop_vlan{};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_pad_is_equal)
+      {
+        auto const sut1 = actions::pop_vlan{};
+        auto const sut2 = actions::pop_vlan{};
+
+        BOOST_TEST(equivalent(sut1, sut2));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_pad_is_not_equal)
+      {
+        auto const binary = "\x00\x12\x00\x08\x10\x20\x30\x40"_bin;
+        auto it = binary.begin();
+        auto const sut1 = actions::pop_vlan{};
+        auto const sut2 = actions::pop_vlan::decode(it, binary.end());
+
+        BOOST_TEST(equivalent(sut1, sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(encode_test, pop_vlan_fixture)
     {

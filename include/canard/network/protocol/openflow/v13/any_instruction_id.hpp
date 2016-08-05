@@ -107,6 +107,15 @@ namespace v13 {
             return lhs.variant_ == rhs.variant_;
         }
 
+        friend auto equivalent(
+                  any_instruction_id const& lhs
+                , any_instruction_id const& rhs) noexcept
+            -> bool
+        {
+            auto visitor = detail::equivalent_visitor{};
+            return boost::apply_visitor(visitor, lhs.variant_, rhs.variant_);
+        }
+
     private:
         instruction_id_variant variant_;
     };

@@ -53,12 +53,55 @@ BOOST_AUTO_TEST_SUITE(copy_ttl_out_test)
         BOOST_TEST(((void)sut, true));
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
         auto const sut = actions::copy_ttl_out{};
 
         BOOST_TEST((sut == sut));
-    }
+      }
+      BOOST_AUTO_TEST_CASE(true_if_pad_is_equal)
+      {
+        auto const sut1 = actions::copy_ttl_out{};
+        auto const sut2 = actions::copy_ttl_out{};
+
+        BOOST_TEST((sut1 == sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_pad_is_not_equal)
+      {
+        auto const binary = "\x00\x0b\x00\x08\x00\x00\x00\x01"_bin;
+        auto it = binary.begin();
+        auto const sut1 = actions::copy_ttl_out{};
+        auto const sut2 = actions::copy_ttl_out::decode(it, binary.end());
+
+        BOOST_TEST((sut1 != sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = actions::copy_ttl_out{};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_pad_is_equal)
+      {
+        auto const sut1 = actions::copy_ttl_out{};
+        auto const sut2 = actions::copy_ttl_out{};
+
+        BOOST_TEST(equivalent(sut1, sut2));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_pad_is_not_equal)
+      {
+        auto const binary = "\x00\x0b\x00\x08\x12\x34\x56\x78"_bin;
+        auto it = binary.begin();
+        auto const sut1 = actions::copy_ttl_out{};
+        auto const sut2 = actions::copy_ttl_out::decode(it, binary.end());
+
+        BOOST_TEST(equivalent(sut1, sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(encode_test, copy_ttl_out_fixture)
     {

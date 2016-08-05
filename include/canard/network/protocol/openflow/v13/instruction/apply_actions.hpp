@@ -51,6 +51,13 @@ namespace instructions {
         }
     };
 
+    inline auto equivalent(
+            apply_actions const& lhs, apply_actions const& rhs) noexcept
+        -> bool
+    {
+        return equivalent(lhs.actions(), rhs.actions());
+    }
+
 } // namespace instructions
 } // namespace v13
 } // namespace openflow

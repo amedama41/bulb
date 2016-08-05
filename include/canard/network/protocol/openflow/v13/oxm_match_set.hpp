@@ -13,8 +13,10 @@
 #include <boost/mpl/transform.hpp>
 #include <boost/operators.hpp>
 #include <boost/optional.hpp>
+#include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/adaptor/map.hpp>
 #include <boost/range/adaptor/transformed.hpp>
+#include <boost/range/algorithm/equal.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/iterator.hpp>
 #include <boost/range/numeric.hpp>
@@ -263,6 +265,26 @@ namespace v13 {
             }
         }
 
+        friend auto operator==(
+                oxm_match_set const& lhs, oxm_match_set const& rhs)
+            -> bool
+        {
+            return lhs.oxm_tlvs_ == rhs.oxm_tlvs_;
+        }
+
+        friend auto equivalent(
+                oxm_match_set const& lhs, oxm_match_set const& rhs) noexcept
+            -> bool
+        {
+            auto const filter
+                = [](const_reference v){ return !v.is_wildcard(); };
+            using boost::adaptors::filtered;
+            return boost::equal(
+                      lhs | filtered(filter), rhs | filtered(filter)
+                    , [](const_reference lhs_tlv, const_reference rhs_tlv)
+                      { return equivalent(lhs_tlv, rhs_tlv); });
+        }
+
     private:
         oxm_match_set(container_type&& oxm_tlvs)
             : oxm_tlvs_(std::move(oxm_tlvs))
@@ -301,42 +323,6 @@ namespace v13 {
     private:
         container_type oxm_tlvs_;
     };
-
-    namespace oxm_match_set_detail {
-
-        struct oxm_match_set_equal_check
-        {
-            template <class OXMMatchField>
-            auto operator()(bool const result, OXMMatchField*) const
-                -> bool
-            {
-                auto const lhs_field = lhs.find<OXMMatchField>();
-                auto const rhs_field = rhs.find<OXMMatchField>();
-                if (lhs_field == rhs_field
-                        || (!lhs_field && rhs_field->is_wildcard())
-                        || (!rhs_field && lhs_field->is_wildcard())) {
-                    return result;
-                }
-                return false;
-            }
-
-            oxm_match_set const& lhs;
-            oxm_match_set const& rhs;
-        };
-
-    } // namespace oxm_match_set_detail
-
-    inline auto operator==(oxm_match_set const& lhs, oxm_match_set const& rhs)
-        -> bool
-    {
-        using match_field_pointer_list = boost::mpl::transform<
-            any_oxm_match_field::type_list, std::add_pointer<boost::mpl::_>
-        >::type;
-        return boost::fusion::accumulate(
-                  match_field_pointer_list{}
-                , true
-                , oxm_match_set_detail::oxm_match_set_equal_check{lhs, rhs});
-    }
 
 } // namespace v13
 } // namespace openflow

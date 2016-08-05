@@ -2,6 +2,7 @@
 #define CANARD_NETWORK_OPENFLOW_DETAIL_V13_BASIC_ACTION_PUSH_HPP
 
 #include <cstdint>
+#include <canard/network/protocol/openflow/detail/memcmp.hpp>
 #include <canard/network/protocol/openflow/v13/detail/basic_action.hpp>
 #include <canard/network/protocol/openflow/v13/openflow.hpp>
 
@@ -28,6 +29,12 @@ namespace v13 {
         }
 
         friend auto operator==(T const& lhs, T const& rhs) noexcept
+            -> bool
+        {
+            return detail::memcmp(lhs.action_push_, rhs.action_push_);
+        }
+
+        friend auto equivalent(T const& lhs, T const& rhs) noexcept
             -> bool
         {
             return lhs.ethertype() == rhs.ethertype();

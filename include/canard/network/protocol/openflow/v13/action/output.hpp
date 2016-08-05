@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <stdexcept>
+#include <canard/network/protocol/openflow/detail/memcmp.hpp>
 #include <canard/network/protocol/openflow/v13/detail/basic_action.hpp>
 #include <canard/network/protocol/openflow/v13/openflow.hpp>
 
@@ -55,6 +56,12 @@ namespace actions {
             return output{protocol::OFPP_CONTROLLER, max_length};
         }
 
+        friend auto operator==(output const& lhs, output const& rhs) noexcept
+            -> bool
+        {
+            return detail::memcmp(lhs.action_output_, rhs.action_output_);
+        }
+
     private:
         friend basic_action;
 
@@ -85,7 +92,7 @@ namespace actions {
         raw_ofp_type action_output_;
     };
 
-    inline auto operator==(output const& lhs, output const& rhs) noexcept
+    inline auto equivalent(output const& lhs, output const& rhs) noexcept
         -> bool
     {
         return lhs.port_no() == rhs.port_no()

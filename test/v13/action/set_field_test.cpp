@@ -89,19 +89,69 @@ BOOST_AUTO_TEST_SUITE(set_eth_dst_test)
         BOOST_TEST(sut.value() == field.oxm_value());
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
-        auto const sut
-            = actions::set_eth_dst{"\x01\x02\x03\x04\x05\x06"_mac};
-        auto const same_value
-            = actions::set_eth_dst{"\x01\x02\x03\x04\x05\x06"_mac};
-        auto const diff_value
-            = actions::set_eth_dst{"\x11\x12\x13\x14\x15\x16"_mac};
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = actions::set_eth_dst{"\x01\x02\x03\x04\x05\x06"_mac};
 
         BOOST_TEST((sut == sut));
-        BOOST_TEST((sut == same_value));
-        BOOST_TEST((sut != diff_value));
-    }
+      }
+      BOOST_AUTO_TEST_CASE(true_if_value_is_same)
+      {
+        auto const sut1 = actions::set_eth_dst{"\x01\x02\x03\x04\x05\x06"_mac};
+        auto const sut2 = actions::set_eth_dst{"\x01\x02\x03\x04\x05\x06"_mac};
+
+        BOOST_TEST((sut1 == sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_value_is_diff)
+      {
+        auto const sut1 = actions::set_eth_dst{"\x01\x02\x03\x04\x05\x06"_mac};
+        auto const sut2 = actions::set_eth_dst{"\x11\x12\x13\x14\x15\x16"_mac};
+
+        BOOST_TEST((sut1 != sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_one_has_no_mask_and_another_has_exact_mask)
+      {
+        auto const sut1 = actions::set_eth_dst::create_from_match_field(
+            match::eth_dst{"\x01\x02\x03\x04\x05\x06"_mac});
+        auto const sut2 = actions::set_eth_dst::create_from_match_field(
+            match::eth_dst{"\x01\x02\x03\x04\x05\x06"_mac, "\xff\xff\xff\xff\xff\xff"_mac});
+
+        BOOST_TEST((sut1 != sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = actions::set_eth_dst{"\x01\x02\x03\x04\x05\x06"_mac};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_value_is_same)
+      {
+        auto const sut1 = actions::set_eth_dst{"\x01\x02\x03\x04\x05\x06"_mac};
+        auto const sut2 = actions::set_eth_dst{"\x01\x02\x03\x04\x05\x06"_mac};
+
+        BOOST_TEST(equivalent(sut1, sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_value_is_diff)
+      {
+        auto const sut1 = actions::set_eth_dst{"\x01\x02\x03\x04\x05\x06"_mac};
+        auto const sut2 = actions::set_eth_dst{"\x11\x12\x13\x14\x15\x16"_mac};
+
+        BOOST_TEST(!equivalent(sut1, sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_one_has_no_mask_and_another_has_exact_mask)
+      {
+        auto const sut1 = actions::set_eth_dst::create_from_match_field(
+            match::eth_dst{"\x01\x02\x03\x04\x05\x06"_mac});
+        auto const sut2 = actions::set_eth_dst::create_from_match_field(
+            match::eth_dst{"\x01\x02\x03\x04\x05\x06"_mac, "\xff\xff\xff\xff\xff\xff"_mac});
+
+        BOOST_TEST(!equivalent(sut1, sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(encode_test, set_eth_dst_fixture)
     {
@@ -177,19 +227,79 @@ BOOST_AUTO_TEST_SUITE(set_vlan_vid_test)
                 , std::runtime_error);
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
         auto const sut
-            = actions::set_vlan_vid{protocol::OFPVID_PRESENT | 0x0000};
-        auto const same_value
-            = actions::set_vlan_vid{protocol::OFPVID_PRESENT | 0x0000};
-        auto const diff_value
-            = actions::set_vlan_vid{protocol::OFPVID_PRESENT | 0x0001};
+          = actions::set_vlan_vid{protocol::OFPVID_PRESENT | 0x0000};
 
         BOOST_TEST((sut == sut));
-        BOOST_TEST((sut == same_value));
-        BOOST_TEST((sut != diff_value));
-    }
+      }
+      BOOST_AUTO_TEST_CASE(true_if_value_is_same)
+      {
+        auto const sut1
+          = actions::set_vlan_vid{protocol::OFPVID_PRESENT | 0x0000};
+        auto const sut2
+          = actions::set_vlan_vid{protocol::OFPVID_PRESENT | 0x0000};
+
+        BOOST_TEST((sut1 == sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_value_is_diff)
+      {
+        auto const sut1
+          = actions::set_vlan_vid{protocol::OFPVID_PRESENT | 0x0000};
+        auto const sut2
+          = actions::set_vlan_vid{protocol::OFPVID_PRESENT | 0x0001};
+
+        BOOST_TEST((sut1 != sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_one_has_no_mask_and_another_has_exact_mask)
+      {
+        auto const sut1 = actions::set_vlan_vid::create_from_match_field(
+            match::vlan_vid{protocol::OFPVID_PRESENT | 0x0123});
+        auto const sut2 = actions::set_vlan_vid::create_from_match_field(
+            match::vlan_vid{protocol::OFPVID_PRESENT | 0x0123, 0xffff});
+
+        BOOST_TEST((sut1 != sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut
+          = actions::set_vlan_vid{protocol::OFPVID_PRESENT | 0x0000};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_value_is_same)
+      {
+        auto const sut1
+          = actions::set_vlan_vid{protocol::OFPVID_PRESENT | 0x0000};
+        auto const sut2
+          = actions::set_vlan_vid{protocol::OFPVID_PRESENT | 0x0000};
+
+        BOOST_TEST(equivalent(sut1, sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_value_is_diff)
+      {
+        auto const sut1
+          = actions::set_vlan_vid{protocol::OFPVID_PRESENT | 0x0000};
+        auto const sut2
+          = actions::set_vlan_vid{protocol::OFPVID_PRESENT | 0x0001};
+
+        BOOST_TEST(!equivalent(sut1, sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_one_has_no_mask_and_another_has_exact_mask)
+      {
+        auto const sut1 = actions::set_vlan_vid::create_from_match_field(
+            match::vlan_vid{protocol::OFPVID_PRESENT | 0x0123});
+        auto const sut2 = actions::set_vlan_vid::create_from_match_field(
+            match::vlan_vid{protocol::OFPVID_PRESENT | 0x0123, 0xffff});
+
+        BOOST_TEST(!equivalent(sut1, sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equivalent
 
     BOOST_FIXTURE_TEST_CASE(encode_test, set_vlan_vid_fixture)
     {
@@ -250,16 +360,69 @@ BOOST_AUTO_TEST_SUITE(set_ipv4_src_test)
         BOOST_TEST(sut.value() == field.oxm_value());
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
         auto const sut = actions::set_ipv4_src{"0.0.0.0"_ipv4};
-        auto const same_value = actions::set_ipv4_src{"0.0.0.0"_ipv4};
-        auto const diff_value = actions::set_ipv4_src{"0.0.0.1"_ipv4};
 
         BOOST_TEST((sut == sut));
-        BOOST_TEST((sut == same_value));
-        BOOST_TEST((sut != diff_value));
-    }
+      }
+      BOOST_AUTO_TEST_CASE(true_if_value_is_same)
+      {
+        auto const sut1 = actions::set_ipv4_src{"0.0.0.0"_ipv4};
+        auto const sut2 = actions::set_ipv4_src{"0.0.0.0"_ipv4};
+
+        BOOST_TEST((sut1 == sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_value_is_diff)
+      {
+        auto const sut1 = actions::set_ipv4_src{"0.0.0.0"_ipv4};
+        auto const sut2 = actions::set_ipv4_src{"0.0.0.1"_ipv4};
+
+        BOOST_TEST((sut1 != sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_one_has_no_mask_and_another_has_exact_mask)
+      {
+        auto const sut1 = actions::set_ipv4_src::create_from_match_field(
+            match::ipv4_src{"0.0.0.0"_ipv4});
+        auto const sut2 = actions::set_ipv4_src::create_from_match_field(
+            match::ipv4_src{"0.0.0.1"_ipv4, "255.255.255.255"_ipv4});
+
+        BOOST_TEST((sut1 != sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = actions::set_ipv4_src{"0.0.0.0"_ipv4};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_value_is_same)
+      {
+        auto const sut1 = actions::set_ipv4_src{"0.0.0.0"_ipv4};
+        auto const sut2 = actions::set_ipv4_src{"0.0.0.0"_ipv4};
+
+        BOOST_TEST(equivalent(sut1, sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_value_is_diff)
+      {
+        auto const sut1 = actions::set_ipv4_src{"0.0.0.0"_ipv4};
+        auto const sut2 = actions::set_ipv4_src{"0.0.0.1"_ipv4};
+
+        BOOST_TEST(!equivalent(sut1, sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_one_has_no_mask_and_another_has_exact_mask)
+      {
+        auto const sut1 = actions::set_ipv4_src::create_from_match_field(
+            match::ipv4_src{"0.0.0.0"_ipv4});
+        auto const sut2 = actions::set_ipv4_src::create_from_match_field(
+            match::ipv4_src{"0.0.0.1"_ipv4, "255.255.255.255"_ipv4});
+
+        BOOST_TEST(!equivalent(sut1, sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(encode_test, set_ipv4_src_fixture)
     {
@@ -328,16 +491,69 @@ BOOST_AUTO_TEST_SUITE(set_ipv6_src_test)
         BOOST_TEST(sut.value() == field.oxm_value());
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
         auto const sut = actions::set_ipv6_src{"::"_ipv6};
-        auto const same_value = actions::set_ipv6_src{"::"_ipv6};
-        auto const diff_value = actions::set_ipv6_src{"::1"_ipv6};
 
         BOOST_TEST((sut == sut));
-        BOOST_TEST((sut == same_value));
-        BOOST_TEST((sut != diff_value));
-    }
+      }
+      BOOST_AUTO_TEST_CASE(true_if_value_is_same)
+      {
+        auto const sut1 = actions::set_ipv6_src{"::"_ipv6};
+        auto const sut2 = actions::set_ipv6_src{"0::0"_ipv6};
+
+        BOOST_TEST((sut1 == sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_value_is_diff)
+      {
+        auto const sut1 = actions::set_ipv6_src{"::0"_ipv6};
+        auto const sut2 = actions::set_ipv6_src{"::1"_ipv6};
+
+        BOOST_TEST((sut1 != sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_one_has_no_mask_and_another_has_exact_mask)
+      {
+        auto const sut1 = actions::set_ipv6_src::create_from_match_field(
+            match::ipv6_src{"::"_ipv6});
+        auto const sut2 = actions::set_ipv6_src::create_from_match_field(
+            match::ipv6_src{"::"_ipv6, "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"_ipv6});
+
+        BOOST_TEST((sut1 != sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = actions::set_ipv6_src{"::"_ipv6};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_value_is_same)
+      {
+        auto const sut1 = actions::set_ipv6_src{"::"_ipv6};
+        auto const sut2 = actions::set_ipv6_src{"0::0"_ipv6};
+
+        BOOST_TEST(equivalent(sut1, sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_value_is_diff)
+      {
+        auto const sut1 = actions::set_ipv6_src{"::0"_ipv6};
+        auto const sut2 = actions::set_ipv6_src{"::1"_ipv6};
+
+        BOOST_TEST(!equivalent(sut1, sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_one_has_no_mask_and_another_has_exact_mask)
+      {
+        auto const sut1 = actions::set_ipv6_src::create_from_match_field(
+            match::ipv6_src{"::"_ipv6});
+        auto const sut2 = actions::set_ipv6_src::create_from_match_field(
+            match::ipv6_src{"::"_ipv6, "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"_ipv6});
+
+        BOOST_TEST(!equivalent(sut1, sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(encode_test, set_ipv6_src_fixture)
     {

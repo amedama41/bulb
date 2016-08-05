@@ -62,12 +62,73 @@ BOOST_AUTO_TEST_SUITE(push_pbb_test)
         BOOST_CHECK_THROW(actions::push_pbb::validate(sut), std::runtime_error);
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
         auto const sut = actions::push_pbb{};
 
         BOOST_TEST((sut == sut));
-    }
+      }
+      BOOST_AUTO_TEST_CASE(true_if_ethertype_and_pad_are_equal)
+      {
+        auto const sut1 = actions::push_pbb{};
+        auto const sut2 = actions::push_pbb{};
+
+        BOOST_TEST((sut1 == sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_ethertype_is_not_equal)
+      {
+        auto const binary = "\x00\x1a\x00\x08\x88\xe8\x00\x00"_bin;
+        auto it = binary.begin();
+        auto const sut1 = actions::push_pbb{};
+        auto const sut2 = actions::push_pbb::decode(it, binary.end());
+
+        BOOST_TEST((sut1 != sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_pad_is_not_equal)
+      {
+        auto const binary = "\x00\x1a\x00\x08\x88\xe7\x00\x01"_bin;
+        auto it = binary.begin();
+        auto const sut1 = actions::push_pbb{};
+        auto const sut2 = actions::push_pbb::decode(it, binary.end());
+
+        BOOST_TEST((sut1 != sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = actions::push_pbb{};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_ethertype_and_pad_are_equal)
+      {
+        auto const sut1 = actions::push_pbb{};
+        auto const sut2 = actions::push_pbb{};
+
+        BOOST_TEST(equivalent(sut1, sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_ethertype_is_not_equal)
+      {
+        auto const binary = "\x00\x1a\x00\x08\x88\xe8\x00\x00"_bin;
+        auto it = binary.begin();
+        auto const sut1 = actions::push_pbb{};
+        auto const sut2 = actions::push_pbb::decode(it, binary.end());
+
+        BOOST_TEST(!equivalent(sut1, sut2));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_pad_is_not_equal)
+      {
+        auto const binary = "\x00\x1a\x00\x08\x88\xe7\x00\x01"_bin;
+        auto it = binary.begin();
+        auto const sut1 = actions::push_pbb{};
+        auto const sut2 = actions::push_pbb::decode(it, binary.end());
+
+        BOOST_TEST(equivalent(sut1, sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(encode_test, push_pbb_fixture)
     {

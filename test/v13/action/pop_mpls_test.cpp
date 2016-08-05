@@ -79,16 +79,69 @@ BOOST_AUTO_TEST_SUITE(pop_mpls_test)
         BOOST_TEST(sut.ethertype() == ethertype);
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
         auto const sut = actions::pop_mpls{0x0800};
-        auto const same_value = actions::pop_mpls{0x0800};
-        auto const diff_value = actions::pop_mpls{0x86dd};
 
         BOOST_TEST((sut == sut));
-        BOOST_TEST((sut == same_value));
-        BOOST_TEST((sut != diff_value));
-    }
+      }
+      BOOST_AUTO_TEST_CASE(true_if_ethertype_and_pad_are_equal)
+      {
+        auto const sut1 = actions::pop_mpls{0x8847};
+        auto const sut2 = actions::pop_mpls{0x8847};
+
+        BOOST_TEST((sut1 == sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_ethertype_is_not_equal)
+      {
+        auto const sut1 = actions::pop_mpls{0x8847};
+        auto const sut2 = actions::pop_mpls{0x8848};
+
+        BOOST_TEST((sut1 != sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_pad_is_not_equal)
+      {
+        auto const binary = "\x00\x14\x00\x08\x08\x00\x00\x01"_bin;
+        auto it = binary.begin();
+        auto const sut1 = actions::pop_mpls{0x0800};
+        auto const sut2 = actions::pop_mpls::decode(it, binary.end());
+
+        BOOST_TEST((sut1 != sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = actions::pop_mpls{0x0800};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_ethertype_and_pad_are_equal)
+      {
+        auto const sut1 = actions::pop_mpls{0x8847};
+        auto const sut2 = actions::pop_mpls{0x8847};
+
+        BOOST_TEST(equivalent(sut1, sut2));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_ethertype_is_not_equal)
+      {
+        auto const sut1 = actions::pop_mpls{0x8847};
+        auto const sut2 = actions::pop_mpls{0x8848};
+
+        BOOST_TEST(!equivalent(sut1, sut2));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_pad_is_not_equal)
+      {
+        auto const binary = "\x00\x14\x00\x08\x08\x00\xab\xcd"_bin;
+        auto it = binary.begin();
+        auto const sut1 = actions::pop_mpls{0x0800};
+        auto const sut2 = actions::pop_mpls::decode(it, binary.end());
+
+        BOOST_TEST(equivalent(sut1, sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(encode_test, pop_mpls_fixture)
     {

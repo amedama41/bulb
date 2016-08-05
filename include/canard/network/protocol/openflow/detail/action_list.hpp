@@ -9,6 +9,7 @@
 #include <vector>
 #include <boost/operators.hpp>
 #include <boost/range/adaptor/transformed.hpp>
+#include <boost/range/algorithm/equal.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/numeric.hpp>
 #include <canard/network/protocol/openflow/detail/is_related.hpp>
@@ -274,6 +275,16 @@ namespace detail {
             -> bool
         {
             return lhs.actions_ == rhs.actions_;
+        }
+
+        friend auto equivalent(
+                action_list const& lhs, action_list const& rhs) noexcept
+            -> bool
+        {
+            return boost::equal(
+                      lhs.actions_, rhs.actions_
+                    , [](const_reference lhs, const_reference rhs)
+                      { return equivalent(lhs, rhs); });
         }
 
     private:

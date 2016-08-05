@@ -2,6 +2,7 @@
 #define CANARD_NETWORK_OPENFLOW_V13_ACTIONS_SET_MPLS_TTL_HPP
 
 #include <cstdint>
+#include <canard/network/protocol/openflow/detail/memcmp.hpp>
 #include <canard/network/protocol/openflow/v13/detail/basic_action.hpp>
 #include <canard/network/protocol/openflow/v13/openflow.hpp>
 
@@ -36,6 +37,13 @@ namespace actions {
             return action_mpls_ttl_.mpls_ttl;
         }
 
+        friend auto operator==(
+                set_mpls_ttl const& lhs, set_mpls_ttl const& rhs) noexcept
+            -> bool
+        {
+            return detail::memcmp(lhs.action_mpls_ttl_, rhs.action_mpls_ttl_);
+        }
+
     private:
         friend basic_action;
 
@@ -58,7 +66,7 @@ namespace actions {
         raw_ofp_type action_mpls_ttl_;
     };
 
-    inline auto operator==(
+    inline auto equivalent(
             set_mpls_ttl const& lhs, set_mpls_ttl const& rhs) noexcept
         -> bool
     {

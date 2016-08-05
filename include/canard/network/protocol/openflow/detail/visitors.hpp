@@ -68,6 +68,25 @@ namespace openflow {
             }
         };
 
+        class equivalent_visitor
+            : public boost::static_visitor<bool>
+        {
+        public:
+            template <class T>
+            auto operator()(T const& lhs, T const& rhs) const noexcept
+                -> bool
+            {
+                return equivalent(lhs, rhs);
+            }
+
+            template <class T, class U>
+            auto operator()(T const&, U const&) const noexcept
+                -> bool
+            {
+                return false;
+            }
+        };
+
     } // namespace detail
 
 } // namespace openflow

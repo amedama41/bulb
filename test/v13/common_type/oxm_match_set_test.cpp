@@ -122,79 +122,124 @@ BOOST_AUTO_TEST_SUITE(oxm_match_test)
         BOOST_TEST((sut.get<match::eth_type>() == eth_type));
     }
 
-    BOOST_AUTO_TEST_SUITE(equality_test)
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut
+          = v13::oxm_match_set{match::in_port{1, 3}, match::vlan_pcp{1}};
 
-        BOOST_AUTO_TEST_CASE(no_mask_same_field_types_test)
-        {
-            auto const sut1
-                = v13::oxm_match_set{match::in_port{1}, match::vlan_pcp{1}};
-            auto const sut2
-                = v13::oxm_match_set{match::in_port{2}, match::vlan_pcp{1}};
-            auto const sut3
-                = v13::oxm_match_set{match::in_port{1}, match::vlan_pcp{2}};
-            auto const sut4
-                = v13::oxm_match_set{match::in_port{2}, match::vlan_pcp{2}};
+        BOOST_TEST((sut == sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_both_oxm_match_sets_are_empty)
+      {
+        BOOST_TEST((v13::oxm_match_set{} == v13::oxm_match_set{}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_oxm_match_field_value_is_equal)
+      {
+        BOOST_TEST(
+            (v13::oxm_match_set{match::in_port{1, 3}, match::vlan_pcp{1}}
+             == v13::oxm_match_set{match::in_port{1, 3}, match::vlan_pcp{1}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_oxm_match_field_value_is_not_equal)
+      {
+        BOOST_TEST(
+            (v13::oxm_match_set{match::in_port{1, 3}, match::vlan_pcp{2}}
+             != v13::oxm_match_set{match::in_port{1, 3}, match::vlan_pcp{3}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_oxm_match_field_value_is_not_equal_but_equivalent)
+      {
+        BOOST_TEST(
+            (v13::oxm_match_set{match::in_port{1, 3}, match::vlan_pcp{4}}
+             != v13::oxm_match_set{match::in_port{1, 3}, match::vlan_pcp{4, 0xff}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_oxm_match_field_type_is_not_equal)
+      {
+        BOOST_TEST(
+            (v13::oxm_match_set{match::in_phy_port{1}, match::vlan_pcp{2}}
+             != v13::oxm_match_set{match::in_phy_port{1}, match::vlan_vid{2}}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_oxm_match_field_order_is_not_equal)
+      {
+        BOOST_TEST(
+            (v13::oxm_match_set{match::in_phy_port{1}, match::vlan_vid{2}}
+             == v13::oxm_match_set{match::vlan_vid{2}, match::in_phy_port{1}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_oxm_match_field_number_is_not_equal)
+      {
+        BOOST_TEST(
+            (v13::oxm_match_set{match::in_phy_port{1}, match::vlan_pcp{2}}
+             != v13::oxm_match_set{match::in_phy_port{1}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_oxm_match_field_number_is_not_equal_but_one_is_wildcard)
+      {
+        BOOST_TEST(
+            (v13::oxm_match_set{match::in_phy_port{1}, match::vlan_pcp{2, 0x00}}
+             != v13::oxm_match_set{match::in_phy_port{1}}));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
 
-            BOOST_TEST((sut1 == sut1));
-            BOOST_TEST((sut1 != sut2));
-            BOOST_TEST((sut1 != sut3));
-            BOOST_TEST((sut1 != sut4));
-        }
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut
+          = v13::oxm_match_set{match::in_port{1, 3}, match::vlan_pcp{1}};
 
-        BOOST_AUTO_TEST_CASE(has_mask_same_field_types_test)
-        {
-            auto const sut1
-                = v13::oxm_match_set{match::in_port{1, 3}, match::vlan_pcp{1}};
-            auto const sut2
-                = v13::oxm_match_set{match::in_port{2, 3}, match::vlan_pcp{1}};
-            auto const sut3
-                = v13::oxm_match_set{match::in_port{1, 3}, match::vlan_pcp{2}};
-            auto const sut4
-                = v13::oxm_match_set{match::in_port{2, 3}, match::vlan_pcp{2}};
-
-            BOOST_TEST((sut1 == sut1));
-            BOOST_TEST((sut1 != sut2));
-            BOOST_TEST((sut1 != sut3));
-            BOOST_TEST((sut1 != sut4));
-        }
-
-        BOOST_AUTO_TEST_CASE(different_field_types_test)
-        {
-            auto const sut1
-                = v13::oxm_match_set{match::in_port{1}, match::vlan_pcp{1}};
-            auto const sut2
-                = v13::oxm_match_set{match::in_port{2}, match::vlan_vid{1}};
-            auto const sut3
-                = v13::oxm_match_set{match::in_phy_port{1}, match::vlan_pcp{2}};
-            auto const sut4
-                = v13::oxm_match_set{match::in_phy_port{2}, match::vlan_vid{2}};
-
-            BOOST_TEST((sut1 == sut1));
-            BOOST_TEST((sut1 != sut2));
-            BOOST_TEST((sut1 != sut3));
-            BOOST_TEST((sut1 != sut4));
-        }
-
-        BOOST_AUTO_TEST_CASE(has_wildcard_field_test)
-        {
-            auto const sut1
-                = v13::oxm_match_set{match::in_port{1}, match::vlan_pcp{0, 0}};
-            auto const sut2
-                = v13::oxm_match_set{match::in_port{1}, match::vlan_vid{0, 0}};
-
-            BOOST_TEST((sut1 == sut2));
-        }
-
-        BOOST_AUTO_TEST_CASE(empty_match_test)
-        {
-            auto const sut1 = v13::oxm_match_set{};
-            auto const sut2 = v13::oxm_match_set{match::in_port{1}};
-
-            BOOST_TEST((sut1 == sut1));
-            BOOST_TEST((sut1 != sut2));
-        }
-
-    BOOST_AUTO_TEST_SUITE_END() // equality_test
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_both_oxm_match_sets_are_empty)
+      {
+        BOOST_TEST(equivalent(v13::oxm_match_set{}, v13::oxm_match_set{}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_oxm_match_field_value_is_equal)
+      {
+        BOOST_TEST(
+            equivalent(
+                v13::oxm_match_set{match::in_port{1, 3}, match::vlan_pcp{1}}
+              , v13::oxm_match_set{match::in_port{1, 3}, match::vlan_pcp{1}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_oxm_match_field_value_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                v13::oxm_match_set{match::in_port{1, 3}, match::vlan_pcp{2}}
+              , v13::oxm_match_set{match::in_port{1, 3}, match::vlan_pcp{3}}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_oxm_match_field_value_is_not_equal_but_equivalent)
+      {
+        BOOST_TEST(
+            equivalent(
+                v13::oxm_match_set{match::in_port{1, 3}, match::vlan_pcp{4}}
+              , v13::oxm_match_set{match::in_port{1, 3}, match::vlan_pcp{4, 0xff}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_oxm_match_field_type_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                v13::oxm_match_set{match::in_phy_port{1}, match::vlan_pcp{2}}
+              , v13::oxm_match_set{match::in_phy_port{1}, match::vlan_vid{2}}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_oxm_match_field_order_is_not_equal)
+      {
+        BOOST_TEST(
+            equivalent(
+                v13::oxm_match_set{match::in_phy_port{1}, match::vlan_vid{2}}
+              , v13::oxm_match_set{match::vlan_vid{2}, match::in_phy_port{1}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_oxm_match_field_number_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                v13::oxm_match_set{match::in_phy_port{1}, match::vlan_pcp{2}}
+              , v13::oxm_match_set{match::in_phy_port{1}}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_oxm_match_field_number_is_not_equal_but_one_is_wildcard)
+      {
+        BOOST_TEST(
+            equivalent(
+                v13::oxm_match_set{match::in_phy_port{1}, match::vlan_pcp{2, 0x00}}
+              , v13::oxm_match_set{match::in_phy_port{1}}));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(insert_new_field_test, oxm_match_set_fixture)
     {

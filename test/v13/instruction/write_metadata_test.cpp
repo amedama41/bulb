@@ -74,26 +74,88 @@ BOOST_AUTO_TEST_SUITE(write_metadata_test)
                 instructions::write_metadata::create(metadata, metadata_mask));
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
-        auto const max = std::numeric_limits<std::uint64_t>::max();
-        auto const sut1 = instructions::write_metadata{1};
-        auto const sut2 = instructions::write_metadata{2};
-        auto const sut3 = instructions::write_metadata{1, max};
-        auto const sut4 = instructions::write_metadata{1, 0};
-        auto const sut5 = instructions::write_metadata{2, max};
-        auto const sut6 = instructions::write_metadata{2, 0};
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = instructions::write_metadata{1, 0xffffffffffffffff};
 
-        BOOST_TEST((sut1 == sut1));
-        BOOST_TEST((sut1 != sut2));
-        BOOST_TEST((sut1 == sut3));
-        BOOST_TEST((sut1 != sut4));
-        BOOST_TEST((sut1 != sut5));
-        BOOST_TEST((sut1 != sut6));
-        BOOST_TEST((sut2 == sut5));
-        BOOST_TEST((sut4 == sut4));
-        BOOST_TEST((sut4 != sut6));
-    }
+        BOOST_TEST((sut == sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_metadata_and_mask_are_equal)
+      {
+        BOOST_TEST(
+            (instructions::write_metadata{0x12, 0xff} == instructions::write_metadata{0x12, 0xff}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_metadata_is_not_equal)
+      {
+        BOOST_TEST(
+            (instructions::write_metadata{0} != instructions::write_metadata{1}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_mask_is_not_equal)
+      {
+        BOOST_TEST(
+            (instructions::write_metadata{0, 0x1} != instructions::write_metadata{0, 0x2}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_pad_is_not_equal)
+      {
+        auto const binary
+          = "\x00\x02\x00\x18\x00\x00\x00\x01""\x00\x00\x00\x00\x00\x00\x00\xff"
+            "\x00\x00\x00\x00\x00\x00\x00\xff"_bin;
+        auto it = binary.begin();
+        auto const nonzero_pad
+          = instructions::write_metadata::decode(it, binary.end());
+
+        BOOST_TEST((instructions::write_metadata{0xff, 0xff} != nonzero_pad));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = instructions::write_metadata{1, 0xffffffffffffffff};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_metadata_and_mask_are_equal)
+      {
+        BOOST_TEST(
+            equivalent(
+                instructions::write_metadata{0x12, 0xff}
+              , instructions::write_metadata{0x12, 0xff}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_metadata_is_not_equal_but_write_value_is_equal)
+      {
+        BOOST_TEST(
+            equivalent(
+                instructions::write_metadata{0x0101, 0x00ff}
+              , instructions::write_metadata{0x1001, 0x00ff}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_metadata_is_not_equal_and_write_value_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+              instructions::write_metadata{0}, instructions::write_metadata{1}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_mask_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                instructions::write_metadata{0, 0x1}
+              , instructions::write_metadata{0, 0x2}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_pad_is_not_equal)
+      {
+        auto const binary
+          = "\x00\x02\x00\x18\x00\x00\x00\x01""\x00\x00\x00\x00\x00\x00\x00\xff"
+            "\x00\x00\x00\x00\x00\x00\x00\xff"_bin;
+        auto it = binary.begin();
+        auto const nonzero_pad
+          = instructions::write_metadata::decode(it, binary.end());
+
+        BOOST_TEST(
+            equivalent(instructions::write_metadata{0xff, 0xff}, nonzero_pad));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(encode_test, write_metadata_fixture)
     {

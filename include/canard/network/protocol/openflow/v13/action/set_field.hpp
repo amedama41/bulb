@@ -126,6 +126,12 @@ namespace actions {
             return validate(set_field(std::forward<Args>(args)...));
         }
 
+        static auto create_from_match_field(OXMMatchField field)
+            -> set_field
+        {
+            return set_field{std::move(field)};
+        }
+
         static void validate_set_field(raw_ofp_type const& set_field)
         {
             auto const oxm_header = extract_oxm_header(set_field);
@@ -159,6 +165,13 @@ namespace actions {
             -> bool
         {
             return lhs.field_ == rhs.field_;
+        }
+
+        friend auto equivalent(
+                set_field const& lhs, set_field const& rhs) noexcept
+            -> bool
+        {
+            return lhs == rhs;
         }
 
     private:

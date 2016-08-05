@@ -62,7 +62,7 @@ namespace instructions {
         raw_ofp_type instruction_goto_table_;
     };
 
-    inline auto operator==(
+    inline auto equivalent(
             goto_table const& lhs, goto_table const& rhs) noexcept
         -> bool
     {

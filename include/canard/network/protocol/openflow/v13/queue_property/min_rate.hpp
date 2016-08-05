@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <canard/network/protocol/openflow/detail/decode.hpp>
 #include <canard/network/protocol/openflow/detail/encode.hpp>
+#include <canard/network/protocol/openflow/detail/memcmp.hpp>
 #include <canard/network/protocol/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/protocol/openflow/v13/detail/basic_queue_property.hpp>
 #include <canard/network/protocol/openflow/v13/openflow.hpp>
@@ -78,6 +79,13 @@ namespace queue_properties {
             }
         }
 
+        friend auto operator==(
+                min_rate const& lhs, min_rate const& rhs) noexcept
+            -> bool
+        {
+            return detail::memcmp(lhs.min_rate_, rhs.min_rate_);
+        }
+
     private:
         explicit min_rate(
                 v13_detail::ofp_queue_prop_min_rate const& min_rate) noexcept
@@ -88,6 +96,12 @@ namespace queue_properties {
     private:
         v13_detail::ofp_queue_prop_min_rate min_rate_;
     };
+
+    inline auto equivalent(min_rate const& lhs, min_rate const& rhs) noexcept
+        -> bool
+    {
+        return lhs.rate() == rhs.rate();
+    }
 
 } // namespace queue_properties
 } // namespace v13

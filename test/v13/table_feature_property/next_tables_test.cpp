@@ -121,30 +121,90 @@ BOOST_AUTO_TEST_SUITE(next_tables_test)
         BOOST_TEST(src.next_table_ids().empty());
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
         auto const sut
             = table_feature_properties::next_tables{0x01, 0x02, 0x03};
-        auto const diff_order
-            = table_feature_properties::next_tables{0x02, 0x03, 0x01};
-        auto const diff_value
-            = table_feature_properties::next_tables{0x01, 0x04, 0x03};
-        auto const diff_num1
-            = table_feature_properties::next_tables{0x01, 0x03};
-        auto const diff_num2
-            = table_feature_properties::next_tables{0x01, 0x02};
-        auto const diff_num3
-            = table_feature_properties::next_tables{0x01, 0x02, 0x03, 0x04};
-        auto const empty = table_feature_properties::next_tables{};
 
         BOOST_TEST((sut == sut));
-        BOOST_TEST((sut != diff_order));
-        BOOST_TEST((sut != diff_value));
-        BOOST_TEST((sut != diff_num1));
-        BOOST_TEST((sut != diff_num2));
-        BOOST_TEST((sut != diff_num3));
-        BOOST_TEST((sut != empty));
-    }
+      }
+      BOOST_AUTO_TEST_CASE(true_if_next_table_ids_are_equal)
+      {
+        BOOST_TEST(
+            (table_feature_properties::next_tables{0x01, 0x02, 0x03}
+             == table_feature_properties::next_tables{0x01, 0x02, 0x03}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_both_next_table_ids_are_empty)
+      {
+        BOOST_TEST(
+            (table_feature_properties::next_tables{}
+             == table_feature_properties::next_tables{}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_table_id_is_not_equal)
+      {
+        BOOST_TEST(
+            (table_feature_properties::next_tables{0x01, 0x02, 0x03}
+             != table_feature_properties::next_tables{0x01, 0x04, 0x03}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_table_id_order_is_not_equal)
+      {
+        BOOST_TEST(
+            (table_feature_properties::next_tables{0x01, 0x02, 0x03}
+             != table_feature_properties::next_tables{0x02, 0x03, 0x01}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_table_id_number_is_not_equal)
+      {
+        BOOST_TEST(
+            (table_feature_properties::next_tables{0x01, 0x02, 0x03}
+             != table_feature_properties::next_tables{0x01, 0x02}));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut
+            = table_feature_properties::next_tables{0x01, 0x02, 0x03};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_next_table_ids_are_equal)
+      {
+        BOOST_TEST(
+            equivalent(
+                table_feature_properties::next_tables{0x01, 0x02, 0x03}
+              , table_feature_properties::next_tables{0x01, 0x02, 0x03}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_both_next_table_ids_are_empty)
+      {
+        BOOST_TEST(
+            equivalent(
+                table_feature_properties::next_tables{}
+              , table_feature_properties::next_tables{}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_table_id_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                table_feature_properties::next_tables{0x01, 0x02, 0x03}
+              , table_feature_properties::next_tables{0x01, 0x04, 0x03}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_table_id_order_is_not_equal)
+      {
+        BOOST_TEST(
+            equivalent(
+                table_feature_properties::next_tables{0x01, 0x02, 0x03}
+              , table_feature_properties::next_tables{0x02, 0x03, 0x01}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_table_id_number_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                table_feature_properties::next_tables{0x01, 0x02, 0x03}
+              , table_feature_properties::next_tables{0x01, 0x02}));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(encode_test, next_tables_fixture)
     {

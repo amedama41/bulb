@@ -2,6 +2,7 @@
 #define CANARD_NETWORK_OPENFLOW_V13_QUEUE_PROPERTIES_BAISC_QUEUE_PROPERTY_HPP
 
 #include <cstdint>
+#include <boost/operators.hpp>
 #include <canard/network/protocol/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -13,6 +14,7 @@ namespace queue_property_detail {
 
     template <class T>
     class basic_queue_property
+        : private boost::equality_comparable<T>
     {
     public:
         static constexpr auto property() noexcept

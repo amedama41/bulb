@@ -78,6 +78,13 @@ namespace v13 {
         return lhs.type() == rhs.type();
     }
 
+    inline auto equivalent(
+            instruction_id const& lhs, instruction_id const& rhs) noexcept
+        -> bool
+    {
+        return lhs.type() == rhs.type();
+    }
+
 
     class instruction_experimenter_id
     {
@@ -175,6 +182,15 @@ namespace v13 {
     };
 
     inline auto operator==(
+              instruction_experimenter_id const& lhs
+            , instruction_experimenter_id const& rhs) noexcept
+        -> bool
+    {
+        return lhs.experimenter() == rhs.experimenter()
+            && lhs.data() == rhs.data();
+    }
+
+    inline auto equivalent(
               instruction_experimenter_id const& lhs
             , instruction_experimenter_id const& rhs) noexcept
         -> bool

@@ -157,30 +157,267 @@ BOOST_AUTO_TEST_SUITE(bucket_test)
         BOOST_TEST(src.actions() == v13::action_list{});
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
-        auto const sut1 = v13::bucket{1, 2, 3, v13::action_set{
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = v13::bucket{1, 2, 3, v13::action_set{
             actions::output{1}
-        }};
-        auto const sut2 = v13::bucket{v13::action_set{
-            actions::output{1}
-        }};
-        auto const sut3 = v13::bucket{1, v13::action_set{
-            actions::output{1}
-        }};
-        auto const sut4 = v13::bucket{2, 3, v13::action_set{
-            actions::output{1}
-        }};
-        auto const sut5 = v13::bucket{1, 2, 3, v13::action_set{
-            actions::output{2}
         }};
 
-        BOOST_TEST((sut1 == sut1));
-        BOOST_TEST((sut1 != sut2));
-        BOOST_TEST((sut1 != sut3));
-        BOOST_TEST((sut1 != sut4));
-        BOOST_TEST((sut1 != sut5));
-    }
+        BOOST_TEST((sut == sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_having_same_value)
+      {
+        auto const weight = std::uint16_t{1};
+        auto const port = std::uint32_t{2};
+        auto const group = std::uint32_t{3};
+        auto const action_set = v13::action_set{
+            actions::output{1}
+          , actions::set_ipv4_src{"1.2.3.4"_ipv4}
+          , actions::pop_vlan{}
+        };
+
+        BOOST_TEST(
+            (v13::bucket{weight, port, group, action_set}
+             == v13::bucket{weight, port, group, action_set}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_weight_is_not_equal)
+      {
+        auto const port = std::uint32_t{2};
+        auto const group = std::uint32_t{3};
+        auto const action_set = v13::action_set{
+            actions::output{1}
+          , actions::set_ipv4_src{"1.2.3.4"_ipv4}
+          , actions::pop_vlan{}
+        };
+
+        BOOST_TEST(
+            (v13::bucket{2, port, group, action_set}
+             != v13::bucket{3, port, group, action_set}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_port_is_not_equal)
+      {
+        auto const weight = std::uint16_t{1};
+        auto const group = std::uint32_t{3};
+        auto const action_set = v13::action_set{
+            actions::output{1}
+          , actions::set_ipv4_src{"1.2.3.4"_ipv4}
+          , actions::pop_vlan{}
+        };
+
+        BOOST_TEST(
+            (v13::bucket{weight, 3, group, action_set}
+             != v13::bucket{weight, 4, group, action_set}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_group_is_not_equal)
+      {
+        auto const weight = std::uint16_t{1};
+        auto const port = std::uint32_t{2};
+        auto const action_set = v13::action_set{
+            actions::output{1}
+          , actions::set_ipv4_src{"1.2.3.4"_ipv4}
+          , actions::pop_vlan{}
+        };
+
+        BOOST_TEST(
+            (v13::bucket{weight, port, 5, action_set}
+             != v13::bucket{weight, port, 6, action_set}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_action_set_is_not_equal)
+      {
+        auto const weight = std::uint16_t{1};
+        auto const port = std::uint32_t{2};
+        auto const group = std::uint32_t{3};
+
+        BOOST_TEST(
+            (v13::bucket{weight, port, group
+             , v13::action_set{ actions::output{1}, actions::set_ip_ecn{1} }}
+             != v13::bucket{weight, port, group
+             , v13::action_set{ actions::output{1}, actions::set_ip_ecn{2} }}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_actions_order_is_not_equal)
+      {
+        auto const weight = std::uint16_t{1};
+        auto const port = std::uint32_t{2};
+        auto const group = std::uint32_t{3};
+
+        BOOST_TEST(
+            (v13::bucket{weight, port, group
+             , v13::action_list{ actions::pop_vlan{}, actions::pop_pbb{} }}
+             != v13::bucket{weight, port, group
+             , v13::action_list{ actions::pop_pbb{}, actions::pop_vlan{} }}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_contained_action_type_is_not_equal)
+      {
+        auto const weight = std::uint16_t{1};
+        auto const port = std::uint32_t{2};
+        auto const group = std::uint32_t{3};
+
+        BOOST_TEST(
+            (v13::bucket{weight, port, group
+             , v13::action_list{ actions::copy_ttl_out{} }}
+             != v13::bucket{weight, port, group
+             , v13::action_list{ actions::copy_ttl_in{} }}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_action_set_is_anothers_super_set)
+      {
+        auto const weight = std::uint16_t{1};
+        auto const port = std::uint32_t{2};
+        auto const group = std::uint32_t{3};
+
+        BOOST_TEST(
+            (v13::bucket{weight, port, group
+             , v13::action_list{ actions::pop_pbb{}, actions::pop_pbb{} }}
+             != v13::bucket{weight, port, group
+             , v13::action_list{ actions::pop_pbb{} }}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_pad_is_not_equal)
+      {
+        auto const binary
+          = "\x00\x10\x00\x01\x00\x00\x00\x02"
+            "\x00\x00\x00\x03\x00\x00\x00\x01"_bin;
+        auto it = binary.begin();
+        auto const nonzero_pad = v13::bucket::decode(it, binary.end());
+
+        BOOST_TEST(
+            (v13::bucket{1, 2, 3, v13::action_set{}} != nonzero_pad));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = v13::bucket{1, 2, 3, v13::action_set{
+            actions::output{1}
+        }};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_having_same_value)
+      {
+        auto const weight = std::uint16_t{1};
+        auto const port = std::uint32_t{2};
+        auto const group = std::uint32_t{3};
+        auto const action_set = v13::action_set{
+            actions::output{1}
+          , actions::set_ipv4_src{"1.2.3.4"_ipv4}
+          , actions::pop_vlan{}
+        };
+
+        BOOST_TEST(
+            equivalent(
+                v13::bucket{weight, port, group, action_set}
+              , v13::bucket{weight, port, group, action_set}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_weight_is_not_equal)
+      {
+        auto const port = std::uint32_t{2};
+        auto const group = std::uint32_t{3};
+        auto const action_set = v13::action_set{
+            actions::output{1}
+          , actions::set_ipv4_src{"1.2.3.4"_ipv4}
+          , actions::pop_vlan{}
+        };
+
+        BOOST_TEST(
+            !equivalent(
+                v13::bucket{2, port, group, action_set}
+              , v13::bucket{3, port, group, action_set}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_port_is_not_equal)
+      {
+        auto const weight = std::uint16_t{1};
+        auto const group = std::uint32_t{3};
+        auto const action_set = v13::action_set{
+            actions::output{1}
+          , actions::set_ipv4_src{"1.2.3.4"_ipv4}
+          , actions::pop_vlan{}
+        };
+
+        BOOST_TEST(
+            !equivalent(
+                v13::bucket{weight, 3, group, action_set}
+              , v13::bucket{weight, 4, group, action_set}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_group_is_not_equal)
+      {
+        auto const weight = std::uint16_t{1};
+        auto const port = std::uint32_t{2};
+        auto const action_set = v13::action_set{
+            actions::output{1}
+          , actions::set_ipv4_src{"1.2.3.4"_ipv4}
+          , actions::pop_vlan{}
+        };
+
+        BOOST_TEST(
+            !equivalent(
+                v13::bucket{weight, port, 5, action_set}
+              , v13::bucket{weight, port, 6, action_set}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_action_set_is_not_equal)
+      {
+        auto const weight = std::uint16_t{1};
+        auto const port = std::uint32_t{2};
+        auto const group = std::uint32_t{3};
+
+        BOOST_TEST(
+            !equivalent(
+                v13::bucket{weight, port, group
+                  , v13::action_set{ actions::output{1}, actions::set_ip_ecn{1} }}
+              , v13::bucket{weight, port, group
+                  , v13::action_set{ actions::output{1}, actions::set_ip_ecn{2} }}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_actions_order_is_not_equal)
+      {
+        auto const weight = std::uint16_t{1};
+        auto const port = std::uint32_t{2};
+        auto const group = std::uint32_t{3};
+
+        BOOST_TEST(
+            equivalent(
+                v13::bucket{weight, port, group
+                  , v13::action_list{ actions::pop_vlan{}, actions::pop_pbb{} }}
+              , v13::bucket{weight, port, group
+                  , v13::action_list{ actions::pop_pbb{}, actions::pop_vlan{} }}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_contained_action_type_is_not_equal)
+      {
+        auto const weight = std::uint16_t{1};
+        auto const port = std::uint32_t{2};
+        auto const group = std::uint32_t{3};
+
+        BOOST_TEST(
+            !equivalent(
+                v13::bucket{weight, port, group
+                  , v13::action_list{ actions::copy_ttl_out{} }}
+              , v13::bucket{weight, port, group
+                  , v13::action_list{ actions::copy_ttl_in{} }}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_action_set_is_anothers_super_set)
+      {
+        auto const weight = std::uint16_t{1};
+        auto const port = std::uint32_t{2};
+        auto const group = std::uint32_t{3};
+
+        BOOST_TEST(
+            !equivalent(
+                v13::bucket{weight, port, group
+                  , v13::action_list{ actions::pop_pbb{}, actions::pop_pbb{} }}
+              , v13::bucket{weight, port, group
+                  , v13::action_list{ actions::pop_pbb{} }}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_pad_is_not_equal)
+      {
+        auto const binary
+          = "\x00\x10\x00\x01\x00\x00\x00\x02"
+            "\x00\x00\x00\x03\x00\x00\x00\x01"_bin;
+        auto it = binary.begin();
+        auto const nonzero_pad = v13::bucket::decode(it, binary.end());
+
+        BOOST_TEST(
+            equivalent(v13::bucket{1, 2, 3, v13::action_set{}}, nonzero_pad));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_AUTO_TEST_CASE(all_factory_test)
     {

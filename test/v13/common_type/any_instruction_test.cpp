@@ -62,20 +62,155 @@ BOOST_AUTO_TEST_SUITE(any_instruction_test)
                     == apply_actions));
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
-        auto const sut1 = v13::any_instruction{instructions::goto_table{1}};
-        auto const sut2 = v13::any_instruction{instructions::goto_table{2}};
-        auto const sut3 = v13::any_instruction{instructions::clear_actions{}};
-        auto const goto_table1 = instructions::goto_table{1};
-        auto const goto_table2 = instructions::goto_table{2};
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = v13::any_instruction{instructions::goto_table{1}};
 
-        BOOST_TEST((sut1 == sut1));
-        BOOST_TEST((sut1 != sut2));
-        BOOST_TEST((sut1 != sut3));
-        BOOST_TEST((sut1 == goto_table1));
-        BOOST_TEST((sut1 != goto_table2));
-    }
+        BOOST_TEST((sut == sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_contained_instruction_is_equal)
+      {
+        BOOST_TEST(
+            (v13::any_instruction{instructions::goto_table{1}}
+             == v13::any_instruction{instructions::goto_table{1}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_contained_instruction_is_not_equal)
+      {
+        BOOST_TEST(
+            (v13::any_instruction{instructions::goto_table{2}}
+             != v13::any_instruction{instructions::goto_table{3}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_contained_instruction_is_not_equal_but_equivalent)
+      {
+        BOOST_TEST(
+            (v13::any_instruction{instructions::write_metadata{0x11, 0x0f}}
+             != v13::any_instruction{instructions::write_metadata{0x01, 0x0f}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_contained_instruction_type_is_not_equal)
+      {
+        BOOST_TEST(
+            (v13::any_instruction{instructions::write_actions{}}
+             != v13::any_instruction{instructions::apply_actions{}}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_right_operand_is_same_value_action)
+      {
+        BOOST_TEST(
+            (v13::any_instruction{instructions::meter{1}}
+             == instructions::meter{1}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_right_operand_is_different_value_action)
+      {
+        BOOST_TEST(
+            (v13::any_instruction{instructions::meter{1}}
+             != instructions::meter{2}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_right_operand_is_different_type_action)
+      {
+        BOOST_TEST(
+            (v13::any_instruction{instructions::write_actions{}}
+             != instructions::clear_actions{}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_left_operand_is_same_value_action)
+      {
+        BOOST_TEST(
+            (instructions::clear_actions{}
+             == v13::any_instruction{instructions::clear_actions{}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_left_operand_is_different_value_action)
+      {
+        BOOST_TEST(
+            (instructions::write_metadata{1}
+            != v13::any_instruction{instructions::write_metadata{2}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_left_operand_is_different_type_action)
+      {
+        BOOST_TEST(
+            (instructions::apply_actions{actions::group{1}}
+             != v13::any_instruction{
+              instructions::write_actions{actions::group{1}}}));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = v13::any_instruction{instructions::goto_table{1}};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_contained_instruction_is_equal)
+      {
+        BOOST_TEST(
+            equivalent(
+                v13::any_instruction{instructions::goto_table{1}}
+              , v13::any_instruction{instructions::goto_table{1}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_contained_instruction_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                v13::any_instruction{instructions::goto_table{2}}
+              , v13::any_instruction{instructions::goto_table{3}}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_contained_instruction_is_not_equal_but_equivalent)
+      {
+        BOOST_TEST(
+            equivalent(
+                v13::any_instruction{instructions::write_metadata{0x11, 0x0f}}
+              , v13::any_instruction{instructions::write_metadata{0x01, 0x0f}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_contained_instruction_type_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                v13::any_instruction{instructions::write_actions{}}
+              , v13::any_instruction{instructions::apply_actions{}}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_right_operand_is_same_value_action)
+      {
+        BOOST_TEST(
+            equivalent(
+                v13::any_instruction{instructions::meter{1}}
+              , instructions::meter{1}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_right_operand_is_different_value_action)
+      {
+        BOOST_TEST(
+            !equivalent(
+                v13::any_instruction{instructions::meter{1}}
+              , instructions::meter{2}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_right_operand_is_different_type_action)
+      {
+        BOOST_TEST(
+            !equivalent(
+                v13::any_instruction{instructions::write_actions{}}
+              , instructions::clear_actions{}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_left_operand_is_same_value_action)
+      {
+        BOOST_TEST(
+            equivalent(
+                instructions::clear_actions{}
+              , v13::any_instruction{instructions::clear_actions{}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_left_operand_is_different_value_action)
+      {
+        BOOST_TEST(
+            !equivalent(
+                instructions::write_metadata{1}
+              , v13::any_instruction{instructions::write_metadata{2}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_left_operand_is_different_type_action)
+      {
+        BOOST_TEST(
+            !equivalent(
+                instructions::apply_actions{actions::group{1}}
+              , v13::any_instruction{
+                  instructions::write_actions{actions::group{1}}}));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(encode_test, any_instruction_fixture)
     {

@@ -50,7 +50,7 @@ namespace instructions {
         raw_ofp_type instruction_actions_;
     };
 
-    constexpr inline auto operator==(
+    constexpr inline auto equivalent(
             clear_actions const&, clear_actions const&) noexcept
         -> bool
     {

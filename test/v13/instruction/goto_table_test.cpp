@@ -67,15 +67,58 @@ BOOST_AUTO_TEST_SUITE(goto_table_test)
                 , std::runtime_error);
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
-        auto const sut1 = instructions::goto_table{0x12};
-        auto const sut2 = instructions::goto_table{0x13};
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = instructions::goto_table{0x12};
 
-        BOOST_TEST((sut1 == sut1));
-        BOOST_TEST((sut1 != sut2));
-        BOOST_TEST((sut2 == sut2));
-    }
+        BOOST_TEST((sut == sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_table_id_is_equal)
+      {
+        BOOST_TEST(
+            (instructions::goto_table{127} == instructions::goto_table{127}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_table_id_is_not_equal)
+      {
+        BOOST_TEST((instructions::goto_table{1} != instructions::goto_table{2}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_pad_is_not_equal)
+      {
+        auto const binary = "\x00\x01\x00\x08\x12\x00\x00\x01"_bin;
+        auto it = binary.begin();
+        auto const nonzero_pad = instructions::goto_table::decode(it, binary.end());
+
+        BOOST_TEST((instructions::goto_table{0x12} != nonzero_pad));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = instructions::goto_table{0x12};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_table_id_is_equal)
+      {
+        BOOST_TEST(
+            equivalent(instructions::goto_table{3}, instructions::goto_table{3}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_table_id_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(instructions::goto_table{1}, instructions::goto_table{2}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_pad_is_not_equal)
+      {
+        auto const binary = "\x00\x01\x00\x08\x12\x12\x34\x56"_bin;
+        auto it = binary.begin();
+        auto const nonzero_pad = instructions::goto_table::decode(it, binary.end());
+
+        BOOST_TEST(equivalent(instructions::goto_table{0x12}, nonzero_pad));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(encode_test, goto_table_fixture)
     {
