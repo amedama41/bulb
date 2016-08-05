@@ -5,27 +5,36 @@ CXXFLAGS = -std=c++11 -stdlib=libc++ -Wall -pedantic $(INCLUDES)
 # CXX = g++-4.9
 # CXXFLAGS = -std=c++11 -Wall -pedantic $(INCLUDES)
 
-OBJS = $(SRCS:.cpp=.o)
+OBJ_DIR = obj
+DEPENDS_DIR = depends
 
 TARGET = all_test.out
 
-ALL_TESTS = $(OBJS:.o=)
-
-DEPENDS = $(addprefix .,$(OBJS:.o=.depends))
+OBJS = $(addprefix $(OBJ_DIR)/,$(SRCS:.cpp=.o))
+DEPENDS = $(addprefix $(DEPENDS_DIR)/,$(SRCS:.cpp=.depends))
+ALL_TESTS = $(SRCS:.cpp=.out)
+TARGET = all_test.out
 
 define build_test
 $(CXX) -DBOOST_TEST_MODULE=$@ $(CXXFLAGS) -c ../../driver.cpp -o ../../driver.o
 $(CXX) $(CXXFLAGS) -o $@ ../../driver.o $^ $(LDFLAGS) -rpath @executable_path/.
 endef
 
-.PHONY: all clean clean_all run
+.PHONY: all clean clean_dep clean_all run
 
 all: $(TARGET)
 
-.%.depends: %.cpp
-	$(CXX) -MM $(CXXFLAGS) $< > $@
+$(DEPENDS_DIR)/%.depends: %.cpp
+	@mkdir -p $(DEPENDS_DIR)
+	$(CXX) -MM $(CXXFLAGS) $< \
+	| sed 's:\($(notdir $(@:.depends=.o))\):$(OBJ_DIR)/\1:' > $@
+	@[ -s $@ ] || rm -f $@
 
-%: %.o
+$(OBJ_DIR)/%.o: %.cpp
+	@mkdir -p $(OBJ_DIR)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+%.out: $(OBJ_DIR)/%.o
 	$(build_test)
 
 $(TARGET_LIB): $(OBJS)
@@ -38,10 +47,12 @@ run: all
 	./$(TARGET) -l message
 
 clean:
-	-rm *.o $(ALL_TESTS) $(TARGET_LIB) $(TARGET) 2> /dev/null
+	-rm -rf $(OBJ_DIR) $(ALL_TESTS) $(TARGET_LIB) $(TARGET) 2> /dev/null
 
-clean_all: clean
-	-rm $(DEPENDS)
+clean_dep:
+	-rm -rf $(DEPENDS_DIR)
+
+clean_all: clean_dep clean
 
 -include $(DEPENDS)
 

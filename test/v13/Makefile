@@ -47,7 +47,7 @@ define make_each_subdirectories
 done
 endef
 
-.PHONY: all clean clean_all run
+.PHONY: all clean clean_dep clean_all run
 
 all: $(TARGET)
 
@@ -68,6 +68,10 @@ run: all
 
 clean:
 	-rm *.o $(ALL_TESTS) $(TARGET) 2> /dev/null
+	$(make_each_subdirectories)
+
+clean_dep:
+	-rm $(DEPENDS)
 	$(make_each_subdirectories)
 
 clean_all:
