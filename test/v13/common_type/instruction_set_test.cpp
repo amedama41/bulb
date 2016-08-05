@@ -263,61 +263,163 @@ BOOST_AUTO_TEST_SUITE(instruction_set_test)
         BOOST_TEST(src.empty());
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
         auto const sut = v13::instruction_set{
               instructions::goto_table{1}
             , instructions::apply_actions{actions::output{1}, actions::group{2}}
         };
-        auto const diff_value1 = v13::instruction_set{
-              instructions::goto_table{2}
-            , instructions::apply_actions{actions::output{1}, actions::group{2}}
-        };
-        auto const diff_value2 = v13::instruction_set{
-              instructions::goto_table{1}
-            , instructions::apply_actions{actions::output{2}, actions::group{2}}
-        };
-        auto const diff_type1 = v13::instruction_set{
-              instructions::goto_table{1}
-            , instructions::write_actions{actions::output{1}, actions::group{2}}
-        };
-        auto const diff_type2 = v13::instruction_set{
-              instructions::write_metadata{1}
-            , instructions::apply_actions{actions::output{1}, actions::group{2}}
-        };
-        auto const empty = v13::instruction_set{};
-        auto same_value_after_insert1 = v13::instruction_set{
-              instructions::goto_table{1}
-        };
-        same_value_after_insert1.insert(instructions::apply_actions{
-                actions::output{1}, actions::group{2}});
-        auto same_value_after_insert2 = v13::instruction_set{
-              instructions::apply_actions{actions::output{1}, actions::group{2}}
-        };
-        same_value_after_insert2.insert(instructions::goto_table{1});
-        auto same_value_after_assign1 = v13::instruction_set{
-              instructions::goto_table{2}
-            , instructions::apply_actions{actions::output{1}, actions::group{2}}
-        };
-        same_value_after_assign1.assign(instructions::goto_table{1});
-        auto same_value_after_assign2 = v13::instruction_set{
-              instructions::goto_table{1}
-            , instructions::apply_actions{actions::output{2}, actions::group{1}}
-        };
-        same_value_after_assign2.assign(instructions::apply_actions{
-                actions::output{1}, actions::group{2}});
 
         BOOST_TEST((sut == sut));
-        BOOST_TEST((sut != diff_value1));
-        BOOST_TEST((sut != diff_value2));
-        BOOST_TEST((sut != diff_type1));
-        BOOST_TEST((sut != diff_type2));
-        BOOST_TEST((sut != empty));
-        BOOST_TEST((sut == same_value_after_insert1));
-        BOOST_TEST((sut == same_value_after_insert2));
-        BOOST_TEST((sut == same_value_after_assign1));
-        BOOST_TEST((sut == same_value_after_assign2));
-    }
+      }
+      BOOST_AUTO_TEST_CASE(true_if_both_instructions_are_empty)
+      {
+        BOOST_TEST((v13::instruction_set{} == v13::instruction_set{}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_instructions_are_equal)
+      {
+        auto const goto_table = instructions::goto_table{1};
+        auto const apply_actions
+          = instructions::apply_actions{actions::output{1}, actions::group{2}};
+
+        BOOST_TEST((v13::instruction_set{goto_table, apply_actions}
+              == v13::instruction_set{goto_table, apply_actions}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_instruction_value_is_not_equal)
+      {
+        auto const apply_actions
+          = instructions::apply_actions{actions::output{1}, actions::group{2}};
+
+        BOOST_TEST(
+            (v13::instruction_set{apply_actions, instructions::goto_table{1}}
+             != v13::instruction_set{apply_actions, instructions::goto_table{2}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_instruction_value_is_not_equal_but_equivalent)
+      {
+        auto const apply_actions
+          = instructions::apply_actions{actions::output{1}, actions::group{2}};
+
+        BOOST_TEST(
+            (v13::instruction_set{
+             apply_actions, instructions::write_metadata{0x01, 0x01}}
+             != v13::instruction_set{
+             apply_actions, instructions::write_metadata{0x11, 0x01}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_instruction_type_is_not_equal)
+      {
+        auto const goto_table = instructions::goto_table{1};
+        auto const apply_actions
+          = instructions::apply_actions{actions::output{1}, actions::group{2}};
+        auto const write_actions
+          = instructions::write_actions{actions::output{1}, actions::group{2}};
+
+        BOOST_TEST((v13::instruction_set{goto_table, apply_actions}
+              != v13::instruction_set{goto_table, write_actions}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_instruction_order_is_not_equal)
+      {
+        auto const goto_table = instructions::goto_table{1};
+        auto const apply_actions
+          = instructions::apply_actions{actions::output{1}, actions::group{2}};
+
+        BOOST_TEST((v13::instruction_set{goto_table, apply_actions}
+              == v13::instruction_set{apply_actions, goto_table}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_instruction_number_is_not_equal)
+      {
+        auto const goto_table = instructions::goto_table{1};
+        auto const apply_actions
+          = instructions::apply_actions{actions::output{1}, actions::group{2}};
+
+        BOOST_TEST((v13::instruction_set{goto_table, apply_actions}
+              != v13::instruction_set{goto_table}));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(true_if_same_object)
+      {
+        auto const sut = v13::instruction_set{
+              instructions::goto_table{1}
+            , instructions::apply_actions{actions::output{1}, actions::group{2}}
+        };
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_both_instructions_are_empty)
+      {
+        BOOST_TEST(equivalent(v13::instruction_set{}, v13::instruction_set{}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_instructions_are_equal)
+      {
+        auto const goto_table = instructions::goto_table{1};
+        auto const apply_actions
+          = instructions::apply_actions{actions::output{1}, actions::group{2}};
+
+        BOOST_TEST(
+            equivalent(
+                v13::instruction_set{goto_table, apply_actions}
+              , v13::instruction_set{goto_table, apply_actions}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_instruction_value_is_not_equal)
+      {
+        auto const apply_actions
+          = instructions::apply_actions{actions::output{1}, actions::group{2}};
+
+        BOOST_TEST(
+            !equivalent(
+                v13::instruction_set{apply_actions, instructions::goto_table{1}}
+              , v13::instruction_set{apply_actions, instructions::goto_table{2}}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_instruction_value_is_not_equal_but_equivalent)
+      {
+        auto const apply_actions
+          = instructions::apply_actions{actions::output{1}, actions::group{2}};
+
+        BOOST_TEST(
+            equivalent(
+                v13::instruction_set{
+                  apply_actions, instructions::write_metadata{0x01, 0x01}}
+              , v13::instruction_set{
+                  apply_actions, instructions::write_metadata{0x11, 0x01}}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_instruction_type_is_not_equal)
+      {
+        auto const goto_table = instructions::goto_table{1};
+        auto const apply_actions
+          = instructions::apply_actions{actions::output{1}, actions::group{2}};
+        auto const write_actions
+          = instructions::write_actions{actions::output{1}, actions::group{2}};
+
+        BOOST_TEST(
+            !equivalent(
+                v13::instruction_set{goto_table, apply_actions}
+              , v13::instruction_set{goto_table, write_actions}));
+      }
+      BOOST_AUTO_TEST_CASE(true_if_instruction_order_is_not_equal)
+      {
+        auto const goto_table = instructions::goto_table{1};
+        auto const apply_actions
+          = instructions::apply_actions{actions::output{1}, actions::group{2}};
+
+        BOOST_TEST(
+            equivalent(
+                v13::instruction_set{goto_table, apply_actions}
+              , v13::instruction_set{apply_actions, goto_table}));
+      }
+      BOOST_AUTO_TEST_CASE(false_if_instruction_number_is_not_equal)
+      {
+        auto const goto_table = instructions::goto_table{1};
+        auto const apply_actions
+          = instructions::apply_actions{actions::output{1}, actions::group{2}};
+
+        BOOST_TEST(
+            !equivalent(
+                v13::instruction_set{goto_table, apply_actions}
+              , v13::instruction_set{goto_table}));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
 
     BOOST_FIXTURE_TEST_SUITE(modification_test, instruction_set_fixture)
