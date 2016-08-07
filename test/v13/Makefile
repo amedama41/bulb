@@ -2,20 +2,27 @@ INCLUDES = -I../../include
 LDFLAGS = -lboost_unit_test_framework-mt -lboost_system-mt
 CXX = clang++
 # CXX = g++-4.9
-CXXFLAGS = -std=c++11 -stdlib=libc++ -Wall -pedantic $(INCLUDES)
+CXXFLAGS = -std=c++11 -stdlib=libc++ -Wall -pedantic -DCANARD_NET_OFP_SUPPRESS_IMPLICIT_INSTANTIATION $(INCLUDES)
 # CXXFLAGS = -std=c++11 -Wall -pedantic $(INCLUDES)
 
-SUB_DIRECTORIES = action \
-				  common_type \
-				  instruction \
-				  message \
-				  multipart \
-				  oxm_match \
-				  queue_property \
-				  table_feature_property
-TEST_LIBRARIES = $(foreach dir,$(SUB_DIRECTORIES),./$(dir)/lib$(dir)_test.dylib)
-LINKED_LIBRARIES = $(foreach dir,$(SUB_DIRECTORIES),-L./$(dir) -l$(dir)_test)
-LIBRARIES_RPATH = $(foreach dir,$(SUB_DIRECTORIES),-rpath @executable_path/./$(dir))
+LIBBULB_DIR = libbulb
+LIBBULB_LIB = ./$(LIBBULB_DIR)/libbulb.dylib
+LIBBULB_RPATH = -rpath @executable_path/./$(LIBBULB_DIR)
+
+TEST_DIRS = action \
+			common_type \
+			instruction \
+			message \
+			multipart \
+			oxm_match \
+			queue_property \
+			table_feature_property
+TEST_LIBS = $(foreach dir,$(TEST_DIRS),./$(dir)/lib$(dir)_test.dylib)
+TEST_RPATH = $(foreach dir,$(TEST_DIRS),-rpath @executable_path/./$(dir))
+
+ALL_SUBDIRS = $(LIBBULB_DIR) $(TEST_DIRS)
+ALL_LIBS = $(LIBBULB_LIB) $(TEST_LIBS)
+ALL_RPATH = $(LIBBULB_RPATH) $(TEST_RPATH)
 
 UTILITY_TEST_SRCS = byteorder_test.cpp \
 					port_test.cpp
@@ -38,18 +45,21 @@ DEPENDS = $(addprefix .,$(OBJS:.o=.depends))
 
 define build_test
 $(CXX) -DBOOST_TEST_MODULE=$@ $(CXXFLAGS) -c ../driver.cpp -o ../driver.o
-$(CXX) $(CXXFLAGS) -o $@ ../driver.o $^ $(LDFLAGS) $(LIBRARIES_RPATH)
+$(CXX) $(CXXFLAGS) -o $@ ../driver.o $^ $(LDFLAGS) $(ALL_RPATH)
 endef
 
 define make_each_subdirectories
-@for dir in $(SUB_DIRECTORIES); do \
+@for dir in $(ALL_SUBDIRS); do \
 	$(MAKE) -C ./$$dir $@; \
 done
 endef
 
-.PHONY: all clean clean_dep clean_all run
+.PHONY: all lib clean clean_dep clean_all dep run
 
-all: $(TARGET)
+all: lib $(TARGET)
+
+dep: $(DEPENDS)
+	$(make_each_subdirectories)
 
 .%.depends: %.cpp
 	$(CXX) -MM $(CXXFLAGS) $< > $@
@@ -57,11 +67,11 @@ all: $(TARGET)
 %: %.o
 	$(build_test)
 
-$(TARGET): $(TEST_LIBRARIES) $(OBJS)
+$(TARGET): $(ALL_LIBS) $(OBJS)
 	$(build_test)
 
-$(TEST_LIBRARIES):
-	$(MAKE) -C $(dir $@) $(notdir $@)
+lib:
+	$(make_each_subdirectories)
 
 run: all
 	./$(TARGET)

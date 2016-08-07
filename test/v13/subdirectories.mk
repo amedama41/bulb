@@ -1,14 +1,15 @@
 INCLUDES = -I../../../include
 LDFLAGS = -lboost_unit_test_framework-mt -lboost_system-mt
 CXX = clang++
-CXXFLAGS = -std=c++11 -stdlib=libc++ -Wall -pedantic $(INCLUDES)
+CXXFLAGS = -std=c++11 -stdlib=libc++ -Wall -pedantic -DCANARD_NET_OFP_SUPPRESS_IMPLICIT_INSTANTIATION $(INCLUDES)
 # CXX = g++-4.9
 # CXXFLAGS = -std=c++11 -Wall -pedantic $(INCLUDES)
 
 OBJ_DIR = obj
 DEPENDS_DIR = depends
 
-TARGET = all_test.out
+LIBBULB_DIR = ../libbulb
+LIBBULB = $(LIBBULB_DIR)/libbulb.dylib
 
 OBJS = $(addprefix $(OBJ_DIR)/,$(SRCS:.cpp=.o))
 DEPENDS = $(addprefix $(DEPENDS_DIR)/,$(SRCS:.cpp=.depends))
@@ -17,12 +18,18 @@ TARGET = all_test.out
 
 define build_test
 $(CXX) -DBOOST_TEST_MODULE=$@ $(CXXFLAGS) -c ../../driver.cpp -o ../../driver.o
-$(CXX) $(CXXFLAGS) -o $@ ../../driver.o $^ $(LDFLAGS) -rpath @executable_path/.
+$(CXX) $(CXXFLAGS) -o $@ ../../driver.o $^ $(LDFLAGS) \
+	-rpath @executable_path/. -rpath @executable_path/$(LIBBULB_DIR)
 endef
 
-.PHONY: all clean clean_dep clean_all run
+.PHONY: all lib clean clean_dep clean_all dep run
 
 all: $(TARGET)
+
+lib: $(TARGET_LIB)
+
+$(LIBBULB):
+	$(MAKE) -C $(LIBBULB_DIR) all
 
 $(DEPENDS_DIR)/%.depends: %.cpp
 	@mkdir -p $(DEPENDS_DIR)
@@ -37,7 +44,7 @@ $(OBJ_DIR)/%.o: %.cpp
 %.out: $(OBJ_DIR)/%.o
 	$(build_test)
 
-$(TARGET_LIB): $(OBJS)
+$(TARGET_LIB): $(LIBBULB) $(OBJS)
 	$(CXX) -dynamiclib -install_name @rpath/$@ $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 $(TARGET): $(TARGET_LIB)
