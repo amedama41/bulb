@@ -124,7 +124,7 @@ namespace detail {
                 any_instruction const& lhs, any_instruction const& rhs)
             -> bool
         {
-            return lhs.variant_ == rhs.variant_;
+            return lhs.equal_impl(rhs);
         }
 
         template <class Instruction, class = containable_if_t<Instruction>>
@@ -171,8 +171,7 @@ namespace detail {
                 any_instruction const& lhs, any_instruction const& rhs) noexcept
             -> bool
         {
-            auto visitor = detail::equivalent_visitor{};
-            return boost::apply_visitor(visitor, lhs.variant_, rhs.variant_);
+            return lhs.equivalent_impl(rhs);
         }
 
         template <class Instruction, class = containable_if_t<Instruction>>
@@ -208,6 +207,19 @@ namespace detail {
             -> T const*;
 
     private:
+        auto equal_impl(any_instruction const& rhs) const
+            -> bool
+        {
+            return variant_ == rhs.variant_;
+        }
+
+        auto equivalent_impl(any_instruction const& rhs) const noexcept
+            -> bool
+        {
+            auto visitor = detail::equivalent_visitor{};
+            return boost::apply_visitor(visitor, variant_, rhs.variant_);
+        }
+
         instruction_variant variant_;
     };
 
