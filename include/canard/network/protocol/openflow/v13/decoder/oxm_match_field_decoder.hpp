@@ -15,6 +15,8 @@ namespace v13 {
 
 struct oxm_match_field_decoder
 {
+    using oxm_match_field_type_list = default_oxm_match_field_list;
+
     template <class ReturnType, class Iterator, class Function>
     static auto decode(Iterator& first, Iterator last, Function function)
         -> ReturnType

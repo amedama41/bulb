@@ -87,6 +87,30 @@ namespace openflow {
             }
         };
 
+#define DEFINE_OXM_VISITOR(FUNC_NAME, RETURN_TYPE) \
+        class FUNC_NAME ## _visitor \
+            : public boost::static_visitor<RETURN_TYPE> \
+        { \
+        public: \
+            template <class T> \
+            auto operator()(T const& t) const noexcept \
+                -> RETURN_TYPE \
+            { \
+                return t.FUNC_NAME(); \
+            } \
+        }; \
+
+        DEFINE_OXM_VISITOR(oxm_class, std::uint16_t)
+        DEFINE_OXM_VISITOR(oxm_field, std::uint8_t)
+        DEFINE_OXM_VISITOR(oxm_type, std::uint32_t)
+        DEFINE_OXM_VISITOR(oxm_header, std::uint32_t)
+        DEFINE_OXM_VISITOR(oxm_has_mask, bool)
+        DEFINE_OXM_VISITOR(oxm_length, std::uint8_t)
+        DEFINE_OXM_VISITOR(is_wildcard, bool)
+        DEFINE_OXM_VISITOR(is_exact, bool)
+
+#undef DEFINE_OXM_VISITOR
+
     } // namespace detail
 
 } // namespace openflow

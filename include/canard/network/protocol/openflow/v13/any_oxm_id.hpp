@@ -56,28 +56,28 @@ namespace v13 {
         auto oxm_type() const noexcept
             -> std::uint32_t
         {
-            auto visitor = detail::v13::oxm_type_visitor{};
+            auto visitor = detail::oxm_type_visitor{};
             return boost::apply_visitor(visitor, variant_);
         }
 
         auto oxm_header() const noexcept
             -> std::uint32_t
         {
-            auto visitor = detail::v13::oxm_header_visitor{};
+            auto visitor = detail::oxm_header_visitor{};
             return boost::apply_visitor(visitor, variant_);
         }
 
         auto oxm_has_mask() const noexcept
             -> bool
         {
-            auto visitor = detail::v13::oxm_has_mask_visitor{};
+            auto visitor = detail::oxm_has_mask_visitor{};
             return boost::apply_visitor(visitor, variant_);
         }
 
         auto oxm_length() const noexcept
             -> std::uint8_t
         {
-            auto visitor = detail::v13::oxm_length_visitor{};
+            auto visitor = detail::oxm_length_visitor{};
             return boost::apply_visitor(visitor, variant_);
         }
 
