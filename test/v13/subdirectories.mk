@@ -1,7 +1,7 @@
 INCLUDES = -I../../../include
 LDFLAGS = -lboost_unit_test_framework-mt -lboost_system-mt
 CXX = clang++
-CXXFLAGS = -std=c++11 -stdlib=libc++ -Wall -pedantic -DCANARD_NET_OFP_SUPPRESS_IMPLICIT_INSTANTIATION $(INCLUDES)
+CXXFLAGS = -std=c++11 -stdlib=libc++ -Wall -pedantic -DCANARD_NET_OFP_SUPPRESS_IMPLICIT_INSTANTIATION -DCANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION $(INCLUDES)
 # CXX = g++-4.9
 # CXXFLAGS = -std=c++11 -Wall -pedantic $(INCLUDES)
 

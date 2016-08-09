@@ -1,6 +1,6 @@
 INCLUDES = -I../../../include
 CXX = clang++
-CXXFLAGS = -std=c++11 -stdlib=libc++ -Wall -pedantic -DCANARD_NET_OFP_IMPOSE_EXPLICIT_INSTANTIATION $(INCLUDES)
+CXXFLAGS = -std=c++11 -stdlib=libc++ -Wall -pedantic -DCANARD_NET_OFP_IMPOSE_EXPLICIT_INSTANTIATION -DCANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION $(INCLUDES)
 # CXX = g++-4.9
 # CXXFLAGS = -std=c++11 -Wall -pedantic $(INCLUDES)
 
