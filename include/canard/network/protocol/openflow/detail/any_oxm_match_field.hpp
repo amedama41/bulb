@@ -57,68 +57,32 @@ namespace detail {
             return *this;
         }
 
-        auto length() const noexcept
-            -> std::uint16_t
-        {
-            auto visitor = detail::length_visitor{};
-            return boost::apply_visitor(visitor, variant_);
-        }
+        CANARD_NET_OFP_DECL auto length() const noexcept
+            -> std::uint16_t;
 
-        auto oxm_class() const noexcept
-            -> std::uint16_t
-        {
-            auto visitor = detail::oxm_class_visitor{};
-            return boost::apply_visitor(visitor, variant_);
-        }
+        CANARD_NET_OFP_DECL auto oxm_class() const noexcept
+            -> std::uint16_t;
 
-        auto oxm_field() const noexcept
-            -> std::uint8_t
-        {
-            auto visitor = detail::oxm_field_visitor{};
-            return boost::apply_visitor(visitor, variant_);
-        }
+        CANARD_NET_OFP_DECL auto oxm_field() const noexcept
+            -> std::uint8_t;
 
-        auto oxm_type() const noexcept
-            -> std::uint32_t
-        {
-            auto visitor = detail::oxm_type_visitor{};
-            return boost::apply_visitor(visitor, variant_);
-        }
+        CANARD_NET_OFP_DECL auto oxm_type() const noexcept
+            -> std::uint32_t;
 
-        auto oxm_header() const noexcept
-            -> std::uint32_t
-        {
-            auto visitor = detail::oxm_header_visitor{};
-            return boost::apply_visitor(visitor, variant_);
-        }
+        CANARD_NET_OFP_DECL auto oxm_header() const noexcept
+            -> std::uint32_t;
 
-        auto oxm_has_mask() const noexcept
-            -> bool
-        {
-            auto visitor = detail::oxm_has_mask_visitor{};
-            return boost::apply_visitor(visitor, variant_);
-        }
+        CANARD_NET_OFP_DECL auto oxm_has_mask() const noexcept
+            -> bool;
 
-        auto oxm_length() const noexcept
-            -> std::uint8_t
-        {
-            auto visitor = detail::oxm_length_visitor{};
-            return boost::apply_visitor(visitor, variant_);
-        }
+        CANARD_NET_OFP_DECL auto oxm_length() const noexcept
+            -> std::uint8_t;
 
-        auto is_wildcard() const noexcept
-            -> bool
-        {
-            auto visitor = detail::is_wildcard_visitor{};
-            return boost::apply_visitor(visitor, variant_);
-        }
+        CANARD_NET_OFP_DECL auto is_wildcard() const noexcept
+            -> bool;
 
-        auto is_exact() const noexcept
-            -> bool
-        {
-            auto visitor = detail::is_exact_visitor{};
-            return boost::apply_visitor(visitor, variant_);
-        }
+        CANARD_NET_OFP_DECL auto is_exact() const noexcept
+            -> bool;
 
         template <class Container>
         auto encode(Container& container) const
@@ -163,19 +127,13 @@ namespace detail {
             -> T const*;
 
     private:
-        auto equal_impl(any_oxm_match_field const& rhs) const
-            -> bool
-        {
-            return variant_ == rhs.variant_;
-        }
+        CANARD_NET_OFP_DECL auto equal_impl(
+                any_oxm_match_field const& rhs) const
+            -> bool;
 
-        auto equivalent_impl(
+        CANARD_NET_OFP_DECL auto equivalent_impl(
                 any_oxm_match_field const& rhs) const noexcept
-            -> bool
-        {
-            auto visitor = detail::equivalent_visitor{};
-            return boost::apply_visitor(visitor, variant_, rhs.variant_);
-        }
+            -> bool;
 
         oxm_match_field_variant variant_;
     };
@@ -198,5 +156,9 @@ namespace detail {
 } // namespace openflow
 } // namespace network
 } // namespace canard
+
+#if defined(CANARD_NET_OFP_HEADER_ONLY) || !defined(CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
+#   include <canard/network/protocol/openflow/detail/impl/any_oxm_match_field.hpp>
+#endif
 
 #endif // CANARD_NETWORK_OPENFLOW_DETAIL_ANY_OXM_MATCH_FIELD_HPP
