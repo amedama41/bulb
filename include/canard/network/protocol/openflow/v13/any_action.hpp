@@ -1,6 +1,8 @@
 #ifndef CANARD_NETWORK_OPENFLOW_V13_ANY_ACTION_HPP
 #define CANARD_NETWORK_OPENFLOW_V13_ANY_ACTION_HPP
 
+#include <canard/network/protocol/openflow/detail/config.hpp>
+
 #include <cstdint>
 #include <boost/variant/static_visitor.hpp>
 #include <canard/network/protocol/openflow/detail/any_action.hpp>
@@ -61,7 +63,9 @@ namespace v13 {
 } // namespace network
 } // namespace canard
 
-#if defined(CANARD_NET_OFP_SUPPRESS_IMPLICIT_INSTANTIATION)
+#if !defined(CANARD_NET_OFP_HEADER_ONLY)
+# if defined(CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
+
 namespace canard {
 namespace network {
 namespace openflow {
@@ -73,18 +77,8 @@ namespace detail {
 } // namespace openflow
 } // namespace network
 } // namespace canard
-#elif defined(CANARD_NET_OFP_IMPOSE_EXPLICIT_INSTANTIATION)
-namespace canard {
-namespace network {
-namespace openflow {
-namespace detail {
 
-    template class any_action<openflow::v13::action_decoder>;
-
-} // namespace detail
-} // namespace openflow
-} // namespace network
-} // namespace canard
+# endif
 #endif
 
 #endif // CANARD_NETWORK_OPENFLOW_V13_ANY_ACTION_HPP
