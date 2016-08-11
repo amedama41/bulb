@@ -1,6 +1,8 @@
 #ifndef CANARD_NETWORK_OPENFLOW_DETAIL_ANY_INSTRUCTION_HPP
 #define CANARD_NETWORK_OPENFLOW_DETAIL_ANY_INSTRUCTION_HPP
 
+#include <canard/network/protocol/openflow/detail/config.hpp>
+
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -68,25 +70,14 @@ namespace detail {
             return *this;
         }
 
-        auto type() const noexcept
-            -> ofp_instruction_type
-        {
-            auto visitor = detail::type_visitor<ofp_instruction_type>{};
-            return boost::apply_visitor(visitor, variant_);
-        }
+        CANARD_NET_OFP_DECL auto type() const noexcept
+            -> ofp_instruction_type;
 
-        auto length() const noexcept
-            -> std::uint16_t
-        {
-            auto visitor = detail::length_visitor{};
-            return boost::apply_visitor(visitor, variant_);
-        }
+        CANARD_NET_OFP_DECL auto length() const noexcept
+            -> std::uint16_t;
 
-        auto index() const noexcept
-            -> std::size_t
-        {
-            return variant_.which();
-        }
+        CANARD_NET_OFP_DECL auto index() const noexcept
+            -> std::size_t;
 
         template <class Container>
         auto encode(Container& container) const
@@ -207,18 +198,12 @@ namespace detail {
             -> T const*;
 
     private:
-        auto equal_impl(any_instruction const& rhs) const
-            -> bool
-        {
-            return variant_ == rhs.variant_;
-        }
+        CANARD_NET_OFP_DECL auto equal_impl(any_instruction const& rhs) const
+            -> bool;
 
-        auto equivalent_impl(any_instruction const& rhs) const noexcept
-            -> bool
-        {
-            auto visitor = detail::equivalent_visitor{};
-            return boost::apply_visitor(visitor, variant_, rhs.variant_);
-        }
+        CANARD_NET_OFP_DECL auto equivalent_impl(
+                any_instruction const& rhs) const noexcept
+            -> bool;
 
         instruction_variant variant_;
     };
@@ -241,5 +226,9 @@ namespace detail {
 } // namespace openflow
 } // namespace network
 } // namespace canard
+
+#if defined(CANARD_NET_OFP_HEADER_ONLY) || !defined(CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
+#   include <canard/network/protocol/openflow/detail/impl/any_instruction.hpp>
+#endif
 
 #endif // CANARD_NETWORK_OPENFLOW_DETAIL_ANY_INSTRUCTION_HPP

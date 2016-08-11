@@ -6,7 +6,7 @@ CXXFLAGS = -std=c++11 -stdlib=libc++ -Wall -pedantic -DCANARD_NET_OFP_IMPOSE_EXP
 
 VPATH = ../../../include/canard/network/protocol/openflow/v13/impl
 SRCS = instantiation_def.cpp
-IPP_SRCS = any_action.ipp
+IPP_SRCS = any_action.ipp any_instruction.ipp
 LDFLAGS = -lboost_system-mt
 TARGET = libbulb.dylib
 
