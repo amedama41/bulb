@@ -1,6 +1,8 @@
 #ifndef CANARD_NETWORK_OPENFLOW_DETAIL_ACTION_LIST_HPP
 #define CANARD_NETWORK_OPENFLOW_DETAIL_ACTION_LIST_HPP
 
+#include <canard/network/protocol/openflow/detail/config.hpp>
+
 #include <cstddef>
 #include <iterator>
 #include <stdexcept>
@@ -8,10 +10,7 @@
 #include <utility>
 #include <vector>
 #include <boost/operators.hpp>
-#include <boost/range/adaptor/transformed.hpp>
-#include <boost/range/algorithm/equal.hpp>
 #include <boost/range/algorithm/for_each.hpp>
-#include <boost/range/numeric.hpp>
 #include <canard/network/protocol/openflow/detail/is_related.hpp>
 
 namespace canard {
@@ -71,129 +70,66 @@ namespace detail {
         {
         }
 
-        auto begin() noexcept
-            -> iterator
-        {
-            return actions_.begin();
-        }
+        CANARD_NET_OFP_DECL auto begin() noexcept
+            -> iterator;
 
-        auto begin() const noexcept
-            -> const_iterator
-        {
-            return actions_.begin();
-        }
+        CANARD_NET_OFP_DECL auto begin() const noexcept
+            -> const_iterator;
 
-        auto end() noexcept
-            -> iterator
-        {
-            return actions_.end();
-        }
+        CANARD_NET_OFP_DECL auto end() noexcept
+            -> iterator;
 
-        auto end() const noexcept
-            -> const_iterator
-        {
-            return actions_.end();
-        }
+        CANARD_NET_OFP_DECL auto end() const noexcept
+            -> const_iterator;
 
-        auto cbegin() const noexcept
-            -> const_iterator
-        {
-            return actions_.cbegin();
-        }
+        CANARD_NET_OFP_DECL auto cbegin() const noexcept
+            -> const_iterator;
 
-        auto cend() const noexcept
-            -> const_iterator
-        {
-            return actions_.cend();
-        }
+        CANARD_NET_OFP_DECL auto cend() const noexcept
+            -> const_iterator;
 
-        auto rbegin() noexcept
-            -> reverse_iterator
-        {
-            return actions_.rbegin();
-        }
+        CANARD_NET_OFP_DECL auto rbegin() noexcept
+            -> reverse_iterator;
 
-        auto rbegin() const noexcept
-            -> const_reverse_iterator
-        {
-            return actions_.rbegin();
-        }
+        CANARD_NET_OFP_DECL auto rbegin() const noexcept
+            -> const_reverse_iterator;
 
-        auto rend() noexcept
-            -> reverse_iterator
-        {
-            return actions_.rend();
-        }
+        CANARD_NET_OFP_DECL auto rend() noexcept
+            -> reverse_iterator;
 
-        auto rend() const noexcept
-            -> const_reverse_iterator
-        {
-            return actions_.rend();
-        }
+        CANARD_NET_OFP_DECL auto rend() const noexcept
+            -> const_reverse_iterator;
 
-        auto crbegin() const noexcept
-            -> const_reverse_iterator
-        {
-            return actions_.crbegin();
-        }
+        CANARD_NET_OFP_DECL auto crbegin() const noexcept
+            -> const_reverse_iterator;
 
-        auto crend() const noexcept
-            -> const_reverse_iterator
-        {
-            return actions_.crend();
-        }
+        CANARD_NET_OFP_DECL auto crend() const noexcept
+            -> const_reverse_iterator;
 
-        void swap(action_list& other) noexcept
-        {
-            actions_.swap(other.actions_);
-        }
+        CANARD_NET_OFP_DECL void swap(action_list&) noexcept;
 
-        auto size() const noexcept
-            -> size_type
-        {
-            return actions_.size();
-        }
+        CANARD_NET_OFP_DECL auto size() const noexcept
+            -> size_type;
 
-        auto max_size() const noexcept
-            -> size_type
-        {
-            return actions_.max_size();
-        }
+        CANARD_NET_OFP_DECL auto max_size() const noexcept
+            -> size_type;
 
-        auto empty() const noexcept
-            -> bool
-        {
-            return actions_.empty();
-        }
+        CANARD_NET_OFP_DECL auto empty() const noexcept
+            -> bool;
 
-        void clear() noexcept
-        {
-            return actions_.clear();
-        }
+        CANARD_NET_OFP_DECL void clear() noexcept;
 
-        auto operator[](size_type const n)
-            -> reference
-        {
-            return actions_[n];
-        }
+        CANARD_NET_OFP_DECL auto operator[](size_type const)
+            -> reference;
 
-        auto operator[](size_type const n) const
-            -> const_reference
-        {
-            return actions_[n];
-        }
+        CANARD_NET_OFP_DECL auto operator[](size_type const) const
+            -> const_reference;
 
-        auto at(size_type const n)
-            -> reference
-        {
-            return actions_.at(n);
-        }
+        CANARD_NET_OFP_DECL auto at(size_type const)
+            -> reference;
 
-        auto at(size_type const n) const
-            -> const_reference
-        {
-            return actions_.at(n);
-        }
+        CANARD_NET_OFP_DECL auto at(size_type const) const
+            -> const_reference;
 
         template <class Action>
         void push_back(Action&& action)
@@ -201,10 +137,7 @@ namespace detail {
             actions_.emplace_back(std::forward<Action>(action));
         }
 
-        void pop_back()
-        {
-            actions_.pop_back();
-        }
+        CANARD_NET_OFP_DECL void pop_back();
 
         template <class... Actions>
         auto insert(const_iterator pos, Actions&&... actions)
@@ -225,26 +158,15 @@ namespace detail {
             return actions_.insert(pos, first, last);
         }
 
-        auto erase(const_iterator pos)
-            -> iterator
-        {
-            return actions_.erase(pos);
-        }
+        CANARD_NET_OFP_DECL auto erase(const_iterator)
+            -> iterator;
 
-        auto erase(const_iterator first, const_iterator last)
-            -> iterator
-        {
-            return actions_.erase(first, last);
-        }
+        CANARD_NET_OFP_DECL auto erase(
+                const_iterator first, const_iterator last)
+            -> iterator;
 
-        auto length() const
-            -> std::size_t
-        {
-            return boost::accumulate(
-                      actions_ | boost::adaptors::transformed(
-                          [](value_type const& action) { return action.length(); })
-                    , std::size_t{0});
-        }
+        CANARD_NET_OFP_DECL auto length() const
+            -> std::size_t;
 
         template <class Container>
         auto encode(Container& container) const
@@ -274,24 +196,25 @@ namespace detail {
         friend auto operator==(action_list const& lhs, action_list const& rhs)
             -> bool
         {
-            return lhs.actions_ == rhs.actions_;
+            return lhs.equal_impl(rhs);
         }
 
         friend auto equivalent(
                 action_list const& lhs, action_list const& rhs) noexcept
             -> bool
         {
-            return boost::equal(
-                      lhs.actions_, rhs.actions_
-                    , [](const_reference lhs, const_reference rhs)
-                      { return equivalent(lhs, rhs); });
+            return lhs.equivalent_impl(rhs);
         }
 
     private:
-        explicit action_list(std::vector<value_type>&& actions)
-            : actions_(std::move(actions))
-        {
-        }
+        CANARD_NET_OFP_DECL explicit action_list(std::vector<value_type>&&);
+
+        CANARD_NET_OFP_DECL auto equal_impl(action_list const&) const
+            -> bool;
+
+        CANARD_NET_OFP_DECL auto equivalent_impl(
+                action_list const&) const noexcept
+            -> bool;
 
     private:
         std::vector<value_type> actions_;
@@ -308,5 +231,9 @@ namespace detail {
 } // namespace openflow
 } // namespace network
 } // namespace canard
+
+#if defined(CANARD_NET_OFP_HEADER_ONLY) || !defined(CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
+#   include <canard/network/protocol/openflow/detail/impl/action_list.hpp>
+#endif
 
 #endif // CANARD_NETWORK_OPENFLOW_DETAIL_ACTION_LIST_HPP
