@@ -1,91 +1,21 @@
 #ifndef CANARD_NETWORK_OPENFLOW_V13_ACTION_SET_HPP
 #define CANARD_NETWORK_OPENFLOW_V13_ACTION_SET_HPP
 
-#include <cstddef>
+#include <canard/network/protocol/openflow/detail/config.hpp>
+
 #include <cstdint>
-#include <algorithm>
-#include <array>
-#include <iterator>
-#include <stdexcept>
 #include <type_traits>
-#include <unordered_set>
 #include <utility>
 #include <boost/operators.hpp>
 #include <boost/optional/optional.hpp>
-#include <boost/range/algorithm/equal.hpp>
-#include <boost/range/algorithm/fill.hpp>
-#include <boost/range/algorithm/find_if.hpp>
-#include <boost/range/algorithm/lower_bound.hpp>
 #include <canard/network/protocol/openflow/detail/is_related.hpp>
 #include <canard/network/protocol/openflow/v13/action_list.hpp>
-#include <canard/network/protocol/openflow/v13/actions.hpp>
+#include <canard/network/protocol/openflow/v13/action_order.hpp>
 
 namespace canard {
 namespace network {
 namespace openflow {
 namespace v13 {
-
-    namespace action_set_detail {
-
-        class action_set_info
-        {
-            struct action_info
-            {
-                action_list::const_iterator pos;
-                std::size_t num_actions;
-            };
-
-        public:
-            action_set_info(action_list const& actions) noexcept
-                : it_end_(actions.end())
-            {
-                boost::fill(info_map_, action_info{it_end_, 0});
-                for (auto it = actions.begin(); it != it_end_; ++it) {
-                    auto& action_info = info_map_[it->index()];
-                    if (action_info.num_actions++ == 0) {
-                        action_info.pos = it;
-                    }
-                }
-            }
-
-            auto has_equivalent_action(
-                    action_list::const_reference action) const noexcept
-                -> bool
-            {
-                auto const& info = info_map_[action.index()];
-                if (info.pos == it_end_) {
-                    return false;
-                }
-                if (!equivalent(action, *info.pos)) {
-                    return false;
-                }
-                return true;
-            }
-
-            void set_next_pos(action_list::const_reference action) noexcept
-            {
-                auto const index = action.index();
-                auto& info = info_map_[index];
-                if (info.num_actions-- > 0) {
-                    info.pos = std::find_if(
-                              std::next(info.pos), it_end_
-                            , [index](action_list::const_reference action)
-                              { return action.index() == index; });
-                }
-                else {
-                    info.pos = it_end_;
-                }
-            }
-
-        public:
-            std::array<
-                action_info, action_list::value_type::number_of_types
-            > info_map_;
-            action_list::const_iterator it_end_;
-        };
-
-    } // namespace write_actions_detail
-
 
     class action_set
         : private boost::equality_comparable<action_set>
@@ -118,81 +48,41 @@ namespace v13 {
             static_cast<void>(dummy);
         }
 
-        auto begin() const noexcept
-            -> const_iterator
-        {
-            return actions_.begin();
-        }
+        CANARD_NET_OFP_DECL auto begin() const noexcept
+            -> const_iterator;
 
-        auto end() const noexcept
-            -> const_iterator
-        {
-            return actions_.end();
-        }
+        CANARD_NET_OFP_DECL auto end() const noexcept
+            -> const_iterator;
 
-        auto cbegin() const noexcept
-            -> const_iterator
-        {
-            return actions_.cbegin();
-        }
+        CANARD_NET_OFP_DECL auto cbegin() const noexcept
+            -> const_iterator;
 
-        auto cend() const noexcept
-            -> const_iterator
-        {
-            return actions_.cend();
-        }
+        CANARD_NET_OFP_DECL auto cend() const noexcept
+            -> const_iterator;
 
-        auto rbegin() const noexcept
-            -> const_reverse_iterator
-        {
-            return actions_.rbegin();
-        }
+        CANARD_NET_OFP_DECL auto rbegin() const noexcept
+            -> const_reverse_iterator;
 
-        auto rend() const noexcept
-            -> const_reverse_iterator
-        {
-            return actions_.rend();
-        }
+        CANARD_NET_OFP_DECL auto rend() const noexcept
+            -> const_reverse_iterator;
 
-        auto crbegin() const noexcept
-            -> const_reverse_iterator
-        {
-            return actions_.crbegin();
-        }
+        CANARD_NET_OFP_DECL auto crbegin() const noexcept
+            -> const_reverse_iterator;
 
-        auto crend() const noexcept
-            -> const_reverse_iterator
-        {
-            return actions_.crend();
-        }
+        CANARD_NET_OFP_DECL auto crend() const noexcept
+            -> const_reverse_iterator;
 
-        auto empty() const noexcept
-            -> bool
-        {
-            return actions_.empty();
-        }
+        CANARD_NET_OFP_DECL auto empty() const noexcept
+            -> bool;
 
-        auto size() const noexcept
-            -> size_type
-        {
-            return actions_.size();
-        }
+        CANARD_NET_OFP_DECL auto size() const noexcept
+            -> size_type;
 
-        auto max_size() const noexcept
-            -> size_type
-        {
-            return actions_.max_size();
-        }
+        CANARD_NET_OFP_DECL auto max_size() const noexcept
+            -> size_type;
 
-        auto at(key_type const act_order) const
-            -> const_reference
-        {
-            auto const it = find(act_order);
-            if (it == actions_.end()) {
-                throw std::out_of_range{"not found specified action"};
-            }
-            return *it;
-        }
+        CANARD_NET_OFP_DECL auto at(key_type const) const
+            -> const_reference;
 
         template <class Action>
         auto at() const
@@ -257,11 +147,8 @@ namespace v13 {
             }
         }
 
-        auto erase(const_iterator it)
-            -> const_iterator
-        {
-            return actions_.erase(it);
-        }
+        CANARD_NET_OFP_DECL auto erase(const_iterator)
+            -> const_iterator;
 
         template <class Action>
         auto erase()
@@ -275,23 +162,12 @@ namespace v13 {
             return 1;
         }
 
-        void swap(action_set& other) noexcept
-        {
-            actions_.swap(other.actions_);
-        }
+        CANARD_NET_OFP_DECL void swap(action_set&) noexcept;
 
-        void clear() noexcept
-        {
-            return actions_.clear();
-        }
+        CANARD_NET_OFP_DECL void clear() noexcept;
 
-        auto find(key_type const act_order) const
-            -> const_iterator
-        {
-            return boost::find_if(actions_, [=](const_reference e) {
-                    return get_order(e) == act_order;
-            });
-        }
+        CANARD_NET_OFP_DECL auto find(key_type const) const
+            -> const_iterator;
 
         template <class Action>
         auto find() const
@@ -304,77 +180,45 @@ namespace v13 {
             return v13::any_cast<Action>(*it);
         }
 
-        auto length() const
-            -> std::uint16_t
-        {
-            return actions_.length();
-        }
+        CANARD_NET_OFP_DECL auto length() const
+            -> std::uint16_t;
 
-        auto to_list() const&
-            -> action_list const&
-        {
-            return actions_;
-        }
+        CANARD_NET_OFP_DECL auto to_list() const&
+            -> action_list const&;
 
-        auto to_list() &&
-            -> action_list
-        {
-            return actions_;
-        }
+        CANARD_NET_OFP_DECL auto to_list() &&
+            -> action_list;
 
         friend auto operator==(action_set const& lhs, action_set const& rhs)
             -> bool
         {
-            return lhs.to_list() == rhs.to_list();
+            return lhs.equal_impl(rhs);
         }
 
-        friend auto equivalent(action_set const& lhs, action_set const& rhs)
+        friend auto equivalent(
+                action_set const& lhs, action_set const& rhs) noexcept
             -> bool
         {
-            return boost::equal(
-                      lhs, rhs
-                    , [](const_reference lhs_action, const_reference rhs_action)
-                      { return equivalent(lhs_action, rhs_action); });
+            return lhs.equivalent_impl(rhs);
         }
 
-        static auto is_action_set(action_list const& actions)
-            -> bool
-        {
-            auto action_order_set = std::unordered_set<key_type>{};
-            action_order_set.reserve(actions.size());
-            for (auto const& action : actions) {
-                if (!action_order_set.insert(get_order(action)).second) {
-                    return false;
-                }
-            }
-            return true;
-        }
+        CANARD_NET_OFP_DECL static auto is_action_set(action_list const&)
+            -> bool;
 
-        static auto equivalent_as_action_set(
-                action_list const& lhs, action_list const& rhs) noexcept
-            -> bool
-        {
-            auto rhs_action_set_info
-                = action_set_detail::action_set_info{rhs};
-            for (auto const& lhs_action : lhs) {
-                if (!rhs_action_set_info.has_equivalent_action(lhs_action)) {
-                    return false;
-                }
-                rhs_action_set_info.set_next_pos(lhs_action);
-            }
-            return true;
-        }
+        CANARD_NET_OFP_DECL static auto equivalent_as_action_set(
+                action_list const&, action_list const&) noexcept
+            -> bool;
 
     private:
-        auto non_const_lower_bound(key_type const act_order)
-            -> action_list::iterator
-        {
-            return boost::lower_bound(
-                      actions_
-                    , act_order
-                    , [](const_reference e, key_type const act_order)
-                      { return get_order(e) < act_order; });
-        }
+        CANARD_NET_OFP_DECL auto non_const_lower_bound(key_type const)
+            -> action_list::iterator;
+
+        CANARD_NET_OFP_DECL auto equal_impl(action_set const&) const
+            -> bool;
+
+        CANARD_NET_OFP_DECL auto equivalent_impl(
+                action_set const&) const noexcept
+            -> bool;
 
     private:
         action_list actions_;
@@ -384,5 +228,9 @@ namespace v13 {
 } // namespace openflow
 } // namespace network
 } // namespace canard
+
+#if defined(CANARD_NET_OFP_HEADER_ONLY)
+# include <canard/network/protocol/openflow/v13/impl/action_set.ipp>
+#endif
 
 #endif // CANARD_NETWORK_OPENFLOW_V13_ACTION_SET_HPP
