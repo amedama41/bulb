@@ -1,6 +1,8 @@
 #ifndef CANARD_NETWORK_OPENFLOW_V13_OXM_MATCH_SET_HPP
 #define CANARD_NETWORK_OPENFLOW_V13_OXM_MATCH_SET_HPP
 
+#include <canard/network/protocol/openflow/detail/config.hpp>
+
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
@@ -8,19 +10,11 @@
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
-#include <boost/fusion/algorithm/iteration/accumulate.hpp>
-#include <boost/mpl/placeholders.hpp>
-#include <boost/mpl/transform.hpp>
 #include <boost/operators.hpp>
 #include <boost/optional.hpp>
-#include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/adaptor/map.hpp>
-#include <boost/range/adaptor/transformed.hpp>
-#include <boost/range/algorithm/equal.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/iterator.hpp>
-#include <boost/range/numeric.hpp>
-#include <canard/mpl/adapted/std_tuple.hpp>
 #include <canard/network/protocol/openflow/detail/decode.hpp>
 #include <canard/network/protocol/openflow/detail/encode.hpp>
 #include <canard/network/protocol/openflow/detail/is_related.hpp>
@@ -67,64 +61,35 @@ namespace v13 {
         {
         }
 
-        constexpr auto type() const noexcept
+        static constexpr auto type()
             -> protocol::ofp_match_type
         {
             return match_type;
         }
 
-        auto length() const noexcept
-            -> std::uint16_t
-        {
-            using boost::adaptors::transformed;
-            using pair = container_type::value_type;
-            return boost::accumulate(
-                      oxm_tlvs_ | transformed(
-                          [](pair const& p) { return p.second.length(); })
-                    , std::uint16_t{base_length});
-        }
+        CANARD_NET_OFP_DECL auto length() const noexcept
+            -> std::uint16_t;
 
-        auto begin() const noexcept
-            -> const_iterator
-        {
-            return const_iterator{oxm_tlvs_.begin()};
-        }
+        CANARD_NET_OFP_DECL auto begin() const noexcept
+            -> const_iterator;
 
-        auto end() const noexcept
-            -> const_iterator
-        {
-            return const_iterator{oxm_tlvs_.end()};
-        }
+        CANARD_NET_OFP_DECL auto end() const noexcept
+            -> const_iterator;
 
-        auto cbegin() const noexcept
-            -> const_iterator
-        {
-            return const_iterator{oxm_tlvs_.cbegin()};
-        }
+        CANARD_NET_OFP_DECL auto cbegin() const noexcept
+            -> const_iterator;
 
-        auto cend() const noexcept
-            -> const_iterator
-        {
-            return const_iterator{oxm_tlvs_.cend()};
-        }
+        CANARD_NET_OFP_DECL auto cend() const noexcept
+            -> const_iterator;
 
-        auto empty() const noexcept
-            -> bool
-        {
-            return oxm_tlvs_.empty();
-        }
+        CANARD_NET_OFP_DECL auto empty() const noexcept
+            -> bool;
 
-        auto size() const noexcept
-            -> size_type
-        {
-            return oxm_tlvs_.size();
-        }
+        CANARD_NET_OFP_DECL auto size() const noexcept
+            -> size_type;
 
-        auto max_size() const noexcept
-            -> size_type
-        {
-            return oxm_tlvs_.max_size();
-        }
+        CANARD_NET_OFP_DECL auto max_size() const noexcept
+            -> size_type;
 
         template <class OXMMatchField>
         auto get() const
@@ -134,11 +99,8 @@ namespace v13 {
             return v13::any_cast<OXMMatchField>(it->second);
         }
 
-        auto at(key_type const oxm_type) const
-            -> any_oxm_match_field const&
-        {
-            return oxm_tlvs_.at(oxm_type);
-        }
+        CANARD_NET_OFP_DECL auto at(key_type const oxm_type) const
+            -> const_reference;
 
         template <class OXMMatchField>
         auto insert(OXMMatchField const& field)
@@ -184,27 +146,15 @@ namespace v13 {
             return oxm_tlvs_.erase(OXMMatchField::oxm_type());
         }
 
-        auto erase(const_iterator it)
-            -> const_iterator
-        {
-            return const_iterator{oxm_tlvs_.erase(it.base())};
-        }
+        CANARD_NET_OFP_DECL auto erase(const_iterator)
+            -> const_iterator;
 
-        void swap(oxm_match_set& other)
-        {
-            oxm_tlvs_.swap(other.oxm_tlvs_);
-        }
+        CANARD_NET_OFP_DECL void swap(oxm_match_set&);
 
-        void clear() noexcept
-        {
-            oxm_tlvs_.clear();
-        }
+        CANARD_NET_OFP_DECL void clear() noexcept;
 
-        auto find(key_type const oxm_type) const
-            -> const_iterator
-        {
-            return const_iterator{oxm_tlvs_.find(oxm_type)};
-        }
+        CANARD_NET_OFP_DECL auto find(key_type const) const
+            -> const_iterator;
 
         template <class OXMMatchField>
         auto find() const
@@ -255,41 +205,32 @@ namespace v13 {
             return oxm_match_set{std::move(oxm_tlvs)};
         }
 
-        static void validate_ofp_match(v13_detail::ofp_match const& match)
-        {
-            if (match.type != protocol::OFPMT_OXM) {
-                throw std::runtime_error{"match_type is not OFPMT_OXM"};
-            }
-            if (match.length < base_length) {
-                throw std::runtime_error{"oxm_match length is too short"};
-            }
-        }
+        CANARD_NET_OFP_DECL static void validate_ofp_match(
+                v13_detail::ofp_match const&);
 
         friend auto operator==(
                 oxm_match_set const& lhs, oxm_match_set const& rhs)
             -> bool
         {
-            return lhs.oxm_tlvs_ == rhs.oxm_tlvs_;
+            return lhs.equal_impl(rhs);
         }
 
         friend auto equivalent(
                 oxm_match_set const& lhs, oxm_match_set const& rhs) noexcept
             -> bool
         {
-            auto const filter
-                = [](const_reference v){ return !v.is_wildcard(); };
-            using boost::adaptors::filtered;
-            return boost::equal(
-                      lhs | filtered(filter), rhs | filtered(filter)
-                    , [](const_reference lhs_tlv, const_reference rhs_tlv)
-                      { return equivalent(lhs_tlv, rhs_tlv); });
+            return lhs.equivalent_impl(rhs);
         }
 
     private:
-        oxm_match_set(container_type&& oxm_tlvs)
-            : oxm_tlvs_(std::move(oxm_tlvs))
-        {
-        }
+        CANARD_NET_OFP_DECL oxm_match_set(container_type&&);
+
+        CANARD_NET_OFP_DECL auto equal_impl(oxm_match_set const&) const
+            -> bool;
+
+        CANARD_NET_OFP_DECL auto equivalent_impl(
+                oxm_match_set const&) const noexcept
+            -> bool;
 
         template <class OXMMatchField>
         static auto to_pair(OXMMatchField&& oxm_field)
@@ -301,11 +242,9 @@ namespace v13 {
             };
         }
 
-        static auto make_result(container_type::iterator it, bool const result)
-            -> std::pair<const_iterator, bool>
-        {
-            return std::make_pair(const_iterator{it}, result);
-        }
+        CANARD_NET_OFP_DECL static auto make_result(
+                container_type::iterator it, bool const result)
+            -> std::pair<const_iterator, bool>;
 
         struct oxm_tlv_inserter
         {
@@ -328,5 +267,9 @@ namespace v13 {
 } // namespace openflow
 } // namespace network
 } // namespace canard
+
+#if defined(CANARD_NET_OFP_HEADER_ONLY)
+# include <canard/network/protocol/openflow/v13/impl/oxm_match_set.ipp>
+#endif
 
 #endif // CANARD_NETWORK_OPENFLOW_V13_OXM_MATCH_SET_HPP
