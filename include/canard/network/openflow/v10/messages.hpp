@@ -14,12 +14,12 @@
 #include <canard/network/openflow/v10/message/port_mod.hpp>
 #include <canard/network/openflow/v10/message/port_status.hpp>
 #include <canard/network/openflow/v10/message/queue_config.hpp>
-#include <canard/network/openflow/v10/message/stats_message/aggregate_stats.hpp>
-#include <canard/network/openflow/v10/message/stats_message/description.hpp>
-#include <canard/network/openflow/v10/message/stats_message/flow_stats.hpp>
-#include <canard/network/openflow/v10/message/stats_message/port_stats.hpp>
-#include <canard/network/openflow/v10/message/stats_message/queue_stats.hpp>
-#include <canard/network/openflow/v10/message/stats_message/table_stats.hpp>
+#include <canard/network/openflow/v10/message/stats/aggregate_stats.hpp>
+#include <canard/network/openflow/v10/message/stats/description.hpp>
+#include <canard/network/openflow/v10/message/stats/flow_stats.hpp>
+#include <canard/network/openflow/v10/message/stats/port_stats.hpp>
+#include <canard/network/openflow/v10/message/stats/queue_stats.hpp>
+#include <canard/network/openflow/v10/message/stats/table_stats.hpp>
 #include <canard/network/openflow/v10/message/switch_config.hpp>
 #include <canard/network/openflow/v10/message/switch_features.hpp>
 
