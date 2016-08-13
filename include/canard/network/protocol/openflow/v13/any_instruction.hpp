@@ -4,7 +4,6 @@
 #include <canard/network/protocol/openflow/detail/config.hpp>
 
 #include <cstdint>
-#include <boost/variant/static_visitor.hpp>
 #include <canard/network/protocol/openflow/detail/any_instruction.hpp>
 #include <canard/network/protocol/openflow/v13/decoder/instruction_decoder.hpp>
 #include <canard/network/protocol/openflow/v13/instruction_order.hpp>
@@ -30,30 +29,11 @@ namespace v13 {
         return detail::any_cast<T>(instruction);
     }
 
-    namespace any_instruction_detail {
-
-        struct instruction_order_visitor
-            : boost::static_visitor<std::uint64_t>
-        {
-            template <class Instruction>
-            auto operator()(Instruction const& instruction) const
-                -> std::uint64_t
-            {
-                return instruction_order<Instruction>::get_value(instruction);
-            }
-        };
-
-    } // namespace any_instruction_detail
-
     template <>
     struct instruction_order<any_instruction>
     {
-        static auto get_value(any_instruction const& instruction)
-            -> std::uint64_t
-        {
-            auto visitor = any_instruction_detail::instruction_order_visitor{};
-            return instruction.visit(visitor);
-        }
+        CANARD_NET_OFP_DECL static auto get_value(any_instruction const&)
+            -> std::uint64_t;
     };
 
 } // namespace v13
@@ -61,8 +41,11 @@ namespace v13 {
 } // namespace network
 } // namespace canard
 
-#if !defined(CANARD_NET_OFP_HEADER_ONLY)
-# if defined(CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
+#if defined(CANARD_NET_OFP_HEADER_ONLY)
+
+#include <canard/network/protocol/openflow/v13/impl/any_instruction.ipp>
+
+#elif defined(CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
 
 namespace canard {
 namespace network {
@@ -76,7 +59,6 @@ namespace detail {
 } // namespace network
 } // namespace canard
 
-# endif
 #endif
 
 #endif // CANARD_NETWORK_OPENFLOW_V13_ANY_INSTRUCTION_HPP
