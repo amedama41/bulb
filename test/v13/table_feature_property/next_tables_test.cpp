@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/protocol/openflow/v13/table_feature_property/next_tables.hpp>
+#include <canard/network/openflow/v13/table_feature_property/next_tables.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include "../../test_utility.hpp"

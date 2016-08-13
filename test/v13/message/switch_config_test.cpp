@@ -1,10 +1,10 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/protocol/openflow/v13/message/switch_config.hpp>
+#include <canard/network/openflow/v13/message/switch_config.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <cstdint>
 #include <vector>
-#include <canard/network/protocol/openflow/v13/openflow.hpp>
+#include <canard/network/openflow/v13/openflow.hpp>
 
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;

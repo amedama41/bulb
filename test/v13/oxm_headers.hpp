@@ -2,7 +2,7 @@
 #define CANARD_NET_OFP_V13_TEST_OXM_HEADERS_HPP
 
 #include <cstdint>
-#include <canard/network/protocol/openflow/v13/openflow.hpp>
+#include <canard/network/openflow/v13/openflow.hpp>
 
 #define OXM_HEADER__(CLASS, FIELD, HASMASK, LENGTH) \
     ((std::uint32_t(CLASS) << 16) | (std::uint32_t(FIELD) << 9) | (std::uint32_t(HASMASK) << 8) | (LENGTH))

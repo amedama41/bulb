@@ -1,8 +1,8 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/protocol/openflow/v13/any_queue_property.hpp>
+#include <canard/network/openflow/v13/any_queue_property.hpp>
 #include <boost/test/unit_test.hpp>
 
-#include <canard/network/protocol/openflow/v13/queue_properties.hpp>
+#include <canard/network/openflow/v13/queue_properties.hpp>
 
 #include "../../test_utility.hpp"
 

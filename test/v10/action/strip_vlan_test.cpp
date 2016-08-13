@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/protocol/openflow/v10/action/strip_vlan.hpp>
+#include <canard/network/openflow/v10/action/strip_vlan.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <cstddef>

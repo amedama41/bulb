@@ -1,11 +1,11 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/protocol/openflow/v13/message/packet_in.hpp>
+#include <canard/network/openflow/v13/message/packet_in.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <cstdint>
 #include <utility>
 #include <vector>
-#include <canard/network/protocol/openflow/v13/openflow.hpp>
+#include <canard/network/openflow/v13/openflow.hpp>
 
 #include "../../test_utility.hpp"
 

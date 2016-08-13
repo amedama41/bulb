@@ -1,8 +1,8 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/protocol/openflow/v13/table_feature_property/actions.hpp>
+#include <canard/network/openflow/v13/table_feature_property/actions.hpp>
 #include <boost/test/unit_test.hpp>
 
-#include <canard/network/protocol/openflow/v13/table_feature_property/id/action_id.hpp>
+#include <canard/network/openflow/v13/table_feature_property/id/action_id.hpp>
 
 #include "../../test_utility.hpp"
 
