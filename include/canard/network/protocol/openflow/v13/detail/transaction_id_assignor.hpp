@@ -1,12 +1,12 @@
-#ifndef CANARD_NETWORK_OPENFLOW_V13_TRANSACTION_ID_ASSIGNOR
-#define CANARD_NETWORK_OPENFLOW_V13_TRANSACTION_ID_ASSIGNOR
+#ifndef CANARD_NET_OFP_V13_TRANSACTION_ID_ASSIGNOR
+#define CANARD_NET_OFP_V13_TRANSACTION_ID_ASSIGNOR
 
 #include <cstdint>
 #include <atomic>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace v13 {
 
     namespace v13_detail {
@@ -31,8 +31,8 @@ namespace v13 {
     } // namespace v13_detail
 
 } // namespace v13
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_V13_TRANSACTION_ID_ASSIGNOR
+#endif // CANARD_NET_OFP_V13_TRANSACTION_ID_ASSIGNOR

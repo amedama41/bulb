@@ -1,5 +1,5 @@
-#ifndef CANARD_NETWORK_OPENFLOW_V13_SET_FIELD_DECODER_HPP
-#define CANARD_NETWORK_OPENFLOW_V13_SET_FIELD_DECODER_HPP
+#ifndef CANARD_NET_OFP_V13_SET_FIELD_DECODER_HPP
+#define CANARD_NET_OFP_V13_SET_FIELD_DECODER_HPP
 
 #include <cstddef>
 #include <cstdint>
@@ -12,8 +12,8 @@
 #include <canard/network/protocol/openflow/v13/openflow.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace v13 {
 struct set_field_decoder
 {
@@ -32,13 +32,13 @@ struct set_field_decoder
                   std::tuple_size<default_set_field_list>::value == 36
                 , "not match to the number of set_field types");
         switch (oxm_header >> 9) {
-#       define CANARD_NETWORK_OPENFLOW_V13_SET_FIELD_CASE(z, N, _) \
+#       define CANARD_NET_OFP_V13_SET_FIELD_CASE(z, N, _) \
         using set_field ## N = \
             std::tuple_element<N, default_set_field_list>::type; \
         case set_field ## N::oxm_type(): \
             return function(set_field ## N::decode(first, last));
-        BOOST_PP_REPEAT(36, CANARD_NETWORK_OPENFLOW_V13_SET_FIELD_CASE, _)
-#       undef CANARD_NETWORK_OPENFLOW_V13_SET_FIELD_CASE
+        BOOST_PP_REPEAT(36, CANARD_NET_OFP_V13_SET_FIELD_CASE, _)
+#       undef CANARD_NET_OFP_V13_SET_FIELD_CASE
         default:
             throw std::runtime_error{"unknwon set field oxm type"};
         }
@@ -46,8 +46,8 @@ struct set_field_decoder
 };
 
 } // namespace v13
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_V13_SET_FIELD_DECODER_HPP
+#endif // CANARD_NET_OFP_V13_SET_FIELD_DECODER_HPP

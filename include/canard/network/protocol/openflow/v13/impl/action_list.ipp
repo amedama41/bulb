@@ -1,5 +1,5 @@
-#ifndef CANARD_NETWORK_OPENFLOW_V13_IMPL_ACTION_LIST_IPP
-#define CANARD_NETWORK_OPENFLOW_V13_IMPL_ACTION_LIST_IPP
+#ifndef CANARD_NET_OFP_V13_IMPL_ACTION_LIST_IPP
+#define CANARD_NET_OFP_V13_IMPL_ACTION_LIST_IPP
 
 #include <canard/network/protocol/openflow/detail/config.hpp>
 
@@ -10,20 +10,20 @@
 #  include <canard/network/protocol/openflow/v13/action_list.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace detail {
 
   template class action_list<
-    openflow::v13::any_action, openflow::v13::v13_detail::ofp_action_header
+    ofp::v13::any_action, ofp::v13::v13_detail::ofp_action_header
   >;
 
 } // namespace detail
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
 # endif
 #endif
 
-#endif // CANARD_NETWORK_OPENFLOW_V13_IMPL_ACTION_LIST_IPP
+#endif // CANARD_NET_OFP_V13_IMPL_ACTION_LIST_IPP

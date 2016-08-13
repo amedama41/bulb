@@ -1,5 +1,5 @@
-#ifndef CANARD_NETWORK_OPENFLOW_V13_IMPL_ANY_INSTRUCTION_IPP
-#define CANARD_NETWORK_OPENFLOW_V13_IMPL_ANY_INSTRUCTION_IPP
+#ifndef CANARD_NET_OFP_V13_IMPL_ANY_INSTRUCTION_IPP
+#define CANARD_NET_OFP_V13_IMPL_ANY_INSTRUCTION_IPP
 
 #include <canard/network/protocol/openflow/detail/config.hpp>
 #include <canard/network/protocol/openflow/v13/any_instruction.hpp>
@@ -14,23 +14,23 @@
 #  include <canard/network/protocol/openflow/detail/impl/any_instruction.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace detail {
 
-  template class any_instruction<openflow::v13::instruction_decoder>;
+  template class any_instruction<ofp::v13::instruction_decoder>;
 
 } // namespace detail
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
 # endif
 #endif
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace v13 {
 
   namespace any_instruction_detail {
@@ -57,8 +57,8 @@ namespace v13 {
   }
 
 } // namespace v13
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_V13_IMPL_ANY_INSTRUCTION_IPP
+#endif // CANARD_NET_OFP_V13_IMPL_ANY_INSTRUCTION_IPP

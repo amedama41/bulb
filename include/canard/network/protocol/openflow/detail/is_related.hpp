@@ -1,11 +1,11 @@
-#ifndef CANARD_NETWORK_OPENFLOW_DETAIL_IS_RELATED_HPP
-#define CANARD_NETWORK_OPENFLOW_DETAIL_IS_RELATED_HPP
+#ifndef CANARD_NET_OFP_DETAIL_IS_RELATED_HPP
+#define CANARD_NET_OFP_DETAIL_IS_RELATED_HPP
 
 #include <type_traits>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace detail {
 
     namespace is_related_detail {
@@ -27,8 +27,8 @@ namespace detail {
     > {};
 
 } // namespace detail
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_DETAIL_IS_RELATED_HPP
+#endif // CANARD_NET_OFP_DETAIL_IS_RELATED_HPP

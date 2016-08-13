@@ -1,12 +1,12 @@
-#ifndef CANARD_NETWORK_OPENFLOW_V10_OPENFLOW_HPP
-#define CANARD_NETWORK_OPENFLOW_V10_OPENFLOW_HPP
+#ifndef CANARD_NET_OFP_V10_OPENFLOW_HPP
+#define CANARD_NET_OFP_V10_OPENFLOW_HPP
 
 #include <cstddef>
 #include <cstdint>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace v10 {
 
     namespace v10_detail {
@@ -756,8 +756,8 @@ namespace v10 {
     };
 
 } // namespace v10
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_V10_OPENFLOW_HPP
+#endif // CANARD_NET_OFP_V10_OPENFLOW_HPP

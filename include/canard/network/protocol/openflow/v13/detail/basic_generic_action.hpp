@@ -1,22 +1,22 @@
-#ifndef CANARD_NETWORK_OPENFLOW_DETAIL_V13_BASIC_GENERIC_ACTION_HPP
-#define CANARD_NETWORK_OPENFLOW_DETAIL_V13_BASIC_GENERIC_ACTION_HPP
+#ifndef CANARD_NET_OFP_DETAIL_V13_BASIC_GENERIC_ACTION_HPP
+#define CANARD_NET_OFP_DETAIL_V13_BASIC_GENERIC_ACTION_HPP
 
 #include <canard/network/protocol/openflow/detail/memcmp.hpp>
 #include <canard/network/protocol/openflow/v13/detail/basic_action.hpp>
 #include <canard/network/protocol/openflow/v13/openflow.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace detail {
 namespace v13 {
 
     template <class T>
     class basic_generic_action
-        : public basic_action<T, openflow::v13::v13_detail::ofp_action_header>
+        : public basic_action<T, ofp::v13::v13_detail::ofp_action_header>
     {
         using base_type
-            = basic_action<T, openflow::v13::v13_detail::ofp_action_header>;
+            = basic_action<T, ofp::v13::v13_detail::ofp_action_header>;
 
     public:
         using raw_ofp_type = typename base_type::raw_ofp_type;
@@ -68,8 +68,8 @@ namespace v13 {
 
 } // namespace v13
 } // namespace detail
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_DETAIL_V13_BASIC_GENERIC_ACTION_HPP
+#endif // CANARD_NET_OFP_DETAIL_V13_BASIC_GENERIC_ACTION_HPP

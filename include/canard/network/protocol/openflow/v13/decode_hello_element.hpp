@@ -1,5 +1,5 @@
-#ifndef CANARD_NETWORK_OPENFLOW_V13_DECODE_HELLO_ELEMENT_HPP
-#define CANARD_NETWORK_OPENFLOW_V13_DECODE_HELLO_ELEMENT_HPP
+#ifndef CANARD_NET_OFP_V13_DECODE_HELLO_ELEMENT_HPP
+#define CANARD_NET_OFP_V13_DECODE_HELLO_ELEMENT_HPP
 
 #include <algorithm>
 #include <iterator>
@@ -12,8 +12,8 @@
 #include <canard/network/protocol/openflow/v13/message/hello_elements.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace v13 {
 
     namespace v13_detail {
@@ -41,11 +41,11 @@ namespace v13 {
             }
             switch (header.type) {
             static_assert(std::tuple_size<hello_element_list>::value - 1 == 1, "");
-#define     CANARD_NETWORK_OPENFLOW_DECODE_HELLO_ELEMENT_CASE(z, N, _) \
+#define     CANARD_NET_OFP_DECODE_HELLO_ELEMENT_CASE(z, N, _) \
             case std::tuple_element<N, hello_element_list>::type::hello_element_type: \
                 return func(std::tuple_element<N, hello_element_list>::type::decode(first, last));
-            BOOST_PP_REPEAT(1, CANARD_NETWORK_OPENFLOW_DECODE_HELLO_ELEMENT_CASE, _)
-#undef      CANARD_NETWORK_OPENFLOW_DECODE_HELLO_ELEMENT_CASE
+            BOOST_PP_REPEAT(1, CANARD_NET_OFP_DECODE_HELLO_ELEMENT_CASE, _)
+#undef      CANARD_NET_OFP_DECODE_HELLO_ELEMENT_CASE
             default:
                 return func(hello_elements::unknown_element::decode(first, last));
             }
@@ -54,8 +54,8 @@ namespace v13 {
     } // namespace v13_detail
 
 } // namespace v13
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_V13_DECODE_HELLO_ELEMENT_HPP
+#endif // CANARD_NET_OFP_V13_DECODE_HELLO_ELEMENT_HPP

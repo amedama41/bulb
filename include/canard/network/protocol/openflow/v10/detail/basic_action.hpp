@@ -1,5 +1,5 @@
-#ifndef CANARD_NETWORK_OPENFLOW_V10_ACTIONS_BASIC_ACTION_HPP
-#define CANARD_NETWORK_OPENFLOW_V10_ACTIONS_BASIC_ACTION_HPP
+#ifndef CANARD_NET_OFP_V10_ACTIONS_BASIC_ACTION_HPP
+#define CANARD_NET_OFP_V10_ACTIONS_BASIC_ACTION_HPP
 
 #include <cstdint>
 #include <stdexcept>
@@ -11,8 +11,8 @@
 #include <canard/network/protocol/openflow/v10/openflow.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace v10 {
 namespace actions_detail {
 
@@ -77,8 +77,8 @@ namespace actions_detail {
 
 } // namespace actions_detail
 } // namespace v10
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_V10_ACTIONS_BASIC_ACTION_HPP
+#endif // CANARD_NET_OFP_V10_ACTIONS_BASIC_ACTION_HPP

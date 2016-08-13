@@ -1,11 +1,11 @@
-#ifndef CANARD_NETWORK_OPENFLOW_V10_FUSION_ADATOR_HPP
-#define CANARD_NETWORK_OPENFLOW_V10_FUSION_ADATOR_HPP
+#ifndef CANARD_NET_OFP_V10_FUSION_ADATOR_HPP
+#define CANARD_NET_OFP_V10_FUSION_ADATOR_HPP
 
 #include <boost/fusion/adapted/struct/adapt_struct.hpp>
 #include <canard/network/protocol/openflow/v10/openflow.hpp>
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_header,
+    canard::net::ofp::v10::v10_detail::ofp_header,
     (std::uint8_t, version)
     (std::uint8_t, type)
     (std::uint16_t, length)
@@ -13,19 +13,19 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_hello,
-    (canard::network::openflow::v10::v10_detail::ofp_header, header)
+    canard::net::ofp::v10::v10_detail::ofp_hello,
+    (canard::net::ofp::v10::v10_detail::ofp_header, header)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_switch_config,
-    (canard::network::openflow::v10::v10_detail::ofp_header, header)
+    canard::net::ofp::v10::v10_detail::ofp_switch_config,
+    (canard::net::ofp::v10::v10_detail::ofp_header, header)
     (std::uint16_t, flags)
     (std::uint16_t, miss_send_len)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_phy_port,
+    canard::net::ofp::v10::v10_detail::ofp_phy_port,
     (std::uint16_t, port_no)
     (std::uint8_t, hw_addr[0])
     (std::uint8_t, hw_addr[1])
@@ -42,8 +42,8 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_switch_features,
-    (canard::network::openflow::v10::v10_detail::ofp_header, header)
+    canard::net::ofp::v10::v10_detail::ofp_switch_features,
+    (canard::net::ofp::v10::v10_detail::ofp_header, header)
     (std::uint64_t, datapath_id)
     (std::uint32_t, n_buffers)
     (std::uint8_t, n_tables)
@@ -55,8 +55,8 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_port_status,
-    (canard::network::openflow::v10::v10_detail::ofp_header, header)
+    canard::net::ofp::v10::v10_detail::ofp_port_status,
+    (canard::net::ofp::v10::v10_detail::ofp_header, header)
     (std::uint8_t, reason)
     (std::uint8_t, pad[0])
     (std::uint8_t, pad[1])
@@ -65,12 +65,12 @@ BOOST_FUSION_ADAPT_STRUCT(
     (std::uint8_t, pad[4])
     (std::uint8_t, pad[5])
     (std::uint8_t, pad[6])
-    (canard::network::openflow::v10::v10_detail::ofp_phy_port, desc)
+    (canard::net::ofp::v10::v10_detail::ofp_phy_port, desc)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_port_mod,
-    (canard::network::openflow::v10::v10_detail::ofp_header, header)
+    canard::net::ofp::v10::v10_detail::ofp_port_mod,
+    (canard::net::ofp::v10::v10_detail::ofp_header, header)
     (std::uint16_t, port_no)
     (std::uint8_t, hw_addr[0])
     (std::uint8_t, hw_addr[1])
@@ -88,8 +88,8 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_packet_in,
-    (canard::network::openflow::v10::v10_detail::ofp_header, header)
+    canard::net::ofp::v10::v10_detail::ofp_packet_in,
+    (canard::net::ofp::v10::v10_detail::ofp_header, header)
     (std::uint32_t, buffer_id)
     (std::uint16_t, total_len)
     (std::uint16_t, in_port)
@@ -98,7 +98,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_action_output,
+    canard::net::ofp::v10::v10_detail::ofp_action_output,
     (std::uint16_t, type)
     (std::uint16_t, len)
     (std::uint16_t, port)
@@ -106,7 +106,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_action_vlan_vid,
+    canard::net::ofp::v10::v10_detail::ofp_action_vlan_vid,
     (std::uint16_t, type)
     (std::uint16_t, len)
     (std::uint16_t, vlan_vid)
@@ -115,7 +115,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_action_vlan_pcp,
+    canard::net::ofp::v10::v10_detail::ofp_action_vlan_pcp,
     (std::uint16_t, type)
     (std::uint16_t, len)
     (std::uint8_t, vlan_pcp)
@@ -125,7 +125,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_action_dl_addr,
+    canard::net::ofp::v10::v10_detail::ofp_action_dl_addr,
     (std::uint16_t, type)
     (std::uint16_t, len)
     (std::uint8_t, dl_addr[0])
@@ -143,14 +143,14 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_action_nw_addr,
+    canard::net::ofp::v10::v10_detail::ofp_action_nw_addr,
     (std::uint16_t, type)
     (std::uint16_t, len)
     (std::uint32_t, nw_addr)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_action_tp_port,
+    canard::net::ofp::v10::v10_detail::ofp_action_tp_port,
     (std::uint16_t, type)
     (std::uint16_t, len)
     (std::uint16_t, tp_port)
@@ -159,7 +159,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_action_nw_tos,
+    canard::net::ofp::v10::v10_detail::ofp_action_nw_tos,
     (std::uint16_t, type)
     (std::uint16_t, len)
     (std::uint8_t, nw_tos)
@@ -169,14 +169,14 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_action_vendor_header,
+    canard::net::ofp::v10::v10_detail::ofp_action_vendor_header,
     (std::uint16_t, type)
     (std::uint16_t, len)
     (std::uint32_t, vendor)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_action_header,
+    canard::net::ofp::v10::v10_detail::ofp_action_header,
     (std::uint16_t, type)
     (std::uint16_t, len)
     (std::uint8_t, pad[0])
@@ -186,15 +186,15 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_packet_out,
-    (canard::network::openflow::v10::v10_detail::ofp_header, header)
+    canard::net::ofp::v10::v10_detail::ofp_packet_out,
+    (canard::net::ofp::v10::v10_detail::ofp_header, header)
     (std::uint32_t, buffer_id)
     (std::uint16_t, in_port)
     (std::uint16_t, actions_len)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_match,
+    canard::net::ofp::v10::v10_detail::ofp_match,
     (std::uint32_t, wildcards)
     (std::uint16_t, in_port)
     (std::uint8_t, dl_src[0])
@@ -224,9 +224,9 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_flow_mod,
-    (canard::network::openflow::v10::v10_detail::ofp_header, header)
-    (canard::network::openflow::v10::v10_detail::ofp_match, match)
+    canard::net::ofp::v10::v10_detail::ofp_flow_mod,
+    (canard::net::ofp::v10::v10_detail::ofp_header, header)
+    (canard::net::ofp::v10::v10_detail::ofp_match, match)
     (std::uint64_t, cookie)
     (std::uint16_t, command)
     (std::uint16_t, idle_timeout)
@@ -238,9 +238,9 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_flow_removed,
-    (canard::network::openflow::v10::v10_detail::ofp_header, header)
-    (canard::network::openflow::v10::v10_detail::ofp_match, match)
+    canard::net::ofp::v10::v10_detail::ofp_flow_removed,
+    (canard::net::ofp::v10::v10_detail::ofp_header, header)
+    (canard::net::ofp::v10::v10_detail::ofp_match, match)
     (std::uint64_t, cookie)
     (std::uint16_t, priority)
     (std::uint8_t, reason)
@@ -255,45 +255,45 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_error_msg,
-    (canard::network::openflow::v10::v10_detail::ofp_header, header)
+    canard::net::ofp::v10::v10_detail::ofp_error_msg,
+    (canard::net::ofp::v10::v10_detail::ofp_header, header)
     (std::uint16_t, type)
     (std::uint16_t, code)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_stats_request,
-    (canard::network::openflow::v10::v10_detail::ofp_header, header)
+    canard::net::ofp::v10::v10_detail::ofp_stats_request,
+    (canard::net::ofp::v10::v10_detail::ofp_header, header)
     (std::uint16_t, type)
     (std::uint16_t, flags)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_stats_reply,
-    (canard::network::openflow::v10::v10_detail::ofp_header, header)
+    canard::net::ofp::v10::v10_detail::ofp_stats_reply,
+    (canard::net::ofp::v10::v10_detail::ofp_header, header)
     (std::uint16_t, type)
     (std::uint16_t, flags)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_desc_stats,
+    canard::net::ofp::v10::v10_detail::ofp_desc_stats,
 
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_flow_stats_request,
-    (canard::network::openflow::v10::v10_detail::ofp_match, match)
+    canard::net::ofp::v10::v10_detail::ofp_flow_stats_request,
+    (canard::net::ofp::v10::v10_detail::ofp_match, match)
     (std::uint8_t, table_id)
     (std::uint8_t, pad)
     (std::uint16_t, out_port)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_flow_stats,
+    canard::net::ofp::v10::v10_detail::ofp_flow_stats,
     (std::uint16_t, length)
     (std::uint8_t, table_id)
     (std::uint8_t, pad)
-    (canard::network::openflow::v10::v10_detail::ofp_match, match)
+    (canard::net::ofp::v10::v10_detail::ofp_match, match)
     (std::uint32_t, duration_sec)
     (std::uint32_t, duration_nsec)
     (std::uint16_t, priority)
@@ -311,15 +311,15 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_aggregate_stats_request,
-    (canard::network::openflow::v10::v10_detail::ofp_match, match)
+    canard::net::ofp::v10::v10_detail::ofp_aggregate_stats_request,
+    (canard::net::ofp::v10::v10_detail::ofp_match, match)
     (std::uint8_t, table_id)
     (std::uint8_t, pad)
     (std::uint16_t, out_port)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_aggregate_stats_reply,
+    canard::net::ofp::v10::v10_detail::ofp_aggregate_stats_reply,
     (std::uint64_t, packet_count)
     (std::uint64_t, byte_count)
     (std::uint32_t, flow_count)
@@ -330,7 +330,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_table_stats,
+    canard::net::ofp::v10::v10_detail::ofp_table_stats,
     (std::uint8_t, table_id)
     (std::uint8_t, pad[0])
     (std::uint8_t, pad[1])
@@ -343,7 +343,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_port_stats_request,
+    canard::net::ofp::v10::v10_detail::ofp_port_stats_request,
     (std::uint16_t, port_no)
     (std::uint8_t, pad[0])
     (std::uint8_t, pad[1])
@@ -354,7 +354,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_port_stats,
+    canard::net::ofp::v10::v10_detail::ofp_port_stats,
     (std::uint16_t, port_no)
     (std::uint8_t, pad[0])
     (std::uint8_t, pad[1])
@@ -377,13 +377,13 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_vendor_header,
-    (canard::network::openflow::v10::v10_detail::ofp_header, header)
+    canard::net::ofp::v10::v10_detail::ofp_vendor_header,
+    (canard::net::ofp::v10::v10_detail::ofp_header, header)
     (std::uint32_t, vendor)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_queue_prop_header,
+    canard::net::ofp::v10::v10_detail::ofp_queue_prop_header,
     (std::uint16_t, property)
     (std::uint16_t, len)
     (std::uint8_t, pad[0])
@@ -393,8 +393,8 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_queue_prop_min_rate,
-    (canard::network::openflow::v10::v10_detail::ofp_queue_prop_header, prop_header)
+    canard::net::ofp::v10::v10_detail::ofp_queue_prop_min_rate,
+    (canard::net::ofp::v10::v10_detail::ofp_queue_prop_header, prop_header)
     (std::uint16_t, rate)
     (std::uint8_t, pad[0])
     (std::uint8_t, pad[1])
@@ -405,7 +405,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_packet_queue,
+    canard::net::ofp::v10::v10_detail::ofp_packet_queue,
     (std::uint32_t, queue_id)
     (std::uint16_t, len)
     (std::uint8_t, pad[0])
@@ -413,16 +413,16 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_queue_get_config_request,
-    (canard::network::openflow::v10::v10_detail::ofp_header, header)
+    canard::net::ofp::v10::v10_detail::ofp_queue_get_config_request,
+    (canard::net::ofp::v10::v10_detail::ofp_header, header)
     (std::uint16_t, port)
     (std::uint8_t, pad[0])
     (std::uint8_t, pad[1])
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_queue_get_config_reply,
-    (canard::network::openflow::v10::v10_detail::ofp_header, header)
+    canard::net::ofp::v10::v10_detail::ofp_queue_get_config_reply,
+    (canard::net::ofp::v10::v10_detail::ofp_header, header)
     (std::uint16_t, port)
     (std::uint8_t, pad[0])
     (std::uint8_t, pad[1])
@@ -433,7 +433,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_action_enqueue,
+    canard::net::ofp::v10::v10_detail::ofp_action_enqueue,
     (std::uint16_t, type)
     (std::uint16_t, len)
     (std::uint16_t, port)
@@ -447,7 +447,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_queue_stats_request,
+    canard::net::ofp::v10::v10_detail::ofp_queue_stats_request,
     (std::uint16_t, port_no)
     (std::uint8_t, pad[0])
     (std::uint8_t, pad[1])
@@ -455,7 +455,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::network::openflow::v10::v10_detail::ofp_queue_stats,
+    canard::net::ofp::v10::v10_detail::ofp_queue_stats,
     (std::uint16_t, port_no)
     (std::uint8_t, pad[0])
     (std::uint8_t, pad[1])
@@ -465,4 +465,4 @@ BOOST_FUSION_ADAPT_STRUCT(
     (std::uint64_t, tx_errors)
 )
 
-#endif // CANARD_NETWORK_OPENFLOW_V10_FUSION_ADATOR_HPP
+#endif // CANARD_NET_OFP_V10_FUSION_ADATOR_HPP

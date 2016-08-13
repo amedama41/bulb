@@ -1,5 +1,5 @@
-#ifndef CANARD_NETWORK_OPENFLOW_V13_MESSAGES_PACKET_IN_HPP
-#define CANARD_NETWORK_OPENFLOW_V13_MESSAGES_PACKET_IN_HPP
+#ifndef CANARD_NET_OFP_V13_MESSAGES_PACKET_IN_HPP
+#define CANARD_NET_OFP_V13_MESSAGES_PACKET_IN_HPP
 
 #include <cstdint>
 #include <iterator>
@@ -19,8 +19,8 @@
 #include <canard/network/protocol/openflow/v13/oxm_match_set.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace v13 {
 namespace messages {
 
@@ -264,8 +264,8 @@ namespace messages {
 
 } // namespace messages
 } // namespace v13
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_V13_MESSAGES_PACKET_IN_HPP
+#endif // CANARD_NET_OFP_V13_MESSAGES_PACKET_IN_HPP

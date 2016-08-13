@@ -1,5 +1,5 @@
-#ifndef CANARD_NETWORK_OPENFLOW_V10_QUEUE_PROPERTY_DECODER_HPP
-#define CANARD_NETWORK_OPENFLOW_V10_QUEUE_PROPERTY_DECODER_HPP
+#ifndef CANARD_NET_OFP_V10_QUEUE_PROPERTY_DECODER_HPP
+#define CANARD_NET_OFP_V10_QUEUE_PROPERTY_DECODER_HPP
 
 #include <iterator>
 #include <stdexcept>
@@ -11,8 +11,8 @@
 #include <canard/network/protocol/openflow/v10/queue_properties.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace v10 {
 
 struct queue_property_decoder
@@ -30,7 +30,7 @@ struct queue_property_decoder
         }
 
         switch (prop_header.property) {
-#       define CANARD_NETWORK_OPENFLOW_V10_QUEUE_PROPERTY_CASE(z, N, _) \
+#       define CANARD_NET_OFP_V10_QUEUE_PROPERTY_CASE(z, N, _) \
         using property ## N \
             = std::tuple_element<N, default_queue_property_list>::type; \
         case property ## N::queue_property: \
@@ -38,8 +38,8 @@ struct queue_property_decoder
         static_assert(
                   std::tuple_size<default_queue_property_list>::value == 1
                 , "not match to the number of queue property types");
-        BOOST_PP_REPEAT(1, CANARD_NETWORK_OPENFLOW_V10_QUEUE_PROPERTY_CASE, _)
-#       undef  CANARD_NETWORK_OPENFLOW_V10_QUEUE_PROPERTY_CASE
+        BOOST_PP_REPEAT(1, CANARD_NET_OFP_V10_QUEUE_PROPERTY_CASE, _)
+#       undef  CANARD_NET_OFP_V10_QUEUE_PROPERTY_CASE
         default:
             throw std::runtime_error{"unknwon queue property"};
         }
@@ -47,8 +47,8 @@ struct queue_property_decoder
 };
 
 } // namespace v10
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_V10_QUEUE_PROPERTY_DECODER_HPP
+#endif // CANARD_NET_OFP_V10_QUEUE_PROPERTY_DECODER_HPP

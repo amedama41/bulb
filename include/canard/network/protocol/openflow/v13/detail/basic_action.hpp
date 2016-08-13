@@ -1,5 +1,5 @@
-#ifndef CANARD_NETWORK_OPENFLOW_DETAIL_V13_BASIC_ACTION_HPP
-#define CANARD_NETWORK_OPENFLOW_DETAIL_V13_BASIC_ACTION_HPP
+#ifndef CANARD_NET_OFP_DETAIL_V13_BASIC_ACTION_HPP
+#define CANARD_NET_OFP_DETAIL_V13_BASIC_ACTION_HPP
 
 #include <cstdint>
 #include <stdexcept>
@@ -13,8 +13,8 @@
 #include <canard/network/protocol/openflow/v13/openflow.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace detail {
 namespace v13 {
 
@@ -29,7 +29,7 @@ namespace v13 {
 
     public:
         static constexpr auto type() noexcept
-            -> openflow::v13::protocol::ofp_action_type
+            -> ofp::v13::protocol::ofp_action_type
         {
             return T::action_type;
         }
@@ -62,7 +62,7 @@ namespace v13 {
         }
 
         static void validate_action_header(
-                openflow::v13::v13_detail::ofp_action_header const& header)
+                ofp::v13::v13_detail::ofp_action_header const& header)
         {
             if (header.type != T::action_type) {
                 throw std::runtime_error{"invalid action type"};
@@ -93,8 +93,8 @@ namespace v13 {
 
 } // namespace v13
 } // namespace detail
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_DETAIL_V13_BASIC_ACTION_HPP
+#endif // CANARD_NET_OFP_DETAIL_V13_BASIC_ACTION_HPP

@@ -1,13 +1,13 @@
-#ifndef CANARD_NETWORK_OPENFLOW_DETAIL_AS_BYTE_RANGE_HPP
-#define CANARD_NETWORK_OPENFLOW_DETAIL_AS_BYTE_RANGE_HPP
+#ifndef CANARD_NET_OFP_DETAIL_AS_BYTE_RANGE_HPP
+#define CANARD_NET_OFP_DETAIL_AS_BYTE_RANGE_HPP
 
 #include <memory>
 #include <type_traits>
 #include <boost/range/iterator_range.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace detail {
 
     namespace byte_range_detail {
@@ -45,9 +45,9 @@ namespace detail {
     using byte_range_detail::as_byte_range;
 
 } // namespace detail
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_DETAIL_AS_BYTE_RANGE_HPP
+#endif // CANARD_NET_OFP_DETAIL_AS_BYTE_RANGE_HPP

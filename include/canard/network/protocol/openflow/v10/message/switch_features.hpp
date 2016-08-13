@@ -1,5 +1,5 @@
-#ifndef CANARD_NETWORK_OPENFLOW_V10_MESSAGES_SWITCH_FEATURES_HPP
-#define CANARD_NETWORK_OPENFLOW_V10_MESSAGES_SWITCH_FEATURES_HPP
+#ifndef CANARD_NET_OFP_V10_MESSAGES_SWITCH_FEATURES_HPP
+#define CANARD_NET_OFP_V10_MESSAGES_SWITCH_FEATURES_HPP
 
 #include <cstdint>
 #include <stdexcept> // TODO
@@ -13,8 +13,8 @@
 #include <canard/network/protocol/openflow/v10/port.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace v10 {
 namespace messages {
 
@@ -222,8 +222,8 @@ namespace messages {
 
 } // namespace messages
 } // namespace v10
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_V10_MESSAGES_SWITCH_FEATURES_HPP
+#endif // CANARD_NET_OFP_V10_MESSAGES_SWITCH_FEATURES_HPP

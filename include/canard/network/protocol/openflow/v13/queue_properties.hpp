@@ -1,13 +1,13 @@
-#ifndef CANARD_NETWORK_OPENFLOW_V13_QUEUE_PROPERTIES_HPP
-#define CANARD_NETWORK_OPENFLOW_V13_QUEUE_PROPERTIES_HPP
+#ifndef CANARD_NET_OFP_V13_QUEUE_PROPERTIES_HPP
+#define CANARD_NET_OFP_V13_QUEUE_PROPERTIES_HPP
 
 #include <tuple>
 #include <canard/network/protocol/openflow/v13/queue_property/max_rate.hpp>
 #include <canard/network/protocol/openflow/v13/queue_property/min_rate.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace v13 {
 
     using default_queue_property_list = std::tuple<
@@ -16,8 +16,8 @@ namespace v13 {
     >;
 
 } // namespace v13
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_V13_QUEUE_PROPERTIES_HPP
+#endif // CANARD_NET_OFP_V13_QUEUE_PROPERTIES_HPP

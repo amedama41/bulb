@@ -1,5 +1,5 @@
-#ifndef CANARD_NETWORK_OPENFLOW_V13_OXM_MATCH_FIELD_DECODER_HPP
-#define CANARD_NETWORK_OPENFLOW_V13_OXM_MATCH_FIELD_DECODER_HPP
+#ifndef CANARD_NET_OFP_V13_OXM_MATCH_FIELD_DECODER_HPP
+#define CANARD_NET_OFP_V13_OXM_MATCH_FIELD_DECODER_HPP
 
 #include <cstdint>
 #include <stdexcept>
@@ -9,8 +9,8 @@
 #include <canard/network/protocol/openflow/v13/oxm_match_field.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace v13 {
 
 struct oxm_match_field_decoder
@@ -29,7 +29,7 @@ struct oxm_match_field_decoder
         }
 
         switch (oxm_header >> 9) {
-#       define CANARD_NETWORK_OPENFLOW_V13_MATCH_FIELD_CASE(z, N, _) \
+#       define CANARD_NET_OFP_V13_MATCH_FIELD_CASE(z, N, _) \
         using oxm_match_field ## N \
             = std::tuple_element<N, default_oxm_match_field_list>::type; \
         case oxm_match_field ## N::oxm_type(): \
@@ -37,8 +37,8 @@ struct oxm_match_field_decoder
         static_assert(
                   std::tuple_size<default_oxm_match_field_list>::value == 40
                 , "not match to the number of oxm match types");
-        BOOST_PP_REPEAT(40, CANARD_NETWORK_OPENFLOW_V13_MATCH_FIELD_CASE, _)
-#       undef CANARD_NETWORK_OPENFLOW_V13_MATCH_FIELD_CASE
+        BOOST_PP_REPEAT(40, CANARD_NET_OFP_V13_MATCH_FIELD_CASE, _)
+#       undef CANARD_NET_OFP_V13_MATCH_FIELD_CASE
         default:
             throw std::runtime_error{"unknwon oxm type"};
         }
@@ -46,8 +46,8 @@ struct oxm_match_field_decoder
 };
 
 } // namespace v13
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_V13_OXM_MATCH_FIELD_DECODER_HPP
+#endif // CANARD_NET_OFP_V13_OXM_MATCH_FIELD_DECODER_HPP

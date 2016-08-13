@@ -1,5 +1,5 @@
-#ifndef CANARD_NETWORK_OPENFLOW_V10_ACTION_DECODER_HPP
-#define CANARD_NETWORK_OPENFLOW_V10_ACTION_DECODER_HPP
+#ifndef CANARD_NET_OFP_V10_ACTION_DECODER_HPP
+#define CANARD_NET_OFP_V10_ACTION_DECODER_HPP
 
 #include <iterator>
 #include <stdexcept>
@@ -11,8 +11,8 @@
 #include <canard/network/protocol/openflow/v10/openflow.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace v10 {
 
 struct action_decoder
@@ -36,13 +36,13 @@ struct action_decoder
         }
 
         switch (action_header.type) {
-#       define CANARD_NETWORK_OPENFLOW_V10_ACTION_CASE(z, N, _) \
+#       define CANARD_NET_OFP_V10_ACTION_CASE(z, N, _) \
         using action ## N \
             = std::tuple_element<N, default_action_list>::type; \
         case action ## N::action_type: \
             return function(action ## N::decode(first, last));
-        BOOST_PP_REPEAT(12, CANARD_NETWORK_OPENFLOW_V10_ACTION_CASE, _)
-#       undef CANARD_NETWORK_OPENFLOW_V10_ACTION_CASE
+        BOOST_PP_REPEAT(12, CANARD_NET_OFP_V10_ACTION_CASE, _)
+#       undef CANARD_NET_OFP_V10_ACTION_CASE
         default:
             throw std::runtime_error{"unknwon action type"};
         }
@@ -50,8 +50,8 @@ struct action_decoder
 };
 
 } // namespace v10
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_V10_ACTION_DECODER_HPP
+#endif // CANARD_NET_OFP_V10_ACTION_DECODER_HPP

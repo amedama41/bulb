@@ -1,5 +1,5 @@
-#ifndef CANARD_NETWORK_OPENFLOW_V10_ACTIONS_HPP
-#define CANARD_NETWORK_OPENFLOW_V10_ACTIONS_HPP
+#ifndef CANARD_NET_OFP_V10_ACTIONS_HPP
+#define CANARD_NET_OFP_V10_ACTIONS_HPP
 
 #include <tuple>
 #include <canard/network/protocol/openflow/v10/action/enqueue.hpp>
@@ -8,8 +8,8 @@
 #include <canard/network/protocol/openflow/v10/action/strip_vlan.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace v10 {
 
     using default_action_list = std::tuple<
@@ -28,8 +28,8 @@ namespace v10 {
     >;
 
 } // namespace v10
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_V10_ACTIONS_HPP
+#endif // CANARD_NET_OFP_V10_ACTIONS_HPP

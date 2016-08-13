@@ -1,13 +1,13 @@
-#ifndef CANARD_NETWORK_OPENFLOW_V10_FLOW_ENTRY_ADAPTOR_HPP
-#define CANARD_NETWORK_OPENFLOW_V10_FLOW_ENTRY_ADAPTOR_HPP
+#ifndef CANARD_NET_OFP_V10_FLOW_ENTRY_ADAPTOR_HPP
+#define CANARD_NET_OFP_V10_FLOW_ENTRY_ADAPTOR_HPP
 
 #include <cstdint>
 #include <canard/network/protocol/openflow/v10/flow_entry.hpp>
 #include <canard/network/protocol/openflow/v10/match_set.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace v10 {
 namespace v10_detail {
 
@@ -105,8 +105,8 @@ namespace v10_detail {
 
 } // namespace v10_detail
 } // namespace v10
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_V10_FLOW_ENTRY_ADAPTOR_HPP
+#endif // CANARD_NET_OFP_V10_FLOW_ENTRY_ADAPTOR_HPP

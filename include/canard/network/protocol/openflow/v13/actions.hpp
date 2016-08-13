@@ -1,5 +1,5 @@
-#ifndef CANARD_NETWORK_OPENFLOW_V13_ACTIONS_HPP
-#define CANARD_NETWORK_OPENFLOW_V13_ACTIONS_HPP
+#ifndef CANARD_NET_OFP_V13_ACTIONS_HPP
+#define CANARD_NET_OFP_V13_ACTIONS_HPP
 
 #include <tuple>
 #include <canard/network/protocol/openflow/v13/action/output.hpp>
@@ -20,8 +20,8 @@
 #include <canard/network/protocol/openflow/v13/action/pop_pbb.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace v13 {
 
     namespace actions_detail {
@@ -61,8 +61,8 @@ namespace v13 {
     >::type;
 
 } // namespace v13
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_V13_ACTIONS_HPP
+#endif // CANARD_NET_OFP_V13_ACTIONS_HPP

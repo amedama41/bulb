@@ -1,12 +1,12 @@
-#ifndef CANARD_NETWORK_OPENFLOW_ERROR_HPP
-#define CANARD_NETWORK_OPENFLOW_ERROR_HPP
+#ifndef CANARD_NET_OFP_ERROR_HPP
+#define CANARD_NET_OFP_ERROR_HPP
 
 #include <canard/network/protocol/openflow/v13/openflow.hpp>
 #include <canard/network/protocol/openflow/v13/message/error.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 
     using error = v13::messages::error;
 
@@ -15,8 +15,8 @@ namespace openflow {
     constexpr auto OFPHFC_INCOMPATIBLE = v13::protocol::OFPHFC_INCOMPATIBLE;
     constexpr auto OFPHFC_EPERM = v13::protocol::OFPHFC_EPERM;
 
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_ERROR_HPP
+#endif // CANARD_NET_OFP_ERROR_HPP

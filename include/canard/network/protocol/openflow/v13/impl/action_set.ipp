@@ -1,5 +1,5 @@
-#ifndef CANARD_NETWORK_OPENFLOW_V13_IMPL_ACTION_SET_IPP
-#define CANARD_NETWORK_OPENFLOW_V13_IMPL_ACTION_SET_IPP
+#ifndef CANARD_NET_OFP_V13_IMPL_ACTION_SET_IPP
+#define CANARD_NET_OFP_V13_IMPL_ACTION_SET_IPP
 
 #include <canard/network/protocol/openflow/detail/config.hpp>
 #include <canard/network/protocol/openflow/v13/action_set.hpp>
@@ -19,8 +19,8 @@
 #include <canard/network/protocol/openflow/v13/action_order.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace v13 {
 
   namespace action_set_detail {
@@ -255,8 +255,8 @@ namespace v13 {
   }
 
 } // namespace v13
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_V13_IMPL_ACTION_SET_IPP
+#endif // CANARD_NET_OFP_V13_IMPL_ACTION_SET_IPP

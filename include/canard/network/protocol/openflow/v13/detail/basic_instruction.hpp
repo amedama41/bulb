@@ -1,5 +1,5 @@
-#ifndef CANARD_NETWORK_OPENFLOW_DETAIL_V13_BASIC_INSTRUCTION_HPP
-#define CANARD_NETWORK_OPENFLOW_DETAIL_V13_BASIC_INSTRUCTION_HPP
+#ifndef CANARD_NET_OFP_DETAIL_V13_BASIC_INSTRUCTION_HPP
+#define CANARD_NET_OFP_DETAIL_V13_BASIC_INSTRUCTION_HPP
 
 #include <cstdint>
 #include <stdexcept>
@@ -14,8 +14,8 @@
 #include <canard/network/protocol/openflow/v13/openflow.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace detail {
 namespace v13 {
 
@@ -30,7 +30,7 @@ namespace v13 {
 
     public:
         static constexpr auto type() noexcept
-            -> openflow::v13::protocol::ofp_instruction_type
+            -> ofp::v13::protocol::ofp_instruction_type
         {
             return T::instruction_type;
         }
@@ -63,7 +63,7 @@ namespace v13 {
         }
 
         static void validate_instruction(
-                openflow::v13::v13_detail::ofp_instruction const& instruction)
+                ofp::v13::v13_detail::ofp_instruction const& instruction)
         {
             if (instruction.type != T::instruction_type) {
                 throw std::runtime_error{"invalid instruction type"};
@@ -101,8 +101,8 @@ namespace v13 {
 
 } // namespace v13
 } // namespace detail
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_DETAIL_V13_BASIC_INSTRUCTION_HPP
+#endif // CANARD_NET_OFP_DETAIL_V13_BASIC_INSTRUCTION_HPP

@@ -1,12 +1,12 @@
-#ifndef CANARD_NETWORK_OPENFLOW_GET_XID_HPP
-#define CANARD_NETWORK_OPENFLOW_GET_XID_HPP
+#ifndef CANARD_NET_OFP_GET_XID_HPP
+#define CANARD_NET_OFP_GET_XID_HPP
 
 #include <cstdint>
 #include <atomic>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 
     inline auto get_xid()
         -> std::uint32_t
@@ -15,8 +15,8 @@ namespace openflow {
         return xid.fetch_add(1, std::memory_order_relaxed);
     }
 
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_GET_XID_HPP
+#endif // CANARD_NET_OFP_GET_XID_HPP

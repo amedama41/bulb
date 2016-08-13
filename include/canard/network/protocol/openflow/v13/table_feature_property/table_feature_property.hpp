@@ -1,5 +1,5 @@
-#ifndef CANARD_NETWORK_OPENFLOW_V13_TABLE_FEATURE_PROPERTY_HPP
-#define CANARD_NETWORK_OPENFLOW_V13_TABLE_FEATURE_PROPERTY_HPP
+#ifndef CANARD_NET_OFP_V13_TABLE_FEATURE_PROPERTY_HPP
+#define CANARD_NET_OFP_V13_TABLE_FEATURE_PROPERTY_HPP
 
 #include <cstdint>
 #include <iterator>
@@ -15,8 +15,8 @@
 #include <canard/mpl/adapted/std_tuple.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace v13 {
 
     namespace table_feature_properties {
@@ -37,12 +37,12 @@ namespace v13 {
             auto copy_first = first;
             auto const header = detail::decode<v13_detail::ofp_table_feature_prop_header>(copy_first, last);
             switch (header.type) {
-#           define CANARD_NETWORK_OPENFLOW_V13_TABLE_FEATURE_PROPERTY_DECODE_CASE(z, N, _) \
+#           define CANARD_NET_OFP_V13_TABLE_FEATURE_PROPERTY_DECODE_CASE(z, N, _) \
             case std::tuple_element<N, property_list>::type::prop_type: \
                 return function(std::tuple_element<N, property_list>::type::decode(first, last));
             static_assert(std::tuple_size<property_list>::value == 14, "");
-            BOOST_PP_REPEAT(14, CANARD_NETWORK_OPENFLOW_V13_TABLE_FEATURE_PROPERTY_DECODE_CASE, _)
-#           undef  CANARD_NETWORK_OPENFLOW_V13_TABLE_FEATURE_PROPERTY_DECODE_CASE
+            BOOST_PP_REPEAT(14, CANARD_NET_OFP_V13_TABLE_FEATURE_PROPERTY_DECODE_CASE, _)
+#           undef  CANARD_NET_OFP_V13_TABLE_FEATURE_PROPERTY_DECODE_CASE
             default:
                 // TODO
                 std::advance(first, v13_detail::exact_length(header.length));
@@ -74,8 +74,8 @@ namespace v13 {
     } // namespace table_feature_properties
 
 } // namespace v13
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_V13_TABLE_FEATURE_PROPERTY_HPP
+#endif // CANARD_NET_OFP_V13_TABLE_FEATURE_PROPERTY_HPP

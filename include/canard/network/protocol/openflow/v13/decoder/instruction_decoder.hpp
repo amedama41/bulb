@@ -1,5 +1,5 @@
-#ifndef CANARD_NETWORK_OPENFLOW_V13_INSTRUCTION_DECODER_HPP
-#define CANARD_NETWORK_OPENFLOW_V13_INSTRUCTION_DECODER_HPP
+#ifndef CANARD_NET_OFP_V13_INSTRUCTION_DECODER_HPP
+#define CANARD_NET_OFP_V13_INSTRUCTION_DECODER_HPP
 
 #include <iterator>
 #include <stdexcept>
@@ -11,8 +11,8 @@
 #include <canard/network/protocol/openflow/v13/openflow.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace v13 {
 
 struct instruction_decoder
@@ -36,13 +36,13 @@ struct instruction_decoder
         }
 
         switch (instruction.type) {
-#       define CANARD_NETWORK_OPENFLOW_V13_INSTRUCTION_CASE(z, N, _) \
+#       define CANARD_NET_OFP_V13_INSTRUCTION_CASE(z, N, _) \
         using instruction ## N \
             = std::tuple_element<N, instruction_type_list>::type; \
         case instruction ## N::instruction_type: \
             return function(instruction ## N::decode(first, last));
-        BOOST_PP_REPEAT(6, CANARD_NETWORK_OPENFLOW_V13_INSTRUCTION_CASE, _)
-#       undef CANARD_NETWORK_OPENFLOW_V13_INSTRUCTION_CASE
+        BOOST_PP_REPEAT(6, CANARD_NET_OFP_V13_INSTRUCTION_CASE, _)
+#       undef CANARD_NET_OFP_V13_INSTRUCTION_CASE
         default:
             throw std::runtime_error{"unknown instruction type"};
         }
@@ -50,8 +50,8 @@ struct instruction_decoder
 };
 
 } // namespace v13
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_V13_INSTRUCTION_DECODER_HPP
+#endif // CANARD_NET_OFP_V13_INSTRUCTION_DECODER_HPP

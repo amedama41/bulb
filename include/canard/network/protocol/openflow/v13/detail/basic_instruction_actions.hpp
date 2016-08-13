@@ -1,5 +1,5 @@
-#ifndef CANARD_NETWORK_OPENFLOW_DETAIL_V13_BASIC_INSTRUCTION_ACTIONS_HPP
-#define CANARD_NETWORK_OPENFLOW_DETAIL_V13_BASIC_INSTRUCTION_ACTIONS_HPP
+#ifndef CANARD_NET_OFP_DETAIL_V13_BASIC_INSTRUCTION_ACTIONS_HPP
+#define CANARD_NET_OFP_DETAIL_V13_BASIC_INSTRUCTION_ACTIONS_HPP
 
 #include <cstdint>
 #include <iterator>
@@ -16,8 +16,8 @@
 #include <canard/network/protocol/openflow/v13/openflow.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace detail {
 namespace v13 {
 
@@ -26,11 +26,11 @@ namespace v13 {
         : private boost::equality_comparable<T>
     {
     protected:
-        using raw_ofp_type = openflow::v13::v13_detail::ofp_instruction_actions;
+        using raw_ofp_type = ofp::v13::v13_detail::ofp_instruction_actions;
 
     public:
         static constexpr auto type() noexcept
-            -> openflow::v13::protocol::ofp_instruction_type
+            -> ofp::v13::protocol::ofp_instruction_type
         {
             return T::instruction_type;
         }
@@ -42,7 +42,7 @@ namespace v13 {
         }
 
         auto actions() const noexcept
-            -> openflow::v13::action_list const&
+            -> ofp::v13::action_list const&
         {
             return actions_;
         }
@@ -63,7 +63,7 @@ namespace v13 {
                 = detail::decode<raw_ofp_type>(first, last);
             last = std::next(
                     first, instruction_actions.len - sizeof(raw_ofp_type));
-            auto actions = openflow::v13::action_list::decode(first, last);
+            auto actions = ofp::v13::action_list::decode(first, last);
             return T{instruction_actions, std::move(actions)};
         }
 
@@ -75,7 +75,7 @@ namespace v13 {
         }
 
         static void validate_instruction(
-                openflow::v13::v13_detail::ofp_instruction const& instruction)
+                ofp::v13::v13_detail::ofp_instruction const& instruction)
         {
             if (instruction.type != T::instruction_type) {
                 throw std::runtime_error{"invalid instruction type"};
@@ -105,7 +105,7 @@ namespace v13 {
         }
 
     protected:
-        explicit basic_instruction_actions(openflow::v13::action_list&& actions)
+        explicit basic_instruction_actions(ofp::v13::action_list&& actions)
             : instruction_actions_{
                   T::instruction_type
                 , std::uint16_t(sizeof(raw_ofp_type) + actions.length())
@@ -117,7 +117,7 @@ namespace v13 {
 
         basic_instruction_actions(
                   raw_ofp_type const& instruction_actions
-                , openflow::v13::action_list&& actions)
+                , ofp::v13::action_list&& actions)
             : instruction_actions_(instruction_actions)
             , actions_(std::move(actions))
         {
@@ -146,13 +146,13 @@ namespace v13 {
 
     private:
         raw_ofp_type instruction_actions_;
-        openflow::v13::action_list actions_;
+        ofp::v13::action_list actions_;
     };
 
 } // namespace v13
 } // namespace detail
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_DETAIL_V13_BASIC_INSTRUCTION_ACTIONS_HPP
+#endif // CANARD_NET_OFP_DETAIL_V13_BASIC_INSTRUCTION_ACTIONS_HPP

@@ -1,5 +1,5 @@
-#ifndef CANARD_NETWORK_OPENFLOW_V13_IMPL_INSTRUCTION_SET_IPP
-#define CANARD_NETWORK_OPENFLOW_V13_IMPL_INSTRUCTION_SET_IPP
+#ifndef CANARD_NET_OFP_V13_IMPL_INSTRUCTION_SET_IPP
+#define CANARD_NET_OFP_V13_IMPL_INSTRUCTION_SET_IPP
 
 #include <canard/network/protocol/openflow/detail/config.hpp>
 #include <canard/network/protocol/openflow/v13/instruction_set.hpp>
@@ -11,8 +11,8 @@
 #include <boost/range/numeric.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace v13 {
 
   auto instruction_set::begin() const noexcept
@@ -130,8 +130,8 @@ namespace v13 {
   }
 
 } // namespace v13
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_V13_IMPL_INSTRUCTION_SET_IPP
+#endif // CANARD_NET_OFP_V13_IMPL_INSTRUCTION_SET_IPP

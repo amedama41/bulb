@@ -1,5 +1,5 @@
-#ifndef CANARD_NETWORK_OPENFLOW_HELLO_HPP
-#define CANARD_NETWORK_OPENFLOW_HELLO_HPP
+#ifndef CANARD_NET_OFP_HELLO_HPP
+#define CANARD_NET_OFP_HELLO_HPP
 
 #include <cstdint>
 #include <cstring>
@@ -12,8 +12,8 @@
 #include <canard/network/protocol/openflow/v13/detail/byteorder.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 
     using hello = v13::hello;
     using ofp_header = v13::v13_detail::ofp_header;
@@ -32,8 +32,8 @@ namespace openflow {
 
     } // namespace detail
 
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_HELLO_HPP
+#endif // CANARD_NET_OFP_HELLO_HPP

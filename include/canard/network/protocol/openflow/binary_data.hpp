@@ -1,5 +1,5 @@
-#ifndef CANARD_NETWORK_OPENFLOW_BINARY_DATA_HPP
-#define CANARD_NETWORK_OPENFLOW_BINARY_DATA_HPP
+#ifndef CANARD_NET_OFP_BINARY_DATA_HPP
+#define CANARD_NET_OFP_BINARY_DATA_HPP
 
 #include <cstddef>
 #include <algorithm>
@@ -9,8 +9,8 @@
 #include <boost/range/distance.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 
     class binary_data
     {
@@ -136,8 +136,8 @@ namespace openflow {
         std::size_t size_;
     };
 
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
-#endif // CANARD_NETWORK_OPENFLOW_BINARY_DATA_HPP
+#endif // CANARD_NET_OFP_BINARY_DATA_HPP

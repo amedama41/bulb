@@ -1,5 +1,5 @@
-#ifndef CANARD_NETWORK_OPENFLOW_DETAIL_ANY_INSTRUCTION_HPP
-#define CANARD_NETWORK_OPENFLOW_DETAIL_ANY_INSTRUCTION_HPP
+#ifndef CANARD_NET_OFP_DETAIL_ANY_INSTRUCTION_HPP
+#define CANARD_NET_OFP_DETAIL_ANY_INSTRUCTION_HPP
 
 #include <canard/network/protocol/openflow/detail/config.hpp>
 
@@ -20,8 +20,8 @@
 #include <canard/network/protocol/openflow/detail/visitors.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace detail {
 
     template <class InstructionDecoder>
@@ -223,12 +223,12 @@ namespace detail {
     }
 
 } // namespace detail
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard
 
 #if defined(CANARD_NET_OFP_HEADER_ONLY) || !defined(CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
 #   include <canard/network/protocol/openflow/detail/impl/any_instruction.hpp>
 #endif
 
-#endif // CANARD_NETWORK_OPENFLOW_DETAIL_ANY_INSTRUCTION_HPP
+#endif // CANARD_NET_OFP_DETAIL_ANY_INSTRUCTION_HPP
