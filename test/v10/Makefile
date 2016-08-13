@@ -10,7 +10,8 @@ LIBBULB_LIB = ./$(LIBBULB_DIR)/libbulb.dylib
 LIBBULB_RPATH = -rpath @executable_path/./$(LIBBULB_DIR)
 
 TEST_DIRS = action \
-			common_type
+			common_type \
+			queue_property
 TEST_LIBS = $(foreach dir,$(TEST_DIRS),./$(dir)/lib$(dir)_test.dylib)
 TEST_RPATH = $(foreach dir,$(TEST_DIRS),-rpath @executable_path/./$(dir))
 
