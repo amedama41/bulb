@@ -3,13 +3,13 @@
 
 #include <cstdint>
 #include <utility>
-#include <canard/network/protocol/openflow/get_xid.hpp>
-#include <canard/network/protocol/openflow/v13/detail/flow_entry_adaptor.hpp>
-#include <canard/network/protocol/openflow/v13/detail/flow_mod_base.hpp>
-#include <canard/network/protocol/openflow/v13/flow_entry.hpp>
-#include <canard/network/protocol/openflow/v13/instruction_set.hpp>
-#include <canard/network/protocol/openflow/v13/openflow.hpp>
-#include <canard/network/protocol/openflow/v13/oxm_match_set.hpp>
+#include <canard/network/openflow/get_xid.hpp>
+#include <canard/network/openflow/v13/detail/flow_entry_adaptor.hpp>
+#include <canard/network/openflow/v13/detail/flow_mod_base.hpp>
+#include <canard/network/openflow/v13/flow_entry.hpp>
+#include <canard/network/openflow/v13/instruction_set.hpp>
+#include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/network/openflow/v13/oxm_match_set.hpp>
 
 namespace canard {
 namespace net {

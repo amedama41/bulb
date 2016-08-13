@@ -12,9 +12,9 @@
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/get.hpp>
 #include <boost/variant/variant.hpp>
-#include <canard/network/protocol/openflow/detail/is_related.hpp>
-#include <canard/network/protocol/openflow/detail/min_base_size_element.hpp>
-#include <canard/network/protocol/openflow/detail/visitors.hpp>
+#include <canard/network/openflow/detail/is_related.hpp>
+#include <canard/network/openflow/detail/min_base_size_element.hpp>
+#include <canard/network/openflow/detail/visitors.hpp>
 
 namespace canard {
 namespace net {

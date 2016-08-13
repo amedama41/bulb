@@ -5,11 +5,11 @@
 #include <stdexcept>
 #include <tuple>
 #include <boost/preprocessor/repeat.hpp>
-#include <canard/network/protocol/openflow/detail/decode.hpp>
-#include <canard/network/protocol/openflow/detail/min_base_size_element.hpp>
-#include <canard/network/protocol/openflow/v13/detail/byteorder.hpp>
-#include <canard/network/protocol/openflow/v13/openflow.hpp>
-#include <canard/network/protocol/openflow/v13/queue_properties.hpp>
+#include <canard/network/openflow/detail/decode.hpp>
+#include <canard/network/openflow/detail/min_base_size_element.hpp>
+#include <canard/network/openflow/v13/detail/byteorder.hpp>
+#include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/network/openflow/v13/queue_properties.hpp>
 
 namespace canard {
 namespace net {

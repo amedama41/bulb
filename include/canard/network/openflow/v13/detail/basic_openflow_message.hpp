@@ -3,8 +3,8 @@
 
 #include <cstdint>
 #include <vector>
-#include <canard/network/protocol/openflow/v13/openflow.hpp>
-#include <canard/network/protocol/openflow/v13/detail/transaction_id_assignor.hpp>
+#include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/network/openflow/v13/detail/transaction_id_assignor.hpp>
 
 namespace canard {
 namespace net {

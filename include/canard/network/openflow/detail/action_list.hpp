@@ -1,7 +1,7 @@
 #ifndef CANARD_NET_OFP_DETAIL_ACTION_LIST_HPP
 #define CANARD_NET_OFP_DETAIL_ACTION_LIST_HPP
 
-#include <canard/network/protocol/openflow/detail/config.hpp>
+#include <canard/network/openflow/detail/config.hpp>
 
 #include <cstddef>
 #include <iterator>
@@ -11,7 +11,7 @@
 #include <vector>
 #include <boost/operators.hpp>
 #include <boost/range/algorithm/for_each.hpp>
-#include <canard/network/protocol/openflow/detail/is_related.hpp>
+#include <canard/network/openflow/detail/is_related.hpp>
 
 namespace canard {
 namespace net {
@@ -233,7 +233,7 @@ namespace detail {
 } // namespace canard
 
 #if defined(CANARD_NET_OFP_HEADER_ONLY) || !defined(CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
-#   include <canard/network/protocol/openflow/detail/impl/action_list.hpp>
+#   include <canard/network/openflow/detail/impl/action_list.hpp>
 #endif
 
 #endif // CANARD_NET_OFP_DETAIL_ACTION_LIST_HPP

@@ -6,9 +6,9 @@
 #include <boost/range/adaptor/sliced.hpp>
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/utility/string_ref.hpp>
-#include <canard/network/protocol/openflow/get_xid.hpp>
-#include <canard/network/protocol/openflow/v10/detail/basic_stats.hpp>
-#include <canard/network/protocol/openflow/v10/openflow.hpp>
+#include <canard/network/openflow/get_xid.hpp>
+#include <canard/network/openflow/v10/detail/basic_stats.hpp>
+#include <canard/network/openflow/v10/openflow.hpp>
 
 namespace canard {
 namespace net {

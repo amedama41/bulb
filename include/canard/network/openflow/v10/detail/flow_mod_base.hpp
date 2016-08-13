@@ -5,13 +5,13 @@
 #include <iterator>
 #include <stdexcept>
 #include <utility>
-#include <canard/network/protocol/openflow/detail/decode.hpp>
-#include <canard/network/protocol/openflow/detail/encode.hpp>
-#include <canard/network/protocol/openflow/v10/action_list.hpp>
-#include <canard/network/protocol/openflow/v10/detail/basic_openflow_message.hpp>
-#include <canard/network/protocol/openflow/v10/detail/byteorder.hpp>
-#include <canard/network/protocol/openflow/v10/match_set.hpp>
-#include <canard/network/protocol/openflow/v10/openflow.hpp>
+#include <canard/network/openflow/detail/decode.hpp>
+#include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/v10/action_list.hpp>
+#include <canard/network/openflow/v10/detail/basic_openflow_message.hpp>
+#include <canard/network/openflow/v10/detail/byteorder.hpp>
+#include <canard/network/openflow/v10/match_set.hpp>
+#include <canard/network/openflow/v10/openflow.hpp>
 
 namespace canard {
 namespace net {

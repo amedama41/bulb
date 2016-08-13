@@ -4,13 +4,13 @@
 #include <cstdint>
 #include <stdexcept>
 #include <canard/mac_address.hpp>
-#include <canard/network/protocol/openflow/detail/decode.hpp>
-#include <canard/network/protocol/openflow/detail/encode.hpp>
-#include <canard/network/protocol/openflow/get_xid.hpp>
-#include <canard/network/protocol/openflow/v13/detail/basic_openflow_message.hpp>
-#include <canard/network/protocol/openflow/v13/detail/byteorder.hpp>
-#include <canard/network/protocol/openflow/v13/openflow.hpp>
-#include <canard/network/protocol/openflow/v13/port.hpp>
+#include <canard/network/openflow/detail/decode.hpp>
+#include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/get_xid.hpp>
+#include <canard/network/openflow/v13/detail/basic_openflow_message.hpp>
+#include <canard/network/openflow/v13/detail/byteorder.hpp>
+#include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/network/openflow/v13/port.hpp>
 
 namespace canard {
 namespace net {

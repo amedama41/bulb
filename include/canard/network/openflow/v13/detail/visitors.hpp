@@ -3,8 +3,8 @@
 
 #include <cstdint>
 #include <boost/variant/static_visitor.hpp>
-#include <canard/network/protocol/openflow/detail/visitors.hpp>
-#include <canard/network/protocol/openflow/v13/detail/length_utility.hpp>
+#include <canard/network/openflow/detail/visitors.hpp>
+#include <canard/network/openflow/v13/detail/length_utility.hpp>
 
 namespace canard {
 namespace net {

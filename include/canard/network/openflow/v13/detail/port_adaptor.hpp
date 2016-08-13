@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <boost/utility/string_ref.hpp>
 #include <canard/mac_address.hpp>
-#include <canard/network/protocol/openflow/v13/openflow.hpp>
+#include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
 namespace net {

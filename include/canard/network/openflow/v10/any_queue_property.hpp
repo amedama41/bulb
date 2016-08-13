@@ -1,9 +1,9 @@
 #ifndef CANARD_NET_OFP_V10_ANY_QUEUE_PROPEPRTY_HPP
 #define CANARD_NET_OFP_V10_ANY_QUEUE_PROPEPRTY_HPP
 
-#include <canard/network/protocol/openflow/detail/any_queue_property.hpp>
-#include <canard/network/protocol/openflow/v10/decoder/queue_property_decoder.hpp>
-#include <canard/network/protocol/openflow/v10/queue_properties.hpp>
+#include <canard/network/openflow/detail/any_queue_property.hpp>
+#include <canard/network/openflow/v10/decoder/queue_property_decoder.hpp>
+#include <canard/network/openflow/v10/queue_properties.hpp>
 
 namespace canard {
 namespace net {

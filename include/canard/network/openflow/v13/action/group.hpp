@@ -3,9 +3,9 @@
 
 #include <cstdint>
 #include <stdexcept>
-#include <canard/network/protocol/openflow/detail/memcmp.hpp>
-#include <canard/network/protocol/openflow/v13/detail/basic_action.hpp>
-#include <canard/network/protocol/openflow/v13/openflow.hpp>
+#include <canard/network/openflow/detail/memcmp.hpp>
+#include <canard/network/openflow/v13/detail/basic_action.hpp>
+#include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
 namespace net {

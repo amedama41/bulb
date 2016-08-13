@@ -2,11 +2,11 @@
 #define CANARD_NET_OFP_V10_MESSAGES_STATISTICS_AGGREGATE_STATS_HPP
 
 #include <cstdint>
-#include <canard/network/protocol/openflow/get_xid.hpp>
-#include <canard/network/protocol/openflow/v10/detail/basic_stats.hpp>
-#include <canard/network/protocol/openflow/v10/flow_entry.hpp>
-#include <canard/network/protocol/openflow/v10/match_set.hpp>
-#include <canard/network/protocol/openflow/v10/openflow.hpp>
+#include <canard/network/openflow/get_xid.hpp>
+#include <canard/network/openflow/v10/detail/basic_stats.hpp>
+#include <canard/network/openflow/v10/flow_entry.hpp>
+#include <canard/network/openflow/v10/match_set.hpp>
+#include <canard/network/openflow/v10/openflow.hpp>
 
 namespace canard {
 namespace net {

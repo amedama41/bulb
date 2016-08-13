@@ -8,10 +8,10 @@
 #include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/numeric.hpp>
-#include <canard/network/protocol/openflow/detail/add_helper.hpp>
-#include <canard/network/protocol/openflow/detail/is_related.hpp>
-#include <canard/network/protocol/openflow/v10/any_action.hpp>
-#include <canard/network/protocol/openflow/v10/decoder/action_decoder.hpp>
+#include <canard/network/openflow/detail/add_helper.hpp>
+#include <canard/network/openflow/detail/is_related.hpp>
+#include <canard/network/openflow/v10/any_action.hpp>
+#include <canard/network/openflow/v10/decoder/action_decoder.hpp>
 
 namespace canard {
 namespace net {

@@ -11,13 +11,13 @@
 #include <vector>
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/numeric.hpp>
-#include <canard/network/protocol/openflow/detail/decode.hpp>
-#include <canard/network/protocol/openflow/detail/encode.hpp>
-#include <canard/network/protocol/openflow/v13/detail/basic_openflow_message.hpp>
-#include <canard/network/protocol/openflow/v13/detail/byteorder.hpp>
-#include <canard/network/protocol/openflow/v13/detail/length_utility.hpp>
-#include <canard/network/protocol/openflow/v13/openflow.hpp>
-#include <canard/network/protocol/openflow/v13/oxm_match_set.hpp>
+#include <canard/network/openflow/detail/decode.hpp>
+#include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/v13/detail/basic_openflow_message.hpp>
+#include <canard/network/openflow/v13/detail/byteorder.hpp>
+#include <canard/network/openflow/v13/detail/length_utility.hpp>
+#include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/network/openflow/v13/oxm_match_set.hpp>
 
 namespace canard {
 namespace net {

@@ -5,8 +5,8 @@
 #include <stdexcept>
 #include <tuple>
 #include <boost/preprocessor/repeat.hpp>
-#include <canard/network/protocol/openflow/detail/decode.hpp>
-#include <canard/network/protocol/openflow/v13/oxm_match_field.hpp>
+#include <canard/network/openflow/detail/decode.hpp>
+#include <canard/network/openflow/v13/oxm_match_field.hpp>
 
 namespace canard {
 namespace net {

@@ -1,8 +1,8 @@
 #ifndef CANARD_NET_OFP_DETAIL_IMPL_ACTION_LIST_HPP
 #define CANARD_NET_OFP_DETAIL_IMPL_ACTION_LIST_HPP
 
-#include <canard/network/protocol/openflow/detail/config.hpp>
-#include <canard/network/protocol/openflow/detail/action_list.hpp>
+#include <canard/network/openflow/detail/config.hpp>
+#include <canard/network/openflow/detail/action_list.hpp>
 #include <cstddef>
 #include <utility>
 #include <vector>

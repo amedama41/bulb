@@ -1,16 +1,16 @@
 #ifndef CANARD_NET_OFP_V13_ACTION_SET_HPP
 #define CANARD_NET_OFP_V13_ACTION_SET_HPP
 
-#include <canard/network/protocol/openflow/detail/config.hpp>
+#include <canard/network/openflow/detail/config.hpp>
 
 #include <cstdint>
 #include <type_traits>
 #include <utility>
 #include <boost/operators.hpp>
 #include <boost/optional/optional.hpp>
-#include <canard/network/protocol/openflow/detail/is_related.hpp>
-#include <canard/network/protocol/openflow/v13/action_list.hpp>
-#include <canard/network/protocol/openflow/v13/action_order.hpp>
+#include <canard/network/openflow/detail/is_related.hpp>
+#include <canard/network/openflow/v13/action_list.hpp>
+#include <canard/network/openflow/v13/action_order.hpp>
 
 namespace canard {
 namespace net {
@@ -230,7 +230,7 @@ namespace v13 {
 } // namespace canard
 
 #if defined(CANARD_NET_OFP_HEADER_ONLY)
-# include <canard/network/protocol/openflow/v13/impl/action_set.ipp>
+# include <canard/network/openflow/v13/impl/action_set.ipp>
 #endif
 
 #endif // CANARD_NET_OFP_V13_ACTION_SET_HPP

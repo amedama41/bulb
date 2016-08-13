@@ -2,12 +2,12 @@
 #define CANARD_NET_OFP_V13_INSTRUCTIONS_HPP
 
 #include <tuple>
-#include <canard/network/protocol/openflow/v13/instruction/apply_actions.hpp>
-#include <canard/network/protocol/openflow/v13/instruction/clear_actions.hpp>
-#include <canard/network/protocol/openflow/v13/instruction/goto_table.hpp>
-#include <canard/network/protocol/openflow/v13/instruction/meter.hpp>
-#include <canard/network/protocol/openflow/v13/instruction/write_actions.hpp>
-#include <canard/network/protocol/openflow/v13/instruction/write_metadata.hpp>
+#include <canard/network/openflow/v13/instruction/apply_actions.hpp>
+#include <canard/network/openflow/v13/instruction/clear_actions.hpp>
+#include <canard/network/openflow/v13/instruction/goto_table.hpp>
+#include <canard/network/openflow/v13/instruction/meter.hpp>
+#include <canard/network/openflow/v13/instruction/write_actions.hpp>
+#include <canard/network/openflow/v13/instruction/write_metadata.hpp>
 
 namespace canard {
 namespace net {

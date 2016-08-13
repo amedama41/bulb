@@ -1,10 +1,10 @@
 #ifndef CANARD_NET_OFP_V13_ANY_OXM_MATCH_FIELD_HPP
 #define CANARD_NET_OFP_V13_ANY_OXM_MATCH_FIELD_HPP
 
-#include <canard/network/protocol/openflow/detail/config.hpp>
+#include <canard/network/openflow/detail/config.hpp>
 
-#include <canard/network/protocol/openflow/detail/any_oxm_match_field.hpp>
-#include <canard/network/protocol/openflow/v13/decoder/oxm_match_field_decoder.hpp>
+#include <canard/network/openflow/detail/any_oxm_match_field.hpp>
+#include <canard/network/openflow/v13/decoder/oxm_match_field_decoder.hpp>
 
 namespace canard {
 namespace net {

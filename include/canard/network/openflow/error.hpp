@@ -1,8 +1,8 @@
 #ifndef CANARD_NET_OFP_ERROR_HPP
 #define CANARD_NET_OFP_ERROR_HPP
 
-#include <canard/network/protocol/openflow/v13/openflow.hpp>
-#include <canard/network/protocol/openflow/v13/message/error.hpp>
+#include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/network/openflow/v13/message/error.hpp>
 
 namespace canard {
 namespace net {

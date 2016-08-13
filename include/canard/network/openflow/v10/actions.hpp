@@ -2,10 +2,10 @@
 #define CANARD_NET_OFP_V10_ACTIONS_HPP
 
 #include <tuple>
-#include <canard/network/protocol/openflow/v10/action/enqueue.hpp>
-#include <canard/network/protocol/openflow/v10/action/output.hpp>
-#include <canard/network/protocol/openflow/v10/action/set_field.hpp>
-#include <canard/network/protocol/openflow/v10/action/strip_vlan.hpp>
+#include <canard/network/openflow/v10/action/enqueue.hpp>
+#include <canard/network/openflow/v10/action/output.hpp>
+#include <canard/network/openflow/v10/action/set_field.hpp>
+#include <canard/network/openflow/v10/action/strip_vlan.hpp>
 
 namespace canard {
 namespace net {

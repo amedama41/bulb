@@ -2,8 +2,8 @@
 #define CANARD_NET_OFP_V10_FLOW_ENTRY_ADAPTOR_HPP
 
 #include <cstdint>
-#include <canard/network/protocol/openflow/v10/flow_entry.hpp>
-#include <canard/network/protocol/openflow/v10/match_set.hpp>
+#include <canard/network/openflow/v10/flow_entry.hpp>
+#include <canard/network/openflow/v10/match_set.hpp>
 
 namespace canard {
 namespace net {

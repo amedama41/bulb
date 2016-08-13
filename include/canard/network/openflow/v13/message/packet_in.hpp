@@ -7,16 +7,16 @@
 #include <stdexcept>
 #include <utility>
 #include <boost/range/iterator_range.hpp>
-#include <canard/network/protocol/openflow/binary_data.hpp>
-#include <canard/network/protocol/openflow/detail/decode.hpp>
-#include <canard/network/protocol/openflow/detail/encode.hpp>
-#include <canard/network/protocol/openflow/detail/padding.hpp>
-#include <canard/network/protocol/openflow/get_xid.hpp>
-#include <canard/network/protocol/openflow/v13/detail/basic_openflow_message.hpp>
-#include <canard/network/protocol/openflow/v13/detail/byteorder.hpp>
-#include <canard/network/protocol/openflow/v13/detail/length_utility.hpp>
-#include <canard/network/protocol/openflow/v13/openflow.hpp>
-#include <canard/network/protocol/openflow/v13/oxm_match_set.hpp>
+#include <canard/network/openflow/binary_data.hpp>
+#include <canard/network/openflow/detail/decode.hpp>
+#include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/detail/padding.hpp>
+#include <canard/network/openflow/get_xid.hpp>
+#include <canard/network/openflow/v13/detail/basic_openflow_message.hpp>
+#include <canard/network/openflow/v13/detail/byteorder.hpp>
+#include <canard/network/openflow/v13/detail/length_utility.hpp>
+#include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/network/openflow/v13/oxm_match_set.hpp>
 
 namespace canard {
 namespace net {

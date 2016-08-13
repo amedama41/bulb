@@ -5,9 +5,9 @@
 #include <utility>
 #include <boost/operators.hpp>
 #include <boost/optional/optional.hpp>
-#include <canard/network/protocol/openflow/detail/is_related.hpp>
-#include <canard/network/protocol/openflow/v10/match_fields.hpp>
-#include <canard/network/protocol/openflow/v10/openflow.hpp>
+#include <canard/network/openflow/detail/is_related.hpp>
+#include <canard/network/openflow/v10/match_fields.hpp>
+#include <canard/network/openflow/v10/openflow.hpp>
 
 namespace canard {
 namespace net {

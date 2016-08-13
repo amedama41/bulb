@@ -1,11 +1,11 @@
 #ifndef CANARD_NET_OFP_V13_ACTION_LIST_HPP
 #define CANARD_NET_OFP_V13_ACTION_LIST_HPP
 
-#include <canard/network/protocol/openflow/detail/config.hpp>
+#include <canard/network/openflow/detail/config.hpp>
 
-#include <canard/network/protocol/openflow/detail/action_list.hpp>
-#include <canard/network/protocol/openflow/v13/any_action.hpp>
-#include <canard/network/protocol/openflow/v13/openflow.hpp>
+#include <canard/network/openflow/detail/action_list.hpp>
+#include <canard/network/openflow/v13/any_action.hpp>
+#include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
 namespace net {

@@ -1,8 +1,8 @@
 #ifndef CANARD_NET_OFP_V13_IMPL_OXM_MATCH_SET_IPP
 #define CANARD_NET_OFP_V13_IMPL_OXM_MATCH_SET_IPP
 
-#include <canard/network/protocol/openflow/detail/config.hpp>
-#include <canard/network/protocol/openflow/v13/oxm_match_set.hpp>
+#include <canard/network/openflow/detail/config.hpp>
+#include <canard/network/openflow/v13/oxm_match_set.hpp>
 
 #include <cstdint>
 #include <stdexcept>
@@ -11,7 +11,7 @@
 #include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/algorithm/equal.hpp>
 #include <boost/range/numeric.hpp>
-#include <canard/network/protocol/openflow/v13/openflow.hpp>
+#include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
 namespace net {

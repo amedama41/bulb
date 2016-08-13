@@ -3,8 +3,8 @@
 
 #include <cstdint>
 #include <utility>
-#include <canard/network/protocol/openflow/v10/action_list.hpp>
-#include <canard/network/protocol/openflow/v10/match_set.hpp>
+#include <canard/network/openflow/v10/action_list.hpp>
+#include <canard/network/openflow/v10/match_set.hpp>
 
 namespace canard {
 namespace net {

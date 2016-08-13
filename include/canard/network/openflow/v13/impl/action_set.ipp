@@ -1,8 +1,8 @@
 #ifndef CANARD_NET_OFP_V13_IMPL_ACTION_SET_IPP
 #define CANARD_NET_OFP_V13_IMPL_ACTION_SET_IPP
 
-#include <canard/network/protocol/openflow/detail/config.hpp>
-#include <canard/network/protocol/openflow/v13/action_set.hpp>
+#include <canard/network/openflow/detail/config.hpp>
+#include <canard/network/openflow/v13/action_set.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -15,8 +15,8 @@
 #include <boost/range/algorithm/fill.hpp>
 #include <boost/range/algorithm/find_if.hpp>
 #include <boost/range/algorithm/lower_bound.hpp>
-#include <canard/network/protocol/openflow/v13/action_list.hpp>
-#include <canard/network/protocol/openflow/v13/action_order.hpp>
+#include <canard/network/openflow/v13/action_list.hpp>
+#include <canard/network/openflow/v13/action_order.hpp>
 
 namespace canard {
 namespace net {

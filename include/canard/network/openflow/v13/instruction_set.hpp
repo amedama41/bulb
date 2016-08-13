@@ -1,7 +1,7 @@
 #ifndef CANARD_NET_OFP_V13_INSTRUCTION_SET_HPP
 #define CANARD_NET_OFP_V13_INSTRUCTION_SET_HPP
 
-#include <canard/network/protocol/openflow/detail/config.hpp>
+#include <canard/network/openflow/detail/config.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -15,11 +15,11 @@
 #include <boost/range/adaptor/map.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/iterator.hpp>
-#include <canard/network/protocol/openflow/detail/is_related.hpp>
-#include <canard/network/protocol/openflow/v13/decoder/instruction_decoder.hpp>
-#include <canard/network/protocol/openflow/v13/any_instruction.hpp>
-#include <canard/network/protocol/openflow/v13/instruction_order.hpp>
-#include <canard/network/protocol/openflow/v13/openflow.hpp>
+#include <canard/network/openflow/detail/is_related.hpp>
+#include <canard/network/openflow/v13/decoder/instruction_decoder.hpp>
+#include <canard/network/openflow/v13/any_instruction.hpp>
+#include <canard/network/openflow/v13/instruction_order.hpp>
+#include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
 namespace net {
@@ -261,7 +261,7 @@ namespace v13 {
 } // namespace canard
 
 #if defined(CANARD_NET_OFP_HEADER_ONLY)
-# include <canard/network/protocol/openflow/v13/impl/instruction_set.ipp>
+# include <canard/network/openflow/v13/impl/instruction_set.ipp>
 #endif
 
 #endif // CANARD_NET_OFP_V13_INSTRUCTION_SET_HPP

@@ -5,9 +5,9 @@
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
-#include <canard/network/protocol/openflow/detail/is_same_value_type.hpp>
-#include <canard/network/protocol/openflow/v10/detail/basic_action.hpp>
-#include <canard/network/protocol/openflow/v10/openflow.hpp>
+#include <canard/network/openflow/detail/is_same_value_type.hpp>
+#include <canard/network/openflow/v10/detail/basic_action.hpp>
+#include <canard/network/openflow/v10/openflow.hpp>
 
 namespace canard {
 namespace net {

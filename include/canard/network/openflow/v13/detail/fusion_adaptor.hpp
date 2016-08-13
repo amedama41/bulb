@@ -2,7 +2,7 @@
 #define CANARD_NET_OFP_V13_FUSION_ADATOR_HPP
 
 #include <boost/fusion/adapted/struct/adapt_struct.hpp>
-#include <canard/network/protocol/openflow/v13/openflow.hpp>
+#include <canard/network/openflow/v13/openflow.hpp>
 
 BOOST_FUSION_ADAPT_STRUCT(
     canard::net::ofp::v13::v13_detail::ofp_header,

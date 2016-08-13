@@ -1,8 +1,8 @@
 #ifndef CANARD_NET_OFP_V13_INSTRUCTIONS_CLEAR_ACTIONS_HPP
 #define CANARD_NET_OFP_V13_INSTRUCTIONS_CLEAR_ACTIONS_HPP
 
-#include <canard/network/protocol/openflow/v13/detail/basic_instruction.hpp>
-#include <canard/network/protocol/openflow/v13/openflow.hpp>
+#include <canard/network/openflow/v13/detail/basic_instruction.hpp>
+#include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
 namespace net {

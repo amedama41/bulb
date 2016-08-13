@@ -1,11 +1,11 @@
 #ifndef CANARD_NET_OFP_DETAIL_IMPL_ANY_OXM_MATCH_FIELD_HPP
 #define CANARD_NET_OFP_DETAIL_IMPL_ANY_OXM_MATCH_FIELD_HPP
 
-#include <canard/network/protocol/openflow/detail/config.hpp>
-#include <canard/network/protocol/openflow/detail/any_oxm_match_field.hpp>
+#include <canard/network/openflow/detail/config.hpp>
+#include <canard/network/openflow/detail/any_oxm_match_field.hpp>
 #include <cstdint>
 #include <boost/variant/apply_visitor.hpp>
-#include <canard/network/protocol/openflow/detail/visitors.hpp>
+#include <canard/network/openflow/detail/visitors.hpp>
 
 namespace canard {
 namespace net {

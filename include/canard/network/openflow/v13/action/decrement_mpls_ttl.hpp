@@ -1,8 +1,8 @@
 #ifndef CANARD_NET_OFP_V13_ACTIONS_DECREMENT_MPLS_TTL_HPP
 #define CANARD_NET_OFP_V13_ACTIONS_DECREMENT_MPLS_TTL_HPP
 
-#include <canard/network/protocol/openflow/v13/detail/basic_generic_action.hpp>
-#include <canard/network/protocol/openflow/v13/openflow.hpp>
+#include <canard/network/openflow/v13/detail/basic_generic_action.hpp>
+#include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
 namespace net {

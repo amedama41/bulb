@@ -1,8 +1,8 @@
 #ifndef CANARD_NET_OFP_V13_IMPL_INSTRUCTION_SET_IPP
 #define CANARD_NET_OFP_V13_IMPL_INSTRUCTION_SET_IPP
 
-#include <canard/network/protocol/openflow/detail/config.hpp>
-#include <canard/network/protocol/openflow/v13/instruction_set.hpp>
+#include <canard/network/openflow/detail/config.hpp>
+#include <canard/network/openflow/v13/instruction_set.hpp>
 
 #include <cstddef>
 #include <utility>

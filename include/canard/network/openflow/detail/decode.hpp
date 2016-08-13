@@ -7,7 +7,7 @@
 #include <boost/endian/conversion.hpp>
 #include <boost/range/algorithm_ext/overwrite.hpp>
 #include <boost/range/iterator_range.hpp>
-#include <canard/network/protocol/openflow/detail/as_byte_range.hpp>
+#include <canard/network/openflow/detail/as_byte_range.hpp>
 
 namespace canard {
 namespace net {

@@ -1,7 +1,7 @@
 #ifndef CANARD_NET_OFP_DETAIL_ANY_INSTRUCTION_HPP
 #define CANARD_NET_OFP_DETAIL_ANY_INSTRUCTION_HPP
 
-#include <canard/network/protocol/openflow/detail/config.hpp>
+#include <canard/network/openflow/detail/config.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -15,9 +15,9 @@
 #include <boost/variant/get.hpp>
 #include <boost/variant/variant.hpp>
 #include <canard/mpl/adapted/std_tuple.hpp>
-#include <canard/network/protocol/openflow/detail/construct.hpp>
-#include <canard/network/protocol/openflow/detail/is_related.hpp>
-#include <canard/network/protocol/openflow/detail/visitors.hpp>
+#include <canard/network/openflow/detail/construct.hpp>
+#include <canard/network/openflow/detail/is_related.hpp>
+#include <canard/network/openflow/detail/visitors.hpp>
 
 namespace canard {
 namespace net {
@@ -228,7 +228,7 @@ namespace detail {
 } // namespace canard
 
 #if defined(CANARD_NET_OFP_HEADER_ONLY) || !defined(CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
-#   include <canard/network/protocol/openflow/detail/impl/any_instruction.hpp>
+#   include <canard/network/openflow/detail/impl/any_instruction.hpp>
 #endif
 
 #endif // CANARD_NET_OFP_DETAIL_ANY_INSTRUCTION_HPP

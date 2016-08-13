@@ -2,7 +2,7 @@
 #define CANARD_NET_OFP_V10_QUEUE_PROPERTIES_HPP
 
 #include <tuple>
-#include <canard/network/protocol/openflow/v10/queue_property/min_rate.hpp>
+#include <canard/network/openflow/v10/queue_property/min_rate.hpp>
 
 namespace canard {
 namespace net {

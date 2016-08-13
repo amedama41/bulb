@@ -12,10 +12,10 @@
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/numeric.hpp>
 #include <boost/variant/apply_visitor.hpp>
-#include <canard/network/protocol/openflow/detail/add_helper.hpp>
-#include <canard/network/protocol/openflow/detail/visitors.hpp>
-#include <canard/network/protocol/openflow/v13/detail/visitors.hpp>
-#include <canard/network/protocol/openflow/v13/table_feature_property/table_feature_property.hpp>
+#include <canard/network/openflow/detail/add_helper.hpp>
+#include <canard/network/openflow/detail/visitors.hpp>
+#include <canard/network/openflow/v13/detail/visitors.hpp>
+#include <canard/network/openflow/v13/table_feature_property/table_feature_property.hpp>
 
 namespace canard {
 namespace net {

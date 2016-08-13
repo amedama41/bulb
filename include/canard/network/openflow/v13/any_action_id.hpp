@@ -10,11 +10,11 @@
 #include <boost/variant/get.hpp>
 #include <boost/variant/variant.hpp>
 #include <boost/variant/static_visitor.hpp>
-#include <canard/network/protocol/openflow/detail/decode.hpp>
-#include <canard/network/protocol/openflow/detail/is_related.hpp>
-#include <canard/network/protocol/openflow/detail/visitors.hpp>
-#include <canard/network/protocol/openflow/v13/table_feature_property/id/action_id.hpp>
-#include <canard/network/protocol/openflow/v13/openflow.hpp>
+#include <canard/network/openflow/detail/decode.hpp>
+#include <canard/network/openflow/detail/is_related.hpp>
+#include <canard/network/openflow/detail/visitors.hpp>
+#include <canard/network/openflow/v13/table_feature_property/id/action_id.hpp>
+#include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
 namespace net {

@@ -11,10 +11,10 @@
 #include <boost/algorithm/cxx11/all_of.hpp>
 #include <boost/endian/arithmetic.hpp>
 #include <boost/operators.hpp>
-#include <canard/network/protocol/openflow/detail/as_byte_range.hpp>
-#include <canard/network/protocol/openflow/detail/decode.hpp>
-#include <canard/network/protocol/openflow/detail/encode.hpp>
-#include <canard/network/protocol/openflow/v13/openflow.hpp>
+#include <canard/network/openflow/detail/as_byte_range.hpp>
+#include <canard/network/openflow/detail/decode.hpp>
+#include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
 namespace net {

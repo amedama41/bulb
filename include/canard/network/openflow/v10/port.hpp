@@ -2,11 +2,11 @@
 #define CANARD_NET_OFP_V10_PORT_HPP
 
 #include <cstdint>
-#include <canard/network/protocol/openflow/detail/decode.hpp>
-#include <canard/network/protocol/openflow/detail/encode.hpp>
-#include <canard/network/protocol/openflow/v10/detail/byteorder.hpp>
-#include <canard/network/protocol/openflow/v10/detail/port_adaptor.hpp>
-#include <canard/network/protocol/openflow/v10/openflow.hpp>
+#include <canard/network/openflow/detail/decode.hpp>
+#include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/v10/detail/byteorder.hpp>
+#include <canard/network/openflow/v10/detail/port_adaptor.hpp>
+#include <canard/network/openflow/v10/openflow.hpp>
 
 namespace canard {
 namespace net {

@@ -5,12 +5,12 @@
 #include <stdexcept> // TODO
 #include <utility>
 #include <vector>
-#include <canard/network/protocol/openflow/detail/decode.hpp>
-#include <canard/network/protocol/openflow/detail/encode.hpp>
-#include <canard/network/protocol/openflow/get_xid.hpp>
-#include <canard/network/protocol/openflow/v10/detail/basic_openflow_message.hpp>
-#include <canard/network/protocol/openflow/v10/openflow.hpp>
-#include <canard/network/protocol/openflow/v10/port.hpp>
+#include <canard/network/openflow/detail/decode.hpp>
+#include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/get_xid.hpp>
+#include <canard/network/openflow/v10/detail/basic_openflow_message.hpp>
+#include <canard/network/openflow/v10/openflow.hpp>
+#include <canard/network/openflow/v10/port.hpp>
 
 namespace canard {
 namespace net {

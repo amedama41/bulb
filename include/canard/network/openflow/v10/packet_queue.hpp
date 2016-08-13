@@ -10,12 +10,12 @@
 #include <vector>
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/numeric.hpp>
-#include <canard/network/protocol/openflow/detail/decode.hpp>
-#include <canard/network/protocol/openflow/detail/encode.hpp>
-#include <canard/network/protocol/openflow/queue_id.hpp>
-#include <canard/network/protocol/openflow/v10/any_queue_property.hpp>
-#include <canard/network/protocol/openflow/v10/detail/byteorder.hpp>
-#include <canard/network/protocol/openflow/v10/openflow.hpp>
+#include <canard/network/openflow/detail/decode.hpp>
+#include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/queue_id.hpp>
+#include <canard/network/openflow/v10/any_queue_property.hpp>
+#include <canard/network/openflow/v10/detail/byteorder.hpp>
+#include <canard/network/openflow/v10/openflow.hpp>
 
 namespace canard {
 namespace net {

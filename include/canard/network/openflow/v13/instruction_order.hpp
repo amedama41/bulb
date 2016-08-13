@@ -7,7 +7,7 @@
 #include <boost/fusion/sequence/intrinsic/has_key.hpp>
 #include <boost/fusion/sequence/intrinsic/value_at_key.hpp>
 #include <boost/fusion/support/pair.hpp>
-#include <canard/network/protocol/openflow/v13/instructions.hpp>
+#include <canard/network/openflow/v13/instructions.hpp>
 
 namespace canard {
 namespace net {

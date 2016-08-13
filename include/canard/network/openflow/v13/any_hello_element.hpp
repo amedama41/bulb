@@ -7,12 +7,12 @@
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/get.hpp>
 #include <boost/variant/variant.hpp>
-#include <canard/network/protocol/openflow/detail/construct.hpp>
-#include <canard/network/protocol/openflow/detail/is_related.hpp>
-#include <canard/network/protocol/openflow/detail/visitors.hpp>
-#include <canard/network/protocol/openflow/v13/decode_hello_element.hpp>
-#include <canard/network/protocol/openflow/v13/message/hello_elements.hpp>
-#include <canard/network/protocol/openflow/v13/openflow.hpp>
+#include <canard/network/openflow/detail/construct.hpp>
+#include <canard/network/openflow/detail/is_related.hpp>
+#include <canard/network/openflow/detail/visitors.hpp>
+#include <canard/network/openflow/v13/decode_hello_element.hpp>
+#include <canard/network/openflow/v13/message/hello_elements.hpp>
+#include <canard/network/openflow/v13/openflow.hpp>
 #include <canard/mpl/adapted/std_tuple.hpp>
 
 namespace canard {

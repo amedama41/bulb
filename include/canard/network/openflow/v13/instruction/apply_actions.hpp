@@ -3,10 +3,10 @@
 
 #include <type_traits>
 #include <utility>
-#include <canard/network/protocol/openflow/detail/is_related.hpp>
-#include <canard/network/protocol/openflow/v13/action_list.hpp>
-#include <canard/network/protocol/openflow/v13/detail/basic_instruction_actions.hpp>
-#include <canard/network/protocol/openflow/v13/openflow.hpp>
+#include <canard/network/openflow/detail/is_related.hpp>
+#include <canard/network/openflow/v13/action_list.hpp>
+#include <canard/network/openflow/v13/detail/basic_instruction_actions.hpp>
+#include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
 namespace net {
