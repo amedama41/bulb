@@ -4,5 +4,5 @@ SRCS = output_test.cpp \
 	   enqueue_test.cpp
 TARGET_LIB = libaction_test.dylib
 
--include ../subdirectories.mk
+-include ../../subdirectories.mk
 

@@ -15,5 +15,5 @@ SRCS = error_test.cpp \
 	   queue_config_test.cpp
 TARGET_LIB = libmessage_test.dylib
 
--include ../subdirectories.mk
+-include ../../subdirectories.mk
 

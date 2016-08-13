@@ -4,5 +4,5 @@ SRCS = instructions_test.cpp \
 	   oxm_test.cpp
 TARGET_LIB = libtable_feature_property_test.dylib
 
--include ../subdirectories.mk
+-include ../../subdirectories.mk
 

@@ -16,5 +16,5 @@ SRCS = output_test.cpp \
 	   pop_pbb_test.cpp
 TARGET_LIB = libaction_test.dylib
 
--include ../subdirectories.mk
+-include ../../subdirectories.mk
 

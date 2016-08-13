@@ -10,5 +10,5 @@ SRCS = any_oxm_match_field_test.cpp \
 	   packet_queue_test.cpp
 TARGET_LIB = libcommon_type_test.dylib
 
--include ../subdirectories.mk
+-include ../../subdirectories.mk
 

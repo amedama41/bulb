@@ -6,5 +6,5 @@ SRCS = goto_table_test.cpp \
 	   meter_test.cpp
 TARGET_LIB = libinstruction_test.dylib
 
--include ../subdirectories.mk
+-include ../../subdirectories.mk
 
