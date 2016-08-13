@@ -4,10 +4,8 @@
 #include <canard/network/protocol/openflow/detail/config.hpp>
 
 #include <cstdint>
-#include <boost/variant/static_visitor.hpp>
 #include <canard/network/protocol/openflow/detail/any_action.hpp>
 #include <canard/network/protocol/openflow/v13/action_order.hpp>
-#include <canard/network/protocol/openflow/v13/actions.hpp>
 #include <canard/network/protocol/openflow/v13/decoder/action_decoder.hpp>
 #include <canard/network/protocol/openflow/v13/openflow.hpp>
 
@@ -32,30 +30,11 @@ namespace v13 {
         return detail::any_cast<T>(action);
     }
 
-    namespace any_action_detail {
-
-        struct action_order_visitor
-            : boost::static_visitor<std::uint64_t>
-        {
-            template <class Action>
-            auto operator()(Action const& action) const
-                -> result_type
-            {
-                return action_order<Action>::get_value(action);
-            }
-        };
-
-    } // namespace any_action_detail
-
     template <>
     struct action_order<any_action>
     {
-        static auto get_value(any_action const& action)
-            -> std::uint64_t
-        {
-            auto visitor = any_action_detail::action_order_visitor{};
-            return action.visit(visitor);
-        }
+        CANARD_NET_OFP_DECL static auto get_value(any_action const&)
+            -> std::uint64_t;
     };
 
 } // namespace v13
@@ -63,8 +42,11 @@ namespace v13 {
 } // namespace network
 } // namespace canard
 
-#if !defined(CANARD_NET_OFP_HEADER_ONLY)
-# if defined(CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
+#if defined(CANARD_NET_OFP_HEADER_ONLY)
+
+#include <canard/network/protocol/openflow/v13/impl/any_action.ipp>
+
+#elif defined(CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
 
 namespace canard {
 namespace network {
@@ -78,7 +60,6 @@ namespace detail {
 } // namespace network
 } // namespace canard
 
-# endif
 #endif
 
 #endif // CANARD_NETWORK_OPENFLOW_V13_ANY_ACTION_HPP
