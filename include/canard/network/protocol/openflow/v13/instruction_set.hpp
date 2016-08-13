@@ -1,6 +1,8 @@
 #ifndef CANARD_NETWORK_OPENFLOW_V13_INSTRUCTION_SET_HPP
 #define CANARD_NETWORK_OPENFLOW_V13_INSTRUCTION_SET_HPP
 
+#include <canard/network/protocol/openflow/detail/config.hpp>
+
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
@@ -11,11 +13,8 @@
 #include <boost/operators.hpp>
 #include <boost/optional/optional.hpp>
 #include <boost/range/adaptor/map.hpp>
-#include <boost/range/adaptor/transformed.hpp>
-#include <boost/range/algorithm/equal.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/iterator.hpp>
-#include <boost/range/numeric.hpp>
 #include <canard/network/protocol/openflow/detail/is_related.hpp>
 #include <canard/network/protocol/openflow/v13/decoder/instruction_decoder.hpp>
 #include <canard/network/protocol/openflow/v13/any_instruction.hpp>
@@ -55,47 +54,26 @@ namespace v13 {
         {
         }
 
-        auto begin() const noexcept
-            -> const_iterator
-        {
-            return const_iterator{instructions_.begin()};
-        }
+        CANARD_NET_OFP_DECL auto begin() const noexcept
+            -> const_iterator;
 
-        auto end() const noexcept
-            -> const_iterator
-        {
-            return const_iterator{instructions_.end()};
-        }
+        CANARD_NET_OFP_DECL auto end() const noexcept
+            -> const_iterator;
 
-        auto cbegin() const noexcept
-            -> const_iterator
-        {
-            return const_iterator{instructions_.begin()};
-        }
+        CANARD_NET_OFP_DECL auto cbegin() const noexcept
+            -> const_iterator;
 
-        auto cend() const noexcept
-            -> const_iterator
-        {
-            return const_iterator{instructions_.end()};
-        }
+        CANARD_NET_OFP_DECL auto cend() const noexcept
+            -> const_iterator;
 
-        auto empty() const noexcept
-            -> bool
-        {
-            return instructions_.empty();
-        }
+        CANARD_NET_OFP_DECL auto empty() const noexcept
+            -> bool;
 
-        auto size() const noexcept
-            -> size_type
-        {
-            return instructions_.size();
-        }
+        CANARD_NET_OFP_DECL auto size() const noexcept
+            -> size_type;
 
-        auto max_size() const noexcept
-            -> size_type
-        {
-            return instructions_.max_size();
-        }
+        CANARD_NET_OFP_DECL auto max_size() const noexcept
+            -> size_type;
 
         template <class Instruction>
         auto get() const
@@ -106,11 +84,8 @@ namespace v13 {
             return v13::any_cast<Instruction>(it->second);
         }
 
-        auto at(key_type const instruction_order) const
-            -> const_reference
-        {
-            return instructions_.at(instruction_order);
-        }
+        CANARD_NET_OFP_DECL auto at(key_type const) const
+            -> const_reference;
 
         template <class Instruction>
         auto at() const
@@ -168,33 +143,18 @@ namespace v13 {
             return erase(order);
         }
 
-        auto erase(key_type const instruction_order)
-            -> size_type
-        {
-            return instructions_.erase(instruction_order);
-        }
+        CANARD_NET_OFP_DECL auto erase(key_type const)
+            -> size_type;
 
-        auto erase(const_iterator it)
-            -> const_iterator
-        {
-            return const_iterator{instructions_.erase(it.base())};
-        }
+        CANARD_NET_OFP_DECL auto erase(const_iterator)
+            -> const_iterator;
 
-        void swap(instruction_set& other)
-        {
-            instructions_.swap(other.instructions_);
-        }
+        CANARD_NET_OFP_DECL void swap(instruction_set&);
 
-        void clear() noexcept
-        {
-            instructions_.clear();
-        }
+        CANARD_NET_OFP_DECL void clear() noexcept;
 
-        auto find(key_type const instruction_order) const
-            -> const_iterator
-        {
-            return const_iterator{instructions_.find(instruction_order)};
-        }
+        CANARD_NET_OFP_DECL auto find(key_type const) const
+            -> const_iterator;
 
         template <class Instruction>
         auto find() const
@@ -208,15 +168,8 @@ namespace v13 {
             return v13::any_cast<Instruction>(it->second);
         }
 
-        auto length() const noexcept
-            -> std::size_t
-        {
-            using boost::adaptors::transformed;
-            return boost::accumulate(
-                      *this
-                    | transformed([](const_reference e) { return e.length(); })
-                    , std::size_t{0});
-        }
+        CANARD_NET_OFP_DECL auto length() const noexcept
+            -> std::size_t;
 
         template <class Container>
         auto encode(Container& container) const
@@ -248,24 +201,25 @@ namespace v13 {
                 instruction_set const& lhs, instruction_set const& rhs)
             -> bool
         {
-            return lhs.instructions_ == rhs.instructions_;
+            return lhs.equal_impl(rhs);
         }
 
         friend auto equivalent(
                 instruction_set const& lhs, instruction_set const& rhs) noexcept
             -> bool
         {
-            return boost::equal(
-                      lhs, rhs
-                    , [](const_reference lhs_inst, const_reference rhs_inst)
-                      { return equivalent(lhs_inst, rhs_inst); });
+            return lhs.equivalent_impl(rhs);
         }
 
     private:
-        explicit instruction_set(container_type&& instructions)
-            : instructions_(std::move(instructions))
-        {
-        }
+        CANARD_NET_OFP_DECL explicit instruction_set(container_type&&);
+
+        CANARD_NET_OFP_DECL auto equal_impl(instruction_set const&) const
+            -> bool;
+
+        CANARD_NET_OFP_DECL auto equivalent_impl(
+                instruction_set const&) const noexcept
+            -> bool;
 
         template <class Instruction>
         static auto to_pair(Instruction&& instruction)
@@ -277,11 +231,9 @@ namespace v13 {
             };
         }
 
-        static auto make_result(container_type::iterator it, bool const result)
-            -> std::pair<const_iterator, bool>
-        {
-            return std::make_pair(const_iterator{it}, result);
-        }
+        CANARD_NET_OFP_DECL static auto make_result(
+                container_type::iterator it, bool const result)
+            -> std::pair<const_iterator, bool>;
 
         struct instruction_inserter
         {
@@ -307,5 +259,9 @@ namespace v13 {
 } // namespace openflow
 } // namespace network
 } // namespace canard
+
+#if defined(CANARD_NET_OFP_HEADER_ONLY)
+# include <canard/network/protocol/openflow/v13/impl/instruction_set.ipp>
+#endif
 
 #endif // CANARD_NETWORK_OPENFLOW_V13_INSTRUCTION_SET_HPP
