@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <vector>
 
-namespace of = canard::network::openflow;
+namespace of = canard::net::ofp;
 namespace v10 = of::v10;
 namespace detail = v10::v10_detail;
 namespace actions = v10::actions;

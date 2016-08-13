@@ -3,8 +3,8 @@
 #include <boost/test/unit_test.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace v13 {
 
 BOOST_AUTO_TEST_SUITE(table_features_test)
@@ -233,6 +233,6 @@ BOOST_AUTO_TEST_SUITE_END() // table_features_reply_test
 BOOST_AUTO_TEST_SUITE_END() // table_features_test
 
 } // namespace v13
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard

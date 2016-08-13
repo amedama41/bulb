@@ -11,7 +11,7 @@
 #include <boost/asio/ip/address_v4.hpp>
 #include <canard/mac_address.hpp>
 
-namespace of = canard::network::openflow;
+namespace of = canard::net::ofp;
 namespace v10 = of::v10;
 namespace detail = v10::v10_detail;
 namespace actions = v10::actions;

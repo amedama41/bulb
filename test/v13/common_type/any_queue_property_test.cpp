@@ -6,7 +6,7 @@
 
 #include "../../test_utility.hpp"
 
-namespace ofp = canard::network::openflow;
+namespace ofp = canard::net::ofp;
 namespace v13 = ofp::v13;
 namespace queue_props = v13::queue_properties;
 

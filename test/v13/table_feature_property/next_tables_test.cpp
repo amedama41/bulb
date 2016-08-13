@@ -4,7 +4,7 @@
 
 #include "../../test_utility.hpp"
 
-namespace of = canard::network::openflow;
+namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace table_feature_properties = v13::table_feature_properties;
 namespace detail = v13::v13_detail;

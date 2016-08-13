@@ -6,8 +6,8 @@
 #include <vector>
 #include <canard/network/protocol/openflow/v13/openflow.hpp>
 
-namespace of = canard::network::openflow;
-namespace v13 = canard::network::openflow::v13;
+namespace of = canard::net::ofp;
+namespace v13 = of::v13;
 using proto = v13::protocol;
 
 template <std::size_t N>

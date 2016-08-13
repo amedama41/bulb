@@ -8,8 +8,8 @@
 using boost::asio::ip::address_v4;
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace v13 {
 
 BOOST_AUTO_TEST_SUITE(group_mod_test)
@@ -158,6 +158,6 @@ BOOST_AUTO_TEST_SUITE_END() // group_mod_delete_test
 BOOST_AUTO_TEST_SUITE_END() // group_mod_test
 
 } // namespace v13
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard

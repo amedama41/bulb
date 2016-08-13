@@ -6,8 +6,8 @@
 
 #include "../../test_utility.hpp"
 
-namespace of = canard::network::openflow;
-namespace v13 = canard::network::openflow::v13;
+namespace of = canard::net::ofp;
+namespace v13 = of::v13;
 using proto = v13::protocol;
 
 BOOST_AUTO_TEST_SUITE(message_test)

@@ -8,7 +8,7 @@
 
 #include "../../test_utility.hpp"
 
-namespace ofp = canard::network::openflow;
+namespace ofp = canard::net::ofp;
 namespace v13 = ofp::v13;
 namespace actions = v13::actions;
 

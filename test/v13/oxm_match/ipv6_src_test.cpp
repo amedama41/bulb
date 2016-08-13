@@ -13,7 +13,7 @@
 #include "../../test_utility.hpp"
 #include "../oxm_headers.hpp"
 
-namespace of = canard::network::openflow;
+namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace match = v13::oxm_match;
 
