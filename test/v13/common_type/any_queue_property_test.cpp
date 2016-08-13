@@ -1,12 +1,12 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/protocol/openflow/v13/any_queue_property.hpp>
+#include <canard/network/openflow/v13/any_queue_property.hpp>
 #include <boost/test/unit_test.hpp>
 
-#include <canard/network/protocol/openflow/v13/queue_properties.hpp>
+#include <canard/network/openflow/v13/queue_properties.hpp>
 
 #include "../../test_utility.hpp"
 
-namespace ofp = canard::network::openflow;
+namespace ofp = canard::net::ofp;
 namespace v13 = ofp::v13;
 namespace queue_props = v13::queue_properties;
 

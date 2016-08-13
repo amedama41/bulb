@@ -1,13 +1,13 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/protocol/openflow/v13/message/barrier.hpp>
+#include <canard/network/openflow/v13/message/barrier.hpp>
 #include <boost/test/unit_test.hpp>
 #include <cstdint>
 #include <vector>
 
 #include "../../test_utility.hpp"
 
-namespace of = canard::network::openflow;
-namespace v13 = canard::network::openflow::v13;
+namespace of = canard::net::ofp;
+namespace v13 = of::v13;
 using proto = v13::protocol;
 
 BOOST_AUTO_TEST_SUITE(message_test)

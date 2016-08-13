@@ -1,5 +1,5 @@
-#ifndef CANARD_NETWORK_OPENFLOW_TEST_UTILITY_HPP
-#define CANARD_NETWORK_OPENFLOW_TEST_UTILITY_HPP
+#ifndef CANARD_NET_OFP_TEST_UTILITY_HPP
+#define CANARD_NET_OFP_TEST_UTILITY_HPP
 
 #include <cstddef>
 #include <cstdint>
@@ -38,4 +38,4 @@ inline auto operator"" _ipv6(char const* const ipv6, std::size_t)
     return boost::asio::ip::address_v6::from_string(ipv6);
 }
 
-#endif // CANARD_NETWORK_OPENFLOW_TEST_UTILITY_HPP
+#endif // CANARD_NET_OFP_TEST_UTILITY_HPP

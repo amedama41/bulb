@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/protocol/openflow/v13/oxm_match_field.hpp>
+#include <canard/network/openflow/v13/oxm_match_field.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
@@ -8,7 +8,7 @@
 #include <boost/optional/optional.hpp>
 #include <boost/optional/optional_io.hpp>
 
-namespace of = canard::network::openflow;
+namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace match = v13::oxm_match;
 

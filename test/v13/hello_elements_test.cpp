@@ -1,10 +1,10 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/protocol/openflow/v13/message/hello_elements.hpp>
+#include <canard/network/openflow/v13/message/hello_elements.hpp>
 #include <boost/test/unit_test.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace v13 {
 
 BOOST_AUTO_TEST_SUITE(hello_elements_test)
@@ -98,6 +98,6 @@ BOOST_AUTO_TEST_SUITE_END() // max_support_version_test
 BOOST_AUTO_TEST_SUITE_END() // hello_elements_test
 
 } // namespace v13
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard

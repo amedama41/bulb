@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/protocol/openflow/v13/instruction/write_metadata.hpp>
+#include <canard/network/openflow/v13/instruction/write_metadata.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/monomorphic.hpp>
 #include <boost/test/data/test_case.hpp>
@@ -9,7 +9,7 @@
 
 #include "../../test_utility.hpp"
 
-namespace of = canard::network::openflow;
+namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace instructions = v13::instructions;
 namespace detail = v13::v13_detail;

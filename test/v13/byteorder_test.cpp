@@ -1,12 +1,12 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/protocol/openflow/v13/detail/byteorder.hpp>
+#include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/endian/conversion.hpp>
-#include <canard/network/protocol/openflow/v13/openflow.hpp>
+#include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
-namespace network {
-namespace openflow {
+namespace net {
+namespace ofp {
 namespace v13 {
 
 BOOST_AUTO_TEST_SUITE(byteorder_test)
@@ -34,6 +34,6 @@ BOOST_AUTO_TEST_CASE(ofp_header_ntoh_test)
 BOOST_AUTO_TEST_SUITE_END() // byteorder_test
 
 } // namespace v13
-} // namespace openflow
-} // namespace network
+} // namespace ofp
+} // namespace net
 } // namespace canard

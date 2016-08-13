@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/protocol/openflow/v10/action/enqueue.hpp>
+#include <canard/network/openflow/v10/action/enqueue.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <vector>
 
-namespace of = canard::network::openflow;
+namespace of = canard::net::ofp;
 namespace v10 = of::v10;
 namespace detail = v10::v10_detail;
 namespace actions = v10::actions;

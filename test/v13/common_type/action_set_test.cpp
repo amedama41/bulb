@@ -1,12 +1,12 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/protocol/openflow/v13/action_set.hpp>
+#include <canard/network/openflow/v13/action_set.hpp>
 #include <boost/test/unit_test.hpp>
-#include <canard/network/protocol/openflow/v13/action_order.hpp>
-#include <canard/network/protocol/openflow/v13/actions.hpp>
+#include <canard/network/openflow/v13/action_order.hpp>
+#include <canard/network/openflow/v13/actions.hpp>
 
 #include "../../test_utility.hpp"
 
-namespace of = canard::network::openflow;
+namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace actions = v13::actions;
 

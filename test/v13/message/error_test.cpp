@@ -1,14 +1,14 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/protocol/openflow/v13/message/error.hpp>
+#include <canard/network/openflow/v13/message/error.hpp>
 #include <boost/test/unit_test.hpp>
-#include <canard/network/protocol/openflow/v13/message/switch_config.hpp>
+#include <canard/network/openflow/v13/message/switch_config.hpp>
 #include <cstdint>
 #include <vector>
 #include <boost/endian/conversion.hpp>
 
 #include "../../test_utility.hpp"
 
-namespace of = canard::network::openflow;
+namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace v13_detail = v13::v13_detail;
 using proto = v13::protocol;

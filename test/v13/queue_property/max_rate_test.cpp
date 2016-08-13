@@ -1,11 +1,11 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/protocol/openflow/v13/queue_property/max_rate.hpp>
+#include <canard/network/openflow/v13/queue_property/max_rate.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <cstdint>
 #include <vector>
 
-namespace of = canard::network::openflow;
+namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace v13_detail = v13::v13_detail;
 namespace queue_props = v13::queue_properties;

@@ -1,14 +1,14 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/protocol/openflow/v13/message/multipart_message/aggregate_stats.hpp>
+#include <canard/network/openflow/v13/message/multipart/aggregate_stats.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <cstdint>
 #include <vector>
-#include <canard/network/protocol/openflow/v13/oxm_match_set.hpp>
+#include <canard/network/openflow/v13/oxm_match_set.hpp>
 
 #include "../../test_utility.hpp"
 
-namespace of = canard::network::openflow;
+namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace v13_detail = v13::v13_detail;
 namespace match = v13::oxm_match;
