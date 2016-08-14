@@ -56,7 +56,7 @@ namespace actions {
         raw_ofp_type strip_vlan_;
     };
 
-    constexpr inline auto operator==(
+    constexpr inline auto equivalent(
             strip_vlan const&, strip_vlan const&) noexcept
         -> bool
     {

@@ -183,7 +183,7 @@ namespace actions {
     };
 
     template <class MatchField>
-    auto operator==(
+    auto equivalent(
               set_field<MatchField> const& lhs
             , set_field<MatchField> const& rhs) noexcept
         -> bool

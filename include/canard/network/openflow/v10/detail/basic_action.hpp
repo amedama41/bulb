@@ -7,6 +7,7 @@
 #include <boost/operators.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
 
@@ -67,11 +68,23 @@ namespace actions_detail {
             }
         }
 
+        friend auto operator==(T const& lhs, T const& rhs) noexcept
+            -> bool
+        {
+            return lhs.equal_impl(rhs);
+        }
+
     private:
         auto base_action() const noexcept
             -> OFPAction const&
         {
             return static_cast<T const*>(this)->ofp_action();
+        }
+
+        auto equal_impl(T const& rhs) const noexcept
+            -> bool
+        {
+            return detail::memcmp(base_action(), rhs.base_action());
         }
     };
 

@@ -97,33 +97,84 @@ BOOST_AUTO_TEST_SUITE(output_test)
         BOOST_CHECK_THROW(actions::output::create(port_no), std::runtime_error);
     }
 
-    BOOST_AUTO_TEST_CASE(normal_port_equality_test)
-    {
-        auto const sut1 = actions::output{v10::protocol::OFPP_MAX};
-        auto const sut2 = actions::output{v10::protocol::OFPP_MAX};
-        auto const sut3 = actions::output{v10::protocol::OFPP_MAX, 0};
-        auto const sut4 = actions::output{1};
-        auto const sut5 = actions::output{v10::protocol::OFPP_CONTROLLER};
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(is_true_if_same_object)
+      {
+        auto const sut = actions::output{v10::protocol::OFPP_MAX};
 
-        BOOST_TEST((sut1 == sut1));
-        BOOST_TEST((sut1 == sut2));
-        BOOST_TEST((sut1 == sut3));
-        BOOST_TEST((sut1 != sut4));
-        BOOST_TEST((sut1 != sut5));
-    }
+        BOOST_TEST((sut == sut));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_same_value)
+      {
+        BOOST_TEST((actions::output{1} == actions::output{1}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_port_no_is_different)
+      {
+        BOOST_TEST((actions::output{2} != actions::output{3}));
+      }
+      BOOST_AUTO_TEST_CASE(
+          is_false_if_port_no_is_same_and_not_controller_but_max_len_is_different)
+      {
+        BOOST_TEST(
+            (actions::output{v10::protocol::OFPP_MAX, 1}
+          != actions::output{v10::protocol::OFPP_MAX, 2}));
+      }
+      BOOST_AUTO_TEST_CASE(
+          is_false_if_port_no_is_controller_but_max_len_is_different)
+      {
+        BOOST_TEST(
+            (actions::output{v10::protocol::OFPP_CONTROLLER, 1}
+          != actions::output{v10::protocol::OFPP_CONTROLLER, 2}));
+      }
+      BOOST_AUTO_TEST_CASE(
+          is_true_if_port_no_is_controller_and_max_len_is_same)
+      {
+        BOOST_TEST(
+            (actions::output{v10::protocol::OFPP_CONTROLLER, 3}
+          == actions::output{v10::protocol::OFPP_CONTROLLER, 3}));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
 
-    BOOST_AUTO_TEST_CASE(to_controller_equality_test)
-    {
-        auto const sut1 = actions::output::to_controller(0x1234);
-        auto const sut2 = actions::output::to_controller(0x1234);
-        auto const sut3 = actions::output::to_controller(0x1235);
-        auto const sut4 = actions::output{1};
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(is_true_if_same_object)
+      {
+        auto const sut = actions::output{v10::protocol::OFPP_MAX};
 
-        BOOST_TEST((sut1 == sut1));
-        BOOST_TEST((sut1 == sut2));
-        BOOST_TEST((sut1 != sut3));
-        BOOST_TEST((sut1 != sut4));
-    }
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_same_value)
+      {
+        BOOST_TEST(equivalent(actions::output{1}, actions::output{1}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_port_no_is_different)
+      {
+        BOOST_TEST(!equivalent(actions::output{2}, actions::output{3}));
+      }
+      BOOST_AUTO_TEST_CASE(
+          is_true_if_port_no_is_same_and_not_controller_but_max_len_is_different)
+      {
+        BOOST_TEST(
+            equivalent(
+                actions::output{v10::protocol::OFPP_MAX, 1}
+              , actions::output{v10::protocol::OFPP_MAX, 2}));
+      }
+      BOOST_AUTO_TEST_CASE(
+          is_false_if_both_port_nos_are_controller_but_max_len_is_different)
+      {
+        BOOST_TEST(
+            !equivalent(
+                actions::output{v10::protocol::OFPP_CONTROLLER, 1}
+              , actions::output{v10::protocol::OFPP_CONTROLLER, 2}));
+      }
+      BOOST_AUTO_TEST_CASE(
+          is_true_if_port_no_is_controller_and_max_len_is_same)
+      {
+        BOOST_TEST(
+            equivalent(
+                actions::output{v10::protocol::OFPP_CONTROLLER, 3}
+              , actions::output{v10::protocol::OFPP_CONTROLLER, 3}));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(encode_test, output_fixture)
     {
