@@ -100,13 +100,14 @@ namespace actions {
             return boost::fusion::at_c<2>(action_set_field);
         }
 
-        auto access(v10_detail::ofp_action_dl_addr const& set_dl_addr) noexcept
+        inline auto access(
+                v10_detail::ofp_action_dl_addr const& set_dl_addr) noexcept
             -> canard::mac_address
         {
             return canard::mac_address{set_dl_addr.dl_addr};
         }
 
-        auto access(v10_detail::ofp_action_nw_addr const& set_nw_addr)
+        inline auto access(v10_detail::ofp_action_nw_addr const& set_nw_addr)
             -> boost::asio::ip::address_v4
         {
             return boost::asio::ip::address_v4{set_nw_addr.nw_addr};
