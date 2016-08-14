@@ -7,7 +7,6 @@
 #include <type_traits>
 #include <utility>
 #include <canard/network/openflow/detail/is_same_value_type.hpp>
-#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/v10/detail/basic_action.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
 
@@ -74,9 +73,6 @@ namespace actions {
             return std::forward<Action>(action);
         }
 
-        friend auto operator==(output const&, output const&) noexcept
-            -> bool;
-
     private:
         friend basic_action;
 
@@ -91,21 +87,9 @@ namespace actions {
             return action_output_;
         }
 
-        auto equal_impl(output const& rhs) const noexcept
-            -> bool
-        {
-            return detail::memcmp(action_output_, rhs.action_output_);
-        }
-
     private:
         raw_ofp_type action_output_;
     };
-
-    inline auto operator==(output const& lhs, output const& rhs) noexcept
-        -> bool
-    {
-        return lhs.equal_impl(rhs);
-    }
 
     inline auto equivalent(output const& lhs, output const& rhs) noexcept
         -> bool
