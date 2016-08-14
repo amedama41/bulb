@@ -10,6 +10,7 @@
 #include <vector>
 #include <boost/asio/ip/address_v4.hpp>
 #include <canard/mac_address.hpp>
+#include "../../test_utility.hpp"
 
 namespace of = canard::net::ofp;
 namespace v10 = of::v10;
@@ -20,12 +21,6 @@ namespace bdata = boost::unit_test::data;
 
 namespace {
 
-auto operator""_bin(char const* const str, std::size_t const size)
-    -> std::vector<std::uint8_t>
-{
-    return std::vector<std::uint8_t>(str, str + size);
-}
-
 struct set_eth_src_fixture
 {
     actions::set_eth_src sut{
@@ -33,6 +28,9 @@ struct set_eth_src_fixture
     };
     std::vector<std::uint8_t> binary
         = "\x00\x04\x00\x10\x01\x02\x03\x04""\x05\x06\x00\x00\x00\x00\x00\x00"
+          ""_bin;
+    std::vector<std::uint8_t> non_zero_padding_binary
+        = "\x00\x04\x00\x10\x01\x02\x03\x04""\x05\x06\x00\x00\x00\x00\x00\x01"
           ""_bin;
 };
 
@@ -50,6 +48,8 @@ struct set_tcp_src_fixture
     actions::set_tcp_src sut{0x1234};
     std::vector<std::uint8_t> binary
         = "\x00\x09\x00\x08\x12\x34\x00\x00"_bin;
+    std::vector<std::uint8_t> non_zero_padding_binary
+        = "\x00\x09\x00\x08\x12\x34\x00\x01"_bin;
 };
 
 }
@@ -92,6 +92,79 @@ BOOST_AUTO_TEST_SUITE(set_vlan_vid_test)
                 actions::set_vlan_vid::create(vid), std::runtime_error);
     }
 
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+      {
+        auto const sut = actions::set_vlan_vid{1};
+
+        BOOST_TEST((sut == sut));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_vlan_vid_is_equal)
+      {
+        auto const vid = 0x0123;
+
+        BOOST_TEST((actions::set_vlan_vid{vid} == actions::set_vlan_vid{vid}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_vlan_vid_is_not_equal)
+      {
+        BOOST_TEST((actions::set_vlan_vid{1} != actions::set_vlan_vid{2}));
+      }
+      BOOST_AUTO_TEST_CASE(
+          is_false_if_vid_lower_12_bits_are_equal_but_other_bits_are_not_equal)
+      {
+        BOOST_TEST(
+            (actions::set_vlan_vid{0x1001} != actions::set_vlan_vid{0x0001}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_padding_is_not_equal)
+      {
+        auto const non_zero_padding_binary
+          = "\x00\x02\x00\x01\x01\x23\x00\x01"_bin;
+        auto it = non_zero_padding_binary.begin();
+        auto const non_zero_padding
+          = actions::set_vlan_vid::decode(it, non_zero_padding_binary.end());
+
+        BOOST_TEST((actions::set_vlan_vid{0x0123} != non_zero_padding));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+      {
+        auto const sut = actions::set_vlan_vid{1};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_vlan_vid_is_equal)
+      {
+        auto const vid = 0x0123;
+
+        BOOST_TEST(
+            equivalent(actions::set_vlan_vid{vid}, actions::set_vlan_vid{vid}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_vlan_vid_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(actions::set_vlan_vid{1}, actions::set_vlan_vid{2}));
+      }
+      BOOST_AUTO_TEST_CASE(
+          is_false_if_vid_lower_12_bits_are_equal_but_other_bits_are_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+              actions::set_vlan_vid{0x1001}, actions::set_vlan_vid{0x0001}));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_padding_is_not_equal)
+      {
+        auto const non_zero_padding_binary
+          = "\x00\x02\x00\x01\x01\x23\x00\x01"_bin;
+        auto it = non_zero_padding_binary.begin();
+        auto const non_zero_padding
+          = actions::set_vlan_vid::decode(it, non_zero_padding_binary.end());
+
+        BOOST_TEST(equivalent(actions::set_vlan_vid{0x0123}, non_zero_padding));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
+
 BOOST_AUTO_TEST_SUITE_END() // set_vlan_vid_test
 
 BOOST_AUTO_TEST_SUITE(set_vlan_pcp_test)
@@ -120,6 +193,79 @@ BOOST_AUTO_TEST_SUITE(set_vlan_pcp_test)
                 actions::set_vlan_pcp::create(pcp), std::runtime_error);
     }
 
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+      {
+        auto const sut = actions::set_vlan_pcp{0x1};
+
+        BOOST_TEST((sut == sut));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_vlan_pcp_is_equal)
+      {
+        auto const pcp = std::uint8_t{0x2};
+
+        BOOST_TEST((actions::set_vlan_pcp{pcp} == actions::set_vlan_pcp{pcp}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_vlan_pcp_is_not_equal)
+      {
+        BOOST_TEST((actions::set_vlan_pcp{0x0} != actions::set_vlan_pcp{0x1}));
+      }
+      BOOST_AUTO_TEST_CASE(
+          is_false_if_pcp_lower_3_bits_are_equal_but_other_bits_are_not_equal)
+      {
+        BOOST_TEST((actions::set_vlan_pcp{0x9} != actions::set_vlan_pcp{0x1}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_padding_is_not_equal)
+      {
+        auto const non_zero_padding_binary
+          = "\x00\x03\x00\x08\x03\x00\x00\x01"_bin;
+        auto it = non_zero_padding_binary.begin();
+        auto const non_zero_padding
+          = actions::set_vlan_pcp::decode(it, non_zero_padding_binary.end());
+
+        BOOST_TEST((actions::set_vlan_pcp{0x3} != non_zero_padding));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+      {
+        auto const sut = actions::set_vlan_pcp{0x1};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_vlan_pcp_is_equal)
+      {
+        auto const pcp = std::uint8_t{0x2};
+
+        BOOST_TEST(
+            equivalent(actions::set_vlan_pcp{pcp}, actions::set_vlan_pcp{pcp}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_vlan_pcp_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+              actions::set_vlan_pcp{0x0}, actions::set_vlan_pcp{0x1}));
+      }
+      BOOST_AUTO_TEST_CASE(
+          is_false_if_pcp_lower_3_bits_are_equal_but_other_bits_are_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+              actions::set_vlan_pcp{0x9}, actions::set_vlan_pcp{0x1}));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_padding_is_not_equal)
+      {
+        auto const non_zero_padding_binary
+          = "\x00\x03\x00\x08\x03\x00\x00\x01"_bin;
+        auto it = non_zero_padding_binary.begin();
+        auto const non_zero_padding
+          = actions::set_vlan_pcp::decode(it, non_zero_padding_binary.end());
+
+        BOOST_TEST(equivalent(actions::set_vlan_pcp{0x3}, non_zero_padding));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
+
 BOOST_AUTO_TEST_SUITE_END() // set_vlan_pcp_test
 
 BOOST_AUTO_TEST_SUITE(set_eth_src_test)
@@ -146,22 +292,67 @@ BOOST_AUTO_TEST_SUITE(set_eth_src_test)
         BOOST_TEST(sut.value() == mac);
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
-        auto const sut1 = actions::set_eth_src{
-            canard::mac_address{{0x01, 0x02, 0x03, 0x04, 0x05, 0x06}}
-        };
-        auto const sut2 = actions::set_eth_src{
-            canard::mac_address{{0x01, 0x02, 0x03, 0x04, 0x05, 0x06}}
-        };
-        auto const sut3 = actions::set_eth_src{
-            canard::mac_address{{0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6}}
-        };
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+      {
+        auto const sut = actions::set_eth_src{"\x01\x02\x03\x04\x05\x06"_mac};
 
-        BOOST_TEST((sut1 == sut1));
-        BOOST_TEST((sut1 == sut2));
-        BOOST_TEST((sut1 != sut3));
-    }
+        BOOST_TEST((sut == sut));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_mac_is_equal)
+      {
+        auto const mac = "\x11\x12\x13\x14\x15\x16"_mac;
+
+        BOOST_TEST((actions::set_eth_src{mac} == actions::set_eth_src{mac}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_mac_is_equal)
+      {
+        BOOST_TEST(
+            (actions::set_eth_src{"\x01\x02\x03\x04\x05\x06"_mac}
+          != actions::set_eth_src{"\x01\x02\x03\x04\x05\x16"_mac}));
+      }
+      BOOST_FIXTURE_TEST_CASE(
+          is_false_if_padding_is_not_equal, set_eth_src_fixture)
+      {
+        auto it = non_zero_padding_binary.begin();
+        auto const non_zero_padding
+          = actions::set_eth_src::decode(it, non_zero_padding_binary.end());
+
+        BOOST_TEST((sut != non_zero_padding));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+      {
+        auto const sut = actions::set_eth_src{"\x01\x02\x03\x04\x05\x06"_mac};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_mac_is_equal)
+      {
+        auto const mac = "\x11\x12\x13\x14\x15\x16"_mac;
+
+        BOOST_TEST(
+            equivalent(actions::set_eth_src{mac}, actions::set_eth_src{mac}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_mac_is_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                actions::set_eth_src{"\x01\x02\x03\x04\x05\x06"_mac}
+              , actions::set_eth_src{"\x01\x02\x03\x04\x05\x16"_mac}));
+      }
+      BOOST_FIXTURE_TEST_CASE(
+          is_true_if_padding_is_not_equal, set_eth_src_fixture)
+      {
+        auto it = non_zero_padding_binary.begin();
+        auto const non_zero_padding
+          = actions::set_eth_src::decode(it, non_zero_padding_binary.end());
+
+        BOOST_TEST(equivalent(sut, non_zero_padding));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(encode_test, set_eth_src_fixture)
     {
@@ -210,23 +401,51 @@ BOOST_AUTO_TEST_SUITE(set_ipv4_dst_test)
         BOOST_TEST(sut.value() == addr);
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
-        using boost::asio::ip::address_v4;
-        auto const sut1 = actions::set_ipv4_dst{
-            address_v4::from_string("127.0.0.1")
-        };
-        auto const sut2 = actions::set_ipv4_dst{
-            address_v4::from_string("127.0.0.1")
-        };
-        auto const sut3 = actions::set_ipv4_dst{
-            address_v4::from_string("192.168.1.255")
-        };
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+      {
+        auto const sut = actions::set_ipv4_dst{"127.0.0.1"_ipv4};
 
-        BOOST_TEST((sut1 == sut1));
-        BOOST_TEST((sut1 == sut2));
-        BOOST_TEST((sut1 != sut3));
-    }
+        BOOST_TEST((sut == sut));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_ip_address_is_equal)
+      {
+        auto const ipaddr = "192.168.1.3"_ipv4;
+
+        BOOST_TEST(
+            (actions::set_ipv4_dst{ipaddr} == actions::set_ipv4_dst{ipaddr}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_ip_address_is_not_equal)
+      {
+        BOOST_TEST(
+            (actions::set_ipv4_dst{"0.0.0.0"_ipv4}
+          != actions::set_ipv4_dst{"0.0.0.1"_ipv4}));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+      {
+        auto const sut = actions::set_ipv4_dst{"127.0.0.1"_ipv4};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_ip_address_is_equal)
+      {
+        auto const ipaddr = "192.168.1.3"_ipv4;
+
+        BOOST_TEST(
+            equivalent(
+              actions::set_ipv4_dst{ipaddr}, actions::set_ipv4_dst{ipaddr}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_ip_address_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                actions::set_ipv4_dst{"0.0.0.0"_ipv4}
+              , actions::set_ipv4_dst{"0.0.0.1"_ipv4}));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(encode_test, set_ipv4_dst_fixture)
     {
@@ -277,6 +496,79 @@ BOOST_AUTO_TEST_SUITE(set_ip_dscp_test)
                 actions::set_ip_dscp::create(dscp), std::runtime_error);
     }
 
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+      {
+        auto const sut = actions::set_ip_dscp{0x01};
+
+        BOOST_TEST((sut == sut));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_ip_dscp_is_equal)
+      {
+        auto const dscp = 0x1f;
+
+        BOOST_TEST((actions::set_ip_dscp{dscp} == actions::set_ip_dscp{dscp}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_ip_dscp_is_equal)
+      {
+        BOOST_TEST((actions::set_ip_dscp{0x01} != actions::set_ip_dscp{0x02}));
+      }
+      BOOST_AUTO_TEST_CASE(
+          is_false_if_dscp_6_lower_bits_are_equal_not_other_bits_are_not_equal)
+      {
+        BOOST_TEST((actions::set_ip_dscp{0x81} != actions::set_ip_dscp{0x01}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_padding_is_not_equal)
+      {
+        auto const non_zero_padding_binary
+          = "\x00\x08\x00\x08\x3f\x00\x00\x01"_bin;
+        auto it = non_zero_padding_binary.begin();
+        auto const non_zero_padding
+          = actions::set_ip_dscp::decode(it, non_zero_padding_binary.end());
+
+        BOOST_TEST((actions::set_ip_dscp{0x3f} != non_zero_padding));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+      {
+        auto const sut = actions::set_ip_dscp{0x01};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_ip_dscp_is_equal)
+      {
+        auto const dscp = 0x1f;
+
+        BOOST_TEST(
+            equivalent(actions::set_ip_dscp{dscp}, actions::set_ip_dscp{dscp}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_ip_dscp_is_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+              actions::set_ip_dscp{0x01}, actions::set_ip_dscp{0x02}));
+      }
+      BOOST_AUTO_TEST_CASE(
+          is_false_if_dscp_6_lower_bits_are_equal_not_other_bits_are_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+              actions::set_ip_dscp{0x81}, actions::set_ip_dscp{0x01}));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_padding_is_not_equal)
+      {
+        auto const non_zero_padding_binary
+          = "\x00\x08\x00\x08\x3f\x00\x00\x01"_bin;
+        auto it = non_zero_padding_binary.begin();
+        auto const non_zero_padding
+          = actions::set_ip_dscp::decode(it, non_zero_padding_binary.end());
+
+        BOOST_TEST(equivalent(actions::set_ip_dscp{0x3f}, non_zero_padding));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
+
 BOOST_AUTO_TEST_SUITE_END() // set_ip_dscp_test
 
 BOOST_AUTO_TEST_SUITE(set_tcp_src_test)
@@ -301,16 +593,59 @@ BOOST_AUTO_TEST_SUITE(set_tcp_src_test)
         BOOST_TEST(sut.value() == port);
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
-        auto const sut1 = actions::set_tcp_src{0x1234};
-        auto const sut2 = actions::set_tcp_src{0x1234};
-        auto const sut3 = actions::set_tcp_src{0x4321};
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+      {
+        auto const sut = actions::set_tcp_src{0x1234};
 
-        BOOST_TEST((sut1 == sut1));
-        BOOST_TEST((sut1 == sut2));
-        BOOST_TEST((sut1 != sut3));
-    }
+        BOOST_TEST((sut == sut));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_port_is_equal)
+      {
+        BOOST_TEST((actions::set_tcp_src{80} == actions::set_tcp_src{80}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_port_is_not_equal)
+      {
+        BOOST_TEST((actions::set_tcp_src{80} != actions::set_tcp_src{443}));
+      }
+      BOOST_FIXTURE_TEST_CASE(
+          is_false_if_padding_is_not_equal, set_tcp_src_fixture)
+      {
+        auto it = non_zero_padding_binary.begin();
+        auto const non_zero_padding
+          = actions::set_tcp_src::decode(it, non_zero_padding_binary.end());
+
+        BOOST_TEST((sut != non_zero_padding));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+      {
+        auto const sut = actions::set_tcp_src{0x1234};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_port_is_equal)
+      {
+        BOOST_TEST(
+            equivalent(actions::set_tcp_src{80}, actions::set_tcp_src{80}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_port_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(actions::set_tcp_src{80}, actions::set_tcp_src{443}));
+      }
+      BOOST_FIXTURE_TEST_CASE(
+          is_true_if_padding_is_not_equal, set_tcp_src_fixture)
+      {
+        auto it = non_zero_padding_binary.begin();
+        auto const non_zero_padding
+          = actions::set_tcp_src::decode(it, non_zero_padding_binary.end());
+
+        BOOST_TEST(equivalent(sut, non_zero_padding));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(encode_test, set_tcp_src_fixture)
     {
