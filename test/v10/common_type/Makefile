@@ -1,4 +1,5 @@
 SRCS = port_test.cpp \
+	   packet_queue_test.cpp \
 	   match_fields_test.cpp \
 	   match_set_test.cpp
 TARGET_LIB = libcommon_type_test.dylib
