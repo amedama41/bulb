@@ -95,8 +95,10 @@ namespace actions {
     inline auto equivalent(output const& lhs, output const& rhs) noexcept
         -> bool
     {
-        return lhs.port_no() == rhs.port_no()
-            && lhs.max_length() == rhs.max_length();
+        return lhs.port_no() == protocol::OFPP_CONTROLLER
+            ? (rhs.port_no() == protocol::OFPP_CONTROLLER
+                    && lhs.max_length() == rhs.max_length())
+            : lhs.port_no() == rhs.port_no();
     }
 
 } // namespace actions
