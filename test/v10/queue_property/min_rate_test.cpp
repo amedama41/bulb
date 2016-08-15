@@ -11,10 +11,10 @@ namespace v10_detail = ofp::v10::v10_detail;
 namespace {
 
 struct binary_min_rate {
-  queue_properties::min_rate const sut{0x1234};
-  std::vector<unsigned char> const bin
+  queue_properties::min_rate sut{0x1234};
+  std::vector<unsigned char> bin
     = "\x00\x01\x00\x10\x00\x00\x00\x00""\x12\x34\x00\x00\x00\x00\x00\x00"_bin;
-  std::vector<unsigned char> const non_zero_padding_bin
+  std::vector<unsigned char> non_zero_padding_bin
     = "\x00\x01\x00\x10\x01\x23\x45\x67""\x12\x34\x01\x23\x45\x67\x89\xab"_bin;
 };
 
@@ -33,6 +33,109 @@ BOOST_AUTO_TEST_SUITE(min_rate_test)
     BOOST_TEST(sut.length() == sizeof(v10_detail::ofp_queue_prop_min_rate));
     BOOST_TEST(sut.rate() == sut.rate());
   }
+
+  BOOST_AUTO_TEST_SUITE(equality)
+    BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+    {
+      auto const sut = queue_properties::min_rate{300};
+
+      BOOST_TEST((sut == sut));
+    }
+    BOOST_AUTO_TEST_CASE(is_true_if_rate_is_equal)
+    {
+      auto const rate = std::uint16_t{1000};
+
+      BOOST_TEST(
+          (queue_properties::min_rate{rate}
+        == queue_properties::min_rate{rate}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_rate_is_not_equal)
+    {
+      BOOST_TEST(
+          (queue_properties::min_rate{0} != queue_properties::min_rate{1}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_rate_is_not_equal_and_both_are_over_1000)
+    {
+      BOOST_TEST(
+          (queue_properties::min_rate{1001}
+        != queue_properties::min_rate{1002}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_lhs_rate_is_over_1000)
+    {
+      BOOST_TEST(
+          (queue_properties::min_rate{1000}
+        != queue_properties::min_rate{1001}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_rhs_rate_is_over_1000)
+    {
+      BOOST_TEST(
+          (queue_properties::min_rate{1001}
+        != queue_properties::min_rate{1000}));
+    }
+    BOOST_FIXTURE_TEST_CASE(is_false_if_padding_is_not_equal, binary_min_rate)
+    {
+      bin.back() = 0x01;
+      auto it = bin.begin();
+      auto const non_zero_padding
+        = queue_properties::min_rate::decode(it, bin.end());
+
+      BOOST_TEST((sut != non_zero_padding));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // equality
+
+  BOOST_AUTO_TEST_SUITE(function_equivalent)
+    BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+    {
+      auto const sut = queue_properties::min_rate{300};
+
+      BOOST_TEST(equivalent(sut, sut));
+    }
+    BOOST_AUTO_TEST_CASE(is_true_if_rate_is_equal)
+    {
+      auto const rate = std::uint16_t{1000};
+
+      BOOST_TEST(
+          equivalent(
+              queue_properties::min_rate{rate}
+            , queue_properties::min_rate{rate}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_rate_is_not_equal)
+    {
+      BOOST_TEST(
+          !equivalent(
+            queue_properties::min_rate{0}, queue_properties::min_rate{1}));
+    }
+    BOOST_AUTO_TEST_CASE(is_true_if_rate_is_not_equal_but_both_are_over_1000)
+    {
+      BOOST_TEST(
+          equivalent(
+              queue_properties::min_rate{1001}
+            , queue_properties::min_rate{1002}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_lhs_rate_is_over_1000)
+    {
+      BOOST_TEST(
+          !equivalent(
+              queue_properties::min_rate{1000}
+            , queue_properties::min_rate{1001}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_rhs_rate_is_over_1000)
+    {
+      BOOST_TEST(
+          !equivalent(
+              queue_properties::min_rate{1001}
+            , queue_properties::min_rate{1000}));
+    }
+    BOOST_FIXTURE_TEST_CASE(is_true_if_padding_is_not_equal, binary_min_rate)
+    {
+      bin.back() = 0x01;
+      auto it = bin.begin();
+      auto const non_zero_padding
+        = queue_properties::min_rate::decode(it, bin.end());
+
+      BOOST_TEST(equivalent(sut, non_zero_padding));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
   BOOST_FIXTURE_TEST_SUITE(encode, binary_min_rate)
     BOOST_AUTO_TEST_CASE(generate_binary)
@@ -53,8 +156,7 @@ BOOST_AUTO_TEST_SUITE(min_rate_test)
 
       auto const min_rate = queue_properties::min_rate::decode(it, bin.end());
       BOOST_TEST((it == bin.end()));
-      // TODO BOOST_TEST((min_rate == sut));
-      BOOST_TEST(min_rate.rate() == sut.rate());
+      BOOST_TEST((min_rate == sut));
     }
     BOOST_AUTO_TEST_CASE(constructible_from_non_zero_padding_binary)
     {
@@ -64,9 +166,8 @@ BOOST_AUTO_TEST_SUITE(min_rate_test)
         = queue_properties::min_rate::decode(it, non_zero_padding_bin.end());
 
       BOOST_TEST((it == non_zero_padding_bin.end()));
-      // TODO BOOST_TEST((min_rate != sut));
-      // TODO BOOST_TEST(equivalnet(min_rate, sut));
-      BOOST_TEST(min_rate.rate() == sut.rate());
+      BOOST_TEST((min_rate != sut));
+      BOOST_TEST(equivalent(min_rate, sut));
     }
   BOOST_AUTO_TEST_SUITE_END() // decode
 
