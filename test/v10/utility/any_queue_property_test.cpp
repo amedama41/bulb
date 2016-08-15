@@ -33,6 +33,149 @@ BOOST_AUTO_TEST_SUITE(any_queue_property_test)
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor
 
+  BOOST_AUTO_TEST_SUITE(equality)
+    BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+    {
+      auto const sut = ofp::v10::any_queue_property{queue_props::min_rate{10}};
+
+      BOOST_TEST((sut == sut));
+    }
+    BOOST_AUTO_TEST_CASE(is_true_if_contained_property_is_equal)
+    {
+      auto const min_rate = queue_props::min_rate{200};
+
+      BOOST_TEST(
+          (ofp::v10::any_queue_property{min_rate}
+        == ofp::v10::any_queue_property{min_rate}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_contained_property_is_not_equal)
+    {
+      BOOST_TEST(
+          (ofp::v10::any_queue_property{queue_props::min_rate{200}}
+        != ofp::v10::any_queue_property{queue_props::min_rate{300}}));
+    }
+    BOOST_AUTO_TEST_CASE(
+        is_false_if_contained_property_is_not_equal_but_equivalent)
+    {
+      BOOST_TEST(
+          (ofp::v10::any_queue_property{queue_props::min_rate{1001}}
+        != ofp::v10::any_queue_property{queue_props::min_rate{1002}}));
+    }
+    BOOST_AUTO_TEST_CASE(is_true_if_right_operand_is_equal_value_property)
+    {
+      auto const min_rate = queue_props::min_rate{200};
+
+      BOOST_TEST((ofp::v10::any_queue_property{min_rate} == min_rate));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_right_operand_is_not_equal_value_property)
+    {
+      BOOST_TEST(
+          (ofp::v10::any_queue_property{queue_props::min_rate{200}}
+        != queue_props::min_rate{201}));
+    }
+    BOOST_AUTO_TEST_CASE(
+        is_false_if_right_operand_is_not_equal_value_property_but_equivalent)
+    {
+      BOOST_TEST(
+          (ofp::v10::any_queue_property{queue_props::min_rate{1200}}
+        != queue_props::min_rate{1201}));
+    }
+    BOOST_AUTO_TEST_CASE(is_true_if_left_operand_is_equal_value_property)
+    {
+      auto const min_rate = queue_props::min_rate{201};
+
+      BOOST_TEST((min_rate == ofp::v10::any_queue_property{min_rate}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_left_operand_is_not_equal_value_property)
+    {
+      BOOST_TEST(
+          (queue_props::min_rate{201}
+        != ofp::v10::any_queue_property{queue_props::min_rate{200}}));
+    }
+    BOOST_AUTO_TEST_CASE(
+        is_false_if_left_operand_is_not_equal_value_property_but_equivalent)
+    {
+      BOOST_TEST(
+          (queue_props::min_rate{1201}
+        != ofp::v10::any_queue_property{queue_props::min_rate{1200}}));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // equality
+
+  BOOST_AUTO_TEST_SUITE(function_equivalent)
+    BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+    {
+      auto const sut = ofp::v10::any_queue_property{queue_props::min_rate{10}};
+
+      BOOST_TEST(equivalent(sut, sut));
+    }
+    BOOST_AUTO_TEST_CASE(is_true_if_contained_property_is_equal)
+    {
+      auto const min_rate = queue_props::min_rate{200};
+
+      BOOST_TEST(
+          equivalent(
+              ofp::v10::any_queue_property{min_rate}
+            , ofp::v10::any_queue_property{min_rate}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_contained_property_is_not_equal)
+    {
+      BOOST_TEST(
+          !equivalent(
+              ofp::v10::any_queue_property{queue_props::min_rate{200}}
+            , ofp::v10::any_queue_property{queue_props::min_rate{300}}));
+    }
+    BOOST_AUTO_TEST_CASE(
+        is_true_if_contained_property_is_not_equal_but_equivalent)
+    {
+      BOOST_TEST(
+          equivalent(
+              ofp::v10::any_queue_property{queue_props::min_rate{1001}}
+            , ofp::v10::any_queue_property{queue_props::min_rate{1002}}));
+    }
+    BOOST_AUTO_TEST_CASE(is_true_if_right_operand_is_equal_value_property)
+    {
+      auto const min_rate = queue_props::min_rate{200};
+
+      BOOST_TEST(equivalent(ofp::v10::any_queue_property{min_rate}, min_rate));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_right_operand_is_not_equal_value_property)
+    {
+      BOOST_TEST(
+          !equivalent(
+              ofp::v10::any_queue_property{queue_props::min_rate{200}}
+            , queue_props::min_rate{201}));
+    }
+    BOOST_AUTO_TEST_CASE(
+        is_true_if_right_operand_is_not_equal_value_property_but_equivalent)
+    {
+      BOOST_TEST(
+          equivalent(
+              ofp::v10::any_queue_property{queue_props::min_rate{1200}}
+            , queue_props::min_rate{1201}));
+    }
+    BOOST_AUTO_TEST_CASE(is_true_if_left_operand_is_equal_value_property)
+    {
+      auto const min_rate = queue_props::min_rate{201};
+
+      BOOST_TEST(equivalent(min_rate, ofp::v10::any_queue_property{min_rate}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_left_operand_is_not_equal_value_property)
+    {
+      BOOST_TEST(
+          !equivalent(
+              queue_props::min_rate{201}
+            , ofp::v10::any_queue_property{queue_props::min_rate{200}}));
+    }
+    BOOST_AUTO_TEST_CASE(
+        is_true_if_left_operand_is_not_equal_value_property_but_equivalent)
+    {
+      BOOST_TEST(
+          equivalent(
+              queue_props::min_rate{1201}
+            , ofp::v10::any_queue_property{queue_props::min_rate{1200}}));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // function_equivalent
+
   BOOST_FIXTURE_TEST_SUITE(encode, any_queue_property_fixiture)
     BOOST_AUTO_TEST_CASE(generate_min_rate_binary_if_containing_min_rate)
     {
@@ -55,7 +198,7 @@ BOOST_AUTO_TEST_SUITE(any_queue_property_test)
         = ofp::v10::any_queue_property::decode(it, min_rate_binary.end());
 
       BOOST_TEST((it == min_rate_binary.end()));
-      // TODO
+      BOOST_TEST((prop == min_rate));
     }
     BOOST_AUTO_TEST_CASE(throw_exception_if_queue_property_is_unknown)
     {
