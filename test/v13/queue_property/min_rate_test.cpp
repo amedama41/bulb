@@ -60,6 +60,21 @@ BOOST_AUTO_TEST_SUITE(min_rate_test)
       {
         BOOST_TEST((queue_props::min_rate{3} != queue_props::min_rate{4}));
       }
+      BOOST_AUTO_TEST_CASE(is_false_if_rate_is_not_equal_and_both_are_over_1000)
+      {
+        BOOST_TEST(
+            (queue_props::min_rate{1001} != queue_props::min_rate{1002}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_lhs_rate_is_over_1000)
+      {
+        BOOST_TEST(
+            (queue_props::min_rate{1000} != queue_props::min_rate{1001}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_rhs_rate_is_over_1000)
+      {
+        BOOST_TEST(
+            (queue_props::min_rate{1001} != queue_props::min_rate{1000}));
+      }
       BOOST_AUTO_TEST_CASE(false_if_pad_is_not_equal)
       {
         auto const binary
@@ -89,6 +104,24 @@ BOOST_AUTO_TEST_SUITE(min_rate_test)
       {
         BOOST_TEST(
             !equivalent(queue_props::min_rate{3}, queue_props::min_rate{4}));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_rate_is_not_equal_but_both_are_over_1000)
+      {
+        BOOST_TEST(
+            equivalent(
+              queue_props::min_rate{1001}, queue_props::min_rate{1002}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_lhs_rate_is_over_1000)
+      {
+        BOOST_TEST(
+            !equivalent(
+              queue_props::min_rate{1000}, queue_props::min_rate{1001}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_rhs_rate_is_over_1000)
+      {
+        BOOST_TEST(
+            !equivalent(
+              queue_props::min_rate{1001}, queue_props::min_rate{1000}));
       }
       BOOST_AUTO_TEST_CASE(true_if_pad_is_not_equal)
       {
