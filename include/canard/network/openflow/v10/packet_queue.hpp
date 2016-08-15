@@ -8,6 +8,8 @@
 #include <stdexcept>
 #include <utility>
 #include <vector>
+#include <boost/operators.hpp>
+#include <boost/range/algorithm/equal.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/numeric.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
@@ -23,6 +25,7 @@ namespace ofp {
 namespace v10 {
 
     class packet_queue
+        : private boost::equality_comparable<packet_queue>
     {
         static constexpr std::size_t base_packet_queue_size
             = sizeof(v10_detail::ofp_packet_queue);
@@ -143,12 +146,23 @@ namespace v10 {
             return packet_queue{pkt_queue, std::move(properties)};
         }
 
+        friend auto operator==(
+                packet_queue const&, packet_queue const&) noexcept
+            -> bool;
+
     private:
         packet_queue(v10_detail::ofp_packet_queue const& pkt_queue
                    , properties_type&& properties)
             : packet_queue_(pkt_queue)
             , properties_(std::move(properties))
         {
+        }
+
+        auto equal_impl(packet_queue const& rhs) const noexcept
+            -> bool
+        {
+            return detail::memcmp(packet_queue_, rhs.packet_queue_)
+                && properties_ == rhs.properties_;
         }
 
         static auto calc_propertis_length(properties_type const& properties)
@@ -170,6 +184,25 @@ namespace v10 {
         v10_detail::ofp_packet_queue packet_queue_;
         properties_type properties_;
     };
+
+    inline auto operator==(
+            packet_queue const& lhs, packet_queue const& rhs) noexcept
+        -> bool
+    {
+        return lhs.equal_impl(rhs);
+    }
+
+    inline auto equivalent(
+            packet_queue const& lhs, packet_queue const& rhs) noexcept
+        -> bool
+    {
+        using cref = packet_queue::properties_type::const_reference;
+        return lhs.queue_id() == rhs.queue_id()
+            && boost::equal(
+                      lhs.properties(), rhs.properties()
+                    , [](cref lhs_prop, cref rhs_prop)
+                      { return equivalent(lhs_prop, rhs_prop); });
+    }
 
 } // namespace v10
 } // namespace ofp
