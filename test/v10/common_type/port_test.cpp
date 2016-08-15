@@ -15,15 +15,15 @@ struct binary_port {
       , 0x00000012, 0x00000301
       , 0x00000123, 0x00000456, 0x00000789, 0x00000abc
   });
-  std::vector<unsigned char> const bin
+  std::vector<unsigned char> bin
     = "\x12\x34\x01\x02\x03\x04\x05\x06""port_nam"
       "e" "\x00\x00\x00\x00\x00\x00\x00""\x00\x00\x00\x12\x00\x00\x03\x01"
       "\x00\x00\x01\x23\x00\x00\x04\x56""\x00\x00\x07\x89\x00\x00\x0a\xbc"_bin;
-  std::vector<unsigned char> const invalid_port_no_bin
+  std::vector<unsigned char> invalid_port_no_bin
     = "\x00\x00\x01\x02\x03\x04\x05\x06""port_nam"
       "e" "\x00\x00\x00\x00\x00\x00\x00""\x00\x00\x00\x12\x00\x00\x03\x01"
       "\x00\x00\x01\x23\x00\x00\x04\x56""\x00\x00\x07\x89\x00\x00\x0a\xbc"_bin;
-  std::vector<unsigned char> const non_null_terminated_name_bin
+  std::vector<unsigned char> non_null_terminated_name_bin
     = "\x12\x34\x01\x02\x03\x04\x05\x06""01234567"
       "89abcdef"                        "\x00\x00\x00\x12\x00\x00\x03\x01"
       "\x00\x00\x01\x23\x00\x00\x04\x56""\x00\x00\x07\x89\x00\x00\x0a\xbc"_bin;
@@ -33,6 +33,30 @@ struct binary_port {
 
 BOOST_AUTO_TEST_SUITE(common_type_test)
 BOOST_AUTO_TEST_SUITE(port_test)
+
+  BOOST_AUTO_TEST_SUITE(equality)
+    BOOST_FIXTURE_TEST_CASE(
+        is_false_if_byte_after_name_termination_null_is_not_equal, binary_port)
+    {
+      bin[offsetof(v10_detail::ofp_phy_port, config) - 1] = 0xff;
+      auto it = bin.begin();
+      auto const port = ofp::v10::port::decode(it, bin.end());
+
+      BOOST_TEST((port != sut));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // equality
+
+  BOOST_AUTO_TEST_SUITE(function_equivalent)
+    BOOST_FIXTURE_TEST_CASE(
+        is_true_if_byte_after_name_termination_null_is_not_equal, binary_port)
+    {
+      bin[offsetof(v10_detail::ofp_phy_port, config) - 1] = 0xff;
+      auto it = bin.begin();
+      auto const port = ofp::v10::port::decode(it, bin.end());
+
+      BOOST_TEST(equivalent(port, sut));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
   BOOST_FIXTURE_TEST_SUITE(encode, binary_port)
     BOOST_AUTO_TEST_CASE(generate_binary)
@@ -53,17 +77,7 @@ BOOST_AUTO_TEST_SUITE(port_test)
 
       auto const port = ofp::v10::port::decode(it, bin.end());
 
-      // TODO
-      BOOST_TEST(port.port_no() == sut.port_no());
-      BOOST_TEST(port.hardware_address() == sut.hardware_address());
-      BOOST_TEST(port.name() == sut.name());
-      BOOST_TEST(port.config() == sut.config());
-      BOOST_TEST(port.state() == sut.state());
-      BOOST_TEST(port.current_features() == sut.current_features());
-      BOOST_TEST(port.advertised_features() == sut.advertised_features());
-      BOOST_TEST(port.supported_features() == sut.supported_features());
-      BOOST_TEST(
-          port.peer_advertised_features() == sut.peer_advertised_features());
+      BOOST_TEST((port == sut));
     }
     BOOST_AUTO_TEST_CASE(constructible_from_invalid_port_no_binary)
     {
