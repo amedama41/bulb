@@ -4,8 +4,10 @@
 #include <cstddef>
 #include <cstdint>
 #include <stdexcept>
+#include <boost/operators.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
 
@@ -16,6 +18,7 @@ namespace v10 {
 namespace queue_properties {
 
     class min_rate
+        : private boost::equality_comparable<min_rate>
     {
     public:
         static constexpr protocol::ofp_queue_properties queue_property
@@ -55,6 +58,12 @@ namespace queue_properties {
             return min_rate_.rate;
         }
 
+        auto is_disabled() const noexcept
+            -> bool
+        {
+            return rate() > 1000;
+        }
+
         template <class Container>
         auto encode(Container& container) const
             -> Container&
@@ -82,6 +91,9 @@ namespace queue_properties {
             }
         }
 
+        friend auto operator==(min_rate const&, min_rate const&) noexcept
+            -> bool;
+
     private:
         explicit min_rate(
                 v10_detail::ofp_queue_prop_min_rate const& min_rate) noexcept
@@ -89,9 +101,28 @@ namespace queue_properties {
         {
         }
 
+        auto equal_impl(min_rate const& rhs) const noexcept
+            -> bool
+        {
+            return detail::memcmp(min_rate_, rhs.min_rate_);
+        }
+
     private:
         v10_detail::ofp_queue_prop_min_rate min_rate_;
     };
+
+    inline auto operator==(min_rate const& lhs, min_rate const& rhs) noexcept
+        -> bool
+    {
+        return lhs.equal_impl(rhs);
+    }
+
+    inline auto equivalent(min_rate const& lhs, min_rate const& rhs) noexcept
+        -> bool
+    {
+        return lhs.rate() == rhs.rate()
+            || (lhs.is_disabled() && rhs.is_disabled());
+    }
 
 } // namespace queue_properties
 } // namespace v10
