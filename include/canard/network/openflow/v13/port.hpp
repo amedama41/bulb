@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/detail/port_adaptor.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
@@ -79,6 +80,28 @@ namespace v13 {
     private:
         v13_detail::ofp_port port_;
     };
+
+    inline auto operator==(port const& lhs, port const& rhs) noexcept
+        -> bool
+    {
+        return detail::memcmp(lhs.ofp_port(), rhs.ofp_port());
+    }
+
+    inline auto equivalent(port const& lhs, port const& rhs) noexcept
+        -> bool
+    {
+        return lhs.port_no() == rhs.port_no()
+            && lhs.hardware_address() == rhs.hardware_address()
+            && lhs.name() == rhs.name()
+            && lhs.config() == rhs.config()
+            && lhs.state() == rhs.state()
+            && lhs.current_features() == rhs.current_features()
+            && lhs.advertised_features() == rhs.advertised_features()
+            && lhs.supported_features() == rhs.supported_features()
+            && lhs.peer_advertised_features() == rhs.peer_advertised_features()
+            && lhs.current_speed() == rhs.current_speed()
+            && lhs.max_speed() == rhs.max_speed();
+    }
 
 } // namespace v13
 } // namespace ofp
