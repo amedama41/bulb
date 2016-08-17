@@ -1,11 +1,15 @@
 #ifndef CANARD_NET_OFP_V10_MATCH_SET_HPP
 #define CANARD_NET_OFP_V10_MATCH_SET_HPP
 
+#include <tuple>
 #include <type_traits>
 #include <utility>
+#include <boost/fusion/algorithm/query/all.hpp>
 #include <boost/operators.hpp>
 #include <boost/optional/optional.hpp>
+#include <canard/mpl/adapted/std_tuple.hpp>
 #include <canard/network/openflow/detail/is_related.hpp>
+#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/v10/match_fields.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
 
@@ -116,19 +120,52 @@ namespace v10 {
     inline auto operator==(match_set const& lhs, match_set const& rhs) noexcept
         -> bool
     {
-        return lhs.get<match::in_port>() == rhs.get<match::in_port>()
-            && lhs.get<match::eth_src>() == rhs.get<match::eth_src>()
-            && lhs.get<match::eth_dst>() == rhs.get<match::eth_dst>()
-            && lhs.get<match::vlan_vid>() == rhs.get<match::vlan_vid>()
-            && lhs.get<match::vlan_pcp>() == rhs.get<match::vlan_pcp>()
-            && lhs.get<match::eth_type>() == rhs.get<match::eth_type>()
-            && lhs.get<match::ip_dscp>() == rhs.get<match::ip_dscp>()
-            && lhs.get<match::ip_proto>() == rhs.get<match::ip_proto>()
-            && lhs.get<match::ipv4_src>() == rhs.get<match::ipv4_src>()
-            && lhs.get<match::ipv4_dst>() == rhs.get<match::ipv4_dst>()
-            && lhs.get<match::tcp_src>() == rhs.get<match::tcp_src>()
-            && lhs.get<match::tcp_dst>() == rhs.get<match::tcp_dst>()
-            ;
+        return detail::memcmp(lhs.ofp_match(), rhs.ofp_match());
+    }
+
+    namespace match_set_detail {
+
+        struct equivalent_impl
+        {
+            template <class FieldType>
+            auto operator()(FieldType*) const noexcept
+                -> bool
+            {
+                if (auto const lhs_field = lhs->get<FieldType>()) {
+                    return equivalent(*lhs_field, *rhs->get<FieldType>());
+                }
+                return true;
+            }
+
+            operator bool() const noexcept
+            {
+                if ((lhs->wildcards() & protocol::OFPFW_ALL)
+                        != (rhs->wildcards() & protocol::OFPFW_ALL)) {
+                    return false;
+                }
+
+                using match_field_pointer_list = std::tuple<
+                      match::in_port*
+                    , match::eth_src*, match::eth_dst*
+                    , match::vlan_vid*, match::vlan_pcp*
+                    , match::eth_type*
+                    , match::ip_dscp*, match::ip_proto*
+                    , match::ipv4_src*, match::ipv4_dst*
+                    , match::tcp_src*, match::tcp_dst*
+                >;
+                return boost::fusion::all(match_field_pointer_list{}, *this);
+            }
+
+            match_set const* lhs;
+            match_set const* rhs;
+        };
+
+    } // namespace match_set_detail
+
+    inline auto equivalent(match_set const& lhs, match_set const& rhs) noexcept
+        -> bool
+    {
+        return match_set_detail::equivalent_impl{&lhs, &rhs};
     }
 
 } // namespace v10
