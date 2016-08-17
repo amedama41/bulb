@@ -490,12 +490,6 @@ BOOST_AUTO_TEST_SUITE(set_ip_dscp_test)
         BOOST_TEST(sut.value() == dscp);
     }
 
-    BOOST_DATA_TEST_CASE(create_failure_test, bdata::xrange(0x40, 0xff), dscp)
-    {
-        BOOST_CHECK_THROW(
-                actions::set_ip_dscp::create(dscp), std::runtime_error);
-    }
-
     BOOST_AUTO_TEST_SUITE(equality)
       BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
       {
@@ -514,19 +508,24 @@ BOOST_AUTO_TEST_SUITE(set_ip_dscp_test)
         BOOST_TEST((actions::set_ip_dscp{0x01} != actions::set_ip_dscp{0x02}));
       }
       BOOST_AUTO_TEST_CASE(
-          is_false_if_dscp_6_lower_bits_are_equal_not_other_bits_are_not_equal)
+          is_false_if_tos_6_upper_bits_are_equal_not_other_bits_are_not_equal)
       {
-        BOOST_TEST((actions::set_ip_dscp{0x81} != actions::set_ip_dscp{0x01}));
+        auto const bin = "\x00\x08\x00\x08\xff\x00\x00\x00"_bin;
+        auto it = bin.begin();
+        auto const sut = actions::set_ip_dscp::decode(it, bin.end());
+        BOOST_TEST((actions::set_ip_dscp{sut.value()} != sut));
       }
       BOOST_AUTO_TEST_CASE(is_false_if_padding_is_not_equal)
       {
         auto const non_zero_padding_binary
-          = "\x00\x08\x00\x08\x3f\x00\x00\x01"_bin;
+          = "\x00\x08\x00\x08\xfc\x00\x00\x01"_bin;
         auto it = non_zero_padding_binary.begin();
         auto const non_zero_padding
           = actions::set_ip_dscp::decode(it, non_zero_padding_binary.end());
 
-        BOOST_TEST((actions::set_ip_dscp{0x3f} != non_zero_padding));
+        BOOST_TEST(
+            (actions::set_ip_dscp{non_zero_padding.value()}
+          != non_zero_padding));
       }
     BOOST_AUTO_TEST_SUITE_END() // equality
 
@@ -551,21 +550,25 @@ BOOST_AUTO_TEST_SUITE(set_ip_dscp_test)
               actions::set_ip_dscp{0x01}, actions::set_ip_dscp{0x02}));
       }
       BOOST_AUTO_TEST_CASE(
-          is_false_if_dscp_6_lower_bits_are_equal_not_other_bits_are_not_equal)
+          is_true_if_tos_6_upper_bits_are_equal_not_other_bits_are_not_equal)
       {
-        BOOST_TEST(
-            !equivalent(
-              actions::set_ip_dscp{0x81}, actions::set_ip_dscp{0x01}));
+        auto const bin = "\x00\x08\x00\x08\xff\x00\x00\x00"_bin;
+        auto it = bin.begin();
+        auto const sut = actions::set_ip_dscp::decode(it, bin.end());
+        BOOST_TEST(equivalent(actions::set_ip_dscp{sut.value()}, sut));
       }
       BOOST_AUTO_TEST_CASE(is_true_if_padding_is_not_equal)
       {
         auto const non_zero_padding_binary
-          = "\x00\x08\x00\x08\x3f\x00\x00\x01"_bin;
+          = "\x00\x08\x00\x08\xfc\x00\x00\x01"_bin;
         auto it = non_zero_padding_binary.begin();
         auto const non_zero_padding
           = actions::set_ip_dscp::decode(it, non_zero_padding_binary.end());
 
-        BOOST_TEST(equivalent(actions::set_ip_dscp{0x3f}, non_zero_padding));
+        BOOST_TEST(
+            equivalent(
+                actions::set_ip_dscp{non_zero_padding.value()}
+              , non_zero_padding));
       }
     BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
