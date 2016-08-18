@@ -1,84 +1,43 @@
 #ifndef CANARD_NET_OFP_V10_ACTION_LIST_HPP
 #define CANARD_NET_OFP_V10_ACTION_LIST_HPP
 
-#include <cstdint>
-#include <type_traits>
-#include <utility>
-#include <vector>
-#include <boost/range/adaptor/transformed.hpp>
-#include <boost/range/algorithm/for_each.hpp>
-#include <boost/range/numeric.hpp>
-#include <canard/network/openflow/detail/add_helper.hpp>
-#include <canard/network/openflow/detail/is_related.hpp>
+#include <canard/network/openflow/detail/config.hpp>
+
+#include <canard/network/openflow/detail/action_list.hpp>
 #include <canard/network/openflow/v10/any_action.hpp>
-#include <canard/network/openflow/v10/decoder/action_decoder.hpp>
+#include <canard/network/openflow/v10/openflow.hpp>
 
 namespace canard {
 namespace net {
 namespace ofp {
 namespace v10 {
 
-    class action_list
-    {
-    public:
-        template <
-              class... Actions
-            , typename std::enable_if<!detail::is_related<action_list, Actions...>::value>::type* = nullptr
-        >
-        action_list(Actions&&... actions)
-            : actions_{any_action(std::forward<Actions>(actions))...}
-        {
-        }
-
-        void swap(action_list& other)
-        {
-            actions_.swap(other.actions_);
-        }
-
-        auto length() const
-            -> std::uint16_t
-        {
-            using boost::adaptors::transformed;
-            return boost::accumulate(actions_ | transformed([](any_action const& action) {
-                        return action.length();
-            }), std::uint16_t{0});
-        }
-
-        template <class Action>
-        void add(Action&& action)
-        {
-            actions_.emplace_back(std::forward<Action>(action));
-        }
-
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            boost::for_each(actions_, [&](any_action const& action) {
-                action.encode(container);
-            });
-            return container;
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> action_list
-        {
-            auto actions = action_list{};
-            while (first != last) {
-                action_decoder::decode<void>(
-                        first, last, detail::add_helper<action_list>{actions});
-            }
-            return actions;
-        }
-
-    private:
-        std::vector<any_action> actions_;
-    };
+    using action_list
+        = detail::action_list<any_action, v10_detail::ofp_action_header>;
 
 } // namespace v10
 } // namespace ofp
 } // namespace net
 } // namespace canard
+
+#if !defined(CANARD_NET_OFP_HEADER_ONLY)
+# if defined(CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
+
+namespace canard {
+namespace net {
+namespace ofp {
+namespace detail {
+
+    extern template class action_list<
+        ofp::v10::any_action, ofp::v10::v10_detail::ofp_action_header
+    >;
+
+} // namespace detail
+} // namespace ofp
+} // namespace net
+} // namespace canard
+
+# endif
+#endif
 
 #endif // CANARD_NET_OFP_V10_ACTION_LIST_HPP

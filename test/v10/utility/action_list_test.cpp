@@ -126,8 +126,7 @@ BOOST_AUTO_TEST_SUITE(action_list_test)
       auto const action_list = ofp::v10::action_list::decode(it, binary.end());
 
       BOOST_TEST((it == binary.end()));
-      // TODO
-      BOOST_TEST(action_list.length() == sut.length());
+      BOOST_TEST(action_list == sut);
     }
     BOOST_AUTO_TEST_CASE(construct_empty_list_from_zero_size_binary)
     {
@@ -137,8 +136,7 @@ BOOST_AUTO_TEST_SUITE(action_list_test)
         = ofp::v10::action_list::decode(it, zero_size_binary.end());
 
       BOOST_TEST((it == zero_size_binary.end()));
-      // TODO
-      BOOST_TEST(action_list.length() == 0);
+      BOOST_TEST(action_list == ofp::v10::action_list{});
     }
   BOOST_AUTO_TEST_SUITE_END() // decode
 
