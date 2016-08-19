@@ -64,6 +64,13 @@ BOOST_AUTO_TEST_SUITE(any_queue_property_test)
 
       BOOST_TEST((v13::any_queue_property{max_rate1} != max_rate2));
     }
+    BOOST_AUTO_TEST_CASE(
+        is_false_if_right_operand_is_not_equal_value_property_but_equivalent)
+    {
+      BOOST_TEST(
+          (v13::any_queue_property{queue_props::max_rate{1200}}
+        != queue_props::max_rate{1201}));
+    }
     BOOST_AUTO_TEST_CASE(false_if_right_operand_is_different_type_prop)
     {
       auto const min_rate = queue_props::min_rate{1};
@@ -83,6 +90,13 @@ BOOST_AUTO_TEST_SUITE(any_queue_property_test)
       auto const max_rate2 = queue_props::max_rate{2};
 
       BOOST_TEST((max_rate2 != v13::any_queue_property{max_rate1}));
+    }
+    BOOST_AUTO_TEST_CASE(
+        is_false_if_left_operand_is_not_equal_value_property_but_equivalent)
+    {
+      BOOST_TEST(
+          (queue_props::min_rate{1201}
+        != v13::any_queue_property{queue_props::min_rate{1200}}));
     }
     BOOST_AUTO_TEST_CASE(false_if_left_operand_is_different_type_prop)
     {
@@ -148,6 +162,14 @@ BOOST_AUTO_TEST_SUITE(any_queue_property_test)
 
       BOOST_TEST(!equivalent(v13::any_queue_property{max_rate1}, max_rate2));
     }
+    BOOST_AUTO_TEST_CASE(
+        is_true_if_right_operand_is_not_equal_value_property_but_equivalent)
+    {
+      BOOST_TEST(
+          equivalent(
+              v13::any_queue_property{queue_props::max_rate{1200}}
+            , queue_props::max_rate{1201}));
+    }
     BOOST_AUTO_TEST_CASE(false_if_right_operand_is_different_type_prop)
     {
       auto const min_rate = queue_props::min_rate{1};
@@ -167,6 +189,14 @@ BOOST_AUTO_TEST_SUITE(any_queue_property_test)
       auto const max_rate2 = queue_props::max_rate{2};
 
       BOOST_TEST(!equivalent(max_rate2, v13::any_queue_property{max_rate1}));
+    }
+    BOOST_AUTO_TEST_CASE(
+        is_true_if_left_operand_is_not_equal_value_property_but_equivalent)
+    {
+      BOOST_TEST(
+          equivalent(
+              queue_props::min_rate{1201}
+            , v13::any_queue_property{queue_props::min_rate{1200}}));
     }
     BOOST_AUTO_TEST_CASE(false_if_left_operand_is_different_type_prop)
     {

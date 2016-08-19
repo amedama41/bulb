@@ -131,19 +131,33 @@ BOOST_AUTO_TEST_SUITE(output_test)
 
         BOOST_TEST((sut1 != sut2));
       }
-      BOOST_AUTO_TEST_CASE(false_if_len_is_not_equal)
-      {
-        auto const sut1 = actions::output{1, 0};
-        auto const sut2 = actions::output{1, 9};
-
-        BOOST_TEST((sut1 != sut2));
-      }
       BOOST_AUTO_TEST_CASE(false_if_port_and_len_are_not_equal)
       {
         auto const sut1 = actions::output{1, 0};
         auto const sut2 = actions::output{2, 9};
 
         BOOST_TEST((sut1 != sut2));
+      }
+      BOOST_AUTO_TEST_CASE(
+          is_false_if_port_is_equal_and_not_controller_and_max_len_is_not_equal)
+      {
+        BOOST_TEST(
+            (actions::output{protocol::OFPP_MAX, 1}
+          != actions::output{protocol::OFPP_MAX, 2}));
+      }
+      BOOST_AUTO_TEST_CASE(
+          is_false_if_port_is_controller_but_max_len_is_not_equal)
+      {
+        BOOST_TEST(
+            (actions::output{protocol::OFPP_CONTROLLER, 1}
+          != actions::output{protocol::OFPP_CONTROLLER, 2}));
+      }
+      BOOST_AUTO_TEST_CASE(
+          is_true_if_port_is_controller_and_max_len_is_equal)
+      {
+        BOOST_TEST(
+            (actions::output{protocol::OFPP_CONTROLLER, 3}
+          == actions::output{protocol::OFPP_CONTROLLER, 3}));
       }
       BOOST_AUTO_TEST_CASE(false_if_pad_is_not_equal)
       {
@@ -178,19 +192,36 @@ BOOST_AUTO_TEST_SUITE(output_test)
 
         BOOST_TEST(!equivalent(sut1, sut2));
       }
-      BOOST_AUTO_TEST_CASE(false_if_len_is_not_equal)
-      {
-        auto const sut1 = actions::output{1, 0};
-        auto const sut2 = actions::output{1, 9};
-
-        BOOST_TEST(!equivalent(sut1, sut2));
-      }
       BOOST_AUTO_TEST_CASE(false_if_port_and_len_are_not_equal)
       {
         auto const sut1 = actions::output{1, 0};
         auto const sut2 = actions::output{2, 9};
 
         BOOST_TEST(!equivalent(sut1, sut2));
+      }
+      BOOST_AUTO_TEST_CASE(
+          is_true_if_port_is_equal_and_not_controller_but_max_len_is_not_equal)
+      {
+        BOOST_TEST(
+            equivalent(
+                actions::output{protocol::OFPP_MAX, 1}
+              , actions::output{protocol::OFPP_MAX, 2}));
+      }
+      BOOST_AUTO_TEST_CASE(
+          is_false_if_both_ports_are_controller_and_max_len_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                actions::output{protocol::OFPP_CONTROLLER, 1}
+              , actions::output{protocol::OFPP_CONTROLLER, 2}));
+      }
+      BOOST_AUTO_TEST_CASE(
+          is_true_if_port_is_controller_and_max_len_is_equal)
+      {
+        BOOST_TEST(
+            equivalent(
+                actions::output{protocol::OFPP_CONTROLLER, 3}
+              , actions::output{protocol::OFPP_CONTROLLER, 3}));
       }
       BOOST_AUTO_TEST_CASE(true_if_pad_is_not_equal)
       {

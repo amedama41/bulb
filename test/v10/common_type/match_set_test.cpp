@@ -2,7 +2,10 @@
 #include <canard/network/openflow/v10/match_set.hpp>
 #include <boost/test/unit_test.hpp>
 
+#include <limits>
 #include <boost/asio/ip/address_v4.hpp>
+
+#include "../../test_utility.hpp"
 
 namespace of = canard::net::ofp;
 namespace v10 = of::v10;
@@ -245,82 +248,137 @@ BOOST_AUTO_TEST_SUITE(match_set_test)
         BOOST_TEST((sut.get<match::ipv4_src>() == boost::none));
     }
 
-    BOOST_FIXTURE_TEST_CASE(equality_test1, match_field_fixture)
-    {
-        auto const sut1 = v10::match_set{
+    BOOST_FIXTURE_TEST_SUITE(equality, match_field_fixture)
+      BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+      {
+        auto const sut = v10::match_set{
               in_port, eth_src, eth_dst, vlan_vid, vlan_pcp, eth_type
             , ip_dscp, ip_proto, ipv4_src, ipv4_dst, tcp_src, tcp_dst
         };
-        auto sut2 = v10::match_set{};
-        sut2.set(in_port);
-        sut2.set(eth_src);
-        sut2.set(eth_dst);
-        sut2.set(vlan_vid);
-        sut2.set(vlan_pcp);
-        sut2.set(eth_type);
-        sut2.set(ip_dscp);
-        sut2.set(ip_proto);
-        sut2.set(ipv4_src);
-        sut2.set(ipv4_dst);
-        sut2.set(tcp_src);
-        sut2.set(tcp_dst);
-        auto const sut3 = v10::match_set{
-              eth_src, eth_dst, vlan_vid, vlan_pcp, eth_type
+
+        BOOST_TEST((sut == sut));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_both_are_empty_set)
+      {
+        BOOST_TEST((v10::match_set{} == v10::match_set{}));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_fields_are_equal)
+      {
+        BOOST_TEST(
+            (v10::match_set{
+                 in_port, eth_src, eth_dst, vlan_vid, vlan_pcp, eth_type
+               , ip_dscp, ip_proto, ipv4_src, ipv4_dst, tcp_src, tcp_dst
+             }
+          == v10::match_set{
+                 in_port, eth_src, eth_dst, vlan_vid, vlan_pcp, eth_type
+               , ip_dscp, ip_proto, ipv4_src, ipv4_dst, tcp_src, tcp_dst
+             }));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_field_is_not_equal)
+      {
+        BOOST_TEST(
+            (v10::match_set{match::in_port{1}}
+          != v10::match_set{match::in_port{2}}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_field_is_not_equal_but_equivalent)
+      {
+        BOOST_TEST(
+            (v10::match_set{match::ipv4_src{"10.0.0.2"_ipv4, 8}}
+          != v10::match_set{match::ipv4_src{"10.0.0.1"_ipv4, 8}}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_size_is_not_equal)
+      {
+        BOOST_TEST(
+            (v10::match_set{in_port, ip_proto} != v10::match_set{in_port}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_wildcards_is_not_equal_but_equivalent)
+      {
+        auto match = detail::ofp_match{};
+        match.wildcards = proto::OFPFW_ALL;
+        auto const sut1 = v10::match_set{match};
+        match.wildcards = std::numeric_limits<std::uint32_t>::max();
+        auto const sut2 = v10::match_set{match};
+
+        BOOST_TEST((sut1 != sut2));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_padding_is_not_equal)
+      {
+        auto match = detail::ofp_match{};
+        auto const sut1 = v10::match_set{match};
+        match.pad1[0] = 0xff;
+        auto const sut2 = v10::match_set{match};
+
+        BOOST_TEST((sut1 != sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_FIXTURE_TEST_SUITE(function_equivalent, match_field_fixture)
+      BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+      {
+        auto const sut = v10::match_set{
+              in_port, eth_src, eth_dst, vlan_vid, vlan_pcp, eth_type
             , ip_dscp, ip_proto, ipv4_src, ipv4_dst, tcp_src, tcp_dst
         };
-        auto sut4 = v10::match_set{};
-        sut4.set(eth_src);
-        sut4.set(eth_dst);
-        sut4.set(vlan_vid);
-        sut4.set(vlan_pcp);
-        sut4.set(eth_type);
-        sut4.set(ip_dscp);
-        sut4.set(ip_proto);
-        sut4.set(ipv4_src);
-        sut4.set(ipv4_dst);
-        sut4.set(tcp_src);
-        sut4.set(tcp_dst);
 
-        BOOST_TEST((sut1 == sut1));
-        BOOST_TEST((sut1 == sut2));
-        BOOST_TEST((sut1 != sut3));
-        BOOST_TEST((sut1 != sut4));
-        BOOST_TEST((sut3 == sut4));
-    }
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_both_are_empty_set)
+      {
+        BOOST_TEST(equivalent(v10::match_set{}, v10::match_set{}));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_fields_are_equal)
+      {
+        BOOST_TEST(
+            equivalent(
+                v10::match_set{
+                    in_port, eth_src, eth_dst, vlan_vid, vlan_pcp, eth_type
+                  , ip_dscp, ip_proto, ipv4_src, ipv4_dst, tcp_src, tcp_dst
+                }
+              , v10::match_set{
+                    in_port, eth_src, eth_dst, vlan_vid, vlan_pcp, eth_type
+                  , ip_dscp, ip_proto, ipv4_src, ipv4_dst, tcp_src, tcp_dst
+                }));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_field_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                v10::match_set{match::in_port{1}}
+              , v10::match_set{match::in_port{2}}));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_field_is_not_equal_but_equivalent)
+      {
+        BOOST_TEST(
+            equivalent(
+                v10::match_set{match::ipv4_src{"10.0.0.2"_ipv4, 8}}
+              , v10::match_set{match::ipv4_src{"10.0.0.1"_ipv4, 8}}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_size_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+              v10::match_set{in_port, ip_proto}, v10::match_set{in_port}));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_wildcards_is_not_equal_but_equivalent)
+      {
+        auto match = detail::ofp_match{};
+        match.wildcards = proto::OFPFW_ALL;
+        auto const sut1 = v10::match_set{match};
+        match.wildcards = std::numeric_limits<std::uint32_t>::max();
+        auto const sut2 = v10::match_set{match};
 
-    BOOST_AUTO_TEST_CASE(equality_test2)
-    {
-        auto const sut1 = v10::match_set{};
-        auto const sut2 = v10::match_set{};
-        auto const sut3 = v10::match_set{match::ip_proto{17}};
+        BOOST_TEST(equivalent(sut1, sut2));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_padding_is_not_equal)
+      {
+        auto match = detail::ofp_match{};
+        auto const sut1 = v10::match_set{match};
+        match.pad1[0] = 0xff;
+        auto const sut2 = v10::match_set{match};
 
-        BOOST_TEST((sut1 == sut1));
-        BOOST_TEST((sut1 == sut2));
-        BOOST_TEST((sut1 != sut3));
-    }
-
-    BOOST_FIXTURE_TEST_CASE(equality_test3, match_field_fixture)
-    {
-        auto const ipv4_src1
-            = match::ipv4_src{address_v4::from_string("192.168.1.0"), 24};
-        auto const ipv4_src2
-            = match::ipv4_src{address_v4::from_string("192.168.1.1"), 24};
-        auto const ipv4_src3
-            = match::ipv4_src{address_v4::from_string("192.168.1.0"), 32};
-        auto const sut1 = v10::match_set{
-              in_port, eth_src, vlan_vid, vlan_pcp, ip_dscp, ipv4_src1, tcp_src
-        };
-        auto const sut2 = v10::match_set{
-              in_port, eth_src, vlan_vid, vlan_pcp, ip_dscp, ipv4_src2, tcp_src
-        };
-        auto const sut3 = v10::match_set{
-              in_port, eth_src, vlan_vid, vlan_pcp, ip_dscp, ipv4_src3, tcp_src
-        };
-
-        BOOST_TEST((sut1 == sut1));
-        BOOST_TEST((sut1 == sut2));
-        BOOST_TEST((sut1 != sut3));
-    }
+        BOOST_TEST(equivalent(sut1, sut2));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
 BOOST_AUTO_TEST_SUITE_END() // match_set_test
 BOOST_AUTO_TEST_SUITE_END() // common_types_test

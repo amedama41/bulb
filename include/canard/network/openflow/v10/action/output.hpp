@@ -91,7 +91,7 @@ namespace actions {
         raw_ofp_type action_output_;
     };
 
-    inline auto operator==(output const& lhs, output const& rhs) noexcept
+    inline auto equivalent(output const& lhs, output const& rhs) noexcept
         -> bool
     {
         if (lhs.port_no() == protocol::OFPP_CONTROLLER) {

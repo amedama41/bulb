@@ -6,6 +6,7 @@
 #include <boost/asio/ip/address_v4.hpp>
 #include <boost/fusion/container/map.hpp>
 #include <boost/fusion/sequence/intrinsic/at_c.hpp>
+#include <boost/fusion/sequence/intrinsic/value_at.hpp>
 #include <boost/fusion/sequence/intrinsic/value_at_key.hpp>
 #include <boost/fusion/support/pair.hpp>
 #include <canard/network/openflow/detail/is_same_value_type.hpp>
@@ -65,6 +66,19 @@ namespace actions {
             };
         }
 
+        inline auto to_ofp_action(
+                std::uint8_t const value, set_field_info<match::ip_dscp>) noexcept
+            -> set_field_info<match::ip_dscp>::raw_ofp_type
+        {
+            using info = set_field_info<match::ip_dscp>;
+            return info::raw_ofp_type{
+                  info::action_type
+                , sizeof(info::raw_ofp_type)
+                , std::uint8_t(std::uint32_t{value} << 2)
+                , { 0, 0, 0 }
+            };
+        }
+
         template <class SetFieldInfo>
         auto to_ofp_action(
                 boost::asio::ip::address_v4 const& value, SetFieldInfo) noexcept
@@ -95,18 +109,28 @@ namespace actions {
 
         template <class OFPAction>
         auto access(OFPAction const& action_set_field) noexcept
-            -> typename boost::fusion::result_of::at_c<OFPAction const, 2>::type
+            -> typename boost::fusion::result_of::value_at_c<OFPAction, 2>::type
         {
             return boost::fusion::at_c<2>(action_set_field);
         }
 
-        auto access(v10_detail::ofp_action_dl_addr const& set_dl_addr) noexcept
+        inline auto access(
+                v10_detail::ofp_action_nw_tos const& set_nw_tos) noexcept
+            -> typename boost::fusion::result_of::value_at_c<
+                   v10_detail::ofp_action_nw_tos, 2
+               >::type
+        {
+            return std::uint32_t{boost::fusion::at_c<2>(set_nw_tos)} >> 2;
+        }
+
+        inline auto access(
+                v10_detail::ofp_action_dl_addr const& set_dl_addr) noexcept
             -> canard::mac_address
         {
             return canard::mac_address{set_dl_addr.dl_addr};
         }
 
-        auto access(v10_detail::ofp_action_nw_addr const& set_nw_addr)
+        inline auto access(v10_detail::ofp_action_nw_addr const& set_nw_addr)
             -> boost::asio::ip::address_v4
         {
             return boost::asio::ip::address_v4{set_nw_addr.nw_addr};
@@ -183,7 +207,7 @@ namespace actions {
     };
 
     template <class MatchField>
-    auto operator==(
+    auto equivalent(
               set_field<MatchField> const& lhs
             , set_field<MatchField> const& rhs) noexcept
         -> bool

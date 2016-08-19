@@ -2,54 +2,55 @@ INCLUDES = -I../../include
 LDFLAGS = -lboost_unit_test_framework-mt -lboost_system-mt
 CXX = clang++
 # CXX = g++-4.9
-CXXFLAGS = -std=c++11 -stdlib=libc++ -Wall -pedantic $(INCLUDES)
+CXXFLAGS = -std=c++11 -stdlib=libc++ -Wall -pedantic -DCANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION $(INCLUDES)
 # CXXFLAGS = -std=c++11 -Wall -pedantic $(INCLUDES)
 
-SUB_DIRECTORIES = action \
-				  common_type
-TEST_LIBRARIES = $(foreach dir,$(SUB_DIRECTORIES),./$(dir)/lib$(dir)_test.dylib)
-LINKED_LIBRARIES = $(foreach dir,$(SUB_DIRECTORIES),-L./$(dir) -l$(dir)_test)
-LIBRARIES_RPATH = $(foreach dir,$(SUB_DIRECTORIES),-rpath @executable_path/./$(dir))
+LIBBULB_DIR = libbulb
+LIBBULB_LIB = ./$(LIBBULB_DIR)/libbulb.dylib
+LIBBULB_RPATH = -rpath @executable_path/./$(LIBBULB_DIR)
+
+TEST_DIRS = action \
+			common_type \
+			queue_property \
+			utility
+TEST_LIBS = $(foreach dir,$(TEST_DIRS),./$(dir)/lib$(dir)_test.dylib)
+TEST_RPATH = $(foreach dir,$(TEST_DIRS),-rpath @executable_path/./$(dir))
+
+ALL_SUBDIRS = $(LIBBULB_DIR) $(TEST_DIRS)
+ALL_LIBS = $(LIBBULB_LIB) $(TEST_LIBS)
+ALL_RPATH = $(LIBBULB_RPATH) $(TEST_RPATH)
 
 TARGET = all_test.out
 
-define build_test
-$(CXX) -DBOOST_TEST_MODULE=$@ $(CXXFLAGS) -c ../driver.cpp -o ../driver.o
-$(CXX) $(CXXFLAGS) -o $@ ../driver.o $^ $(LDFLAGS) $(LIBRARIES_RPATH)
-endef
-
 define make_each_subdirectories
-@for dir in $(SUB_DIRECTORIES); do \
+@for dir in $(ALL_SUBDIRS); do \
 	$(MAKE) -C ./$$dir $@; \
 done
 endef
 
-.PHONY: all clean clean_all run
+.PHONY: all lib run dep clean clean_dep clean_all
 
-all: $(TARGET)
+all: lib $(TARGET)
 
-.%.depends: %.cpp
-	$(CXX) -MM $(CXXFLAGS) $< > $@
-
-%: %.o
-	$(build_test)
-
-$(TARGET): $(TEST_LIBRARIES) $(OBJS)
-	$(build_test)
-
-$(TEST_LIBRARIES):
-	$(MAKE) -C $(dir $@) $(notdir $@)
+lib:
+	$(make_each_subdirectories)
 
 run: all
 	./$(TARGET)
 
+dep:
+	$(make_each_subdirectories)
+
 clean:
-	-rm *.o $(ALL_TESTS) $(TARGET) 2> /dev/null
+	$(make_each_subdirectories)
+
+clean_dep:
 	$(make_each_subdirectories)
 
 clean_all:
-	-rm *.o $(DEPENDS) $(ALL_TESTS) $(TARGET) 2> /dev/null
 	$(make_each_subdirectories)
 
--include $(DEPENDS)
+$(TARGET): $(ALL_LIBS)
+	$(CXX) -DBOOST_TEST_MODULE=$@ $(CXXFLAGS) -c ../driver.cpp -o ../driver.o
+	$(CXX) $(CXXFLAGS) -o $@ ../driver.o $^ $(LDFLAGS) $(ALL_RPATH)
 

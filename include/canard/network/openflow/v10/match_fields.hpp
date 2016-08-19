@@ -65,7 +65,7 @@ namespace v10 {
         };
 
         template <class T, class FieldType>
-        void validate(T const&, FieldType) noexcept
+        void validate(T const, FieldType) noexcept
         {
         }
 
@@ -98,14 +98,6 @@ namespace v10 {
         {
             if (vlan_pcp > 0x07) {
                 throw std::runtime_error{"invalid vlan pcp"};
-            }
-        }
-
-        inline void validate(
-                std::uint8_t const ip_dscp, field_type<protocol::OFPFW_NW_TOS>)
-        {
-            if (ip_dscp > 0x3f) {
-                throw std::runtime_error{"invalid dscp"};
             }
         }
 
@@ -163,13 +155,13 @@ namespace v10 {
                 v10_detail::ofp_match, member_index
             >::type;
 
-            explicit match_field(value_type const& value) noexcept
+            explicit match_field(value_type const value) noexcept
                 : value_(value)
             {
             }
 
             auto value() const noexcept
-                -> value_type const&
+                -> value_type
             {
                 return value_;
             }
@@ -185,18 +177,35 @@ namespace v10 {
                 return std::forward<MatchField>(field);
             }
 
-            static auto create(value_type const& value)
+            static auto create(value_type const value)
                 -> match_field
             {
                 return validate(match_field{value});
             }
 
+            template <class FieldType2>
+            friend auto operator==(
+                      match_field<FieldType2> const&
+                    , match_field<FieldType2> const&) noexcept
+                -> bool;
+
         private:
+            explicit match_field(v10_detail::ofp_match const& match)
+                : value_(boost::fusion::at<member_index>(match))
+            {
+            }
+
+            auto equal_impl(match_field const& rhs) const noexcept
+                -> bool
+            {
+                return value_ == rhs.value_;
+            }
+
             friend match_set;
 
             void set_value(v10_detail::ofp_match& match) const noexcept
             {
-                boost::fusion::at<member_index>(match) = value();
+                boost::fusion::at<member_index>(match) = value_;
                 match.wildcards &= ~FieldType::value;
             }
 
@@ -210,7 +219,7 @@ namespace v10 {
                     v10_detail::ofp_match const& match) noexcept
                 -> match_field
             {
-                return match_field{boost::fusion::at<member_index>(match)};
+                return match_field{match};
             }
 
             static void erase_from_match(v10_detail::ofp_match& match) noexcept
@@ -224,25 +233,33 @@ namespace v10 {
         };
 
         template <>
-        inline void
+        inline
         match_field<match_detail::field_type<protocol::OFPFW_NW_TOS>>
-        ::set_value(v10_detail::ofp_match& match) const noexcept
+        ::match_field(value_type dscp) noexcept
+            : value_(std::uint32_t{dscp} << 2)
         {
-            boost::fusion::at<member_index>(match) = value() << 2;
-            match.wildcards &= ~protocol::OFPFW_NW_TOS;
         }
 
         template <>
         inline auto
         match_field<match_detail::field_type<protocol::OFPFW_NW_TOS>>
-        ::create_from_match(v10_detail::ofp_match const& match) noexcept
-            -> match_field
+        ::value() const noexcept
+            -> value_type
         {
-            return match_field{boost::fusion::at<member_index>(match) >> 2};
+            return std::uint32_t{value_} >> 2;
         }
 
         template <class FieldType>
         auto operator==(
+                  match_field<FieldType> const& lhs
+                , match_field<FieldType> const& rhs) noexcept
+            -> bool
+        {
+            return lhs.equal_impl(rhs);
+        }
+
+        template <class FieldType>
+        auto equivalent(
                   match_field<FieldType> const& lhs
                 , match_field<FieldType> const& rhs) noexcept
             -> bool
@@ -259,13 +276,13 @@ namespace v10 {
             using field_type = FieldType;
             using value_type = canard::mac_address;
 
-            explicit dl_addr_match_field(value_type const& value)
+            explicit dl_addr_match_field(value_type const value)
                 : value_(value)
             {
             }
 
             auto value() const noexcept
-                -> value_type const&
+                -> value_type const
             {
                 return value_;
             }
@@ -280,7 +297,7 @@ namespace v10 {
                 return std::forward<MatchField>(field);
             }
 
-            static auto create(value_type const& value)
+            static auto create(value_type const value)
                 -> dl_addr_match_field
             {
                 return validate(dl_addr_match_field{value});
@@ -333,6 +350,15 @@ namespace v10 {
             return lhs.value() == rhs.value();
         }
 
+        template <class FieldType>
+        auto equivalent(
+                  dl_addr_match_field<FieldType> const& lhs
+                , dl_addr_match_field<FieldType> const& rhs) noexcept
+            -> bool
+        {
+            return lhs == rhs;
+        }
+
 
         template <class FieldType>
         class nw_addr_match_field
@@ -348,23 +374,25 @@ namespace v10 {
             using field_type = FieldType;
             using value_type = boost::asio::ip::address_v4;
 
+            static constexpr std::uint8_t max_prefix_length = 32;
+
             explicit nw_addr_match_field(
-                      value_type const& value
-                    , std::uint8_t const prefix_length = 32)
+                      value_type const value
+                    , std::uint8_t const prefix_length = max_prefix_length)
                 : value_(value)
-                , prefix_length_(prefix_length)
+                , wildcard_bit_count_(max_prefix_length - prefix_length)
             {
             }
 
             explicit nw_addr_match_field(
                       boost::asio::ip::address const value
-                    , std::uint8_t const prefix_length = 32)
+                    , std::uint8_t const prefix_length = max_prefix_length)
                 : nw_addr_match_field{value.to_v4(), prefix_length}
             {
             }
 
             auto value() const noexcept
-                -> value_type const&
+                -> value_type
             {
                 return value_;
             }
@@ -372,13 +400,14 @@ namespace v10 {
             auto prefix_length() const noexcept
                 -> std::uint8_t
             {
-                return prefix_length_;
+                constexpr auto tmp = max_prefix_length; // avoid odr-used
+                return max_prefix_length - std::min(wildcard_bit_count_, tmp);
             }
 
             auto wildcard_bit_count() const noexcept
-                -> std::uint32_t
+                -> std::uint8_t
             {
-                return 32 - prefix_length();
+                return wildcard_bit_count_;
             }
 
             template <class MatchField>
@@ -388,28 +417,41 @@ namespace v10 {
                     , MatchField&&
                    >::type
             {
-                if (field.prefix_length() > 32) {
-                    throw std::runtime_error{"invalid prefix length"};
+                constexpr auto max_wildcard_bit_count
+                    = mask_info::mask >> mask_info::shift;
+                if (field.wildcard_bit_count_ > max_wildcard_bit_count) {
+                    throw std::runtime_error{"invalid wildcard"};
                 }
                 return std::forward<MatchField>(field);
             }
 
             template <class IPAddress>
             static auto create(
-                    IPAddress const& value, std::uint8_t const prefix_length)
+                    IPAddress const value, std::uint8_t const prefix_length)
                 -> nw_addr_match_field
             {
+                if (prefix_length > max_prefix_length) {
+                    throw std::runtime_error{"invalid prefix length"};
+                }
                 return validate(nw_addr_match_field{value, prefix_length});
             }
 
         private:
+            explicit nw_addr_match_field(v10_detail::ofp_match const& match)
+                : value_{boost::fusion::at<member_index>(match)}
+                , wildcard_bit_count_(
+                        (match.wildcards & mask_info::mask) >> mask_info::shift)
+            {
+            }
+
             friend match_set;
 
             void set_value(v10_detail::ofp_match& match) const noexcept
             {
                 boost::fusion::at<member_index>(match) = value().to_ulong();
                 match.wildcards &= ~mask_info::mask;
-                match.wildcards |= (wildcard_bit_count() << mask_info::shift);
+                match.wildcards
+                    |= (std::uint32_t{wildcard_bit_count_} << mask_info::shift);
             }
 
             static auto is_wildcard(v10_detail::ofp_match const& match) noexcept
@@ -421,10 +463,7 @@ namespace v10 {
             static auto create_from_match(v10_detail::ofp_match const& match)
                 -> nw_addr_match_field
             {
-                return nw_addr_match_field{
-                      value_type{boost::fusion::at<member_index>(match)}
-                    , calc_prefix_length(match)
-                };
+                return nw_addr_match_field{match};
             }
 
             static void erase_from_match(v10_detail::ofp_match& match) noexcept
@@ -433,18 +472,9 @@ namespace v10 {
                 match.wildcards |= FieldType::value;
             }
 
-            static auto calc_prefix_length(
-                    v10_detail::ofp_match const& match) noexcept
-                -> std::uint8_t
-            {
-                auto const mask_value
-                    = (match.wildcards & mask_info::mask) >> mask_info::shift;
-                return 32 - mask_value;
-            }
-
         private:
             value_type value_;
-            std::uint8_t prefix_length_;
+            std::uint8_t wildcard_bit_count_;
         };
 
         template <class FieldType>
@@ -453,7 +483,17 @@ namespace v10 {
                 , nw_addr_match_field<FieldType> const& rhs) noexcept
             -> bool
         {
-            return lhs.prefix_length() == rhs.prefix_length()
+            return lhs.wildcard_bit_count() == rhs.wildcard_bit_count()
+                && lhs.value() == rhs.value();
+        }
+
+        template <class FieldType>
+        auto equivalent(
+                  nw_addr_match_field<FieldType> const& lhs
+                , nw_addr_match_field<FieldType> const& rhs) noexcept
+            -> bool
+        {
+            return lhs.wildcard_bit_count() == rhs.wildcard_bit_count()
                 && (lhs.value().to_ulong() >> lhs.wildcard_bit_count())
                 == (rhs.value().to_ulong() >> rhs.wildcard_bit_count());
         }

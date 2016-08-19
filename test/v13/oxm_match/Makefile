@@ -16,5 +16,5 @@ SRCS = match_field_test.cpp \
 	   ipv6_exthdr_test.cpp
 TARGET_LIB = liboxm_match_test.dylib
 
--include ../subdirectories.mk
+-include ../../subdirectories.mk
 

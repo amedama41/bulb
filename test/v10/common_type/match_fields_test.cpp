@@ -9,6 +9,8 @@
 #include <boost/asio/ip/address.hpp>
 #include <boost/asio/ip/address_v4.hpp>
 
+#include "../../test_utility.hpp"
+
 namespace of = canard::net::ofp;
 namespace v10 = of::v10;
 namespace detail = v10::v10_detail;
@@ -31,16 +33,43 @@ BOOST_AUTO_TEST_SUITE(in_port_test)
         BOOST_TEST(sut.value() == port_no);
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
-        auto const sut1 = match::in_port{1};
-        auto const sut2 = match::in_port{1};
-        auto const sut3 = match::in_port{2};
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+      {
+        auto const sut = match::in_port{1};
 
-        BOOST_TEST((sut1 == sut1));
-        BOOST_TEST((sut1 == sut2));
-        BOOST_TEST((sut1 != sut3));
-    }
+        BOOST_TEST((sut == sut));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_port_is_equal)
+      {
+        auto const port = std::uint16_t{proto::OFPP_MAX};
+
+        BOOST_TEST((match::in_port{port} == match::in_port{port}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_port_is_not_equal)
+      {
+        BOOST_TEST((match::in_port{1} != match::in_port{2}));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+      {
+        auto const sut = match::in_port{1};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_port_is_equal)
+      {
+        auto const port = std::uint16_t{proto::OFPP_MAX};
+
+        BOOST_TEST(equivalent(match::in_port{port}, match::in_port{port}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_port_is_not_equal)
+      {
+        BOOST_TEST(!equivalent(match::in_port{1}, match::in_port{2}));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_DATA_TEST_CASE(
               create_success_test
@@ -148,16 +177,67 @@ BOOST_AUTO_TEST_SUITE(ip_dscp_test)
         BOOST_TEST(sut.value() == dscp);
     }
 
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+      {
+        auto const sut = match::ip_dscp{0x01};
+
+        BOOST_TEST((sut == sut));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_dscp_is_equal)
+      {
+        auto const dscp = 0x1f;
+
+        BOOST_TEST((match::ip_dscp{dscp} == match::ip_dscp{dscp}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_dscp_is_not_equal)
+      {
+        BOOST_TEST((match::ip_dscp{0x01} != match::ip_dscp{0x02}));
+      }
+      // BOOST_AUTO_TEST_CASE(
+      //     is_false_if_dspc_is_equal_but_tos_lower_2_bits_are_not_equal)
+      // {
+      //   auto const dscp = std::uint32_t{0x11};
+      //   auto match = detail::ofp_match{};
+      //   match.nw_tos = dscp << 2 | 0x3;
+
+      //   BOOST_TEST((match::ip_dscp{dscp} != match::ip_dscp{match}));
+      // }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+      {
+        auto const sut = match::ip_dscp{0x01};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_dscp_is_equal)
+      {
+        auto const dscp = 0x1f;
+
+        BOOST_TEST(equivalent(match::ip_dscp{dscp}, match::ip_dscp{dscp}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_dscp_is_not_equal)
+      {
+        BOOST_TEST(!equivalent(match::ip_dscp{0x01}, match::ip_dscp{0x02}));
+      }
+      // BOOST_AUTO_TEST_CASE(
+      //     is_true_if_dspc_is_equal_but_tos_lower_2_bits_are_not_equal)
+      // {
+      //   auto const dscp = std::uint32_t{0x11};
+      //   auto match = detail::ofp_match{};
+      //   match.nw_tos = dscp << 2 | 0x3;
+
+      //   BOOST_TEST(equivalent(match::ip_dscp{dscp}, match::ip_dscp{match}));
+      // }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
+
     BOOST_DATA_TEST_CASE(create_success_test, bdata::xrange(0x00, 0x40), dscp)
     {
         auto const sut = match::ip_dscp::create(dscp);
 
         BOOST_TEST(sut.value() == dscp);
-    }
-
-    BOOST_DATA_TEST_CASE(create_failure_test, bdata::xrange(0x40, 0xff), dscp)
-    {
-        BOOST_CHECK_THROW(match::ip_dscp::create(dscp), std::runtime_error);
     }
 
 BOOST_AUTO_TEST_SUITE_END() // ip_dscp_test
@@ -174,22 +254,48 @@ BOOST_AUTO_TEST_SUITE(eth_src_test)
         BOOST_TEST(sut.value() == addr);
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
-        auto const sut1 = match::eth_src{
-            canard::mac_address{{0x01, 0x02, 0x03, 0x04, 0x05, 0x06}}
-        };
-        auto const sut2 = match::eth_src{
-            canard::mac_address{{0x01, 0x02, 0x03, 0x04, 0x05, 0x06}}
-        };
-        auto const sut3 = match::eth_src{
-            canard::mac_address{{0x11, 0x12, 0x13, 0x14, 0x15, 0x16}}
-        };
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+      {
+        auto const sut = match::eth_src{"\x01\x02\x03\x04\x05\x06"_mac};
 
-        BOOST_TEST((sut1 == sut1));
-        BOOST_TEST((sut1 == sut2));
-        BOOST_TEST((sut1 != sut3));
-    }
+        BOOST_TEST((sut == sut));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_address_is_equal)
+      {
+        auto const addr = "\x01\x02\x03\x04\x05\x06"_mac;
+
+        BOOST_TEST((match::eth_src{addr} == match::eth_src{addr}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_address_is_not_equal)
+      {
+        BOOST_TEST(
+            (match::eth_src{"\x01\x02\x03\x04\x05\x06"_mac}
+          != match::eth_src{"\x11\x12\x13\x14\x15\x16"_mac}));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+      {
+        auto const sut = match::eth_src{"\x01\x02\x03\x04\x05\x06"_mac};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_address_is_equal)
+      {
+        auto const addr = "\x01\x02\x03\x04\x05\x06"_mac;
+
+        BOOST_TEST(equivalent(match::eth_src{addr}, match::eth_src{addr}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_address_is_not_equal)
+      {
+        BOOST_TEST(
+            !equivalent(
+                match::eth_src{"\x01\x02\x03\x04\x05\x06"_mac}
+              , match::eth_src{"\x11\x12\x13\x14\x15\x16"_mac}));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_AUTO_TEST_CASE(create_test)
     {
@@ -251,26 +357,87 @@ BOOST_AUTO_TEST_SUITE(ipv4_src_test)
         BOOST_TEST(sut.wildcard_bit_count() == 32 - prefix_length);
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
-        using boost::asio::ip::address;
-        auto const sut1
-            = match::ipv4_src{address::from_string("192.168.1.0"), 24};
-        auto const sut2
-            = match::ipv4_src{address::from_string("192.168.1.0"), 24};
-        auto const sut3
-            = match::ipv4_src{address::from_string("192.168.1.1"), 24};
-        auto const sut4
-            = match::ipv4_src{address::from_string("192.168.1.0"), 16};
-        auto const sut5
-            = match::ipv4_src{address::from_string("192.168.1.1"), 16};
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+      {
+        auto const sut = match::ipv4_src{"192.168.1.0"_ipv4, 24};
 
-        BOOST_TEST((sut1 == sut1));
-        BOOST_TEST((sut1 == sut2));
-        BOOST_TEST((sut1 == sut3));
-        BOOST_TEST((sut1 != sut4));
-        BOOST_TEST((sut1 != sut5));
-    }
+        BOOST_TEST((sut == sut));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_address_and_prefix_length_are_equal)
+      {
+        auto const addr = "192.168.1.0"_ipv4;
+        auto const prefix_len = 16;
+
+        BOOST_TEST(
+            (match::ipv4_src{addr, prefix_len}
+          == match::ipv4_src{addr, prefix_len}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_address_is_not_equal)
+      {
+        auto const prefix_len = 32;
+
+        BOOST_TEST(
+            (match::ipv4_src{"192.168.1.1"_ipv4, prefix_len}
+          != match::ipv4_src{"192.168.1.2"_ipv4, prefix_len}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_prefix_length_is_not_equal)
+      {
+        auto const addr = "192.168.1.1"_ipv4;
+
+        BOOST_TEST((match::ipv4_src{addr, 16} != match::ipv4_src{addr, 8}));
+      }
+      BOOST_AUTO_TEST_CASE(
+          is_false_if_prefix_address_is_equal_but_other_is_not_equal)
+      {
+        BOOST_TEST(
+            (match::ipv4_src{"192.168.1.1"_ipv4, 16}
+          != match::ipv4_src{"192.168.2.1"_ipv4, 16}));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+      {
+        auto const sut = match::ipv4_src{"192.168.1.0"_ipv4, 24};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_address_and_prefix_length_are_equal)
+      {
+        auto const addr = "192.168.1.0"_ipv4;
+        auto const prefix_len = 16;
+
+        BOOST_TEST(
+            equivalent(
+                match::ipv4_src{addr, prefix_len}
+              , match::ipv4_src{addr, prefix_len}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_address_is_not_equal)
+      {
+        auto const prefix_len = 32;
+
+        BOOST_TEST(
+            !equivalent(
+                match::ipv4_src{"192.168.1.1"_ipv4, prefix_len}
+              , match::ipv4_src{"192.168.1.2"_ipv4, prefix_len}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_prefix_length_is_not_equal)
+      {
+        auto const addr = "192.168.1.1"_ipv4;
+
+        BOOST_TEST(
+            !equivalent(match::ipv4_src{addr, 16} , match::ipv4_src{addr, 8}));
+      }
+      BOOST_AUTO_TEST_CASE(
+          is_true_if_prefix_address_is_equal_but_other_is_not_equal)
+      {
+        BOOST_TEST(
+            equivalent(
+                match::ipv4_src{"192.168.1.1"_ipv4, 16}
+              , match::ipv4_src{"192.168.2.1"_ipv4, 16}));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_DATA_TEST_CASE(
               create_success_test
@@ -288,7 +455,7 @@ BOOST_AUTO_TEST_SUITE(ipv4_src_test)
 
     BOOST_DATA_TEST_CASE(
               create_failure_test
-            , bdata::make(std::vector<std::uint8_t>{33, 64, 128, 255})
+            , bdata::make(std::vector<std::uint8_t>{33, 64, 128, 224})
             , prefix_length)
     {
         auto const addr = boost::asio::ip::address::from_string("192.168.2.1");

@@ -27,6 +27,9 @@ struct enqueue_fixture
     std::vector<std::uint8_t> binary
         = "\x00\x0b\x00\x10\xff\x00\x00\x00""\x00\x00\x00\x00\x12\x34\x56\x78"
           ""_bin;
+    std::vector<unsigned char> const non_zero_padding_binary
+        = "\x00\x0b\x00\x10\x12\x34\x00\x00"
+          "\x00\x00\x00\x01\x12\x34\x56\x78"_bin;
 };
 
 }
@@ -74,18 +77,90 @@ BOOST_AUTO_TEST_SUITE(enqueue_test)
                 , std::runtime_error);
     }
 
-    BOOST_AUTO_TEST_CASE(equality_test)
-    {
-        auto const sut1 = actions::enqueue{1, v10::protocol::OFPP_MAX};
-        auto const sut2 = actions::enqueue{1, v10::protocol::OFPP_MAX};
-        auto const sut3 = actions::enqueue{2, v10::protocol::OFPP_MAX};
-        auto const sut4 = actions::enqueue{1, 1};
+    BOOST_AUTO_TEST_SUITE(equality)
+      BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+      {
+        auto const sut = actions::enqueue{1, v10::protocol::OFPP_MAX};
 
-        BOOST_TEST((sut1 == sut1));
-        BOOST_TEST((sut1 == sut2));
-        BOOST_TEST((sut1 != sut3));
-        BOOST_TEST((sut1 != sut4));
-    }
+        BOOST_TEST((sut == sut));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_queue_id_and_port_no_are_equal)
+      {
+        auto const queue_id = std::uint32_t{1};
+        auto const port_no = std::uint16_t{1};
+
+        BOOST_TEST(
+            (actions::enqueue{queue_id, port_no}
+          == actions::enqueue{queue_id, port_no}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_queue_id_is_different)
+      {
+        auto const port_no = std::uint16_t{1};
+
+        BOOST_TEST(
+            (actions::enqueue{3, port_no} != actions::enqueue{4, port_no}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_port_no_is_different)
+      {
+        auto const queue_id = std::uint32_t{1};
+
+        BOOST_TEST(
+            (actions::enqueue{queue_id, 1} != actions::enqueue{queue_id, 2}));
+      }
+      BOOST_FIXTURE_TEST_CASE(is_false_if_padding_is_different, enqueue_fixture)
+      {
+        auto it = non_zero_padding_binary.begin();
+        auto const non_zero_padding
+          = actions::enqueue::decode(it, non_zero_padding_binary.end());
+
+        BOOST_TEST(
+            (actions::enqueue{0x12345678, 0x1234} != non_zero_padding));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // equality
+
+    BOOST_AUTO_TEST_SUITE(function_equivalent)
+      BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+      {
+        auto const sut = actions::enqueue{1, v10::protocol::OFPP_MAX};
+
+        BOOST_TEST(equivalent(sut, sut));
+      }
+      BOOST_AUTO_TEST_CASE(is_true_if_queue_id_and_port_no_are_equal)
+      {
+        auto const queue_id = std::uint32_t{1};
+        auto const port_no = std::uint16_t{1};
+
+        BOOST_TEST(
+            equivalent(
+                actions::enqueue{queue_id, port_no}
+              , actions::enqueue{queue_id, port_no}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_queue_id_is_different)
+      {
+        auto const port_no = std::uint16_t{1};
+
+        BOOST_TEST(
+            !equivalent(
+              actions::enqueue{3, port_no}, actions::enqueue{4, port_no}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_port_no_is_different)
+      {
+        auto const queue_id = std::uint32_t{1};
+
+        BOOST_TEST(
+            !equivalent(
+              actions::enqueue{queue_id, 1}, actions::enqueue{queue_id, 2}));
+      }
+      BOOST_FIXTURE_TEST_CASE(is_true_if_padding_is_different, enqueue_fixture)
+      {
+        auto it = non_zero_padding_binary.begin();
+        auto const non_zero_padding
+          = actions::enqueue::decode(it, non_zero_padding_binary.end());
+
+        BOOST_TEST(
+            equivalent(actions::enqueue{0x12345678, 0x1234}, non_zero_padding));
+      }
+    BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
     BOOST_FIXTURE_TEST_CASE(encode_test, enqueue_fixture)
     {

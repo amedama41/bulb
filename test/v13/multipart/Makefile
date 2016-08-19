@@ -7,5 +7,5 @@ SRCS = description_test.cpp \
 	   port_description_test.cpp
 TARGET_LIB = libmultipart_test.dylib
 
--include ../subdirectories.mk
+-include ../../subdirectories.mk
 

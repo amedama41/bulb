@@ -52,6 +52,12 @@ namespace queue_properties {
             return min_rate_.rate;
         }
 
+        auto is_disabled() const noexcept
+            -> bool
+        {
+            return rate() > 1000;
+        }
+
         template <class Container>
         auto encode(Container& container) const
             -> Container&
@@ -100,7 +106,8 @@ namespace queue_properties {
     inline auto equivalent(min_rate const& lhs, min_rate const& rhs) noexcept
         -> bool
     {
-        return lhs.rate() == rhs.rate();
+        return lhs.rate() == rhs.rate()
+            || (lhs.is_disabled() && rhs.is_disabled());
     }
 
 } // namespace queue_properties

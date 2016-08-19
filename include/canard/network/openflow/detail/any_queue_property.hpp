@@ -170,7 +170,7 @@ namespace detail {
         {
             if (auto const prop
                     = boost::get<QueueProperty>(std::addressof(lhs.variant_))) {
-                return *prop == rhs;
+                return equivalent(*prop, rhs);
             }
             return false;
         }
@@ -183,7 +183,7 @@ namespace detail {
         {
             if (auto const prop
                     = boost::get<QueueProperty>(std::addressof(rhs.variant_))) {
-                return lhs == *prop;
+                return equivalent(lhs, *prop);
             }
             return false;
         }
