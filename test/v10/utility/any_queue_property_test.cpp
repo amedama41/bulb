@@ -221,5 +221,31 @@ BOOST_AUTO_TEST_SUITE(any_queue_property_test)
     }
   BOOST_AUTO_TEST_SUITE_END() // decode
 
+  BOOST_AUTO_TEST_SUITE(reference_style_any_cast)
+    BOOST_AUTO_TEST_CASE(return_contained_property_if_specified_type_is_same)
+    {
+      using prop_type = queue_props::min_rate;
+      auto const prop = prop_type{1};
+      auto const sut = ofp::v10::any_queue_property{prop};
+
+      BOOST_TEST((ofp::v10::any_cast<prop_type>(sut) == prop));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // refstyle_any_cast
+
+  BOOST_AUTO_TEST_SUITE(pointer_style_any_cast)
+    BOOST_AUTO_TEST_CASE(
+        return_pointer_to_contained_property_if_specified_type_is_same)
+    {
+      using prop_type = queue_props::min_rate;
+      auto const prop = prop_type{1};
+      auto const sut = ofp::v10::any_queue_property{prop};
+
+      auto const value = ofp::v10::any_cast<prop_type>(&sut);
+
+      BOOST_TEST_REQUIRE((value != nullptr));
+      BOOST_TEST((*value == prop));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // pointer_style_any_cast
+
 BOOST_AUTO_TEST_SUITE_END() // any_queue_property_test
 BOOST_AUTO_TEST_SUITE_END() // utility_test

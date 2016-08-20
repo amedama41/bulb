@@ -47,7 +47,7 @@ namespace detail {
                   !detail::is_related<any_queue_property, QueueProperty>::value
               >::type* = nullptr
         >
-        explicit any_queue_property(QueueProperty&& property)
+        any_queue_property(QueueProperty&& property)
             : variant_(std::forward<QueueProperty>(property))
         {
         }
@@ -188,12 +188,12 @@ namespace detail {
             return false;
         }
 
-        template <class T>
-        friend auto any_cast(any_queue_property const&)
+        template <class T, class PropertyList, class Decorder>
+        friend auto any_cast(any_queue_property<PropertyList, Decorder> const&)
             -> T const&;
 
-        template <class T>
-        friend auto any_cast(any_queue_property const*)
+        template <class T, class PropertyList, class Decorder>
+        friend auto any_cast(any_queue_property<PropertyList, Decorder> const*)
             -> T const*;
 
     private:

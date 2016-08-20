@@ -207,5 +207,44 @@ BOOST_AUTO_TEST_SUITE(any_queue_property_test)
     }
   BOOST_AUTO_TEST_SUITE_END() // function_equivalent
 
+  BOOST_AUTO_TEST_SUITE(reference_style_any_cast)
+    BOOST_AUTO_TEST_CASE(return_contained_property_if_specified_type_is_same)
+    {
+      using prop_type = queue_props::min_rate;
+      auto const prop = prop_type{1};
+      auto const sut = v13::any_queue_property{prop};
+
+      BOOST_TEST((v13::any_cast<prop_type>(sut) == prop));
+    }
+    BOOST_AUTO_TEST_CASE(throw_exception_if_specified_type_is_not_same)
+    {
+      auto const sut = v13::any_queue_property{queue_props::max_rate{3}};
+
+      BOOST_CHECK_THROW(
+          v13::any_cast<queue_props::min_rate>(sut), boost::bad_get);
+    }
+  BOOST_AUTO_TEST_SUITE_END() // reference_style_any_cast
+
+  BOOST_AUTO_TEST_SUITE(pointer_style_any_cast)
+    BOOST_AUTO_TEST_CASE(
+        return_pointer_to_contained_property_if_specified_type_is_same)
+    {
+      using prop_type = queue_props::min_rate;
+      auto const prop = prop_type{1};
+      auto const sut = v13::any_queue_property{prop};
+
+      auto const ptr = v13::any_cast<prop_type>(&sut);
+
+      BOOST_TEST_REQUIRE((ptr != nullptr));
+      BOOST_TEST((*ptr == prop));
+    }
+    BOOST_AUTO_TEST_CASE(return_null_pointer_if_specified_type_is_not_same)
+    {
+      auto const sut = v13::any_queue_property{queue_props::max_rate{3}};
+
+      BOOST_TEST((v13::any_cast<queue_props::min_rate>(&sut) == nullptr));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // pointer_style_any_cast
+
 BOOST_AUTO_TEST_SUITE_END() // any_queue_property_test
 BOOST_AUTO_TEST_SUITE_END() // common_type_test

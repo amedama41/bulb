@@ -14,6 +14,20 @@ namespace v13 {
         default_queue_property_list, queue_property_decoder
     >;
 
+    template <class T>
+    auto any_cast(any_queue_property const& property)
+        -> T const&
+    {
+        return detail::any_cast<T>(property);
+    }
+
+    template <class T>
+    auto any_cast(any_queue_property const* const property)
+        -> T const*
+    {
+        return detail::any_cast<T>(property);
+    }
+
 } // namespace v13
 } // namespace ofp
 } // namespace net
