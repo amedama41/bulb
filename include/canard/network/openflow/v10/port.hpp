@@ -2,7 +2,11 @@
 #define CANARD_NET_OFP_V10_PORT_HPP
 
 #include <cstdint>
+#include <cstring>
+#include <algorithm>
 #include <boost/operators.hpp>
+#include <boost/utility/string_ref.hpp>
+#include <canard/mac_address.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
@@ -20,8 +24,43 @@ namespace v10 {
         , private boost::equality_comparable<port>
     {
     public:
+        using raw_ofp_type = v10_detail::ofp_phy_port;
+
+        port(std::uint16_t const port_no
+           , canard::mac_address const addr
+           , boost::string_ref const name
+           , std::uint32_t const config
+           , std::uint32_t const state
+           , std::uint32_t const current_features
+           , std::uint32_t const advertised_features
+           , std::uint32_t const supported_features
+           , std::uint32_t const peer_advertised_features)
+            : port_{
+                  port_no
+                , {}
+                , ""
+                , config
+                , state
+                , current_features
+                , advertised_features
+                , supported_features
+                , peer_advertised_features
+              }
+        {
+            std::memcpy(port_.hw_addr, addr.to_bytes().data()
+                      , sizeof(port_.hw_addr));
+            std::memcpy(port_.name, &name[0]
+                      , std::min(name.size(), sizeof(port_.name) - 1));
+        }
+
+        static constexpr auto length() noexcept
+            -> std::uint16_t
+        {
+            return sizeof(raw_ofp_type);
+        }
+
         auto ofp_port() const noexcept
-            -> v10_detail::ofp_phy_port const&
+            -> raw_ofp_type const&
         {
             return port_;
         }
@@ -37,10 +76,10 @@ namespace v10 {
         static auto decode(Iterator& first, Iterator last)
             -> port
         {
-            return port{detail::decode<v10_detail::ofp_phy_port>(first, last)};
+            return port{detail::decode<raw_ofp_type>(first, last)};
         }
 
-        static auto from_ofp_port(v10_detail::ofp_phy_port const& ofp_port) noexcept
+        static auto from_ofp_port(raw_ofp_type const& ofp_port) noexcept
             -> port
         {
             return port{ofp_port};
@@ -50,7 +89,7 @@ namespace v10 {
             -> bool;
 
     private:
-        explicit port(v10_detail::ofp_phy_port const& phy_port) noexcept
+        explicit port(raw_ofp_type const& phy_port) noexcept
             : port_(phy_port)
         {
         }
@@ -62,7 +101,7 @@ namespace v10 {
         }
 
     private:
-        v10_detail::ofp_phy_port port_;
+        raw_ofp_type port_;
     };
 
     inline auto operator==(port const& lhs, port const& rhs) noexcept
