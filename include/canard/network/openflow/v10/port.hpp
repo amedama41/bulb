@@ -34,7 +34,7 @@ namespace v10 {
            , std::uint32_t const current_features
            , std::uint32_t const advertised_features
            , std::uint32_t const supported_features
-           , std::uint32_t const peer_advertised_features)
+           , std::uint32_t const peer_advertised_features) noexcept
             : port_{
                   port_no
                 , {}
