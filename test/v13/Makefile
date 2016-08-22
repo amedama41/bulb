@@ -24,8 +24,7 @@ ALL_SUBDIRS = $(LIBBULB_DIR) $(TEST_DIRS)
 ALL_LIBS = $(LIBBULB_LIB) $(TEST_LIBS)
 ALL_RPATH = $(LIBBULB_RPATH) $(TEST_RPATH)
 
-UTILITY_TEST_SRCS = byteorder_test.cpp \
-					port_test.cpp
+UTILITY_TEST_SRCS = byteorder_test.cpp
 UTILITY_TEST_OBJS = $(UTILITY_TEST_SRCS:.cpp=.o)
 
 MESSAGE_TEST_SRCS = hello_test.cpp hello_elements_test.cpp \

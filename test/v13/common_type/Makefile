@@ -1,4 +1,5 @@
-SRCS = any_oxm_match_field_test.cpp \
+SRCS = port_test.cpp \
+	   any_oxm_match_field_test.cpp \
 	   oxm_match_set_test.cpp \
 	   any_action_test.cpp \
 	   action_list_test.cpp \
