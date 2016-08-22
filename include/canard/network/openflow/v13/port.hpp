@@ -3,6 +3,10 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
+#include <algorithm>
+#include <boost/utility/string_ref.hpp>
+#include <canard/mac_address.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
@@ -19,16 +23,51 @@ namespace v13 {
         : public v13_detail::port_adaptor<port>
     {
     public:
-        static constexpr std::size_t base_size = sizeof(v13_detail::ofp_port);
+        using raw_ofp_type = v13_detail::ofp_port;
+
+        static constexpr std::size_t base_size = sizeof(raw_ofp_type);
+
+        port(std::uint32_t const port_no
+           , canard::mac_address const addr
+           , boost::string_ref const name
+           , std::uint32_t const config
+           , std::uint32_t const state
+           , std::uint32_t const current_features
+           , std::uint32_t const advertised_features
+           , std::uint32_t const supported_features
+           , std::uint32_t const peer_advertised_features
+           , std::uint32_t const current_speed
+           , std::uint32_t const max_speed) noexcept
+            : port_{
+                  port_no
+                , { 0, 0, 0, 0 }
+                , {}
+                , { 0, 0 }
+                , ""
+                , config
+                , state
+                , current_features
+                , advertised_features
+                , supported_features
+                , peer_advertised_features
+                , current_speed
+                , max_speed
+              }
+        {
+            std::memcpy(port_.hw_addr, addr.to_bytes().data()
+                      , sizeof(port_.hw_addr));
+            std::memcpy(port_.name, &name[0]
+                      , std::min(name.size(), sizeof(port_.name) - 1));
+        }
 
         static constexpr auto length() noexcept
             -> std::uint16_t
         {
-            return sizeof(v13_detail::ofp_port);
+            return sizeof(raw_ofp_type);
         }
 
         auto ofp_port() const noexcept
-            -> v13_detail::ofp_port const&
+            -> raw_ofp_type const&
         {
             return port_;
         }
@@ -62,23 +101,23 @@ namespace v13 {
         static auto decode(Iterator& first, Iterator last)
             -> port
         {
-            return port{detail::decode<v13_detail::ofp_port>(first, last)};
+            return port{detail::decode<raw_ofp_type>(first, last)};
         }
 
-        static auto from_ofp_port(v13_detail::ofp_port const& ofp_port) noexcept
+        static auto from_ofp_port(raw_ofp_type const& ofp_port) noexcept
             -> port
         {
             return port{ofp_port};
         }
 
     private:
-        explicit port(v13_detail::ofp_port const& port) noexcept
+        explicit port(raw_ofp_type const& port) noexcept
             : port_(port)
         {
         }
 
     private:
-        v13_detail::ofp_port port_;
+        raw_ofp_type port_;
     };
 
     inline auto operator==(port const& lhs, port const& rhs) noexcept
