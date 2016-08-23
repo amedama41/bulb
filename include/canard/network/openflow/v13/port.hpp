@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <cstring>
 #include <algorithm>
+#include <boost/operators.hpp>
 #include <boost/utility/string_ref.hpp>
 #include <canard/mac_address.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
@@ -21,6 +22,7 @@ namespace v13 {
 
     class port
         : public v13_detail::port_adaptor<port>
+        , private boost::equality_comparable<port>
     {
     public:
         using raw_ofp_type = v13_detail::ofp_port;
