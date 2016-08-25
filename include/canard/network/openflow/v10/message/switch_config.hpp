@@ -22,6 +22,9 @@ namespace messages {
         class switch_config_base
             : public v10_detail::basic_openflow_message<T>
         {
+        public:
+            using raw_ofp_type = v10_detail::ofp_switch_config;
+
         protected:
             switch_config_base(
                       std::uint16_t const flags
@@ -31,17 +34,16 @@ namespace messages {
                       v10_detail::ofp_header{
                           protocol::OFP_VERSION
                         , T::message_type
-                        , sizeof(config_)
+                        , sizeof(raw_ofp_type)
                         , xid
                       }
-                      , flags
-                      , miss_send_len
+                    , flags
+                    , miss_send_len
                   }
             {
             }
 
-            explicit switch_config_base(
-                    v10_detail::ofp_switch_config const& config) noexcept
+            explicit switch_config_base(raw_ofp_type const& config) noexcept
                 : config_(config)
             {
             }
@@ -56,7 +58,7 @@ namespace messages {
             auto flags() const noexcept
                 -> std::uint16_t
             {
-                return protocol::ofp_config_flags(config_.flags);
+                return config_.flags;
             }
 
             auto miss_send_length() const noexcept
@@ -76,9 +78,7 @@ namespace messages {
             static auto decode(Iterator& first, Iterator last)
                 -> T
             {
-                return T{
-                    detail::decode<v10_detail::ofp_switch_config>(first, last)
-                };
+                return T{detail::decode<raw_ofp_type>(first, last)};
             }
 
             static void validate(v10_detail::ofp_header const& header)
@@ -89,13 +89,13 @@ namespace messages {
                 if (header.type != T::message_type) {
                     throw std::runtime_error{"invalid message type"};
                 }
-                if (header.length != sizeof(v10_detail::ofp_switch_config)) {
+                if (header.length != sizeof(raw_ofp_type)) {
                     throw std::runtime_error{"invalid length"};
                 }
             }
 
         private:
-            v10_detail::ofp_switch_config config_;
+            raw_ofp_type config_;
         };
 
     } // namespace switch_config_detail
@@ -105,6 +105,8 @@ namespace messages {
         : public v10_detail::basic_openflow_message<get_config_request>
     {
     public:
+        using raw_ofp_type = v10_detail::ofp_header;
+
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_GET_CONFIG_REQUEST;
 
@@ -113,7 +115,7 @@ namespace messages {
             : header_{
                   protocol::OFP_VERSION
                 , message_type
-                , sizeof(v10_detail::ofp_header)
+                , sizeof(raw_ofp_type)
                 , xid
               }
         {
@@ -133,11 +135,11 @@ namespace messages {
         }
 
         template <class Iterator>
-        auto decode(Iterator& first, Iterator last)
+        static auto decode(Iterator& first, Iterator last)
             -> get_config_request
         {
             return get_config_request{
-                detail::decode<v10_detail::ofp_header>(first, last)
+                detail::decode<raw_ofp_type>(first, last)
             };
         }
 
@@ -149,20 +151,19 @@ namespace messages {
             if (header.type != message_type) {
                 throw std::runtime_error{"invalid message type"};
             }
-            if (header.length != sizeof(v10_detail::ofp_header)) {
+            if (header.length != sizeof(raw_ofp_type)) {
                 throw std::runtime_error{"invalid length"};
             }
         }
 
     private:
-        explicit get_config_request(
-                v10_detail::ofp_header const header) noexcept
+        explicit get_config_request(raw_ofp_type const header) noexcept
             : header_(header)
         {
         }
 
     private:
-        v10_detail::ofp_header header_;
+        raw_ofp_type header_;
     };
 
 
@@ -192,8 +193,7 @@ namespace messages {
     private:
         friend switch_config_base;
 
-        explicit get_config_reply(
-                v10_detail::ofp_switch_config const& config) noexcept
+        explicit get_config_reply(raw_ofp_type const& config) noexcept
             : switch_config_base{config}
         {
         }
@@ -217,8 +217,7 @@ namespace messages {
     private:
         friend switch_config_base;
 
-        explicit set_config(
-                v10_detail::ofp_switch_config const& config) noexcept
+        explicit set_config(raw_ofp_type const& config) noexcept
             : switch_config_base{config}
         {
         }
