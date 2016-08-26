@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <utility>
+#include <boost/operators.hpp>
 #include <canard/network/openflow/v10/action_list.hpp>
 #include <canard/network/openflow/v10/match_set.hpp>
 
@@ -12,6 +13,7 @@ namespace ofp {
 namespace v10 {
 
     class flow_entry_id
+        : private boost::equality_comparable<flow_entry_id>
     {
     public:
         flow_entry_id(match_set const& match
@@ -44,8 +46,17 @@ namespace v10 {
         std::uint16_t priority_;
     };
 
+    inline auto operator==(
+            flow_entry_id const& lhs, flow_entry_id const& rhs) noexcept
+        -> bool
+    {
+        return lhs.priority() == rhs.priority()
+            && equivalent(lhs.match(), rhs.match());
+    }
+
 
     class flow_entry
+        : private boost::equality_comparable<flow_entry>
     {
     public:
         flow_entry(flow_entry_id const& identifer
@@ -114,8 +125,18 @@ namespace v10 {
         action_list actions_;
     };
 
+    inline auto operator==(
+            flow_entry const& lhs, flow_entry const& rhs) noexcept
+        -> bool
+    {
+        return lhs.cookie() == rhs.cookie()
+            && lhs.id() == rhs.id()
+            && equivalent(lhs.actions(), rhs.actions());
+    }
+
 
     class timeouts
+        : private boost::equality_comparable<timeouts>
     {
     public:
         constexpr timeouts(
@@ -143,8 +164,16 @@ namespace v10 {
         std::uint16_t hard_timeout_;
     };
 
+    constexpr auto operator==(timeouts const& lhs, timeouts const& rhs) noexcept
+        -> bool
+    {
+        return lhs.idle_timeout() == rhs.idle_timeout()
+            && lhs.hard_timeout() == rhs.hard_timeout();
+    }
+
 
     class counters
+        : private boost::equality_comparable<counters>
     {
     public:
         constexpr counters(
@@ -172,12 +201,20 @@ namespace v10 {
         std::uint64_t byte_count_;
     };
 
+    constexpr auto operator==(counters const& lhs, counters const& rhs) noexcept
+        -> bool
+    {
+        return lhs.packet_count() == rhs.packet_count()
+            && lhs.byte_count() == rhs.byte_count();
+    }
+
 
     class elapsed_time
+        : private boost::equality_comparable<elapsed_time>
     {
     public:
         constexpr elapsed_time(
-                std::uint32_t const duration_sec
+                  std::uint32_t const duration_sec
                 , std::uint32_t const duration_nsec) noexcept
             : duration_sec_(duration_sec)
             , duration_nsec_(duration_nsec)
@@ -200,6 +237,14 @@ namespace v10 {
         std::uint32_t duration_sec_;
         std::uint32_t duration_nsec_;
     };
+
+    constexpr auto operator==(
+            elapsed_time const& lhs, elapsed_time const& rhs) noexcept
+        -> bool
+    {
+        return lhs.duration_sec() == rhs.duration_sec()
+            && lhs.duration_nsec() == rhs.duration_nsec();
+    }
 
 } // namespace v10
 } // namespace ofp
