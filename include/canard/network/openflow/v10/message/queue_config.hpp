@@ -8,10 +8,12 @@
 #include <stdexcept>
 #include <utility>
 #include <vector>
+#include <boost/operators.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/numeric.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/v10/detail/basic_openflow_message.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
@@ -26,10 +28,11 @@ namespace messages {
 
     class queue_get_config_request
         : public v10_detail::basic_openflow_message<queue_get_config_request>
+        , private boost::equality_comparable<queue_get_config_request>
     {
+    public:
         using raw_ofp_type = v10_detail::ofp_queue_get_config_request;
 
-    public:
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_QUEUE_GET_CONFIG_REQUEST;
 
@@ -90,6 +93,11 @@ namespace messages {
             }
         }
 
+        friend auto operator==(
+                  queue_get_config_request const&
+                , queue_get_config_request const&) noexcept
+            -> bool;
+
     private:
         explicit queue_get_config_request(
                 raw_ofp_type const& queue_get_config_request) noexcept
@@ -97,23 +105,36 @@ namespace messages {
         {
         }
 
+        auto equal_impl(queue_get_config_request const& rhs) const noexcept
+            -> bool
+        {
+            return detail::memcmp(
+                    queue_get_config_request_, rhs.queue_get_config_request_);
+        }
+
     private:
         raw_ofp_type queue_get_config_request_;
     };
 
+    inline auto operator==(
+              queue_get_config_request const& lhs
+            , queue_get_config_request const& rhs) noexcept
+        -> bool
+    {
+        return lhs.equal_impl(rhs);
+    }
+
 
     class queue_get_config_reply
         : public v10_detail::basic_openflow_message<queue_get_config_reply>
+        , private boost::equality_comparable<queue_get_config_reply>
     {
-        using raw_ofp_type = v10_detail::ofp_queue_get_config_reply;
-
     public:
+        using raw_ofp_type = v10_detail::ofp_queue_get_config_reply;
+        using queues_type = std::vector<packet_queue>;
+
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_QUEUE_GET_CONFIG_REPLY;
-
-        using queues_type = std::vector<packet_queue>;
-        using iterator = queues_type::const_iterator;
-        using const_iterator = queues_type::const_iterator;
 
         queue_get_config_reply(
                   std::uint16_t const port_no
@@ -138,13 +159,15 @@ namespace messages {
 
         queue_get_config_reply(queue_get_config_reply&& other)
             : queue_get_config_reply_(other.queue_get_config_reply_)
-            , queues_(std::move(other).queues_)
+            , queues_(other.extract_queues())
         {
-            other.queue_get_config_reply_.header.length = sizeof(raw_ofp_type);
         }
 
-        auto operator=(queue_get_config_reply const&)
-            -> queue_get_config_reply& = default;
+        auto operator=(queue_get_config_reply const& other)
+            -> queue_get_config_reply&
+        {
+            return operator=(queue_get_config_reply{other});
+        }
 
         auto operator=(queue_get_config_reply&& other)
             -> queue_get_config_reply&
@@ -173,16 +196,13 @@ namespace messages {
             return queues_;
         }
 
-        auto begin() const noexcept
-            -> const_iterator
+        auto extract_queues()
+            -> queues_type
         {
-            return queues_.begin();
-        }
-
-        auto end() const noexcept
-            -> const_iterator
-        {
-            return queues_.end();
+            auto queues = queues_type{};
+            queues.swap(queues_);
+            queue_get_config_reply_.header.length = sizeof(raw_ofp_type);
+            return queues;
         }
 
         template <class Container>
@@ -190,7 +210,7 @@ namespace messages {
             -> Container&
         {
             detail::encode(container, queue_get_config_reply_);
-            boost::for_each(queues_, [&](packet_queue const& e) {
+            boost::for_each(queues_, [&](queues_type::const_reference e) {
                 e.encode(container);
             });
             return container;
@@ -235,6 +255,11 @@ namespace messages {
             }
         }
 
+        friend auto operator==(
+                  queue_get_config_reply const&
+                , queue_get_config_reply const&) noexcept
+            -> bool;
+
     private:
         queue_get_config_reply(
                   raw_ofp_type const& queue_get_config_reply
@@ -244,14 +269,21 @@ namespace messages {
         {
         }
 
+        auto equal_impl(queue_get_config_reply const& rhs) const noexcept
+            -> bool
+        {
+            return detail::memcmp(
+                    queue_get_config_reply_, rhs.queue_get_config_reply_)
+                && queues_ == rhs.queues_;
+        }
+
         static auto calc_queues_length(queues_type const& queues)
             -> std::size_t
         {
             auto const queues_length = boost::accumulate(
                       queues, std::size_t{0}
-                    , [](std::size_t const sum, packet_queue const& e) {
-                            return sum + e.length();
-                      });
+                    , [](std::size_t const sum, queues_type::const_reference e)
+                      { return sum + e.length(); });
             if (queues_length + sizeof(raw_ofp_type)
                     > std::numeric_limits<std::uint16_t>::max()) {
                 throw std::runtime_error{"queues length is too big"};
@@ -263,6 +295,14 @@ namespace messages {
         raw_ofp_type queue_get_config_reply_;
         queues_type queues_;
     };
+
+    inline auto operator==(
+              queue_get_config_reply const& lhs
+            , queue_get_config_reply const& rhs) noexcept
+        -> bool
+    {
+        return lhs.equal_impl(rhs);
+    }
 
 } // namespace messages
 } // namespace v10
