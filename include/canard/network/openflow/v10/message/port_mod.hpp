@@ -3,9 +3,11 @@
 
 #include <cstdint>
 #include <stdexcept>
+#include <boost/operators.hpp>
 #include <canard/mac_address.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/v10/detail/basic_openflow_message.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
@@ -20,8 +22,11 @@ namespace messages {
 
     class port_mod
         : public v10_detail::basic_openflow_message<port_mod>
+        , private boost::equality_comparable<port_mod>
     {
     public:
+        using raw_ofp_type = v10_detail::ofp_port_mod;
+
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_PORT_MOD;
 
@@ -35,7 +40,7 @@ namespace messages {
                   v10_detail::ofp_header{
                       protocol::OFP_VERSION
                     , message_type
-                    , sizeof(port_mod_)
+                    , sizeof(raw_ofp_type)
                     , xid
                   }
                 , port_no
@@ -112,9 +117,7 @@ namespace messages {
         static auto decode(Iterator& first, Iterator last)
             -> port_mod
         {
-            return port_mod{
-                detail::decode<v10_detail::ofp_port_mod>(first, last)
-            };
+            return port_mod{detail::decode<raw_ofp_type>(first, last)};
         }
 
         static void validate(v10_detail::ofp_header const& header)
@@ -125,20 +128,35 @@ namespace messages {
             if (header.type != message_type) {
                 throw std::runtime_error{"invalid message type"};
             }
-            if (header.length != sizeof(v10_detail::ofp_port_mod)) {
+            if (header.length != sizeof(raw_ofp_type)) {
                 throw std::runtime_error{"invalid length"};
             }
         }
 
+        friend auto operator==(port_mod const&, port_mod const&) noexcept
+            -> bool;
+
     private:
-        explicit port_mod(v10_detail::ofp_port_mod const& port_mod) noexcept
+        explicit port_mod(raw_ofp_type const& port_mod) noexcept
             : port_mod_(port_mod)
         {
         }
 
+        auto equal_impl(port_mod const& rhs) const noexcept
+            -> bool
+        {
+            return detail::memcmp(port_mod_, rhs.port_mod_);
+        }
+
     private:
-        v10_detail::ofp_port_mod port_mod_;
+        raw_ofp_type port_mod_;
     };
+
+    inline auto operator==(port_mod const& lhs, port_mod const& rhs) noexcept
+        -> bool
+    {
+        return lhs.equal_impl(rhs);
+    }
 
 } // namespace messages
 } // namespace v10
