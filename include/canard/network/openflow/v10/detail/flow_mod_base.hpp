@@ -5,11 +5,14 @@
 #include <iterator>
 #include <stdexcept>
 #include <utility>
+#include <boost/operators.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/v10/action_list.hpp>
 #include <canard/network/openflow/v10/detail/basic_openflow_message.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
+#include <canard/network/openflow/v10/flow_entry.hpp>
 #include <canard/network/openflow/v10/match_set.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
 
@@ -20,13 +23,22 @@ namespace v10 {
 namespace messages {
 namespace flow_mod_detail {
 
-    template <class FlowModType>
+    template <class FlowMod>
     class flow_mod_base
-        : public v10_detail::basic_openflow_message<FlowModType>
+        : public v10_detail::basic_openflow_message<FlowMod>
+        , private boost::equality_comparable<FlowMod>
     {
     public:
+        using raw_ofp_type = v10_detail::ofp_flow_mod;
+
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_FLOW_MOD;
+
+        static constexpr auto command() noexcept
+            -> std::uint16_t
+        {
+            return FlowMod::command_type;
+        }
 
         auto header() const noexcept
             -> v10_detail::ofp_header const&
@@ -34,16 +46,19 @@ namespace flow_mod_detail {
             return flow_mod_.header;
         }
 
-        auto buffer_id() const noexcept
-            -> std::uint32_t
-        {
-            return flow_mod_.buffer_id;
-        }
-
         auto actions() const noexcept
             -> action_list const&
         {
             return actions_;
+        }
+
+        auto extract_actions()
+            -> action_list
+        {
+            auto actions = action_list{};
+            actions.swap(actions_);
+            flow_mod_.header.length = sizeof(raw_ofp_type);
+            return actions;
         }
 
         template <class Container>
@@ -56,15 +71,14 @@ namespace flow_mod_detail {
 
         template <class Iterator>
         static auto decode(Iterator& first, Iterator last)
-            -> FlowModType
+            -> FlowMod
         {
-            auto const flow_mod
-                = detail::decode<v10_detail::ofp_flow_mod>(first, last);
+            auto const flow_mod = detail::decode<raw_ofp_type>(first, last);
             last = std::next(
                     first
-                  , flow_mod.header.length - sizeof(v10_detail::ofp_flow_mod));
+                  , flow_mod.header.length - sizeof(raw_ofp_type));
             auto actions = action_list::decode(first, last);
-            return FlowModType{flow_mod, std::move(actions)};
+            return FlowMod{flow_mod, std::move(actions)};
         }
 
         static void validate(v10_detail::ofp_header const& header)
@@ -75,9 +89,15 @@ namespace flow_mod_detail {
             if (header.type != message_type) {
                 throw std::runtime_error{"invalid message type"};
             }
-            if (header.length < sizeof(v10_detail::ofp_flow_mod)) {
-                throw std::runtime_error{"invalid length"};
+            if (header.length < sizeof(raw_ofp_type)) {
+                throw std::runtime_error{"too small length"};
             }
+        }
+
+        friend auto operator==(FlowMod const& lhs, FlowMod const& rhs) noexcept
+            -> bool
+        {
+            return lhs.equal_impl(rhs);
         }
 
     protected:
@@ -95,14 +115,12 @@ namespace flow_mod_detail {
                   v10_detail::ofp_header{
                       protocol::OFP_VERSION
                     , message_type
-                    , std::uint16_t(
-                              sizeof(v10_detail::ofp_flow_mod)
-                            + actions.length())
+                    , std::uint16_t(sizeof(raw_ofp_type) + actions.length())
                     , xid
                   }
                 , match.ofp_match()
                 , cookie
-                , FlowModType::command_type
+                , command()
                 , idle_timeout
                 , hard_timeout
                 , priority
@@ -114,13 +132,38 @@ namespace flow_mod_detail {
         {
         }
 
+        flow_mod_base(
+                  match_set const& match
+                , std::uint16_t const priority
+                , std::uint16_t const out_port
+                , std::uint32_t const xid)
+            : flow_mod_{
+                  v10_detail::ofp_header{
+                      protocol::OFP_VERSION
+                    , message_type
+                    , std::uint16_t(sizeof(raw_ofp_type))
+                    , xid
+                  }
+                , match.ofp_match()
+                , 0
+                , command()
+                , 0
+                , 0
+                , priority
+                , 0
+                , out_port
+                , 0
+              }
+            , actions_{}
+        {
+        }
+
         flow_mod_base(flow_mod_base const& other) = default;
 
         flow_mod_base(flow_mod_base&& other)
             : flow_mod_(other.flow_mod_)
-            , actions_(std::move(other).actions_)
+            , actions_(other.extract_actions())
         {
-            other.flow_mod_.header.length = sizeof(v10_detail::ofp_flow_mod);
         }
 
         auto operator=(flow_mod_base const& other)
@@ -135,22 +178,28 @@ namespace flow_mod_detail {
             return *this;
         }
 
-        flow_mod_base(
-                  v10_detail::ofp_flow_mod const& flow_mod
-                , action_list&& actions)
+        flow_mod_base(raw_ofp_type const& flow_mod, action_list&& actions)
             : flow_mod_(flow_mod)
             , actions_(std::move(actions))
         {
         }
 
         auto ofp_flow_mod() const noexcept
-            -> v10_detail::ofp_flow_mod const&
+            -> raw_ofp_type const&
         {
             return flow_mod_;
         }
 
     private:
-        v10_detail::ofp_flow_mod flow_mod_;
+        auto equal_impl(FlowMod const& rhs) const noexcept
+            -> bool
+        {
+            return detail::memcmp(flow_mod_, rhs.flow_mod_)
+                && actions_ == rhs.actions_;
+        }
+
+    private:
+        raw_ofp_type flow_mod_;
         action_list actions_;
     };
 
