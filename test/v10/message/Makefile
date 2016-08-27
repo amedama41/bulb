@@ -1,5 +1,8 @@
 SRCS = switch_features_test.cpp \
-	   switch_config_test.cpp
+	   switch_config_test.cpp \
+	   flow_add_test.cpp \
+	   flow_modify_test.cpp \
+	   flow_delete_test.cpp
 TARGET_LIB = libmessage_test.dylib
 
 -include ../../subdirectories.mk
