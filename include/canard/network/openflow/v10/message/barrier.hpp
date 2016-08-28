@@ -3,8 +3,10 @@
 
 #include <cstdint>
 #include <stdexcept>
+#include <boost/operators.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/v10/detail/basic_openflow_message.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
@@ -21,19 +23,11 @@ namespace messages {
         template <class T>
         class barrier_base
             : public v10_detail::basic_openflow_message<T>
+            , private boost::equality_comparable<T>
         {
-        protected:
-            explicit barrier_base(std::uint32_t const xid) noexcept
-                : header_{
-                      protocol::OFP_VERSION
-                    , T::message_type
-                    , sizeof(v10_detail::ofp_header)
-                    , xid
-                  }
-            {
-            }
-
         public:
+            using raw_ofp_type = v10_detail::ofp_header;
+
             auto header() const noexcept
                 -> v10_detail::ofp_header const&
             {
@@ -51,7 +45,7 @@ namespace messages {
             static auto decode(Iterator& first, Iterator last)
                 -> T
             {
-                return T{detail::decode<v10_detail::ofp_header>(first, last)};
+                return T{detail::decode<raw_ofp_type>(first, last)};
             }
 
             static void validate(v10_detail::ofp_header const& header)
@@ -62,22 +56,39 @@ namespace messages {
                 if (header.type != T::message_type) {
                     throw std::runtime_error{"invalid message type"};
                 }
-                if (header.length != sizeof(v10_detail::ofp_header)) {
+                if (header.length != sizeof(raw_ofp_type)) {
                     throw std::runtime_error{"invalid length"};
                 }
             }
 
+            friend auto operator==(T const& lhs, T const& rhs) noexcept
+                -> bool
+            {
+                return detail::memcmp(lhs.header_, rhs.header_);
+            }
+
         protected:
-            explicit barrier_base(v10_detail::ofp_header const& header) noexcept
+            explicit barrier_base(std::uint32_t const xid) noexcept
+                : header_{
+                      protocol::OFP_VERSION
+                    , T::message_type
+                    , sizeof(raw_ofp_type)
+                    , xid
+                  }
+            {
+            }
+
+            explicit barrier_base(raw_ofp_type const& header) noexcept
                 : header_(header)
             {
             }
 
         private:
-            v10_detail::ofp_header header_;
+            raw_ofp_type header_;
         };
 
     } // namespace barrier_detail
+
 
     class barrier_request
         : public barrier_detail::barrier_base<barrier_request>
@@ -94,7 +105,7 @@ namespace messages {
     private:
         friend barrier_base;
 
-        explicit barrier_request(v10_detail::ofp_header const& header) noexcept
+        explicit barrier_request(raw_ofp_type const& header) noexcept
             : barrier_base{header}
         {
         }
@@ -113,7 +124,7 @@ namespace messages {
         {
         }
 
-        explicit barrier_reply(barrier_request const& request)
+        explicit barrier_reply(barrier_request const& request) noexcept
             : barrier_reply{request.xid()}
         {
         }
@@ -121,7 +132,7 @@ namespace messages {
     private:
         friend barrier_base;
 
-        explicit barrier_reply(v10_detail::ofp_header const& header) noexcept
+        explicit barrier_reply(raw_ofp_type const& header) noexcept
             : barrier_base{header}
         {
         }
