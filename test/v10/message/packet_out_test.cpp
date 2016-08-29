@@ -312,7 +312,7 @@ BOOST_AUTO_TEST_SUITE(packet_out)
       BOOST_TEST(buf.size() == sut.length());
       BOOST_TEST(buf == bin, boost::test_tools::per_element{});
     }
-    BOOST_AUTO_TEST_CASE(generates_no_data_binary_from_no_data_packet_in)
+    BOOST_AUTO_TEST_CASE(generates_no_data_binary_from_no_data_packet_out)
     {
       auto buf = std::vector<unsigned char>{};
 
@@ -321,7 +321,7 @@ BOOST_AUTO_TEST_SUITE(packet_out)
       BOOST_TEST(buf.size() == no_data_sut.length());
       BOOST_TEST(buf == no_data_bin, boost::test_tools::per_element{});
     }
-    BOOST_AUTO_TEST_CASE(generates_no_actions_binary_from_no_actions_packet_in)
+    BOOST_AUTO_TEST_CASE(generates_no_actions_binary_from_no_actions_packet_out)
     {
       no_data_bin.resize(sizeof(detail::ofp_packet_out));
       no_data_bin[3] = no_data_bin.size();
@@ -357,7 +357,7 @@ BOOST_AUTO_TEST_SUITE(packet_out)
       BOOST_TEST((it == no_data_bin.end()));
       BOOST_TEST((packet_out == no_data_sut));
     }
-    BOOST_AUTO_TEST_CASE(generates_no_actions_binary_from_no_actions_packet_in)
+    BOOST_AUTO_TEST_CASE(generates_no_actions_binary_from_no_actions_packet_out)
     {
       constexpr auto length = sizeof(detail::ofp_packet_out);
       no_data_bin[3] = length;
