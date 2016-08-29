@@ -7,7 +7,6 @@
 #include <stdexcept>
 #include <utility>
 #include <boost/operators.hpp>
-#include <boost/range/algorithm/equal.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <canard/network/openflow/binary_data.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
@@ -254,7 +253,7 @@ namespace messages {
         {
             return detail::memcmp(packet_out_, rhs.packet_out_)
                 && actions_ == rhs.actions_
-                && boost::equal(frame(), rhs.frame());
+                && frame() == rhs.frame();
         }
 
     private:
