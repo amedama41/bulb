@@ -3,10 +3,11 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <iterator>
-#include <memory>
 #include <stdexcept>
 #include <utility>
+#include <boost/operators.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <canard/network/openflow/binary_data.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
@@ -24,23 +25,24 @@ namespace messages {
 
     class packet_in
         : public v10_detail::basic_openflow_message<packet_in>
+        , private boost::equality_comparable<packet_in>
     {
         static constexpr std::uint16_t base_pkt_in_size
             = offsetof(v10_detail::ofp_packet_in, pad)
             + sizeof(v10_detail::ofp_packet_in::pad);
 
     public:
+        using raw_ofp_type = v10_detail::ofp_packet_in;
         using data_type = binary_data::pointer_type;
 
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_PACKET_IN;
 
-        packet_in(std::uint32_t const buffer_id
+        packet_in(binary_data data
                 , std::uint16_t const total_len
                 , std::uint16_t const in_port
                 , protocol::ofp_packet_in_reason const reason
-                , std::uint8_t const table_id
-                , binary_data data
+                , std::uint32_t const buffer_id
                 , std::uint32_t const xid = get_xid())
             : packet_in_{
                   v10_detail::ofp_header{
@@ -59,22 +61,6 @@ namespace messages {
         {
         }
 
-        template <class Range>
-        packet_in(std::uint32_t const buffer_id
-                , std::uint16_t const total_len
-                , std::uint16_t const in_port
-                , protocol::ofp_packet_in_reason const reason
-                , std::uint8_t const table_id
-                , Range const& data
-                , std::uint32_t const xid = get_xid())
-            : packet_in{
-                  buffer_id, total_len, in_port, reason, table_id
-                , binary_data{data}
-                , xid
-              }
-        {
-        }
-
         packet_in(packet_in const& other)
             : packet_in_(other.packet_in_)
             , data_(binary_data::copy_data(other.frame()))
@@ -83,7 +69,7 @@ namespace messages {
 
         packet_in(packet_in&& other) noexcept
             : packet_in_(other.packet_in_)
-            , data_(std::move(other.data_))
+            , data_(std::move(other).data_)
         {
             other.packet_in_.header.length = base_pkt_in_size;
         }
@@ -91,8 +77,7 @@ namespace messages {
         auto operator=(packet_in const& other)
             -> packet_in&
         {
-            auto tmp = other;
-            return operator=(std::move(tmp));
+            return operator=(packet_in{other});
         }
 
         auto operator=(packet_in&& other) noexcept
@@ -149,9 +134,9 @@ namespace messages {
         auto extract_frame() noexcept
             -> binary_data
         {
-            auto const frame_len = frame_length();
-            packet_in_.header.length -= frame_len;
-            return binary_data{std::move(data_), frame_len};
+            auto data = binary_data{std::move(data_), frame_length()};
+            packet_in_.header.length = base_pkt_in_size;
+            return data;
         }
 
         template <class Container>
@@ -167,8 +152,8 @@ namespace messages {
         static auto decode(Iterator& first, Iterator last)
             -> packet_in
         {
-            auto const pkt_in = detail::decode<v10_detail::ofp_packet_in>(
-                    first, last, base_pkt_in_size);
+            auto pkt_in
+                = detail::decode<raw_ofp_type>(first, last, base_pkt_in_size);
             last = std::next(first, pkt_in.header.length - base_pkt_in_size);
 
             auto data = binary_data::copy_data(first, last);
@@ -190,17 +175,34 @@ namespace messages {
             }
         }
 
+        friend auto operator==(packet_in const&, packet_in const&) noexcept
+            -> bool;
+
     private:
-        packet_in(v10_detail::ofp_packet_in const& pkt_in, data_type&& data)
+        packet_in(raw_ofp_type const& pkt_in, data_type&& data)
             : packet_in_(pkt_in)
             , data_(std::move(data))
         {
         }
 
-    private:
-        v10_detail::ofp_packet_in packet_in_;
+        auto equal_impl(packet_in const& rhs) const noexcept
+            -> bool
+        {
+            return std::memcmp(
+                    &packet_in_, &rhs.packet_in_, base_pkt_in_size) == 0
+                && frame() == rhs.frame();
+        }
+
+    public:
+        raw_ofp_type packet_in_;
         data_type data_;
     };
+
+    inline auto operator==(packet_in const& lhs, packet_in const& rhs) noexcept
+        -> bool
+    {
+        return lhs.equal_impl(rhs);
+    }
 
 } // namespace message
 } // namespace v10
