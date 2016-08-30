@@ -4,6 +4,8 @@
 #include <stdexcept>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/detail/memcmp.hpp>
+#include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/v10/detail/basic_openflow_message.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
 #include <canard/network/openflow/v10/detail/port_adaptor.hpp>
@@ -19,8 +21,11 @@ namespace messages {
     class port_status
         : public v10_detail::basic_openflow_message<port_status>
         , public v10_detail::port_adaptor<port_status>
+        , private boost::equality_comparable<port_status>
     {
     public:
+        using raw_ofp_type = v10_detail::ofp_port_status;
+
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_PORT_STATUS;
 
@@ -31,7 +36,7 @@ namespace messages {
                   v10_detail::ofp_header{
                       protocol::OFP_VERSION
                     , message_type
-                    , sizeof(v10_detail::ofp_port_status)
+                    , sizeof(raw_ofp_type)
                     , xid
                   }
                 , std::uint8_t(reason)
@@ -59,24 +64,6 @@ namespace messages {
             return v10::port::from_ofp_port(port_status_.desc);
         }
 
-        auto is_added() const noexcept
-            -> bool
-        {
-            return reason() == protocol::OFPPR_ADD;
-        }
-
-        auto is_deleted() const noexcept
-            -> bool
-        {
-            return reason() == protocol::OFPPR_DELETE;
-        }
-
-        auto is_modified() const noexcept
-            -> bool
-        {
-            return reason() == protocol::OFPPR_MODIFY;
-        }
-
         template <class Container>
         auto encode(Container& container) const
             -> Container&
@@ -88,8 +75,7 @@ namespace messages {
         static auto decode(Iterator& first, Iterator last)
             -> port_status
         {
-            return port_status{
-                detail::decode<v10_detail::ofp_port_status>(first, last)
+            return port_status{detail::decode<raw_ofp_type>(first, last)
             };
         }
 
@@ -101,15 +87,24 @@ namespace messages {
             if (header.type != message_type) {
                 throw std::runtime_error{"invalid message type"};
             }
-            if (header.length != sizeof(v10_detail::ofp_port_status)) {
+            if (header.length != sizeof(raw_ofp_type)) {
                 throw std::runtime_error{"invalid length"};
             }
         }
 
+        friend auto operator==(port_status const&, port_status const&) noexcept
+            -> bool;
+
     private:
-        explicit port_status(v10_detail::ofp_port_status const& status) noexcept
+        explicit port_status(raw_ofp_type const& status) noexcept
             : port_status_(status)
         {
+        }
+
+        auto equal_impl(port_status const& rhs) const noexcept
+            -> bool
+        {
+            return detail::memcmp(port_status_, rhs.port_status_);
         }
 
         friend port_adaptor;
@@ -121,8 +116,15 @@ namespace messages {
         }
 
     private:
-        v10_detail::ofp_port_status port_status_;
+        raw_ofp_type port_status_;
     };
+
+    inline auto operator==(
+            port_status const& lhs, port_status const& rhs) noexcept
+        -> bool
+    {
+        return lhs.equal_impl(rhs);
+    }
 
 } // namespace messages
 } // namespace v10
