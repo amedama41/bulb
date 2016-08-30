@@ -3,12 +3,13 @@
 
 #include <cstdint>
 #include <stdexcept>
+#include <boost/operators.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/v10/detail/basic_openflow_message.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
-#include <canard/network/openflow/v10/detail/flow_entry_adaptor.hpp>
 #include <canard/network/openflow/v10/flow_entry.hpp>
 #include <canard/network/openflow/v10/match_set.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
@@ -21,11 +22,11 @@ namespace messages {
 
     class flow_removed
         : public v10_detail::basic_openflow_message<flow_removed>
-        , public v10_detail::flow_entry_adaptor<
-                flow_removed, v10_detail::ofp_flow_removed
-          >
+        , private boost::equality_comparable<flow_removed>
     {
     public:
+        using raw_ofp_type = v10_detail::ofp_flow_removed;
+
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_FLOW_REMOVED;
 
@@ -35,14 +36,14 @@ namespace messages {
                 , std::uint64_t const cookie
                 , protocol::ofp_flow_removed_reason const reason
                 , v10::elapsed_time const elapsed_time
-                , v10::timeouts const& timeouts
+                , std::uint16_t const idle_timeout
                 , v10::counters const& counters
                 , std::uint32_t const xid = get_xid())
             : flow_removed_{
                   v10_detail::ofp_header{
                       protocol::OFP_VERSION
                     , message_type
-                    , sizeof(v10_detail::ofp_flow_removed)
+                    , sizeof(raw_ofp_type)
                     , xid
                   }
                 , match.ofp_match()
@@ -52,7 +53,7 @@ namespace messages {
                 , { 0 }
                 , elapsed_time.duration_sec()
                 , elapsed_time.duration_nsec()
-                , timeouts.idle_timeout()
+                , idle_timeout
                 , { 0, 0 }
                 , counters.packet_count()
                 , counters.byte_count()
@@ -64,16 +65,12 @@ namespace messages {
                   flow_entry const& entry
                 , protocol::ofp_flow_removed_reason const reason
                 , v10::elapsed_time const elapsed_time
-                , v10::timeouts const& timeouts
+                , std::uint16_t idle_timeout
                 , v10::counters const& counters
                 , std::uint32_t const xid = get_xid())
             : flow_removed{
                   entry.match(), entry.priority(), entry.cookie()
-                , reason
-                , elapsed_time
-                , timeouts
-                , counters
-                , xid
+                , reason, elapsed_time, idle_timeout, counters, xid
               }
         {
         }
@@ -84,10 +81,70 @@ namespace messages {
             return flow_removed_.header;
         }
 
+        auto match() const noexcept
+            -> match_set
+        {
+            return match_set{flow_removed_.match};
+        }
+
+        auto priority() const noexcept
+            -> std::uint16_t
+        {
+            return flow_removed_.priority;
+        }
+
+        auto cookie() const noexcept
+            -> std::uint64_t
+        {
+            return flow_removed_.cookie;
+        }
+
         auto reason() const noexcept
             -> protocol::ofp_flow_removed_reason
         {
             return protocol::ofp_flow_removed_reason(flow_removed_.reason);
+        }
+
+        auto idle_timeout() const noexcept
+            -> std::uint16_t
+        {
+            return flow_removed_.idle_timeout;
+        }
+
+        auto duration_sec() const noexcept
+            -> std::uint32_t
+        {
+            return flow_removed_.duration_sec;
+        }
+
+        auto duration_nsec() const noexcept
+            -> std::uint32_t
+        {
+            return flow_removed_.duration_nsec;
+        }
+
+        auto elapsed_time() const noexcept
+            -> v10::elapsed_time
+        {
+            return v10::elapsed_time{duration_sec(), duration_nsec()};
+        }
+
+        auto packet_count() const noexcept
+            -> std::uint64_t
+        {
+            return flow_removed_.packet_count;
+        }
+
+        auto byte_count() const noexcept
+            -> std::uint64_t
+        {
+            return flow_removed_.byte_count;
+        }
+
+        auto counters() const noexcept
+            -> v10::counters
+        {
+            return v10::counters{packet_count(), byte_count()};
         }
 
         template <class Container>
@@ -101,9 +158,7 @@ namespace messages {
         static auto decode(Iterator& first, Iterator last)
             -> flow_removed
         {
-            return flow_removed{
-                detail::decode<v10_detail::ofp_flow_removed>(first, last)
-            };
+            return flow_removed{detail::decode<raw_ofp_type>(first, last)};
         }
 
         static void validate(v10_detail::ofp_header const& header)
@@ -114,29 +169,37 @@ namespace messages {
             if (header.type != message_type) {
                 throw std::runtime_error{"invalid message type"};
             }
-            if (header.length != sizeof(v10_detail::ofp_flow_removed)) {
+            if (header.length != sizeof(raw_ofp_type)) {
                 throw std::runtime_error{"invalid length"};
             }
         }
 
+        friend auto operator==(
+                flow_removed const&, flow_removed const&) noexcept
+            -> bool;
+
     private:
-        explicit flow_removed(
-                v10_detail::ofp_flow_removed const& removed) noexcept
+        explicit flow_removed(raw_ofp_type const& removed) noexcept
             : flow_removed_(removed)
         {
         }
 
-        friend flow_entry_adaptor;
-
-        auto ofp_flow_entry() const noexcept
-            -> v10_detail::ofp_flow_removed const&
+        auto equal_impl(flow_removed const& rhs) const noexcept
+            -> bool
         {
-            return flow_removed_;
+            return detail::memcmp(flow_removed_, rhs.flow_removed_);
         }
 
     private:
-        v10_detail::ofp_flow_removed flow_removed_;
+        raw_ofp_type flow_removed_;
     };
+
+    inline auto operator==(
+            flow_removed const& lhs, flow_removed const& rhs) noexcept
+        -> bool
+    {
+        return lhs.equal_impl(rhs);
+    }
 
 } // namespace messages
 } // namespace v10
