@@ -3,15 +3,16 @@
 
 #include <cstdint>
 #include <iterator>
-#include <memory>
 #include <numeric>
 #include <stdexcept>
 #include <utility>
 #include <vector>
+#include <boost/operators.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <canard/network/openflow/binary_data.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/v10/detail/basic_openflow_message.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
@@ -25,11 +26,10 @@ namespace messages {
 
     class error
         : public v10_detail::basic_openflow_message<error>
+        , private boost::equality_comparable<error>
     {
-        static constexpr std::uint16_t base_err_msg_size
-            = sizeof(v10_detail::ofp_error_msg);
-
     public:
+        using raw_ofp_type = v10_detail::ofp_error_msg;
         using data_type = binary_data::pointer_type;
 
         static constexpr protocol::ofp_type message_type = protocol::OFPT_ERROR;
@@ -42,7 +42,7 @@ namespace messages {
                   v10_detail::ofp_header{
                         protocol::OFP_VERSION
                       , message_type
-                      , std::uint16_t(base_err_msg_size + data.size())
+                      , std::uint16_t(sizeof(raw_ofp_type) + data.size())
                       , xid
                   }
                 , std::uint16_t(type)
@@ -55,15 +55,10 @@ namespace messages {
         template <class Message>
         error(protocol::ofp_error_type const type
             , std::uint16_t const code
-            , Message const& msg)
-            : error{type, code, create_data(msg), msg.xid()}
-        {
-        }
-
-        error(protocol::ofp_error_type const type
-            , std::uint16_t const code
-            , v10_detail::ofp_header const& header)
-            : error{type, code, create_data(header), header.xid}
+            , Message const& msg
+            , std::uint16_t const data_size
+                = std::numeric_limits<std::uint16_t>::max())
+            : error{type, code, create_data(msg, data_size), msg.xid()}
         {
         }
 
@@ -77,14 +72,13 @@ namespace messages {
             : error_msg_(other.error_msg_)
             , data_(std::move(other.data_))
         {
-            other.error_msg_.header.length = base_err_msg_size;
+            other.error_msg_.header.length = sizeof(raw_ofp_type);
         }
 
         auto operator=(error const& other)
             -> error&
         {
-            auto tmp = other;
-            return operator=(std::move(tmp));
+            return operator=(error{other});
         }
 
         auto operator=(error&& other) noexcept
@@ -123,14 +117,14 @@ namespace messages {
         auto data_length() const noexcept
             -> std::uint16_t
         {
-            return length() - base_err_msg_size;
+            return length() - sizeof(raw_ofp_type);
         }
 
         auto extract_data() noexcept
             -> binary_data
         {
             auto const data_len = data_length();
-            error_msg_.header.length = base_err_msg_size;
+            error_msg_.header.length = sizeof(raw_ofp_type);
             return binary_data{std::move(data_), data_len};
         }
 
@@ -155,11 +149,10 @@ namespace messages {
         static auto decode(Iterator& first, Iterator last)
             -> error
         {
-            auto const error_msg
-                = detail::decode<v10_detail::ofp_error_msg>(first, last);
+            auto const error_msg = detail::decode<raw_ofp_type>(first, last);
 
             auto const data_length
-                = error_msg.header.length - sizeof(v10_detail::ofp_error_msg);
+                = error_msg.header.length - sizeof(raw_ofp_type);
             last = std::next(first, data_length);
             auto data = binary_data::copy_data(first, last);
             first = last;
@@ -175,21 +168,32 @@ namespace messages {
             if (header.type != message_type) {
                 throw std::runtime_error{"invalid message type"};
             }
-            if (header.length < base_err_msg_size) {
+            if (header.length < sizeof(raw_ofp_type)) {
                 throw std::runtime_error{"invalid length"};
             }
         }
 
+        friend auto operator==(error const&, error const&) noexcept
+            -> bool;
+
     private:
-        error(v10_detail::ofp_error_msg const& error_msg
+        error(raw_ofp_type const& error_msg
             , data_type&& data) noexcept
             : error_msg_(error_msg)
             , data_(std::move(data))
         {
         }
 
+        auto equal_impl(error const& rhs) const noexcept
+            -> bool
+        {
+            return detail::memcmp(error_msg_, rhs.error_msg_)
+                && data() == rhs.data();
+        }
+
         template <class Message>
-        static auto create_data(Message const& msg)
+        static auto create_data(
+                Message const& msg, std::uint16_t data_size)
             -> binary_data
         {
             auto buffer = std::vector<unsigned char>{};
@@ -197,28 +201,28 @@ namespace messages {
             msg.encode(buffer);
 
             constexpr auto max_data_size
-                = std::numeric_limits<std::uint16_t>::max() - base_err_msg_size;
-            if (buffer.size() > max_data_size) {
-                buffer.resize(max_data_size);
+                = std::numeric_limits<std::uint16_t>::max()
+                - sizeof(raw_ofp_type);
+            if (data_size > max_data_size) {
+                data_size = max_data_size;
+            }
+            if (buffer.size() > data_size) {
+                buffer.resize(data_size);
             }
 
             return binary_data{buffer};
         }
 
-        static auto create_data(v10_detail::ofp_header const& header)
-            -> binary_data
-        {
-            auto buffer = std::vector<unsigned char>{};
-            buffer.reserve(sizeof(v10_detail::ofp_header));
-            detail::encode(buffer, header);
-
-            return binary_data{buffer};
-        }
-
     private:
-        v10_detail::ofp_error_msg error_msg_;
+        raw_ofp_type error_msg_;
         data_type data_;
     };
+
+    inline auto operator==(error const& lhs, error const& rhs) noexcept
+        -> bool
+    {
+        return lhs.equal_impl(rhs);
+    }
 
 } // namespace messages
 } // namespace v10
