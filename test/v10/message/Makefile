@@ -10,7 +10,8 @@ SRCS = switch_features_test.cpp \
 	   packet_in_test.cpp \
 	   flow_removed_test.cpp \
 	   port_status_test.cpp \
-	   error_test.cpp
+	   error_test.cpp \
+	   echo_test.cpp
 TARGET_LIB = libmessage_test.dylib
 
 -include ../../subdirectories.mk
