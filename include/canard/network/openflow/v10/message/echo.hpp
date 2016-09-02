@@ -6,10 +6,12 @@
 #include <memory>
 #include <stdexcept>
 #include <utility>
+#include <boost/operators.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <canard/network/openflow/binary_data.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/v10/detail/basic_openflow_message.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
@@ -26,8 +28,10 @@ namespace messages {
         template <class T>
         class echo_base
             : public v10_detail::basic_openflow_message<T>
+            , private boost::equality_comparable<T>
         {
         public:
+            using raw_ofp_type = v10_detail::ofp_header;
             using data_type = binary_data::pointer_type;
 
         protected:
@@ -35,15 +39,14 @@ namespace messages {
                 : header_{
                       protocol::OFP_VERSION
                     , T::message_type
-                    , std::uint16_t(
-                            sizeof(v10_detail::ofp_header) + data.size())
+                    , std::uint16_t(sizeof(raw_ofp_type) + data.size())
                     , xid
                   }
                 , data_(std::move(data).data())
             {
             }
 
-            echo_base(v10_detail::ofp_header const& header, data_type&& data)
+            echo_base(raw_ofp_type const& header, data_type&& data) noexcept
                 : header_(header)
                 , data_(std::move(data))
             {
@@ -57,16 +60,15 @@ namespace messages {
 
             echo_base(echo_base&& other) noexcept
                 : header_(other.header_)
-                , data_(std::move(other.data_))
+                , data_(std::move(other).data_)
             {
-                other.header_.length = sizeof(v10_detail::ofp_header);
+                other.header_.length = sizeof(raw_ofp_type);
             }
 
             auto operator=(echo_base const& other)
                 -> echo_base&
             {
-                auto tmp = other;
-                return operator=(std::move(tmp));
+                return operator=(echo_base{other});
             }
 
             auto operator=(echo_base&& other) noexcept
@@ -94,14 +96,14 @@ namespace messages {
             auto data_length() const noexcept
                 -> std::uint16_t
             {
-                return this->length() - sizeof(v10_detail::ofp_header);
+                return this->length() - sizeof(raw_ofp_type);
             }
 
             auto extract_data() noexcept
                 -> binary_data
             {
                 auto const data_len = data_length();
-                header_.length = sizeof(v10_detail::ofp_header);
+                header_.length = sizeof(raw_ofp_type);
                 return binary_data{std::move(data_), data_len};
             }
 
@@ -118,10 +120,8 @@ namespace messages {
             static auto decode(Iterator& first, Iterator last)
                 -> T
             {
-                auto const header
-                    = detail::decode<v10_detail::ofp_header>(first, last);
-                last = std::next(
-                        first, header.length - sizeof(v10_detail::ofp_header));
+                auto const header = detail::decode<raw_ofp_type>(first, last);
+                last = std::next(first, header.length - sizeof(raw_ofp_type));
                 auto data = binary_data::copy_data(first, last);
                 first = last;
 
@@ -136,13 +136,27 @@ namespace messages {
                 if (header.type != T::message_type) {
                     throw std::runtime_error{"invalid message type"};
                 }
-                if (header.length < sizeof(v10_detail::ofp_header)) {
+                if (header.length < sizeof(raw_ofp_type)) {
                     throw std::runtime_error{"invalid length"};
                 }
             }
 
+            friend auto operator==(T const& lhs, T const& rhs) noexcept
+                -> bool
+            {
+                return lhs.equal_impl(rhs);
+            }
+
         private:
-            v10_detail::ofp_header header_;
+            auto equal_impl(T const& rhs) const noexcept
+                -> bool
+            {
+                return detail::memcmp(header_, rhs.header_)
+                    && data() == rhs.data();
+            }
+
+        private:
+            raw_ofp_type header_;
             data_type data_;
         };
 
@@ -170,7 +184,7 @@ namespace messages {
     private:
         friend echo_base;
 
-        echo_request(v10_detail::ofp_header const& header
+        echo_request(raw_ofp_type const& header
                    , echo_base::data_type&& data) noexcept
             : echo_base{header, std::move(data)}
         {
@@ -204,7 +218,7 @@ namespace messages {
     private:
         friend echo_base;
 
-        echo_reply(v10_detail::ofp_header const& header
+        echo_reply(raw_ofp_type const& header
                  , echo_base::data_type&& data) noexcept
             : echo_base{header, std::move(data)}
         {
