@@ -3,8 +3,10 @@
 
 #include <cstdint>
 #include <stdexcept>
+#include <boost/operators.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/v10/detail/basic_openflow_message.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
@@ -21,6 +23,7 @@ namespace messages {
         template <class T>
         class switch_config_base
             : public v10_detail::basic_openflow_message<T>
+            , private boost::equality_comparable<T>
         {
         public:
             using raw_ofp_type = v10_detail::ofp_switch_config;
@@ -94,6 +97,19 @@ namespace messages {
                 }
             }
 
+            friend auto operator==(T const& lhs, T const& rhs) noexcept
+                -> bool
+            {
+                return lhs.equal_impl(rhs);
+            }
+
+        private:
+            auto equal_impl(T const& rhs) const noexcept
+                -> bool
+            {
+                return detail::memcmp(config_, rhs.config_);
+            }
+
         private:
             raw_ofp_type config_;
         };
@@ -103,6 +119,7 @@ namespace messages {
 
     class get_config_request
         : public v10_detail::basic_openflow_message<get_config_request>
+        , private boost::equality_comparable<get_config_request>
     {
     public:
         using raw_ofp_type = v10_detail::ofp_header;
@@ -156,15 +173,33 @@ namespace messages {
             }
         }
 
+        friend auto operator==(
+                get_config_request const&, get_config_request const&) noexcept
+            -> bool;
+
     private:
         explicit get_config_request(raw_ofp_type const header) noexcept
             : header_(header)
         {
         }
 
+        auto equal_impl(get_config_request const& rhs) const noexcept
+            -> bool
+        {
+            return detail::memcmp(header_, rhs.header_);
+        }
+
     private:
         raw_ofp_type header_;
     };
+
+    inline auto operator==(
+              get_config_request const& lhs
+            , get_config_request const& rhs) noexcept
+        -> bool
+    {
+        return lhs.equal_impl(rhs);
+    }
 
 
     class get_config_reply
