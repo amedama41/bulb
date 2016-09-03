@@ -5,12 +5,14 @@
 #include <cstdint>
 #include <algorithm>
 #include <utility>
+#include <boost/operators.hpp>
 #include <boost/range/adaptor/sliced.hpp>
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/utility/string_ref.hpp>
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/v10/detail/basic_stats.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
@@ -23,10 +25,12 @@ namespace messages {
 namespace statistics {
 
     class table_stats
+        : private boost::equality_comparable<table_stats>
     {
     public:
-        static constexpr std::size_t base_size
-            = sizeof(v10_detail::ofp_table_stats);
+        using raw_ofp_type = v10_detail::ofp_table_stats;
+
+        static constexpr std::size_t base_size = sizeof(raw_ofp_type);
 
         table_stats(std::uint8_t const table_id
                   , boost::string_ref name
@@ -55,7 +59,7 @@ namespace statistics {
         static constexpr auto length() noexcept
             -> std::uint16_t
         {
-            return sizeof(v10_detail::ofp_table_stats);
+            return sizeof(raw_ofp_type);
         }
 
         auto table_id() const noexcept
@@ -111,20 +115,34 @@ namespace statistics {
         static auto decode(Iterator& first, Iterator last)
             -> table_stats
         {
-            return table_stats{
-                detail::decode<v10_detail::ofp_table_stats>(first, last)
-            };
+            return table_stats{detail::decode<raw_ofp_type>(first, last)};
         }
 
+        friend auto operator==(table_stats const&, table_stats const&) noexcept
+            -> bool;
+
     private:
-        explicit table_stats(v10_detail::ofp_table_stats const& table_stats)
+        explicit table_stats(raw_ofp_type const& table_stats) noexcept
             : table_stats_(table_stats)
         {
         }
 
+        auto equal_impl(table_stats const& rhs) const noexcept
+            -> bool
+        {
+            return detail::memcmp(table_stats_, rhs.table_stats_);
+        }
+
     private:
-        v10_detail::ofp_table_stats table_stats_;
+        raw_ofp_type table_stats_;
     };
+
+    inline auto operator==(
+            table_stats const& lhs, table_stats const& rhs) noexcept
+        -> bool
+    {
+        return lhs.equal_impl(rhs);
+    }
 
 
     class table_stats_request
@@ -145,8 +163,7 @@ namespace statistics {
     private:
         friend basic_stats_request::base_type;
 
-        explicit table_stats_request(
-                v10_detail::ofp_stats_request const& stats_request) noexcept
+        explicit table_stats_request(raw_ofp_type const& stats_request) noexcept
             : basic_stats_request{stats_request}
         {
         }
@@ -174,8 +191,7 @@ namespace statistics {
         friend basic_stats_reply::base_type;
 
         table_stats_reply(
-                  v10_detail::ofp_stats_reply const& stats_reply
-                , body_type&& table_stats)
+                raw_ofp_type const& stats_reply, body_type&& table_stats)
             : basic_stats_reply{stats_reply, std::move(table_stats)}
         {
         }
