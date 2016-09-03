@@ -4,8 +4,10 @@
 #include <cstddef>
 #include <cstdint>
 #include <utility>
+#include <boost/operators.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/v10/detail/basic_stats.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
@@ -19,10 +21,11 @@ namespace messages {
 namespace statistics {
 
     class queue_stats
+        : private boost::equality_comparable<queue_stats>
     {
+    public:
         using raw_ofp_type = v10_detail::ofp_queue_stats;
 
-    public:
         static constexpr std::size_t base_size = sizeof(raw_ofp_type);
 
         queue_stats(std::uint32_t const queue_id
@@ -91,15 +94,31 @@ namespace statistics {
             return queue_stats{detail::decode<raw_ofp_type>(first, last)};
         }
 
+        friend auto operator==(queue_stats const&, queue_stats const&) noexcept
+            -> bool;
+
     private:
         explicit queue_stats(raw_ofp_type const& queue_stats) noexcept
             : queue_stats_(queue_stats)
         {
         }
 
+        auto equal_impl(queue_stats const& rhs) const noexcept
+            -> bool
+        {
+            return detail::memcmp(queue_stats_, rhs.queue_stats_);
+        }
+
     private:
         raw_ofp_type queue_stats_;
     };
+
+    inline auto operator==(
+            queue_stats const& lhs, queue_stats const& rhs) noexcept
+        -> bool
+    {
+        return lhs.equal_impl(rhs);
+    }
 
 
     class queue_stats_request
@@ -107,8 +126,6 @@ namespace statistics {
                 queue_stats_request, v10_detail::ofp_queue_stats_request
           >
     {
-        using raw_ofp_type = v10_detail::ofp_queue_stats_request;
-
     public:
         static constexpr protocol::ofp_stats_types stats_type_value
             = protocol::OFPST_QUEUE;
@@ -119,7 +136,7 @@ namespace statistics {
                 , std::uint32_t const xid = get_xid()) noexcept
             : basic_stats_request{
                   0
-                , raw_ofp_type{port_no, { 0, 0 }, queue_id}
+                , raw_ofp_stats_type{port_no, { 0, 0 }, queue_id}
                 , xid
               }
         {
@@ -141,8 +158,8 @@ namespace statistics {
         friend basic_stats_request::base_type;
 
         queue_stats_request(
-                  v10_detail::ofp_stats_request const& stats_request
-                , raw_ofp_type const& queue_stats_request) noexcept
+                  raw_ofp_type const& stats_request
+                , raw_ofp_stats_type const& queue_stats_request) noexcept
             : basic_stats_request{stats_request, queue_stats_request}
         {
         }
@@ -170,8 +187,7 @@ namespace statistics {
         friend basic_stats_reply::base_type;
 
         queue_stats_reply(
-                  v10_detail::ofp_stats_reply const& stats_reply
-                , body_type&& queue_stats)
+                raw_ofp_type const& stats_reply, body_type&& queue_stats)
             : basic_stats_reply{stats_reply, std::move(queue_stats)}
         {
         }
