@@ -5,9 +5,11 @@
 #include <stdexcept> // TODO
 #include <utility>
 #include <vector>
+#include <boost/operators.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/v10/detail/basic_openflow_message.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
@@ -21,6 +23,7 @@ namespace messages {
 
     class features_request
         : public v10_detail::basic_openflow_message<features_request>
+        , private boost::equality_comparable<features_request>
     {
     public:
         using raw_ofp_type = v10_detail::ofp_header;
@@ -72,19 +75,37 @@ namespace messages {
             }
         }
 
+        friend auto operator==(
+                features_request const&, features_request const&) noexcept
+            -> bool;
+
     private:
         explicit features_request(raw_ofp_type const& header) noexcept
             : header_(header)
         {
         }
 
+        auto equal_impl(features_request const& rhs) const noexcept
+            -> bool
+        {
+            return detail::memcmp(header_, rhs.header_);
+        }
+
     private:
         raw_ofp_type header_;
     };
 
+    inline auto operator==(
+            features_request const& lhs, features_request const& rhs) noexcept
+        -> bool
+    {
+        return lhs.equal_impl(rhs);
+    }
+
 
     class features_reply
         : public v10_detail::basic_openflow_message<features_reply>
+        , private boost::equality_comparable<features_reply>
     {
     public:
         using raw_ofp_type = v10_detail::ofp_switch_features;
@@ -232,6 +253,10 @@ namespace messages {
             }
         }
 
+        friend auto operator==(
+                features_reply const&, features_reply const&) noexcept
+            -> bool;
+
     private:
         features_reply(raw_ofp_type const& features
                      , port_list&& ports)
@@ -240,10 +265,24 @@ namespace messages {
         {
         }
 
+        auto equal_impl(features_reply const& rhs) const noexcept
+            -> bool
+        {
+            return detail::memcmp(switch_features_, rhs.switch_features_)
+                && ports_ == rhs.ports_;
+        }
+
     private:
         raw_ofp_type switch_features_;
         port_list ports_;
     };
+
+    inline auto operator==(
+            features_reply const& lhs, features_reply const& rhs) noexcept
+        -> bool
+    {
+        return lhs.equal_impl(rhs);
+    }
 
 } // namespace messages
 } // namespace v10
