@@ -28,10 +28,10 @@ namespace statistics {
                   match_set const& match
                 , std::uint8_t const table_id
                 , std::uint16_t const out_port = protocol::OFPP_NONE
-                , std::uint32_t const xid = get_xid())
+                , std::uint32_t const xid = get_xid()) noexcept
             : basic_stats_request{
                   0
-                , v10_detail::ofp_aggregate_stats_request{
+                , raw_ofp_stats_type{
                       match.ofp_match(), table_id, 0, out_port
                   }
                 , xid
@@ -39,12 +39,30 @@ namespace statistics {
         {
         }
 
+        auto match() const noexcept
+            -> v10::match_set
+        {
+            return v10::match_set{body().match};
+        }
+
+        auto table_id() const noexcept
+            -> std::uint8_t
+        {
+            return body().table_id;
+        }
+
+        auto out_port() const noexcept
+            -> std::uint16_t
+        {
+            return body().out_port;
+        }
+
     private:
         friend basic_stats_request::base_type;
 
         aggregate_stats_request(
-                  v10_detail::ofp_stats_request const& stats_request
-                , v10_detail::ofp_aggregate_stats_request const& aggregate_stats_request) noexcept
+                  raw_ofp_type const& stats_request
+                , raw_ofp_stats_type const& aggregate_stats_request) noexcept
             : basic_stats_request{stats_request, aggregate_stats_request}
         {
         }
@@ -59,6 +77,23 @@ namespace statistics {
     public:
         static constexpr protocol::ofp_stats_types stats_type_value
             = protocol::OFPST_AGGREGATE;
+
+        aggregate_stats_reply(
+                  v10::counters const& counters
+                , std::uint32_t const flow_count
+                , std::uint32_t const xid = get_xid()) noexcept
+            : basic_stats_reply{
+                  0
+                , raw_ofp_stats_type{
+                      counters.packet_count()
+                    , counters.byte_count()
+                    , flow_count
+                    , { 0, 0, 0, 0 }
+                  }
+                , xid
+              }
+        {
+        }
 
         auto packet_count() const noexcept
             -> std::uint64_t
@@ -82,8 +117,8 @@ namespace statistics {
         friend basic_stats_reply::base_type;
 
         aggregate_stats_reply(
-                  v10_detail::ofp_stats_reply const& stats_reply
-                , v10_detail::ofp_aggregate_stats_reply const& aggregate_stats_reply) noexcept
+                  raw_ofp_type const& stats_reply
+                , raw_ofp_stats_type const& aggregate_stats_reply) noexcept
             : basic_stats_reply{stats_reply, aggregate_stats_reply}
         {
         }
