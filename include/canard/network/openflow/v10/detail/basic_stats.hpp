@@ -85,6 +85,12 @@ namespace stats_detail {
                 throw std::runtime_error{"invalid length"};
             }
         }
+
+        friend auto operator==(T const& lhs, T const& rhs) noexcept
+            -> bool
+        {
+            return lhs.equal_impl(rhs);
+        }
     };
 
 
@@ -123,12 +129,6 @@ namespace stats_detail {
             }
         }
 
-        friend auto operator==(T const& lhs, T const& rhs) noexcept
-            -> bool
-        {
-            return lhs.equal_impl(rhs);
-        }
-
     protected:
         empty_body_stats(
                 std::uint16_t const flags, std::uint32_t const xid) noexcept
@@ -151,13 +151,13 @@ namespace stats_detail {
         }
 
     private:
+        friend base_t;
+
         auto equal_impl(T const& rhs) const noexcept
             -> bool
         {
             return detail::memcmp(stats_, rhs.stats_);
         }
-
-        friend base_t;
 
         auto stats() const noexcept
             -> raw_ofp_type const&
@@ -209,12 +209,6 @@ namespace stats_detail {
             }
         }
 
-        friend auto operator==(T const& lhs, T const& rhs) noexcept
-            -> bool
-        {
-            return lhs.equal_impl(rhs);
-        }
-
     protected:
         single_element_stats(
                   std::uint16_t const flags
@@ -249,14 +243,14 @@ namespace stats_detail {
         }
 
     private:
+        friend base_t;
+
         auto equal_impl(T const& rhs) const noexcept
             -> bool
         {
             return detail::memcmp(stats_, rhs.stats_)
                 && detail::memcmp(body_, rhs.body_);
         }
-
-        friend base_t;
 
         auto stats() const noexcept
             -> StatsType const&
@@ -274,41 +268,26 @@ namespace stats_detail {
     class array_body_stats
         : public basic_stats<T, StatsType>
     {
+        using base_t = basic_stats<T, StatsType>;
         using elem_type = typename std::remove_all_extents<BodyType>::type;
 
     public:
+        using raw_ofp_type = typename base_t::raw_ofp_type;
         using body_type = std::vector<elem_type>;
-        using iterator = typename body_type::iterator;
-        using const_iterator = typename body_type::const_iterator;
 
-        auto size() const noexcept
-            -> std::size_t
+        auto body() const noexcept
+            -> body_type const&
         {
-            return body_.size();
+            return body_;
         }
 
-        auto begin() noexcept
-            -> iterator
+        auto extract_body()
+            -> body_type
         {
-            return body_.begin();
-        }
-
-        auto begin() const noexcept
-            -> const_iterator
-        {
-            return body_.begin();
-        }
-
-        auto end() noexcept
-            -> iterator
-        {
-            return body_.end();
-        }
-
-        auto end() const noexcept
-            -> const_iterator
-        {
-            return body_.end();
+            auto body = body_type{};
+            body.swap(body_);
+            stats_.header.length = sizeof(raw_ofp_type);
+            return body;
         }
 
         template <class Container>
@@ -326,9 +305,9 @@ namespace stats_detail {
         static auto decode(Iterator& first, Iterator last)
             -> T
         {
-            auto const stats = detail::decode<StatsType>(first, last);
+            auto const stats = detail::decode<raw_ofp_type>(first, last);
             auto const body_length
-                = stats.header.length - sizeof(StatsType);
+                = stats.header.length - sizeof(raw_ofp_type);
             last = std::next(first, body_length);
 
             auto body = body_type{};
@@ -343,14 +322,14 @@ namespace stats_detail {
             return T{stats, std::move(body)};
         }
 
-        using basic_stats<T, StatsType>::validate;
+        using base_t::validate;
 
-        static void validate(StatsType const& stats)
+        static void validate(raw_ofp_type const& stats)
         {
             if (stats.type != T::stats_type_value) {
                 throw std::runtime_error{"invalid stats type"};
             }
-            if (stats.header.length < sizeof(StatsType)) {
+            if (stats.header.length < sizeof(raw_ofp_type)) {
                 throw std::runtime_error{"invalid stats length"};
             }
         }
@@ -365,7 +344,7 @@ namespace stats_detail {
                       protocol::OFP_VERSION
                     , T::message_type
                     , std::uint16_t(
-                            sizeof(StatsType) + calc_body_length(body))
+                            sizeof(raw_ofp_type) + calc_body_length(body))
                     , xid
                   }
                 , T::stats_type_value
@@ -375,8 +354,7 @@ namespace stats_detail {
         {
         }
 
-        array_body_stats(
-                StatsType const& stats, body_type&& body)
+        array_body_stats(raw_ofp_type const& stats, body_type&& body)
             : stats_(stats)
             , body_(std::move(body))
         {
@@ -387,13 +365,15 @@ namespace stats_detail {
 
         array_body_stats(array_body_stats&& other)
             : stats_(other.stats_)
-            , body_(std::move(other).body_)
+            , body_(other.extract_body())
         {
-            other.stats_.header.length = sizeof(StatsType);
         }
 
-        auto operator=(array_body_stats const&)
-            -> array_body_stats& = default;
+        auto operator=(array_body_stats const& other)
+            -> array_body_stats&
+        {
+            return operator=(array_body_stats{other});
+        }
 
         auto operator=(array_body_stats&& other)
             -> array_body_stats&
@@ -405,10 +385,17 @@ namespace stats_detail {
         }
 
     private:
-        friend basic_stats<T, StatsType>;
+        friend base_t;
+
+        auto equal_impl(T const& rhs) const noexcept
+            -> bool
+        {
+            return detail::memcmp(stats_, rhs.stats_)
+                && body_ == rhs.body_;
+        }
 
         auto stats() const noexcept
-            -> StatsType const&
+            -> raw_ofp_type const&
         {
             return stats_;
         }
@@ -421,7 +408,7 @@ namespace stats_detail {
                     , [](std::size_t const sum, elem_type const& e) {
                             return sum + e.length();
                       });
-            if (body_length + sizeof(StatsType)
+            if (body_length + sizeof(raw_ofp_type)
                     > std::numeric_limits<std::uint16_t>::max()) {
                 throw std::runtime_error{"body size is too big"};
             }
@@ -429,7 +416,7 @@ namespace stats_detail {
         }
 
     private:
-        StatsType stats_;
+        raw_ofp_type stats_;
         body_type body_;
     };
 

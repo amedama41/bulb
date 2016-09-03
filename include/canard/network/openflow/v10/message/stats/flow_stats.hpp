@@ -6,13 +6,14 @@
 #include <iterator>
 #include <stdexcept>
 #include <utility>
+#include <boost/operators.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/v10/action_list.hpp>
 #include <canard/network/openflow/v10/detail/basic_stats.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
-#include <canard/network/openflow/v10/detail/flow_entry_adaptor.hpp>
 #include <canard/network/openflow/v10/flow_entry.hpp>
 #include <canard/network/openflow/v10/match_set.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
@@ -25,13 +26,12 @@ namespace messages {
 namespace statistics {
 
     class flow_stats
-        : public v10_detail::flow_entry_adaptor<
-                flow_stats, v10_detail::ofp_flow_stats
-          >
+        : private boost::equality_comparable<flow_stats>
     {
     public:
-        static constexpr std::uint16_t base_size
-            = sizeof(v10_detail::ofp_flow_stats);
+        using raw_ofp_type = v10_detail::ofp_flow_stats;
+
+        static constexpr std::uint16_t base_size = sizeof(raw_ofp_type);
 
         flow_stats(v10::flow_entry entry
                  , std::uint8_t const table_id
@@ -40,8 +40,7 @@ namespace statistics {
                  , v10::counters const& counters)
             : flow_stats_{
                   std::uint16_t(
-                          sizeof(v10_detail::ofp_flow_stats)
-                        + entry.actions().length())
+                          sizeof(raw_ofp_type) + entry.actions().length())
                 , table_id
                 , 0
                 , entry.match().ofp_match()
@@ -63,13 +62,15 @@ namespace statistics {
 
         flow_stats(flow_stats&& other)
             : flow_stats_(other.flow_stats_)
-            , actions_(std::move(other).actions_)
+            , actions_(other.extract_actions())
         {
-            other.flow_stats_.length = base_size;
         }
 
-        auto operator=(flow_stats const&)
-            -> flow_stats& = default;
+        auto operator=(flow_stats const& other)
+            -> flow_stats&
+        {
+            return operator=(flow_stats{other});
+        }
 
         auto operator=(flow_stats&& other)
             -> flow_stats&
@@ -91,10 +92,28 @@ namespace statistics {
             return flow_stats_.length;
         }
 
-        auto table_id() const noexcept
-            -> std::uint8_t
+        auto match() const noexcept
+            -> v10::match_set
         {
-            return flow_stats_.table_id;
+            return v10::match_set{flow_stats_.match};
+        }
+
+        auto priority() const noexcept
+            -> std::uint16_t
+        {
+            return flow_stats_.priority;
+        }
+
+        auto id() const noexcept
+            -> v10::flow_entry_id
+        {
+            return v10::flow_entry_id{match(), priority()};
+        }
+
+        auto cookie() const noexcept
+            -> std::uint64_t
+        {
+            return flow_stats_.cookie;
         }
 
         auto actions() const noexcept
@@ -103,10 +122,79 @@ namespace statistics {
             return actions_;
         }
 
+        auto extract_actions()
+            -> action_list
+        {
+            auto actions = action_list{};
+            actions.swap(actions_);
+            flow_stats_.length = sizeof(raw_ofp_type);
+            return actions;
+        }
+
         auto entry() const
             -> flow_entry
         {
             return flow_entry{match(), priority(), cookie(), actions()};
+        }
+
+        auto table_id() const noexcept
+            -> std::uint8_t
+        {
+            return flow_stats_.table_id;
+        }
+
+        auto idle_timeout() const noexcept
+            -> std::uint16_t
+        {
+            return flow_stats_.idle_timeout;
+        }
+
+        auto hard_timeout() const noexcept
+            -> std::uint16_t
+        {
+            return flow_stats_.hard_timeout;
+        }
+
+        auto timeouts() const noexcept
+            -> v10::timeouts
+        {
+            return v10::timeouts{idle_timeout(), hard_timeout()};
+        }
+
+        auto duration_sec() const noexcept
+            -> std::uint32_t
+        {
+            return flow_stats_.duration_sec;
+        }
+
+        auto duration_nsec() const noexcept
+            -> std::uint32_t
+        {
+            return flow_stats_.duration_nsec;
+        }
+
+        auto elapsed_time() const noexcept
+            -> v10::elapsed_time
+        {
+            return v10::elapsed_time{duration_sec(), duration_nsec()};
+        }
+
+        auto packet_count() const noexcept
+            -> std::uint64_t
+        {
+            return flow_stats_.packet_count;
+        }
+
+        auto byte_count() const noexcept
+            -> std::uint64_t
+        {
+            return flow_stats_.byte_count;
+        }
+
+        auto counters() const noexcept
+            -> v10::counters
+        {
+            return v10::counters{packet_count(), byte_count()};
         }
 
         template <class Container>
@@ -121,41 +209,49 @@ namespace statistics {
         static auto decode(Iterator& first, Iterator last)
             -> flow_stats
         {
-            auto const stats
-                = detail::decode<v10_detail::ofp_flow_stats>(first, last);
-            if (stats.length < base_size) {
+            auto const stats = detail::decode<raw_ofp_type>(first, last);
+            if (stats.length < sizeof(raw_ofp_type)) {
                 throw std::runtime_error{"flow_stats length is too small"};
             }
-            if (std::distance(first, last) + base_size < stats.length) {
+            auto const actions_length = stats.length - sizeof(raw_ofp_type);
+            if (std::distance(first, last) < actions_length) {
                 throw std::runtime_error{"flow_stats length is too big"};
             }
-            last = std::next(first, stats.length - base_size);
+            last = std::next(first, actions_length);
 
             auto actions = action_list::decode(first, last);
 
             return flow_stats{stats, std::move(actions)};
         }
 
+        friend auto operator==(flow_stats const&, flow_stats const&) noexcept
+            -> bool;
+
     private:
-        flow_stats(v10_detail::ofp_flow_stats const& stats
-                 , action_list&& actions)
+        flow_stats(raw_ofp_type const& stats, action_list&& actions)
             : flow_stats_(stats)
             , actions_(std::move(actions))
         {
         }
 
-        friend flow_entry_adaptor;
-
-        auto ofp_flow_entry() const noexcept
-            -> v10_detail::ofp_flow_stats const&
+        auto equal_impl(flow_stats const& rhs) const noexcept
+            -> bool
         {
-            return flow_stats_;
+            return detail::memcmp(flow_stats_, rhs.flow_stats_)
+                && actions_ == rhs.actions_;
         }
 
     private:
-        v10_detail::ofp_flow_stats flow_stats_;
+        raw_ofp_type flow_stats_;
         action_list actions_;
     };
+
+    inline auto operator==(
+            flow_stats const& lhs, flow_stats const& rhs) noexcept
+        -> bool
+    {
+        return lhs.equal_impl(rhs);
+    }
 
 
     class flow_stats_request
@@ -174,7 +270,7 @@ namespace statistics {
                 , std::uint32_t const xid = get_xid()) noexcept
             : basic_stats_request{
                   0
-                , v10_detail::ofp_flow_stats_request{
+                , raw_ofp_stats_type{
                       match.ofp_match()
                     , table_id
                     , 0
@@ -207,8 +303,8 @@ namespace statistics {
         friend basic_stats_request::base_type;
 
         flow_stats_request(
-                  v10_detail::ofp_stats_request const& stats_request
-                , v10_detail::ofp_flow_stats_request const& flow_stats) noexcept
+                  raw_ofp_type const& stats_request
+                , raw_ofp_stats_type const& flow_stats) noexcept
             : basic_stats_request{stats_request, flow_stats}
         {
         }
@@ -234,8 +330,7 @@ namespace statistics {
         friend basic_stats_reply::base_type;
 
         flow_stats_reply(
-                  v10_detail::ofp_stats_reply const& stats_reply
-                , body_type&& flow_stats)
+                raw_ofp_type const& stats_reply, body_type&& flow_stats)
             : basic_stats_reply{stats_reply, std::move(flow_stats)}
         {
         }
