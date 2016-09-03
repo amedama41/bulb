@@ -64,6 +64,27 @@ BOOST_AUTO_TEST_SUITE(get_config_request)
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor
 
+  BOOST_AUTO_TEST_SUITE(equality)
+    BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+    {
+      auto const sut = msg::get_config_request{0x01020304};
+
+      BOOST_TEST((sut == sut));
+    }
+    BOOST_AUTO_TEST_CASE(is_true_if_xid_is_equal)
+    {
+      auto const xid = 0x12345678;
+
+      BOOST_TEST(
+          (msg::get_config_request{xid} == msg::get_config_request{xid}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_xid_is_not_equal)
+    {
+      BOOST_TEST(
+          (msg::get_config_request{1} != msg::get_config_request{2}));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // equality
+
   BOOST_FIXTURE_TEST_SUITE(encode, get_config_request_fixture)
     BOOST_AUTO_TEST_CASE(generates_binary)
     {
@@ -85,8 +106,7 @@ BOOST_AUTO_TEST_SUITE(get_config_request)
         = msg::get_config_request::decode(it, bin.end());
 
       BOOST_TEST((it == bin.end()));
-      BOOST_TEST(get_config_request.length() == sut.length());
-      BOOST_TEST(get_config_request.xid() == sut.xid());
+      BOOST_TEST((get_config_request == sut));
     }
   BOOST_AUTO_TEST_SUITE_END() // decode
 
@@ -137,6 +157,53 @@ BOOST_AUTO_TEST_SUITE(get_config_reply)
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor
 
+  BOOST_AUTO_TEST_SUITE(equality)
+    BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+    {
+      auto const sut
+        = msg::get_config_reply{proto::OFPC_FRAG_REASM, 0x1111, 0x12345678};
+
+      BOOST_TEST((sut == sut));
+    }
+    BOOST_AUTO_TEST_CASE(is_true_if_all_parameters_are_equal)
+    {
+      auto const flags = proto::OFPC_FRAG_NORMAL;
+      auto const miss_send_len = 0x2211;
+      auto const xid = 0x01020304;
+
+      BOOST_TEST(
+          (msg::get_config_reply{flags, miss_send_len, xid}
+        == msg::get_config_reply{flags, miss_send_len, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_flags_is_not_equal)
+    {
+      auto const miss_send_len = 0x2211;
+      auto const xid = 0x01020304;
+
+      BOOST_TEST(
+          (msg::get_config_reply{proto::OFPC_FRAG_REASM, miss_send_len, xid}
+        != msg::get_config_reply{proto::OFPC_FRAG_DROP, miss_send_len, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_miss_send_len_is_not_equal)
+    {
+      auto const flags = proto::OFPC_FRAG_NORMAL;
+      auto const xid = 0x01020304;
+
+      BOOST_TEST(
+          (msg::get_config_reply{flags, 1, xid}
+        != msg::get_config_reply{flags, 2, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_xid_is_not_equal)
+    {
+      auto const flags = proto::OFPC_FRAG_NORMAL;
+      auto const miss_send_len = 0x2211;
+
+      BOOST_TEST(
+          (msg::get_config_reply{flags, miss_send_len, 1}
+        != msg::get_config_reply{flags, miss_send_len, 2}));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // equality
+
   BOOST_FIXTURE_TEST_SUITE(encode, get_config_reply_fixture)
     BOOST_AUTO_TEST_CASE(generates_binary)
     {
@@ -158,10 +225,7 @@ BOOST_AUTO_TEST_SUITE(get_config_reply)
         = msg::get_config_reply::decode(it, bin.end());
 
       BOOST_TEST((it == bin.end()));
-      BOOST_TEST(get_config_reply.length() == sut.length());
-      BOOST_TEST(get_config_reply.xid() == sut.xid());
-      BOOST_TEST(get_config_reply.flags() == sut.flags());
-      BOOST_TEST(get_config_reply.miss_send_length() == sut.miss_send_length());
+      BOOST_TEST((get_config_reply == sut));
     }
   BOOST_AUTO_TEST_SUITE_END() // decode
 
@@ -199,6 +263,53 @@ BOOST_AUTO_TEST_SUITE(set_config)
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor
 
+  BOOST_AUTO_TEST_SUITE(equality)
+    BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+    {
+      auto const sut
+        = msg::set_config{proto::OFPC_FRAG_REASM, 0x1111, 0x12345678};
+
+      BOOST_TEST((sut == sut));
+    }
+    BOOST_AUTO_TEST_CASE(is_true_if_all_parameters_are_equal)
+    {
+      auto const flags = proto::OFPC_FRAG_NORMAL;
+      auto const miss_send_len = 0x2211;
+      auto const xid = 0x01020304;
+
+      BOOST_TEST(
+          (msg::set_config{flags, miss_send_len, xid}
+        == msg::set_config{flags, miss_send_len, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_flags_is_not_equal)
+    {
+      auto const miss_send_len = 0x2211;
+      auto const xid = 0x01020304;
+
+      BOOST_TEST(
+          (msg::set_config{proto::OFPC_FRAG_REASM, miss_send_len, xid}
+        != msg::set_config{proto::OFPC_FRAG_DROP, miss_send_len, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_miss_send_len_is_not_equal)
+    {
+      auto const flags = proto::OFPC_FRAG_NORMAL;
+      auto const xid = 0x01020304;
+
+      BOOST_TEST(
+          (msg::set_config{flags, 1, xid}
+        != msg::set_config{flags, 2, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_xid_is_not_equal)
+    {
+      auto const flags = proto::OFPC_FRAG_NORMAL;
+      auto const miss_send_len = 0x2211;
+
+      BOOST_TEST(
+          (msg::set_config{flags, miss_send_len, 1}
+        != msg::set_config{flags, miss_send_len, 2}));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // equality
+
   BOOST_FIXTURE_TEST_SUITE(encode, set_config_fixture)
     BOOST_AUTO_TEST_CASE(generates_binary)
     {
@@ -219,10 +330,7 @@ BOOST_AUTO_TEST_SUITE(set_config)
       auto const set_config = msg::set_config::decode(it, bin.end());
 
       BOOST_TEST((it == bin.end()));
-      BOOST_TEST(set_config.length() == sut.length());
-      BOOST_TEST(set_config.xid() == sut.xid());
-      BOOST_TEST(set_config.flags() == sut.flags());
-      BOOST_TEST(set_config.miss_send_length() == sut.miss_send_length());
+      BOOST_TEST((set_config == sut));
     }
   BOOST_AUTO_TEST_SUITE_END() // decode
 
