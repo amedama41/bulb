@@ -248,6 +248,32 @@ BOOST_AUTO_TEST_SUITE(features_reply)
       BOOST_TEST(sut.actions() == actions);
       BOOST_TEST(sut.ports().empty());
     }
+    BOOST_FIXTURE_TEST_CASE(
+        is_copy_constructible_from_non_const_lvalue, features_reply_fixture)
+    {
+      auto const copy = sut;
+
+      BOOST_TEST((copy == sut));
+    }
+    BOOST_FIXTURE_TEST_CASE(
+        is_copy_constructible_from_const_lvalue, features_reply_fixture)
+    {
+      auto const& const_features_reply = sut;
+
+      auto const copy = const_features_reply;
+
+      BOOST_TEST((copy == sut));
+    }
+    BOOST_FIXTURE_TEST_CASE(is_move_constructible, features_reply_fixture)
+    {
+      auto moved = sut;
+
+      auto const copy = std::move(moved);
+
+      BOOST_TEST((copy == sut));
+      BOOST_TEST(moved.length() == sizeof(detail::ofp_switch_features));
+      BOOST_TEST(moved.ports().empty());
+    }
   BOOST_AUTO_TEST_SUITE_END() // constructor
 
   BOOST_FIXTURE_TEST_SUITE(extract_ports, features_reply_fixture)
