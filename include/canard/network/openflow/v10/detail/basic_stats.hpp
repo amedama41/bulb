@@ -9,10 +9,12 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+#include <boost/operators.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/numeric.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/v10/detail/basic_openflow_message.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
@@ -45,10 +47,13 @@ namespace stats_detail {
     template <class T, class StatsType>
     class basic_stats
         : public v10_detail::basic_openflow_message<T>
+        , private boost::equality_comparable<T>
     {
     public:
+        using raw_ofp_type = StatsType;
+
         static constexpr protocol::ofp_type message_type
-            = stats_message_type<StatsType>::value;
+            = stats_message_type<raw_ofp_type>::value;
 
         auto header() const noexcept
             -> v10_detail::ofp_header const&
@@ -56,7 +61,7 @@ namespace stats_detail {
             return static_cast<T const*>(this)->stats().header;
         }
 
-        auto stats_type() const noexcept
+        constexpr static auto stats_type() noexcept
             -> protocol::ofp_stats_types
         {
             return T::stats_type_value;
@@ -76,7 +81,7 @@ namespace stats_detail {
             if (header.type != message_type) {
                 throw std::runtime_error{"invalid message type"};
             }
-            if (header.length < sizeof(StatsType)) {
+            if (header.length < sizeof(raw_ofp_type)) {
                 throw std::runtime_error{"invalid length"};
             }
         }
@@ -87,7 +92,11 @@ namespace stats_detail {
     class empty_body_stats
         : public basic_stats<T, StatsType>
     {
+        using base_t = basic_stats<T, StatsType>;
+
     public:
+        using raw_ofp_type = typename base_t::raw_ofp_type;
+
         template <class Container>
         auto encode(Container& container) const
             -> Container&
@@ -99,19 +108,25 @@ namespace stats_detail {
         static auto decode(Iterator& first, Iterator last)
             -> T
         {
-            return T{detail::decode<StatsType>(first, last)};
+            return T{detail::decode<raw_ofp_type>(first, last)};
         }
 
-        using basic_stats<T, StatsType>::validate;
+        using base_t::validate;
 
-        static void validate(StatsType const& stats)
+        static void validate(raw_ofp_type const& stats)
         {
             if (stats.type != T::stats_type_value) {
                 throw std::runtime_error{"invalid stats type"};
             }
-            if (stats.header.length != sizeof(StatsType)) {
+            if (stats.header.length != sizeof(raw_ofp_type)) {
                 throw std::runtime_error{"invalid stats length"};
             }
+        }
+
+        friend auto operator==(T const& lhs, T const& rhs) noexcept
+            -> bool
+        {
+            return lhs.equal_impl(rhs);
         }
 
     protected:
@@ -121,7 +136,7 @@ namespace stats_detail {
                   v10_detail::ofp_header{
                       protocol::OFP_VERSION
                     , T::message_type
-                    , sizeof(StatsType)
+                    , sizeof(raw_ofp_type)
                     , xid
                   }
                 , T::stats_type_value
@@ -130,22 +145,28 @@ namespace stats_detail {
         {
         }
 
-        explicit empty_body_stats(StatsType const& stats) noexcept
+        explicit empty_body_stats(raw_ofp_type const& stats) noexcept
             : stats_(stats)
         {
         }
 
     private:
-        friend basic_stats<T, StatsType>;
+        auto equal_impl(T const& rhs) const noexcept
+            -> bool
+        {
+            return detail::memcmp(stats_, rhs.stats_);
+        }
+
+        friend base_t;
 
         auto stats() const noexcept
-            -> StatsType const&
+            -> raw_ofp_type const&
         {
             return stats_;
         }
 
     private:
-        StatsType stats_;
+        raw_ofp_type stats_;
     };
 
 
@@ -153,7 +174,12 @@ namespace stats_detail {
     class single_element_stats
         : public basic_stats<T, StatsType>
     {
+        using base_t = basic_stats<T, StatsType>;
+
     public:
+        using raw_ofp_type = typename base_t::raw_ofp_type;
+        using raw_ofp_stats_type = BodyType;
+
         template <class Container>
         auto encode(Container& container) const
             -> Container&
@@ -166,33 +192,39 @@ namespace stats_detail {
         static auto decode(Iterator& first, Iterator last)
             -> T
         {
-            auto const stats = detail::decode<StatsType>(first, last);
-            return T{stats, detail::decode<BodyType>(first, last)};
+            auto const stats = detail::decode<raw_ofp_type>(first, last);
+            return T{stats, detail::decode<raw_ofp_stats_type>(first, last)};
         }
 
-        using basic_stats<T, StatsType>::validate;
+        using base_t::validate;
 
-        static void validate(StatsType const& stats)
+        static void validate(raw_ofp_type const& stats)
         {
             if (stats.type != T::stats_type_value) {
                 throw std::runtime_error{"invalid stats type"};
             }
             if (stats.header.length
-                    != sizeof(StatsType) + sizeof(BodyType)) {
+                    != sizeof(raw_ofp_type) + sizeof(raw_ofp_stats_type)) {
                 throw std::runtime_error{"invalid stats length"};
             }
+        }
+
+        friend auto operator==(T const& lhs, T const& rhs) noexcept
+            -> bool
+        {
+            return lhs.equal_impl(rhs);
         }
 
     protected:
         single_element_stats(
                   std::uint16_t const flags
-                , BodyType const& body
+                , raw_ofp_stats_type const& body
                 , std::uint32_t const xid) noexcept
             : stats_{
                   v10_detail::ofp_header{
                       protocol::OFP_VERSION
                     , T::message_type
-                    , sizeof(StatsType) + sizeof(BodyType)
+                    , sizeof(raw_ofp_type) + sizeof(raw_ofp_stats_type)
                     , xid
                   }
                 , T::stats_type_value
@@ -203,20 +235,28 @@ namespace stats_detail {
         }
 
         single_element_stats(
-                StatsType const& stats, BodyType const& body) noexcept
+                  raw_ofp_type const& stats
+                , raw_ofp_stats_type const& body) noexcept
             : stats_(stats)
             , body_(body)
         {
         }
 
         auto body() const noexcept
-            -> BodyType const&
+            -> raw_ofp_stats_type const&
         {
             return body_;
         }
 
     private:
-        friend basic_stats<T, StatsType>;
+        auto equal_impl(T const& rhs) const noexcept
+            -> bool
+        {
+            return detail::memcmp(stats_, rhs.stats_)
+                && detail::memcmp(body_, rhs.body_);
+        }
+
+        friend base_t;
 
         auto stats() const noexcept
             -> StatsType const&
@@ -225,8 +265,8 @@ namespace stats_detail {
         }
 
     private:
-        StatsType stats_;
-        BodyType body_;
+        raw_ofp_type stats_;
+        raw_ofp_stats_type body_;
     };
 
 
@@ -414,7 +454,6 @@ namespace stats_detail {
         using base_type
             = basic_stats_t<v10_detail::ofp_stats_request, T, BodyType>;
 
-    public:
         using base_type::base_type;
     };
 
@@ -427,7 +466,6 @@ namespace stats_detail {
         using base_type
             = basic_stats_t<v10_detail::ofp_stats_reply, T, BodyType>;
 
-    public:
         using base_type::base_type;
     };
 

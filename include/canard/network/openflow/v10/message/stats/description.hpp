@@ -34,7 +34,7 @@ namespace statistics {
         friend basic_stats_request::base_type;
 
         explicit description_request(
-                v10_detail::ofp_stats_request const& stats_request) noexcept
+                raw_ofp_type const& stats_request) noexcept
             : basic_stats_request{stats_request}
         {
         }
@@ -99,8 +99,8 @@ namespace statistics {
         friend basic_stats_reply::base_type;
 
         description_reply(
-                  v10_detail::ofp_stats_reply const& stats_reply
-                , v10_detail::ofp_desc_stats const& desc_stats) noexcept
+                  raw_ofp_type const& stats_reply
+                , raw_ofp_stats_type const& desc_stats) noexcept
             : basic_stats_reply{stats_reply, desc_stats}
         {
         }
@@ -111,11 +111,11 @@ namespace statistics {
                 , boost::string_ref sw_desc
                 , boost::string_ref serial
                 , boost::string_ref dp_desc)
-            -> v10_detail::ofp_desc_stats
+            -> raw_ofp_stats_type
         {
             using boost::adaptors::sliced;
 
-            auto desc = v10_detail::ofp_desc_stats{};
+            auto desc = raw_ofp_stats_type{};
 
             auto const mfr_desc_size
                 = std::min(mfr_desc.size(), sizeof(desc.mfr_desc) - 1);
