@@ -155,6 +155,29 @@ namespace messages {
         {
         }
 
+        features_reply(features_reply const&) = default;
+
+        features_reply(features_reply&& other)
+            : switch_features_(other.switch_features_)
+            , ports_(other.extract_ports())
+        {
+        }
+
+        auto operator=(features_reply const& other)
+            -> features_reply&
+        {
+            return operator=(features_reply{other});
+        }
+
+        auto operator=(features_reply&& other)
+            -> features_reply&
+        {
+            auto tmp = std::move(other);
+            std::swap(switch_features_, tmp.switch_features_);
+            ports_.swap(tmp.ports_);
+            return *this;
+        }
+
         auto header() const noexcept
             -> v10_detail::ofp_header
         {
