@@ -4,8 +4,10 @@
 #include <cstddef>
 #include <cstdint>
 #include <utility>
+#include <boost/operators.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
 #include <canard/network/openflow/v10/detail/basic_stats.hpp>
@@ -19,10 +21,12 @@ namespace messages {
 namespace statistics {
 
     class port_stats
+        : private boost::equality_comparable<port_stats>
     {
     public:
-        static std::uint16_t const base_size
-            = sizeof(v10_detail::ofp_port_stats);
+        using raw_ofp_type = v10_detail::ofp_port_stats;
+
+        static std::uint16_t const base_size = sizeof(raw_ofp_type);
 
         port_stats(std::uint16_t const port_no
                  , std::uint64_t const rx_packets
@@ -59,7 +63,7 @@ namespace statistics {
         static constexpr auto length() noexcept
             -> std::uint16_t
         {
-            return sizeof(v10_detail::ofp_port_stats);
+            return sizeof(raw_ofp_type);
         }
 
         auto port_no() const noexcept
@@ -151,21 +155,34 @@ namespace statistics {
         static auto decode(Iterator& first, Iterator last)
             -> port_stats
         {
-            return port_stats{
-                detail::decode<v10_detail::ofp_port_stats>(first, last)
-            };
+            return port_stats{detail::decode<raw_ofp_type>(first, last)};
         }
 
+        friend auto operator==(port_stats const&, port_stats const&) noexcept
+            -> bool;
+
     private:
-        explicit port_stats(
-                v10_detail::ofp_port_stats const& port_stats) noexcept
+        explicit port_stats(raw_ofp_type const& port_stats) noexcept
             : port_stats_(port_stats)
         {
         }
 
+        auto equal_impl(port_stats const& rhs) const noexcept
+            -> bool
+        {
+            return detail::memcmp(port_stats_, rhs.port_stats_);
+        }
+
     private:
-        v10_detail::ofp_port_stats port_stats_;
+        raw_ofp_type port_stats_;
     };
+
+    inline auto operator==(
+            port_stats const& lhs, port_stats const& rhs) noexcept
+        -> bool
+    {
+        return lhs.equal_impl(rhs);
+    }
 
 
     class port_stats_request
@@ -182,7 +199,7 @@ namespace statistics {
                 , std::uint32_t const xid = get_xid()) noexcept
             : basic_stats_request{
                   0
-                , v10_detail::ofp_port_stats_request{
+                , raw_ofp_stats_type{
                     port_no, { 0, 0, 0, 0, 0, 0 }
                   }
                 , xid
@@ -200,8 +217,8 @@ namespace statistics {
         friend basic_stats_request::base_type;
 
         port_stats_request(
-                  v10_detail::ofp_stats_request const& stats_request
-                , v10_detail::ofp_port_stats_request const& port_stats_request) noexcept
+                  raw_ofp_type const& stats_request
+                , raw_ofp_stats_type const& port_stats_request) noexcept
             : basic_stats_request{stats_request, port_stats_request}
         {
         }
@@ -229,8 +246,7 @@ namespace statistics {
         friend basic_stats_reply::base_type;
 
         port_stats_reply(
-                  v10_detail::ofp_stats_reply const& stats_reply
-                , body_type&& port_stats)
+                raw_ofp_type const& stats_reply, body_type&& port_stats)
             : basic_stats_reply{stats_reply, std::move(port_stats)}
         {
         }
