@@ -78,7 +78,6 @@ struct features_reply_param_fixture {
     | (1 << proto::OFPAT_SET_TP_DST)
     | (1 << proto::OFPAT_ENQUEUE);
   msg::features_reply::port_list ports{ port1, port2, port3 };
-  msg::features_reply::port_list empty_port_list{};
   std::uint32_t xid = 0x12345678;
 };
 
@@ -128,6 +127,25 @@ BOOST_AUTO_TEST_SUITE(features_request)
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor
 
+  BOOST_AUTO_TEST_SUITE(equality)
+    BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+    {
+      auto const sut = msg::features_request{0x12345678};
+
+      BOOST_TEST((sut == sut));
+    }
+    BOOST_AUTO_TEST_CASE(is_true_if_xid_is_equal)
+    {
+      auto const xid = 0x11002200;
+
+      BOOST_TEST((msg::features_request{xid} == msg::features_request{xid}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_xid_is_not_equal)
+    {
+      BOOST_TEST((msg::features_request{1} != msg::features_request{2}));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // equality
+
   BOOST_FIXTURE_TEST_SUITE(encode, features_request_fixture)
     BOOST_AUTO_TEST_CASE(generate_binary)
     {
@@ -149,7 +167,7 @@ BOOST_AUTO_TEST_SUITE(features_request)
         = msg::features_request::decode(it, bin.end());
 
       BOOST_TEST((it == bin.end()));
-      BOOST_TEST(features_request.xid() == sut.xid());
+      BOOST_TEST((features_request == sut));
     }
   BOOST_AUTO_TEST_SUITE_END() // decode
 
@@ -219,7 +237,7 @@ BOOST_AUTO_TEST_SUITE(features_reply)
     BOOST_AUTO_TEST_CASE(is_constructible_from_empty_port_list)
     {
       auto const sut = msg::features_reply{
-        dpid, n_buffers, n_tables, capabilities, actions, empty_port_list
+        dpid, n_buffers, n_tables, capabilities, actions, {}
       };
 
       BOOST_TEST(sut.length() == sizeof(detail::ofp_switch_features));
@@ -228,7 +246,7 @@ BOOST_AUTO_TEST_SUITE(features_reply)
       BOOST_TEST(sut.num_tables() == n_tables);
       BOOST_TEST(sut.capabilities() == capabilities);
       BOOST_TEST(sut.actions() == actions);
-      BOOST_TEST((sut.ports() == empty_port_list));
+      BOOST_TEST(sut.ports().empty());
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor
 
@@ -238,23 +256,98 @@ BOOST_AUTO_TEST_SUITE(features_reply)
       auto ports = sut.extract_ports();
 
       BOOST_TEST(sut.length() == sizeof(detail::ofp_switch_features));
-      BOOST_TEST((sut.ports() == empty_port_list));
+      BOOST_TEST(sut.ports().empty());
       BOOST_TEST(
           (ports == msg::features_reply::port_list{ port1, port2, port3 }));
     }
     BOOST_AUTO_TEST_CASE(returns_empty_port_list)
     {
       auto sut = msg::features_reply{
-        dpid, n_buffers, n_tables, capabilities, actions, empty_port_list, xid
+        dpid, n_buffers, n_tables, capabilities, actions, {}, xid
       };
 
       auto ports = sut.extract_ports();
 
       BOOST_TEST(sut.length() == sizeof(detail::ofp_switch_features));
-      BOOST_TEST((sut.ports() == empty_port_list));
-      BOOST_TEST((ports == empty_port_list));
+      BOOST_TEST(sut.ports().empty());
+      BOOST_TEST(ports.empty());
     }
   BOOST_AUTO_TEST_SUITE_END() // extract_ports
+
+  BOOST_FIXTURE_TEST_SUITE(equality, features_reply_param_fixture)
+    BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+    {
+      auto const sut = msg::features_reply{
+        dpid, n_buffers, n_tables, capabilities, actions, ports, xid
+      };
+
+      BOOST_TEST((sut == sut));
+    }
+    BOOST_AUTO_TEST_CASE(is_true_if_all_parameters_are_equal)
+    {
+      BOOST_TEST(
+          (msg::features_reply{
+             dpid, n_buffers, n_tables, capabilities, actions, ports, xid}
+        == msg::features_reply{
+             dpid, n_buffers, n_tables, capabilities, actions, ports, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_dpid_is_not_equal)
+    {
+      BOOST_TEST(
+          (msg::features_reply{
+             1, n_buffers, n_tables, capabilities, actions, ports, xid}
+        != msg::features_reply{
+             2, n_buffers, n_tables, capabilities, actions, ports, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_n_buffers_is_not_equal)
+    {
+      BOOST_TEST(
+          (msg::features_reply{
+             dpid, 1, n_tables, capabilities, actions, ports, xid}
+        != msg::features_reply{
+             dpid, 2, n_tables, capabilities, actions, ports, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_n_tables_is_not_equal)
+    {
+      BOOST_TEST(
+          (msg::features_reply{
+             dpid, n_buffers, 1, capabilities, actions, ports, xid}
+        != msg::features_reply{
+             dpid, n_buffers, 2, capabilities, actions, ports, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_capabilities_is_not_equal)
+    {
+      BOOST_TEST(
+          (msg::features_reply{
+             dpid, n_buffers, n_tables, 1, actions, ports, xid}
+        != msg::features_reply{
+             dpid, n_buffers, n_tables, 2, actions, ports, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_actions_is_not_equal)
+    {
+      BOOST_TEST(
+          (msg::features_reply{
+             dpid, n_buffers, n_tables, capabilities, 1, ports, xid}
+        != msg::features_reply{
+             dpid, n_buffers, n_tables, capabilities, 2, ports, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_ports_is_not_equal)
+    {
+      BOOST_TEST(
+          (msg::features_reply{
+             dpid, n_buffers, n_tables, capabilities, actions, { port1 }, xid}
+        != msg::features_reply{
+             dpid, n_buffers, n_tables, capabilities, actions, { port2 }, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_xid_is_not_equal)
+    {
+      BOOST_TEST(
+          (msg::features_reply{
+             dpid, n_buffers, n_tables, capabilities, actions, ports, 1}
+        != msg::features_reply{
+             dpid, n_buffers, n_tables, capabilities, actions, ports, 2}));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // equality
 
   BOOST_FIXTURE_TEST_SUITE(encode, features_reply_fixture)
     BOOST_AUTO_TEST_CASE(generate_binary)
@@ -288,13 +381,7 @@ BOOST_AUTO_TEST_SUITE(features_reply)
       auto const features_reply = msg::features_reply::decode(it, bin.end());
 
       BOOST_TEST((it == bin.end()));
-      BOOST_TEST(features_reply.xid() == xid);
-      BOOST_TEST(features_reply.datapath_id() == dpid);
-      BOOST_TEST(features_reply.num_buffers() == n_buffers);
-      BOOST_TEST(features_reply.num_tables() == n_tables);
-      BOOST_TEST(features_reply.capabilities() == capabilities);
-      BOOST_TEST(features_reply.actions() == actions);
-      BOOST_TEST((features_reply.ports() == ports));
+      BOOST_TEST((features_reply == sut));
     }
     BOOST_AUTO_TEST_CASE(construct_features_reply_from_no_port_binary)
     {
@@ -306,14 +393,9 @@ BOOST_AUTO_TEST_SUITE(features_reply)
 
       BOOST_TEST((it == std::next(bin.begin(), bin_len)));
       BOOST_TEST(
-          features_reply.length() == sizeof(detail::ofp_switch_features));
-      BOOST_TEST(features_reply.xid() == xid);
-      BOOST_TEST(features_reply.datapath_id() == dpid);
-      BOOST_TEST(features_reply.num_buffers() == n_buffers);
-      BOOST_TEST(features_reply.num_tables() == n_tables);
-      BOOST_TEST(features_reply.capabilities() == capabilities);
-      BOOST_TEST(features_reply.actions() == actions);
-      BOOST_TEST((features_reply.ports() == empty_port_list));
+          (features_reply
+        == msg::features_reply{
+            dpid, n_buffers, n_tables, capabilities, actions, {}, xid}));
     }
     BOOST_AUTO_TEST_CASE(construct_features_reply_from_single_port_binary)
     {
@@ -326,16 +408,9 @@ BOOST_AUTO_TEST_SUITE(features_reply)
 
       BOOST_TEST((it == std::next(bin.begin(), bin_len)));
       BOOST_TEST(
-          features_reply.length()
-       == sizeof(detail::ofp_switch_features) + sizeof(detail::ofp_phy_port));
-      BOOST_TEST(features_reply.xid() == xid);
-      BOOST_TEST(features_reply.datapath_id() == dpid);
-      BOOST_TEST(features_reply.num_buffers() == n_buffers);
-      BOOST_TEST(features_reply.num_tables() == n_tables);
-      BOOST_TEST(features_reply.capabilities() == capabilities);
-      BOOST_TEST(features_reply.actions() == actions);
-      BOOST_TEST(
-          (features_reply.ports() == msg::features_reply::port_list{port1}));
+          (features_reply
+        == msg::features_reply{
+            dpid, n_buffers, n_tables, capabilities, actions, { port1 }, xid}));
     }
   BOOST_AUTO_TEST_SUITE_END() // decode
 
