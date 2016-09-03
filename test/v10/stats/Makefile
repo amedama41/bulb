@@ -1,0 +1,5 @@
+SRCS = description_test.cpp
+TARGET_LIB = libstats_test.dylib
+
+-include ../../subdirectories.mk
+
