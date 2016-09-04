@@ -14,6 +14,7 @@
 #include <canard/network/openflow/detail/as_byte_range.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/validator.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -159,7 +160,7 @@ namespace v13 {
         static auto create(Args&&... args)
             -> T
         {
-            return T::validate(T(std::forward<Args>(args)...));
+            return validation::validate(T(std::forward<Args>(args)...));
         }
 
         friend auto operator==(T const& lhs, T const& rhs) noexcept
