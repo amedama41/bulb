@@ -16,6 +16,7 @@
 #include <boost/operators.hpp>
 #include <canard/mac_address.hpp>
 #include <canard/network/openflow/detail/is_same_value_type.hpp>
+#include <canard/network/openflow/validator.hpp>
 #include <canard/network/openflow/v10/detail/fusion_adaptor.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
 
@@ -166,21 +167,16 @@ namespace v10 {
                 return value_;
             }
 
-            template <class MatchField>
-            static auto validate(MatchField&& field)
-                -> typename std::enable_if<
-                      detail::is_same_value_type<MatchField, match_field>::value
-                    , MatchField&&
-                   >::type
+            template <class Validator>
+            void validate(Validator) const
             {
-                match_detail::validate(field.value(), FieldType{});
-                return std::forward<MatchField>(field);
+                match_detail::validate(value(), FieldType{});
             }
 
             static auto create(value_type const value)
                 -> match_field
             {
-                return validate(match_field{value});
+                return validation::validate(match_field{value});
             }
 
             template <class FieldType2>
@@ -287,20 +283,15 @@ namespace v10 {
                 return value_;
             }
 
-            template <class MatchField>
-            static auto validate(MatchField&& field)
-                -> typename std::enable_if<
-                      detail::is_same_value_type<MatchField, dl_addr_match_field>::value
-                    , MatchField&&
-                   >::type
+            template <class Validator>
+            void validate(Validator) const
             {
-                return std::forward<MatchField>(field);
             }
 
             static auto create(value_type const value)
                 -> dl_addr_match_field
             {
-                return validate(dl_addr_match_field{value});
+                return validation::validate(dl_addr_match_field{value});
             }
 
         private:
@@ -410,19 +401,14 @@ namespace v10 {
                 return wildcard_bit_count_;
             }
 
-            template <class MatchField>
-            static auto validate(MatchField&& field)
-                -> typename std::enable_if<
-                      detail::is_same_value_type<MatchField, nw_addr_match_field>::value
-                    , MatchField&&
-                   >::type
+            template <class Validator>
+            void validate(Validator) const
             {
                 constexpr auto max_wildcard_bit_count
                     = mask_info::mask >> mask_info::shift;
-                if (field.wildcard_bit_count_ > max_wildcard_bit_count) {
+                if (wildcard_bit_count_ > max_wildcard_bit_count) {
                     throw std::runtime_error{"invalid wildcard"};
                 }
-                return std::forward<MatchField>(field);
             }
 
             template <class IPAddress>
@@ -433,7 +419,8 @@ namespace v10 {
                 if (prefix_length > max_prefix_length) {
                     throw std::runtime_error{"invalid prefix length"};
                 }
-                return validate(nw_addr_match_field{value, prefix_length});
+                return validation::validate(
+                        nw_addr_match_field{value, prefix_length});
             }
 
         private:

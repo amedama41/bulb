@@ -8,6 +8,7 @@
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
+#include <canard/network/openflow/validator.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
 
@@ -51,11 +52,17 @@ namespace actions_detail {
             return T{detail::decode<OFPAction>(first, last)};
         }
 
+        template <class Validator>
+        void validate(Validator validator_for_children) const
+        {
+            static_cast<T const*>(this)->validate_impl(validator_for_children);
+        }
+
         template <class... Args>
         static auto create(Args&&... args)
             -> T
         {
-            return T::validate(T(std::forward<Args>(args)...));
+            return validation::validate(T(std::forward<Args>(args)...));
         }
 
         static void validate_header(v10_detail::ofp_action_header const& header)

@@ -1,8 +1,6 @@
 #ifndef CANARD_NET_OFP_V10_ACTIONS_STRIP_VLAN_HPP
 #define CANARD_NET_OFP_V10_ACTIONS_STRIP_VLAN_HPP
 
-#include <type_traits>
-#include <utility>
 #include <canard/network/openflow/detail/is_same_value_type.hpp>
 #include <canard/network/openflow/v10/detail/basic_action.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
@@ -29,15 +27,6 @@ namespace actions {
         {
         }
 
-        template <class Action>
-        static auto validate(Action&& action)
-            -> typename std::enable_if<
-                  detail::is_same_value_type<Action, strip_vlan>::value, Action&&
-               >::type
-        {
-            return std::forward<Action>(action);
-        }
-
     private:
         friend basic_action;
 
@@ -50,6 +39,11 @@ namespace actions {
             -> raw_ofp_type const&
         {
             return strip_vlan_;
+        }
+
+        template <class Validator>
+        void validate_impl(Validator) const
+        {
         }
 
     private:

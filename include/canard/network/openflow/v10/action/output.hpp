@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <limits>
 #include <stdexcept>
-#include <type_traits>
 #include <utility>
 #include <canard/network/openflow/detail/is_same_value_type.hpp>
 #include <canard/network/openflow/v10/detail/basic_action.hpp>
@@ -60,19 +59,6 @@ namespace actions {
             return output{protocol::OFPP_CONTROLLER, max_len};
         }
 
-        template <class Action>
-        static auto validate(Action&& action)
-            -> typename std::enable_if<
-                  detail::is_same_value_type<Action, output>::value, Action&&
-               >::type
-        {
-            auto const port_no = action.port_no();
-            if (port_no == 0 || port_no == protocol::OFPP_NONE) {
-                throw std::runtime_error{"invalid port_no"};
-            }
-            return std::forward<Action>(action);
-        }
-
     private:
         friend basic_action;
 
@@ -85,6 +71,14 @@ namespace actions {
             -> raw_ofp_type const&
         {
             return action_output_;
+        }
+
+        template <class Validator>
+        void validate_impl(Validator) const
+        {
+            if (port_no() == 0 || port_no() == protocol::OFPP_NONE) {
+                throw std::runtime_error{"invalid port_no"};
+            }
         }
 
     private:
