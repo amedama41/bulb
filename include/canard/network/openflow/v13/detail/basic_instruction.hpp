@@ -3,13 +3,13 @@
 
 #include <cstdint>
 #include <stdexcept>
-#include <type_traits>
 #include <utility>
 #include <boost/operators.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/is_same_value_type.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
+#include <canard/network/openflow/validator.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -59,7 +59,7 @@ namespace v13 {
         static auto create(Args&&... args)
             -> T
         {
-            return T::validate(T(std::forward<Args>(args)...));
+            return validation::validate(T(std::forward<Args>(args)...));
         }
 
         static void validate_instruction(
@@ -73,15 +73,10 @@ namespace v13 {
             }
         }
 
-        template <class Instruction>
-        static auto validate(Instruction&& instruction)
-            -> typename std::enable_if<
-                  detail::is_same_value_type<Instruction, T>::value
-                , Instruction&&
-               >::type
+        template <class Validator>
+        void validate(Validator validator) const
         {
-            T::validate_impl(instruction);
-            return std::forward<Instruction>(instruction);
+            static_cast<T const*>(this)->validate_impl(validator);
         }
 
         friend auto operator==(T const& lhs, T const& rhs) noexcept

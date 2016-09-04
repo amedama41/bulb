@@ -51,9 +51,10 @@ namespace instructions {
             return instruction_goto_table_;
         }
 
-        static void validate_impl(goto_table const& goto_table)
+        template <class Validator>
+        void validate_impl(Validator) const
         {
-            if (goto_table.table_id() > protocol::OFPTT_MAX) {
+            if (table_id() > protocol::OFPTT_MAX) {
                 throw std::runtime_error{"invalid table id"};
             }
         }

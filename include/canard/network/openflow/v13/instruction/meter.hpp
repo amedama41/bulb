@@ -50,10 +50,10 @@ namespace instructions {
             return instruction_meter_;
         }
 
-        static void validate_impl(meter const& meter)
+        template <class Validator>
+        void validate_impl(Validator) const
         {
-            auto const meter_id = meter.meter_id();
-            if (meter_id == 0 || meter_id > protocol::OFPM_MAX) {
+            if (meter_id() == 0 || meter_id() > protocol::OFPM_MAX) {
                 throw std::runtime_error{"invalid meter id"};
             }
         }

@@ -46,8 +46,10 @@ namespace instructions {
         {
         }
 
-        static void validate_impl(apply_actions const&)
+        template <class Validator>
+        void validate_impl(Validator validator) const
         {
+            validator(actions());
         }
     };
 
