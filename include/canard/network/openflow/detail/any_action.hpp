@@ -90,6 +90,13 @@ namespace detail {
                     first, last, to_any_action{});
         }
 
+        template <class Validator>
+        void validate(Validator validator) const
+        {
+            auto visitor = detail::validation_visitor<Validator>{validator};
+            boost::apply_visitor(visitor, variant_);
+        }
+
         template <class Visitor>
         auto visit(Visitor&& visitor)
             -> typename std::remove_reference<Visitor>::type::result_type
