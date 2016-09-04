@@ -57,9 +57,10 @@ namespace actions {
             return action_set_queue_;
         }
 
-        static void validate_impl(set_queue const& action)
+        template <class Validator>
+        void validate_impl(Validator) const
         {
-            if (action.queue_id() == protocol::OFPQ_ALL) {
+            if (queue_id() == protocol::OFPQ_ALL) {
                 throw std::runtime_error{"invalid queue_id"};
             }
         }

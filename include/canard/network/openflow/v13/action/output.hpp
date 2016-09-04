@@ -76,14 +76,14 @@ namespace actions {
             return action_output_;
         }
 
-        static void validate_impl(output const& action)
+        template <class Validator>
+        void validate_impl(Validator) const
         {
-            if (action.port_no() == 0
-                    || action.port_no() == protocol::OFPP_ANY) {
+            if (port_no() == 0 || port_no() == protocol::OFPP_ANY) {
                 throw std::runtime_error{"invalid port_no"};
             }
-            if (action.max_length() > protocol::OFPCML_MAX
-                    && action.max_length() != protocol::OFPCML_NO_BUFFER) {
+            if (max_length() > protocol::OFPCML_MAX
+                    && max_length() != protocol::OFPCML_NO_BUFFER) {
                 throw std::runtime_error{"invalid max_length"};
             }
         }

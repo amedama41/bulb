@@ -75,7 +75,8 @@ namespace actions {
             return action_pop_mpls_;
         }
 
-        static void validate_impl(pop_mpls const&)
+        template <class Validator>
+        void validate_impl(Validator) const
         {
         }
 

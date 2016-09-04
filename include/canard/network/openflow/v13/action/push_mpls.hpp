@@ -44,9 +44,10 @@ namespace actions {
         {
         }
 
-        static void validate_impl(push_mpls const& action)
+        template <class Validator>
+        void validate_impl(Validator) const
         {
-            if (action.ethertype() != 0x8847 && action.ethertype() != 0x8848) {
+            if (ethertype() != 0x8847 && ethertype() != 0x8848) {
                 throw std::runtime_error{"invalid ethertype"};
             }
         }

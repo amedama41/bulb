@@ -6,13 +6,13 @@
 #include <iterator>
 #include <stdexcept>
 #include <tuple>
-#include <type_traits>
 #include <utility>
 #include <boost/operators.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/is_same_value_type.hpp>
 #include <canard/network/openflow/detail/padding.hpp>
+#include <canard/network/openflow/validator.hpp>
 #include <canard/network/openflow/v13/common/oxm_match_field.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/detail/length_utility.hpp>
@@ -123,7 +123,7 @@ namespace actions {
         static auto create(Args&&... args)
             -> set_field
         {
-            return validate(set_field(std::forward<Args>(args)...));
+            return validation::validate(set_field(std::forward<Args>(args)...));
         }
 
         static auto create_from_match_field(OXMMatchField field)
@@ -146,18 +146,13 @@ namespace actions {
             }
         }
 
-        template <class Action>
-        static auto validate(Action&& action)
-            -> typename std::enable_if<
-                  detail::is_same_value_type<Action, set_field>::value
-                , Action&&
-               >::type
+        template <class Validator>
+        void validate(Validator validator) const
         {
-            OXMMatchField::validate(action.field_);
-            if (action.field_.oxm_has_mask()) {
+            field_.validate(validator);
+            if (field_.oxm_has_mask()) {
                 throw std::runtime_error{"invalid oxm_hasmask"};
             }
-            return std::forward<Action>(action);
         }
 
         friend auto operator==(

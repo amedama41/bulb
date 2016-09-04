@@ -58,7 +58,8 @@ namespace actions {
             return action_mpls_ttl_;
         }
 
-        static void validate_impl(set_mpls_ttl const&)
+        template <class Validator>
+        void validate_impl(Validator) const
         {
         }
 
