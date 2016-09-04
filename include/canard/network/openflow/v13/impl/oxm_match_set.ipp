@@ -2,7 +2,7 @@
 #define CANARD_NET_OFP_V13_IMPL_OXM_MATCH_SET_IPP
 
 #include <canard/network/openflow/detail/config.hpp>
-#include <canard/network/openflow/v13/oxm_match_set.hpp>
+#include <canard/network/openflow/v13/common/oxm_match_set.hpp>
 
 #include <cstdint>
 #include <stdexcept>

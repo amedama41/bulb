@@ -10,6 +10,7 @@
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/get_xid.hpp>
+#include <canard/network/openflow/v13/common/oxm_match_set.hpp>
 #include <canard/network/openflow/v13/detail/basic_multipart.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/detail/flow_entry_adaptor.hpp>
@@ -17,7 +18,6 @@
 #include <canard/network/openflow/v13/flow_entry.hpp>
 #include <canard/network/openflow/v13/instruction_set.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
-#include <canard/network/openflow/v13/oxm_match_set.hpp>
 
 namespace canard {
 namespace net {
