@@ -16,7 +16,8 @@ TEST_DIRS = action \
 			multipart \
 			oxm_match \
 			queue_property \
-			table_feature_property
+			table_feature_property \
+			utility
 TEST_LIBS = $(foreach dir,$(TEST_DIRS),./$(dir)/lib$(dir)_test.dylib)
 TEST_RPATH = $(foreach dir,$(TEST_DIRS),-rpath @executable_path/./$(dir))
 
