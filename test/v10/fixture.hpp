@@ -2,7 +2,7 @@
 #define CANARD_NET_OFP_V10_TEST_FIXTURE_HPP
 
 #include <canard/network/openflow/v10/actions.hpp>
-#include <canard/network/openflow/v10/match_fields.hpp>
+#include <canard/network/openflow/v10/common/match_fields.hpp>
 #include "../test_utility.hpp"
 
 namespace {

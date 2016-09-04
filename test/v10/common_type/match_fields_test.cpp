@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v10/match_fields.hpp>
+#include <canard/network/openflow/v10/common/match_fields.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>

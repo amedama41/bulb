@@ -3,7 +3,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <canard/network/openflow/v10/actions.hpp>
-#include <canard/network/openflow/v10/match_fields.hpp>
+#include <canard/network/openflow/v10/common/match_fields.hpp>
 #include "../../test_utility.hpp"
 
 namespace ofp = canard::net::ofp;

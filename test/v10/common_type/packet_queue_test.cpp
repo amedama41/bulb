@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v10/packet_queue.hpp>
+#include <canard/network/openflow/v10/common/packet_queue.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include "../../test_utility.hpp"
