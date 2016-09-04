@@ -11,6 +11,7 @@ LIBBULB_RPATH = -rpath @executable_path/./$(LIBBULB_DIR)
 
 TEST_DIRS = action \
 			common_type \
+			hello_element \
 			instruction \
 			message \
 			multipart \
@@ -28,7 +29,7 @@ ALL_RPATH = $(LIBBULB_RPATH) $(TEST_RPATH)
 UTILITY_TEST_SRCS = byteorder_test.cpp
 UTILITY_TEST_OBJS = $(UTILITY_TEST_SRCS:.cpp=.o)
 
-MESSAGE_TEST_SRCS = hello_test.cpp hello_elements_test.cpp \
+MESSAGE_TEST_SRCS = hello_test.cpp \
 					table_features_test.cpp
 MESSAGE_TEST_OBJS = $(MESSAGE_TEST_SRCS:.cpp=.o)
 
