@@ -10,7 +10,7 @@
 #include <boost/asio/ip/address_v4.hpp>
 #include <boost/asio/ip/address_v6.hpp>
 #include <canard/mac_address.hpp>
-#include <canard/network/openflow/v13/oxm_match_field.hpp>
+#include <canard/network/openflow/v13/common/oxm_match_field.hpp>
 
 #include "../../test_utility.hpp"
 

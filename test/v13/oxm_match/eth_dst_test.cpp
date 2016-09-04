@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v13/oxm_match_field.hpp>
+#include <canard/network/openflow/v13/common/oxm_match_field.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <stdexcept>
