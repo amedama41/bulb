@@ -56,9 +56,10 @@ namespace actions {
             return action_group_;
         }
 
-        static void validate_impl(group const& action)
+        template <class Validator>
+        void validate_impl(Validator) const
         {
-            if (action.group_id() > protocol::OFPG_MAX) {
+            if (group_id() > protocol::OFPG_MAX) {
                 throw std::runtime_error{"invalid group_id"};
             }
         }

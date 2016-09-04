@@ -193,6 +193,12 @@ namespace detail {
             return action_list{std::move(actions)};
         }
 
+        template <class Validator>
+        void validate(Validator validator_for_children) const
+        {
+            boost::for_each(actions_, validator_for_children);
+        }
+
         friend auto operator==(action_list const& lhs, action_list const& rhs)
             -> bool
         {

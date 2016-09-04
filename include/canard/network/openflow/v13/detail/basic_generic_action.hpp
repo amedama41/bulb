@@ -58,7 +58,8 @@ namespace v13 {
             return action_header_;
         }
 
-        static void validate_impl(T const&)
+        template <class Validator>
+        void validate_impl(Validator) const
         {
         }
 

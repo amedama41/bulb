@@ -402,8 +402,7 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
         BOOST_TEST((it == it_end));
         BOOST_TEST((write_actions == sut));
         BOOST_CHECK_THROW(
-                  instructions::write_actions::validate(write_actions)
-                , std::runtime_error);
+                of::validation::validate(write_actions), std::runtime_error);
     }
 
 BOOST_AUTO_TEST_SUITE_END() // write_actions_test

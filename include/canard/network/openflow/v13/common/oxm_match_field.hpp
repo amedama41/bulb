@@ -5,7 +5,6 @@
 #include <stdexcept>
 #include <tuple>
 #include <type_traits>
-#include <utility>
 #include <boost/asio/ip/address.hpp>
 #include <boost/asio/ip/address_v4.hpp>
 #include <boost/asio/ip/address_v6.hpp>
@@ -286,21 +285,15 @@ namespace oxm_match {
             return mask_;
         }
 
-        template <class OXMMatchField>
-        static auto validate(OXMMatchField&& field)
-            -> typename std::enable_if<
-                  detail::is_same_value_type<OXMMatchField, oxm_match_field>::value
-                , OXMMatchField&&
-               >::type
+        template <class Validator>
+        void validate(Validator) const
         {
             oxm_match_detail::validate_value(
-                      field.oxm_value()
+                      oxm_value()
                     , oxm_match_detail::oxm_type<OXMClass, OXMField>{});
-            if (field.oxm_has_mask()) {
-                oxm_match_detail::validate_mask(
-                        field.raw_value(), field.raw_mask());
+            if (this->oxm_has_mask()) {
+                oxm_match_detail::validate_mask(raw_value(), raw_mask());
             }
-            return std::forward<OXMMatchField>(field);
         }
 
     private:
@@ -372,18 +365,12 @@ namespace oxm_match {
             return mask_;
         }
 
-        template <class OXMMatchField>
-        static auto validate(OXMMatchField&& field)
-            -> typename std::enable_if<
-                  detail::is_same_value_type<OXMMatchField, oxm_match_field>::value
-                , OXMMatchField&&
-               >::type
+        template <class Validator>
+        void validate(Validator) const
         {
-            if (field.oxm_has_mask()) {
-                oxm_match_detail::validate_mask(
-                        field.raw_value(), field.raw_mask());
+            if (this->oxm_has_mask()) {
+                oxm_match_detail::validate_mask(raw_value(), raw_mask());
             }
-            return std::forward<OXMMatchField>(field);
         }
 
     private:
@@ -494,18 +481,12 @@ namespace oxm_match {
             return mask_;
         }
 
-        template <class OXMMatchField>
-        static auto validate(OXMMatchField&& field)
-            -> typename std::enable_if<
-                  detail::is_same_value_type<OXMMatchField, oxm_match_field>::value
-                , OXMMatchField&&
-               >::type
+        template <class Validator>
+        void validate(Validator) const
         {
-            if (field.oxm_has_mask()) {
-                oxm_match_detail::validate_mask(
-                        field.raw_value(), field.raw_mask());
+            if (this->oxm_has_mask()) {
+                oxm_match_detail::validate_mask(raw_value(), raw_mask());
             }
-            return std::forward<OXMMatchField>(field);
         }
 
     private:
@@ -624,18 +605,12 @@ namespace oxm_match {
             return mask_;
         }
 
-        template <class OXMMatchField>
-        static auto validate(OXMMatchField&& field)
-            -> typename std::enable_if<
-                  detail::is_same_value_type<OXMMatchField, oxm_match_field>::value
-                , OXMMatchField&&
-               >::type
+        template <class Validator>
+        void validate(Validator) const
         {
-            if (field.oxm_has_mask()) {
-                oxm_match_detail::validate_mask(
-                        field.raw_value(), field.raw_mask());
+            if (this->oxm_has_mask()) {
+                oxm_match_detail::validate_mask(raw_value(), raw_mask());
             }
-            return std::forward<OXMMatchField>(field);
         }
 
     private:

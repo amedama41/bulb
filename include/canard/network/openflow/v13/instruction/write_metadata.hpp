@@ -62,7 +62,8 @@ namespace instructions {
             return instruction_write_metadata_;
         }
 
-        static void validate_impl(write_metadata const&)
+        template <class Validator>
+        void validate_impl(Validator) const
         {
         }
 

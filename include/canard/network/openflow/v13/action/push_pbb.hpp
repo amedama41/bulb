@@ -32,9 +32,10 @@ namespace actions {
         {
         }
 
-        static void validate_impl(push_pbb const& action)
+        template <class Validator>
+        void validate_impl(Validator) const
         {
-            if (action.ethertype() != 0x88e7) {
+            if (ethertype() != 0x88e7) {
                 throw std::runtime_error{"invalid ethertype"};
             }
         }

@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <stdexcept>
-#include <type_traits>
 #include <utility>
 #include <canard/network/openflow/detail/is_same_value_type.hpp>
 #include <canard/network/openflow/v10/detail/basic_action.hpp>
@@ -50,24 +49,6 @@ namespace actions {
             return enqueue_.port;
         }
 
-        template <class Action>
-        static auto validate(Action&& action)
-            -> typename std::enable_if<
-                  detail::is_same_value_type<Action, enqueue>::value, Action&&
-               >::type
-        {
-            if (action.queue_id() == protocol::OFPQ_ALL) {
-                throw std::runtime_error{"invalid queue_id"};
-            }
-            auto const port_no = action.port_no();
-            if (port_no == 0
-                    || (port_no > protocol::OFPP_MAX
-                        && port_no != protocol::OFPP_IN_PORT)) {
-                throw std::runtime_error{"invalid port_no"};
-            }
-            return std::forward<Action>(action);
-        }
-
     private:
         friend basic_action;
 
@@ -80,6 +61,19 @@ namespace actions {
             -> raw_ofp_type const&
         {
             return enqueue_;
+        }
+
+        template <class Validator>
+        void validate_impl(Validator) const
+        {
+            if (queue_id() == protocol::OFPQ_ALL) {
+                throw std::runtime_error{"invalid queue_id"};
+            }
+            if (port_no() == 0
+                    || (port_no() > protocol::OFPP_MAX
+                        && port_no() != protocol::OFPP_IN_PORT)) {
+                throw std::runtime_error{"invalid port_no"};
+            }
         }
 
     private:

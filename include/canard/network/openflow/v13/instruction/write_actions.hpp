@@ -53,11 +53,13 @@ namespace instructions {
         {
         }
 
-        static void validate_impl(write_actions const& write_actions)
+        template <class Validator>
+        void validate_impl(Validator validator) const
         {
-            if (!action_set::is_action_set(write_actions.actions())) {
+            if (!action_set::is_action_set(actions())) {
                 throw std::runtime_error{"duplicated action type"};
             }
+            validator(actions());
         }
     };
 

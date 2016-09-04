@@ -44,9 +44,10 @@ namespace actions {
         {
         }
 
-        static void validate_impl(push_vlan const& action)
+        template <class Validator>
+        void validate_impl(Validator) const
         {
-            if (action.ethertype() != 0x8100 && action.ethertype() != 0x88a8) {
+            if (ethertype() != 0x8100 && ethertype() != 0x88a8) {
                 throw std::runtime_error{"invalid ethertype"};
             }
         }

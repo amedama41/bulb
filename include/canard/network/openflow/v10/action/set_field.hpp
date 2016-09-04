@@ -1,8 +1,7 @@
 #ifndef CANARD_NET_OFP_V10_ACTIONS_SET_VLAN_VID_HPP
 #define CANARD_NET_OFP_V10_ACTIONS_SET_VLAN_VID_HPP
 
-#include <type_traits>
-#include <utility>
+#include <cstdint>
 #include <boost/asio/ip/address_v4.hpp>
 #include <boost/fusion/container/map.hpp>
 #include <boost/fusion/sequence/intrinsic/at_c.hpp>
@@ -177,17 +176,6 @@ namespace actions {
             return MatchField{value()};
         }
 
-        template <class Action>
-        static auto validate(Action&& action)
-            -> typename std::enable_if<
-                  detail::is_same_value_type<Action, set_field>::value, Action&&
-               >::type
-        {
-            match_detail::validate(
-                    action.value(), typename MatchField::field_type{});
-            return std::forward<Action>(action);
-        }
-
     private:
         friend actions_detail::basic_action<set_field<MatchField>, raw_ofp_type>;
 
@@ -200,6 +188,12 @@ namespace actions {
         explicit set_field(raw_ofp_type const& action) noexcept
             : set_field_(action)
         {
+        }
+
+        template <class Validator>
+        void validate_impl(Validator) const
+        {
+            match_detail::validate(value(), typename MatchField::field_type{});
         }
 
     private:

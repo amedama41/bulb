@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_SUITE(push_pbb_test)
         auto it = binary.begin();
         auto const sut = actions::push_pbb::decode(it, binary.end());
 
-        BOOST_CHECK_THROW(actions::push_pbb::validate(sut), std::runtime_error);
+        BOOST_CHECK_THROW(of::validation::validate(sut), std::runtime_error);
     }
 
     BOOST_AUTO_TEST_SUITE(equality)
