@@ -31,6 +31,26 @@ namespace ofp {
             Container* container_;
         };
 
+        template <class Validator>
+        class validation_visitor
+            : public boost::static_visitor<void>
+        {
+        public:
+            explicit validation_visitor(Validator validator)
+                : validator_(validator)
+            {
+            }
+
+            template <class T>
+            void operator()(T const& t) const
+            {
+                validator_(t);
+            }
+
+        private:
+            Validator validator_;
+        };
+
         template <class Type>
         class type_visitor
             : public boost::static_visitor<Type>
