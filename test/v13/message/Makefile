@@ -1,4 +1,5 @@
-SRCS = error_test.cpp \
+SRCS = hello_test.cpp \
+	   error_test.cpp \
 	   echo_test.cpp \
 	   switch_features_test.cpp \
 	   switch_config_test.cpp \
