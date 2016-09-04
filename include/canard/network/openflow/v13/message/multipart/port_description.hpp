@@ -4,9 +4,9 @@
 #include <cstdint>
 #include <utility>
 #include <canard/network/openflow/get_xid.hpp>
+#include <canard/network/openflow/v13/common/port.hpp>
 #include <canard/network/openflow/v13/detail/basic_multipart.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
-#include <canard/network/openflow/v13/port.hpp>
 
 namespace canard {
 namespace net {
