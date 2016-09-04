@@ -10,6 +10,7 @@
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/is_same_value_type.hpp>
+#include <canard/network/openflow/validator.hpp>
 #include <canard/network/openflow/v13/action_list.hpp>
 #include <canard/network/openflow/v13/action_set.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
@@ -184,23 +185,20 @@ namespace v13 {
             return bucket{watch_port, watch_group, std::move(actions)};
         }
 
-        template <class T>
-        static auto validate(T&& t)
-            -> typename std::enable_if<
-                  detail::is_same_value_type<T, bucket>::value, T&&
-               >::type
+        template <class Validator>
+        void validate(Validator validator) const
         {
-            if (!action_set::is_action_set(t.actions())) {
+            if (!action_set::is_action_set(actions_)) {
                 throw std::runtime_error{"duplicated action type"};
             }
-            return std::forward<T>(t);
+            validator(actions_);
         }
 
         template <class... Args>
         static auto create(Args&&... args)
             -> bucket
         {
-            return validate(bucket(std::forward<Args>(args)...));
+            return validation::validate(bucket(std::forward<Args>(args)...));
         }
 
         friend auto operator==(bucket const& lhs, bucket const& rhs)
