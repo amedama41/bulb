@@ -10,9 +10,9 @@
 #include <boost/fusion/sequence/intrinsic/value_at_key.hpp>
 #include <boost/fusion/support/pair.hpp>
 #include <canard/network/openflow/detail/is_same_value_type.hpp>
+#include <canard/network/openflow/v10/common/match_fields.hpp>
 #include <canard/network/openflow/v10/detail/basic_action.hpp>
 #include <canard/network/openflow/v10/detail/fusion_adaptor.hpp>
-#include <canard/network/openflow/v10/match_fields.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
 
 namespace canard {

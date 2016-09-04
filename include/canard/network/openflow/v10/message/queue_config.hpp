@@ -15,10 +15,10 @@
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/get_xid.hpp>
+#include <canard/network/openflow/v10/common/packet_queue.hpp>
 #include <canard/network/openflow/v10/detail/basic_openflow_message.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
-#include <canard/network/openflow/v10/packet_queue.hpp>
 
 namespace canard {
 namespace net {

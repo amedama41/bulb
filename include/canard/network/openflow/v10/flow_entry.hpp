@@ -5,7 +5,7 @@
 #include <utility>
 #include <boost/operators.hpp>
 #include <canard/network/openflow/v10/action_list.hpp>
-#include <canard/network/openflow/v10/match_set.hpp>
+#include <canard/network/openflow/v10/common/match_set.hpp>
 
 namespace canard {
 namespace net {

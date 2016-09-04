@@ -9,10 +9,10 @@
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/get_xid.hpp>
+#include <canard/network/openflow/v10/common/port.hpp>
 #include <canard/network/openflow/v10/detail/basic_openflow_message.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
-#include <canard/network/openflow/v10/port.hpp>
 
 namespace canard {
 namespace net {
