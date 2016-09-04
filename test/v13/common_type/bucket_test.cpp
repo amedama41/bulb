@@ -510,7 +510,7 @@ BOOST_AUTO_TEST_SUITE(bucket_test)
         BOOST_TEST((it == it_end));
         BOOST_TEST((bucket != sut));
         BOOST_CHECK_THROW(
-                v13::bucket::validate(bucket), std::runtime_error);
+                of::validation::validate(bucket), std::runtime_error);
     }
 
 BOOST_AUTO_TEST_SUITE_END() // bucket_test
