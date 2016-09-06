@@ -17,13 +17,15 @@ namespace v10 {
 
 struct queue_property_decoder
 {
+    using header_type = v10_detail::ofp_queue_prop_header;
+    using decode_type_list = default_queue_property_list;
+
     template <class ReturnType, class Iterator, class Function>
     static auto decode(Iterator& first, Iterator last, Function function)
         -> ReturnType
     {
         auto it = first;
-        auto const prop_header
-            = detail::decode<v10_detail::ofp_queue_prop_header>(it, last);
+        auto const prop_header = detail::decode<header_type>(it, last);
 
         if (std::distance(first, last) < prop_header.len) {
             throw std::runtime_error{"queue property length is too big"};
@@ -32,11 +34,11 @@ struct queue_property_decoder
         switch (prop_header.property) {
 #       define CANARD_NET_OFP_V10_QUEUE_PROPERTY_CASE(z, N, _) \
         using property ## N \
-            = std::tuple_element<N, default_queue_property_list>::type; \
+            = std::tuple_element<N, decode_type_list>::type; \
         case property ## N::queue_property: \
             return function(property ## N::decode(first, last));
         static_assert(
-                  std::tuple_size<default_queue_property_list>::value == 1
+                  std::tuple_size<decode_type_list>::value == 1
                 , "not match to the number of queue property types");
         BOOST_PP_REPEAT(1, CANARD_NET_OFP_V10_QUEUE_PROPERTY_CASE, _)
 #       undef  CANARD_NET_OFP_V10_QUEUE_PROPERTY_CASE
