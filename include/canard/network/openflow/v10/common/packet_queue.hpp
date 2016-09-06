@@ -14,6 +14,8 @@
 #include <boost/range/numeric.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/detail/memcmp.hpp>
+#include <canard/network/openflow/detail/min_base_size_element.hpp>
 #include <canard/network/openflow/queue_id.hpp>
 #include <canard/network/openflow/v10/any_queue_property.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
@@ -133,8 +135,10 @@ namespace v10 {
             last = std::next(first, properties_length);
 
             auto properties = properties_type{};
-            properties.reserve(
-                    properties_length / any_queue_property::min_base_size);
+            constexpr auto min_base_size = detail::min_base_size_element<
+                any_queue_property::type_list
+            >::value;
+            properties.reserve(properties_length / min_base_size);
             while (std::distance(first, last)
                     >= sizeof(v10_detail::ofp_queue_prop_header)) {
                 properties.push_back(any_queue_property::decode(first, last));
