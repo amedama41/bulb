@@ -16,7 +16,6 @@
 #include <boost/range/algorithm_ext/for_each.hpp>
 #include <canard/mac_address.hpp>
 #include <canard/network/openflow/detail/as_byte_range.hpp>
-#include <canard/network/openflow/detail/is_same_value_type.hpp>
 #include <canard/network/openflow/v13/detail/basic_oxm_match_field.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 

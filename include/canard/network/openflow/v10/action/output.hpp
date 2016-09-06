@@ -5,7 +5,6 @@
 #include <limits>
 #include <stdexcept>
 #include <utility>
-#include <canard/network/openflow/detail/is_same_value_type.hpp>
 #include <canard/network/openflow/v10/detail/basic_action.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
 

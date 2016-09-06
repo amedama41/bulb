@@ -1,7 +1,6 @@
 #ifndef CANARD_NET_OFP_V10_ACTIONS_STRIP_VLAN_HPP
 #define CANARD_NET_OFP_V10_ACTIONS_STRIP_VLAN_HPP
 
-#include <canard/network/openflow/detail/is_same_value_type.hpp>
 #include <canard/network/openflow/v10/detail/basic_action.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
 

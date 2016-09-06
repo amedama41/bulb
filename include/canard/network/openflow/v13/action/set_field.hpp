@@ -10,7 +10,6 @@
 #include <boost/operators.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
-#include <canard/network/openflow/detail/is_same_value_type.hpp>
 #include <canard/network/openflow/detail/padding.hpp>
 #include <canard/network/openflow/validator.hpp>
 #include <canard/network/openflow/v13/common/oxm_match_field.hpp>

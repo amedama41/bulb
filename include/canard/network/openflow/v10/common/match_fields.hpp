@@ -15,7 +15,6 @@
 #include <boost/mpl/int.hpp>
 #include <boost/operators.hpp>
 #include <canard/mac_address.hpp>
-#include <canard/network/openflow/detail/is_same_value_type.hpp>
 #include <canard/network/openflow/validator.hpp>
 #include <canard/network/openflow/v10/detail/fusion_adaptor.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
