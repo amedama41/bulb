@@ -11,6 +11,7 @@
 #include <iterator>
 #include <unordered_set>
 #include <utility>
+#include <boost/mpl/size.hpp>
 #include <boost/range/algorithm/equal.hpp>
 #include <boost/range/algorithm/fill.hpp>
 #include <boost/range/algorithm/find_if.hpp>
@@ -76,7 +77,11 @@ namespace v13 {
       }
 
     public:
-      std::array<action_info, action_list::value_type::number_of_types>
+      static constexpr std::size_t number_of_types = boost::mpl::size<
+          typename action_list::value_type::type_list
+      >::type::value;
+
+      std::array<action_info, number_of_types>
         info_map_;
       action_list::const_iterator it_end_;
     };
