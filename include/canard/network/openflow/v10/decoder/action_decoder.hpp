@@ -18,9 +18,10 @@ namespace v10 {
 struct action_decoder
 {
     using ofp_action_type = protocol::ofp_action_type;
-    using action_type_list = default_action_list;
+    using header_type = v10_detail::ofp_action_header;
+    using decode_type_list = default_action_list;
     static_assert(
-              std::tuple_size<default_action_list>::value == 12
+              std::tuple_size<decode_type_list>::value == 12
             , "not match to the number of action types");
 
     template <class ReturnType, class Iterator, class Function>
@@ -28,8 +29,7 @@ struct action_decoder
         -> ReturnType
     {
         auto it = first;
-        auto const action_header
-            = detail::decode<v10_detail::ofp_action_header>(it, last);
+        auto const action_header = detail::decode<header_type>(it, last);
 
         if (std::distance(first, last) < action_header.len) {
             throw std::runtime_error{"action length is too big"};
@@ -38,7 +38,7 @@ struct action_decoder
         switch (action_header.type) {
 #       define CANARD_NET_OFP_V10_ACTION_CASE(z, N, _) \
         using action ## N \
-            = std::tuple_element<N, default_action_list>::type; \
+            = std::tuple_element<N, decode_type_list>::type; \
         case action ## N::action_type: \
             return function(action ## N::decode(first, last));
         BOOST_PP_REPEAT(12, CANARD_NET_OFP_V10_ACTION_CASE, _)

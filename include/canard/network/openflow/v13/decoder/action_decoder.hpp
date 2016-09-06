@@ -19,8 +19,10 @@ namespace v13 {
 struct action_decoder
 {
     using ofp_action_type = protocol::ofp_action_type;
-    using action_type_list = default_all_action_list;
+    using header_type = v13_detail::ofp_action_header;
+    using decode_type_list = default_all_action_list;
     using non_set_field_action_type_list = default_action_list;
+
     static_assert(
               std::tuple_size<non_set_field_action_type_list>::value == 15
             , "not match to the number of action types");
@@ -30,8 +32,7 @@ struct action_decoder
         -> ReturnType
     {
         auto it = first;
-        auto const action_header
-            = detail::decode<v13_detail::ofp_action_header>(it, last);
+        auto const action_header = detail::decode<header_type>(it, last);
 
         if (std::distance(first, last) < action_header.len) {
             throw std::runtime_error{"action length is too big"};

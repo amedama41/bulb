@@ -4,6 +4,7 @@
 #include <canard/network/openflow/detail/config.hpp>
 
 #include <canard/network/openflow/detail/any_action.hpp>
+#include <canard/network/openflow/detail/any_type.hpp>
 #include <canard/network/openflow/v10/actions.hpp>
 #include <canard/network/openflow/v10/decoder/action_decoder.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
@@ -13,21 +14,35 @@ namespace net {
 namespace ofp {
 namespace v10 {
 
-    using any_action = detail::any_action<action_decoder>;
+  using any_action = detail::any_action<action_decoder>;
 
-    template <class T>
-    auto any_cast(any_action const& action)
-        -> T const&
-    {
-        return detail::any_cast<T>(action);
-    }
+  template <class T>
+  auto any_cast(any_action& action)
+    -> T&
+  {
+    return detail::any_cast<T>(action);
+  }
 
-    template <class T>
-    auto any_cast(any_action const* const action)
-        -> T const*
-    {
-        return detail::any_cast<T>(action);
-    }
+  template <class T>
+  auto any_cast(any_action const& action)
+    -> T const&
+  {
+    return detail::any_cast<T>(action);
+  }
+
+  template <class T>
+  auto any_cast(any_action* const action)
+    -> T*
+  {
+    return detail::any_cast<T>(action);
+  }
+
+  template <class T>
+  auto any_cast(any_action const* const action)
+    -> T const*
+  {
+    return detail::any_cast<T>(action);
+  }
 
 } // namespace v10
 } // namespace ofp
@@ -43,6 +58,7 @@ namespace ofp {
 namespace detail {
 
   extern template class any_action<ofp::v10::action_decoder>;
+  extern template class any_type<any_action<ofp::v10::action_decoder>>;
 
 } // namespace detail
 } // namespace ofp
