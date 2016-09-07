@@ -16,6 +16,7 @@
 #include <boost/range/algorithm/fill.hpp>
 #include <boost/range/algorithm/find_if.hpp>
 #include <boost/range/algorithm/lower_bound.hpp>
+#include <canard/network/openflow/detail/type_list.hpp>
 #include <canard/network/openflow/v13/action_list.hpp>
 #include <canard/network/openflow/v13/action_order.hpp>
 
@@ -78,7 +79,7 @@ namespace v13 {
 
     public:
       static constexpr std::size_t number_of_types = boost::mpl::size<
-          typename action_list::value_type::type_list
+          detail::to_type_list_t<typename action_list::value_type::type_list>
       >::type::value;
 
       std::array<action_info, number_of_types>

@@ -9,11 +9,11 @@
 #include <boost/variant/variant.hpp>
 #include <canard/network/openflow/detail/construct.hpp>
 #include <canard/network/openflow/detail/is_related.hpp>
+#include <canard/network/openflow/detail/type_list.hpp>
 #include <canard/network/openflow/detail/visitors.hpp>
 #include <canard/network/openflow/v13/decode_hello_element.hpp>
 #include <canard/network/openflow/v13/message/hello_elements.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
-#include <canard/mpl/adapted/std_tuple.hpp>
 
 namespace canard {
 namespace net {
@@ -23,7 +23,7 @@ namespace v13 {
     class any_hello_element
     {
         using any_hello_element_variant = boost::make_variant_over<
-            hello_element_list
+            detail::to_type_list_t<hello_element_list>
         >::type;
 
     public:

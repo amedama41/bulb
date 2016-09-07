@@ -3,9 +3,9 @@
 
 #include <cstddef>
 #include <type_traits>
-#include <boost/fusion/sequence/intrinsic/value_at.hpp>
+#include <boost/fusion/adapted/std_tuple.hpp>
 #include <boost/fusion/algorithm/iteration/accumulate.hpp>
-#include <canard/mpl/adapted/std_tuple.hpp>
+#include <boost/fusion/sequence/intrinsic/value_at.hpp>
 
 namespace canard {
 namespace net {

@@ -8,11 +8,11 @@
 #include <boost/format.hpp>
 #include <boost/variant/variant.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
+#include <canard/network/openflow/detail/type_list.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/detail/length_utility.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 #include <canard/network/openflow/v13/table_feature_properties.hpp>
-#include <canard/mpl/adapted/std_tuple.hpp>
 
 namespace canard {
 namespace net {
@@ -28,7 +28,9 @@ namespace v13 {
             , match, wildcards
             , write_setfield, write_setfield_miss, apply_setfield, apply_setfield_miss
         >;
-        using variant = boost::make_variant_over<property_list>::type;
+        using variant = boost::make_variant_over<
+            detail::to_type_list_t<property_list>
+        >::type;
 
         template <class ReturnType, class Iterator, class Function>
         inline auto decode(Iterator& first, Iterator last, Function&& function)

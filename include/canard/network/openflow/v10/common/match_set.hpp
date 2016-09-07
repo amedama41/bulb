@@ -4,10 +4,10 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include <boost/fusion/adapted/std_tuple.hpp>
 #include <boost/fusion/algorithm/query/all.hpp>
 #include <boost/operators.hpp>
 #include <boost/optional/optional.hpp>
-#include <canard/mpl/adapted/std_tuple.hpp>
 #include <canard/network/openflow/detail/is_related.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/v10/common/match_fields.hpp>

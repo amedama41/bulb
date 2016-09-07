@@ -13,7 +13,7 @@
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/get.hpp>
 #include <boost/variant/variant.hpp>
-#include <canard/mpl/adapted/std_tuple.hpp>
+#include <canard/network/openflow/detail/type_list.hpp>
 #include <canard/network/openflow/detail/visitors.hpp>
 
 namespace canard {
@@ -43,9 +43,10 @@ namespace detail {
     using type_list = typename Decoder::decode_type_list;
 
   private:
+    using inner_type_list = detail::to_type_list_t<type_list>;
     template <class T>
     using containable_if_t = typename std::enable_if<
-      boost::mpl::contains<type_list, typename std::decay<T>::type>::value
+      boost::mpl::contains<inner_type_list, typename std::decay<T>::type>::value
     >::type;
 
   public:
@@ -225,7 +226,7 @@ namespace detail {
     };
 
   private:
-    using variant_t = typename boost::make_variant_over<type_list>::type;
+    using variant_t = typename boost::make_variant_over<inner_type_list>::type;
     variant_t variant_;
   };
 
