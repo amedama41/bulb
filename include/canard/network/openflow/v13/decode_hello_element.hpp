@@ -9,7 +9,7 @@
 #include <boost/preprocessor/repeat.hpp>
 #include <canard/network/openflow/detail/as_byte_range.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
-#include <canard/network/openflow/v13/message/hello_elements.hpp>
+#include <canard/network/openflow/v13/hello_element/hello_elements.hpp>
 
 namespace canard {
 namespace net {

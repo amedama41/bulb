@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v13/message/hello_elements.hpp>
+#include <canard/network/openflow/v13/hello_element/hello_elements.hpp>
 #include <boost/test/unit_test.hpp>
 
 namespace canard {
