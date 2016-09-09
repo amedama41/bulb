@@ -5,11 +5,13 @@
 #include <boost/test/data/monomorphic.hpp>
 
 #include <boost/range/algorithm/max_element.hpp>
+#include <boost/range/adaptor/filtered.hpp>
 #include "../../test_utility.hpp"
 
 namespace ofp = canard::net::ofp;
 namespace v13 = ofp::v13;
 namespace helems = v13::hello_elements;
+namespace detail = v13::v13_detail;
 
 using proto = v13::protocol;
 
@@ -49,29 +51,57 @@ BOOST_AUTO_TEST_SUITE(versionbitmap)
   BOOST_AUTO_TEST_SUITE(constructor)
     BOOST_AUTO_TEST_CASE(is_constructible_from_single_bitmap)
     {
-      helems::versionbitmap const sut{std::vector<std::uint32_t>{0x00000012}};
+      auto const bitmaps
+        = helems::versionbitmap::bitmaps_type{ 0x00000012 };
 
-      BOOST_TEST(sut.type() == proto::OFPHET_VERSIONBITMAP);
+      helems::versionbitmap const sut{bitmaps};
+
       BOOST_TEST(sut.length() == 8);
+      BOOST_TEST(sut.bitmaps() == bitmaps, boost::test_tools::per_element{});
     }
     BOOST_AUTO_TEST_CASE(is_constructible_from_multiple_bitmaps)
     {
-      helems::versionbitmap const sut{{0x00000012, 0x00010001}};
+      auto const bitmaps
+        = helems::versionbitmap::bitmaps_type{ 0x00000012, 0x00010001 };
 
-      BOOST_TEST(sut.type() == proto::OFPHET_VERSIONBITMAP);
+      helems::versionbitmap const sut{bitmaps};
+
       BOOST_TEST(sut.length() == 12);
+      BOOST_TEST(sut.bitmaps() == bitmaps, boost::test_tools::per_element{});
     }
-    BOOST_AUTO_TEST_CASE(throws_if_all_bitmap_are_zero)
+    BOOST_FIXTURE_TEST_CASE(is_move_constructible, versionbitmap_fixture)
     {
-      BOOST_CHECK_THROW(
-            (helems::versionbitmap{{0x00000000, 0x00000000}})
-          , std::runtime_error);
-    }
-    BOOST_AUTO_TEST_CASE(throws_if_no_bitmap)
-    {
-      BOOST_CHECK_THROW(helems::versionbitmap{{}}, std::runtime_error);
+      auto moved = sut;
+
+      auto const copy = std::move(moved);
+
+      BOOST_TEST((copy == sut));
+      BOOST_TEST(
+          moved.length() == sizeof(detail::ofp_hello_elem_versionbitmap));
+      BOOST_TEST(moved.bitmaps().empty());
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor
+
+  BOOST_AUTO_TEST_SUITE(equality)
+    BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+    {
+      auto const sut = helems::versionbitmap{{ 1, 2, 3 }};
+
+      BOOST_TEST((sut == sut));
+    }
+    BOOST_AUTO_TEST_CASE(is_true_if_bitmaps_are_equal)
+    {
+      auto const bitmaps = helems::versionbitmap::bitmaps_type{ 1, 2, 3 };
+
+      BOOST_TEST(
+          (helems::versionbitmap{bitmaps} == helems::versionbitmap{bitmaps}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_bitmap_is_not_equal)
+    {
+      BOOST_TEST(
+          (helems::versionbitmap{{ 1, 2 }} != helems::versionbitmap{{ 1, 3 }}));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // equality
 
   BOOST_AUTO_TEST_SUITE(support)
     BOOST_DATA_TEST_CASE(
@@ -105,6 +135,24 @@ BOOST_AUTO_TEST_SUITE(versionbitmap)
 
       BOOST_TEST(sut.max_support_version() == max_version);
     }
+    BOOST_AUTO_TEST_CASE(returns_max_version_when_single_bitmap)
+    {
+      auto bitmaps = create_bitmaps(versions);
+      bitmaps.resize(1);
+      auto const sut = helems::versionbitmap{bitmaps};
+      using boost::adaptors::filtered;
+      auto const max_version = *boost::max_element(
+          versions | filtered(
+            (bool(*)(std::uint8_t))([](std::uint8_t v) { return v < 32; })));
+
+      BOOST_TEST(sut.max_support_version() == max_version);
+    }
+    BOOST_AUTO_TEST_CASE(throws_exception_if_all_bitmaps_are_zero)
+    {
+      auto const sut = helems::versionbitmap{{0, 0, 0}};
+
+      BOOST_CHECK_THROW(sut.max_support_version(), std::runtime_error);
+    }
   BOOST_AUTO_TEST_SUITE_END() // max_support_version
 
   BOOST_FIXTURE_TEST_SUITE(encode, versionbitmap_fixture)
@@ -126,9 +174,7 @@ BOOST_AUTO_TEST_SUITE(versionbitmap)
 
       auto const versionbitmap = helems::versionbitmap::decode(it, bin.end());
 
-      BOOST_TEST(versionbitmap.length() == sut.length());
-      BOOST_TEST(
-          versionbitmap.max_support_version() == sut.max_support_version());
+      BOOST_TEST((versionbitmap == sut));
     }
   BOOST_AUTO_TEST_SUITE_END() // decode
 
