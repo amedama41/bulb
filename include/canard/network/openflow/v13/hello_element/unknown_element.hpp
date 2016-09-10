@@ -144,6 +144,13 @@ namespace hello_elements {
     return lhs.equal_impl(rhs);
   }
 
+  inline auto equivalent(
+      unknown_element const& lhs, unknown_element const& rhs) noexcept
+    -> bool
+  {
+    return lhs == rhs;
+  }
+
 } // namespace hello_elements
 } // namespace v13
 } // namespace ofp
