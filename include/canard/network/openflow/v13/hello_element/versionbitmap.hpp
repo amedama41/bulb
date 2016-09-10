@@ -14,6 +14,7 @@
 #include <boost/range/adaptor/reversed.hpp>
 #include <boost/range/algorithm/find_if.hpp>
 #include <boost/range/algorithm/for_each.hpp>
+#include <boost/range/algorithm/mismatch.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
@@ -233,6 +234,28 @@ namespace hello_elements {
     -> bool
   {
     return lhs.equal_impl(rhs);
+  }
+
+  inline auto equivalent(
+      versionbitmap const& lhs, versionbitmap const& rhs) noexcept
+    -> bool
+  {
+    using bt = versionbitmap::bitmaps_type;
+    auto const compare = [](bt const& larger, bt const& smaller) -> bool {
+      auto const result = boost::mismatch(smaller, larger);
+      if (result.first != smaller.end()) {
+        return false;
+      }
+      return std::all_of(
+            result.second, larger.end()
+          , [](bt::value_type const b) { return b == 0; });
+    };
+
+    auto const& lhs_bitmaps = lhs.bitmaps();
+    auto const& rhs_bitmaps = rhs.bitmaps();
+    return (lhs_bitmaps.size() >= rhs_bitmaps.size())
+      ? compare(lhs_bitmaps, rhs_bitmaps)
+      : compare(rhs_bitmaps, lhs_bitmaps);
   }
 
 } // namespace hello_elements
