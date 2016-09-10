@@ -12,7 +12,7 @@
 #include <canard/network/openflow/detail/type_list.hpp>
 #include <canard/network/openflow/detail/visitors.hpp>
 #include <canard/network/openflow/v13/decode_hello_element.hpp>
-#include <canard/network/openflow/v13/hello_element/hello_elements.hpp>
+#include <canard/network/openflow/v13/hello_elements.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {

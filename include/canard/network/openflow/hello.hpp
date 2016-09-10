@@ -6,9 +6,9 @@
 #include <boost/asio/buffer.hpp>
 #include <boost/endian/conversion.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
+#include <canard/network/openflow/v13/hello_elements.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 #include <canard/network/openflow/v13/message/hello.hpp>
-#include <canard/network/openflow/v13/hello_element/hello_elements.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 
 namespace canard {

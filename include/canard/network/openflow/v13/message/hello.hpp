@@ -16,7 +16,7 @@
 #include <canard/network/openflow/v13/any_hello_element.hpp>
 #include <canard/network/openflow/v13/detail/basic_openflow_message.hpp>
 #include <canard/network/openflow/v13/detail/length_utility.hpp>
-#include <canard/network/openflow/v13/hello_element/hello_elements.hpp>
+#include <canard/network/openflow/v13/hello_elements.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
