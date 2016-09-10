@@ -103,6 +103,63 @@ BOOST_AUTO_TEST_SUITE(versionbitmap)
     }
   BOOST_AUTO_TEST_SUITE_END() // equality
 
+  BOOST_AUTO_TEST_SUITE(function_equivalent)
+    BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+    {
+      auto const sut = helems::versionbitmap{{ 1, 2, 3 }};
+
+      BOOST_TEST(equivalent(sut, sut));
+    }
+    BOOST_AUTO_TEST_CASE(is_true_if_bitmaps_are_equal)
+    {
+      auto const bitmaps = helems::versionbitmap::bitmaps_type{ 1, 2, 3 };
+
+      BOOST_TEST(
+          equivalent(
+              helems::versionbitmap{bitmaps}
+            , helems::versionbitmap{bitmaps}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_bitmap_is_not_equal)
+    {
+      BOOST_TEST(
+          !equivalent(
+              helems::versionbitmap{{ 1, 2 }}
+            , helems::versionbitmap{{ 1, 3 }}));
+    }
+    BOOST_AUTO_TEST_CASE(
+        is_true_if_bitmap_is_not_equal_but_lhs_is_rhs_with_0_suffix)
+    {
+      BOOST_TEST(
+          equivalent(
+              helems::versionbitmap{{ 1, 2 }}
+            , helems::versionbitmap{{ 1, 2, 0, 0, 0 }}));
+    }
+    BOOST_AUTO_TEST_CASE(
+        is_false_if_bitmap_is_not_equal_and_lhs_is_rhs_with_non_0_suffix)
+    {
+      BOOST_TEST(
+          !equivalent(
+              helems::versionbitmap{{ 1, 2 }}
+            , helems::versionbitmap{{ 1, 2, 0, 0, 1 }}));
+    }
+    BOOST_AUTO_TEST_CASE(
+        is_true_if_bitmap_is_not_equal_but_rhs_is_lhs_with_0_suffix)
+    {
+      BOOST_TEST(
+          equivalent(
+              helems::versionbitmap{{ 1, 2, 0, 0, 0 }}
+            , helems::versionbitmap{{ 1, 2 }}));
+    }
+    BOOST_AUTO_TEST_CASE(
+        is_false_if_bitmap_is_not_equal_and_rhs_is_lhs_with_non_0_suffix)
+    {
+      BOOST_TEST(
+          !equivalent(
+              helems::versionbitmap{{ 1, 2, 0, 0, 1 }}
+            , helems::versionbitmap{{ 1, 2 }}));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // function_equivalent
+
   BOOST_AUTO_TEST_SUITE(support)
     BOOST_DATA_TEST_CASE(
           returns_true_if_corresponding_bit_is_one
