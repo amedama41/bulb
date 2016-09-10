@@ -108,6 +108,36 @@ BOOST_AUTO_TEST_SUITE(unknown_element)
     }
   BOOST_AUTO_TEST_SUITE_END() // equality
 
+  BOOST_FIXTURE_TEST_SUITE(function_equivalent, parameters)
+    BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
+    {
+      auto const sut = helems::unknown_element{type, data};
+
+      BOOST_TEST(equivalent(sut, sut));
+    }
+    BOOST_AUTO_TEST_CASE(is_true_if_type_and_data_are_equal)
+    {
+      BOOST_TEST(
+          equivalent(
+                helems::unknown_element{type, data}
+              , helems::unknown_element{type, data}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_type_is_not_equal)
+    {
+      BOOST_TEST(
+          !equivalent(
+              helems::unknown_element{1, data}
+            , helems::unknown_element{2, data}));
+    }
+    BOOST_AUTO_TEST_CASE(is_false_if_data_is_not_equal)
+    {
+      BOOST_TEST(
+          !equivalent(
+              helems::unknown_element{type, { 1, 2, 3 }}
+            , helems::unknown_element{type, { 1, 2, 4 }}));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // function_equivalent
+
   BOOST_AUTO_TEST_SUITE(encode)
     BOOST_FIXTURE_TEST_CASE(generates_binary, unknown_element_fixture)
     {
