@@ -52,10 +52,16 @@ namespace queue_properties {
             return min_rate_.rate;
         }
 
+        auto is_configurable() const noexcept
+            -> bool
+        {
+            return rate() != protocol::OFPQ_MIN_RATE_UNCFG;
+        }
+
         auto is_disabled() const noexcept
             -> bool
         {
-            return rate() > 1000;
+            return rate() > 1000 && is_configurable();
         }
 
         template <class Container>
