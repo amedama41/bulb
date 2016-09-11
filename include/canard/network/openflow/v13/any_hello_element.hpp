@@ -1,97 +1,70 @@
 #ifndef CANARD_NET_OFP_V13_ANY_HELLO_ELEMENT_HPP
 #define CANARD_NET_OFP_V13_ANY_HELLO_ELEMENT_HPP
 
-#include <cstdint>
-#include <type_traits>
-#include <utility>
-#include <boost/variant/apply_visitor.hpp>
-#include <boost/variant/get.hpp>
-#include <boost/variant/variant.hpp>
-#include <canard/network/openflow/detail/construct.hpp>
-#include <canard/network/openflow/detail/is_related.hpp>
-#include <canard/network/openflow/detail/type_list.hpp>
-#include <canard/network/openflow/detail/visitors.hpp>
-#include <canard/network/openflow/v13/decode_hello_element.hpp>
-#include <canard/network/openflow/v13/hello_elements.hpp>
-#include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/network/openflow/detail/any_hello_element.hpp>
+#include <canard/network/openflow/v13/decoder/hello_element_decoder.hpp>
 
 namespace canard {
 namespace net {
 namespace ofp {
 namespace v13 {
 
-    class any_hello_element
-    {
-        using any_hello_element_variant = boost::make_variant_over<
-            detail::to_type_list_t<hello_element_list>
-        >::type;
+  using any_hello_element = detail::any_hello_element<hello_element_decoder>;
 
-    public:
-        template <class HelloElem, typename std::enable_if<!detail::is_related<HelloElem, any_hello_element>::value>::type* = nullptr>
-        any_hello_element(HelloElem&& hello_elem)
-            : variant_(std::forward<HelloElem>(hello_elem))
-        {
-        }
+  template <class T>
+  auto any_cast(any_hello_element& hello_elem)
+      -> T&
+  {
+      return detail::any_cast<T>(hello_elem);
+  }
 
-        auto type() const
-            -> protocol::ofp_hello_elem_type
-        {
-            auto visitor = detail::type_visitor<protocol::ofp_hello_elem_type>{};
-            return boost::apply_visitor(visitor, variant_);
-        }
+  template <class T>
+  auto any_cast(any_hello_element const& hello_elem)
+      -> T const&
+  {
+      return detail::any_cast<T>(hello_elem);
+  }
 
-        auto length() const
-            -> std::uint16_t
-        {
-            auto visitor = detail::length_visitor{};
-            return boost::apply_visitor(visitor, variant_);
-        }
+  template <class T>
+  auto any_cast(any_hello_element* const hello_elem)
+      -> T*
+  {
+      return detail::any_cast<T>(hello_elem);
+  }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            auto visitor = detail::encoding_visitor<Container>{container};
-            return boost::apply_visitor(visitor, variant_);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> any_hello_element
-        {
-            return v13_detail::decode_hello_element<any_hello_element>(
-                    first, last, detail::construct<any_hello_element>{});
-        }
-
-        template <class T>
-        friend auto any_cast(any_hello_element const&)
-            -> T const&;
-
-        template <class T>
-        friend auto any_cast(any_hello_element const*)
-            -> T const*;
-
-    private:
-        any_hello_element_variant variant_;
-    };
-
-    template <class T>
-    auto any_cast(any_hello_element const& hello_elem)
-        -> T const&
-    {
-        return boost::get<T>(hello_elem.variant_);
-    }
-
-    template <class T>
-    auto any_cast(any_hello_element const* const hello_elem)
-        -> T const*
-    {
-        return boost::get<T>(&hello_elem->variant_);
-    }
+  template <class T>
+  auto any_cast(any_hello_element const* const hello_elem)
+      -> T const*
+  {
+      return detail::any_cast<T>(hello_elem);
+  }
 
 } // namespace v13
 } // namespace ofp
 } // namespace net
 } // namespace canard
+
+#if defined(CANARD_NET_OFP_HEADER_ONLY)
+
+#include <canard/network/openflow/v13/impl/any_hello_element.ipp>
+
+#elif defined(CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
+
+namespace canard {
+namespace net {
+namespace ofp {
+namespace detail {
+
+  extern template class any_hello_element<ofp::v13::hello_element_decoder>;
+  extern template class any_type<
+    any_hello_element<ofp::v13::hello_element_decoder>
+  >;
+
+} // namespace detail
+} // namespace ofp
+} // namespace net
+} // namespace canard
+
+#endif
 
 #endif // CANARD_NET_OFP_V13_ANY_HELLO_ELEMENT_HPP
