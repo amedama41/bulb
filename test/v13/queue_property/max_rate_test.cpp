@@ -56,6 +56,12 @@ BOOST_AUTO_TEST_SUITE(max_rate_test)
       {
         BOOST_TEST((queue_props::max_rate{2} == queue_props::max_rate{2}));
       }
+      BOOST_AUTO_TEST_CASE(is_true_if_both_rate_are_not_configurable)
+      {
+        BOOST_TEST(
+            (queue_props::max_rate{proto::OFPQ_MAX_RATE_UNCFG}
+          == queue_props::max_rate{proto::OFPQ_MAX_RATE_UNCFG}));
+      }
       BOOST_AUTO_TEST_CASE(false_if_rate_is_not_equal)
       {
         BOOST_TEST((queue_props::max_rate{3} != queue_props::max_rate{4}));
@@ -64,6 +70,12 @@ BOOST_AUTO_TEST_SUITE(max_rate_test)
       {
         BOOST_TEST(
             (queue_props::max_rate{1001} != queue_props::max_rate{1002}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_both_rates_are_over_1000_but_one_is_uncfg)
+      {
+        BOOST_TEST(
+            (queue_props::max_rate{1001}
+          != queue_props::max_rate{proto::OFPQ_MAX_RATE_UNCFG}));
       }
       BOOST_AUTO_TEST_CASE(is_false_if_lhs_rate_is_over_1000)
       {
@@ -100,6 +112,13 @@ BOOST_AUTO_TEST_SUITE(max_rate_test)
         BOOST_TEST(
             equivalent(queue_props::max_rate{2}, queue_props::max_rate{2}));
       }
+      BOOST_AUTO_TEST_CASE(is_true_if_both_rate_are_not_configurable)
+      {
+        BOOST_TEST(
+            equivalent(
+                queue_props::max_rate{proto::OFPQ_MAX_RATE_UNCFG}
+              , queue_props::max_rate{proto::OFPQ_MAX_RATE_UNCFG}));
+      }
       BOOST_AUTO_TEST_CASE(false_if_rate_is_not_equal)
       {
         BOOST_TEST(
@@ -110,6 +129,13 @@ BOOST_AUTO_TEST_SUITE(max_rate_test)
         BOOST_TEST(
             equivalent(
               queue_props::max_rate{1001}, queue_props::max_rate{1002}));
+      }
+      BOOST_AUTO_TEST_CASE(is_false_if_both_rates_are_over_1000_but_one_is_uncfg)
+      {
+        BOOST_TEST(
+            !equivalent(
+                queue_props::max_rate{1001}
+              , queue_props::max_rate{proto::OFPQ_MAX_RATE_UNCFG}));
       }
       BOOST_AUTO_TEST_CASE(is_false_if_lhs_rate_is_over_1000)
       {
