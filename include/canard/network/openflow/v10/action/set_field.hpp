@@ -146,10 +146,15 @@ namespace actions {
                 set_field<MatchField>, typename SetFieldInfo::raw_ofp_type
           >
     {
-        using raw_ofp_type = typename SetFieldInfo::raw_ofp_type;
+        using basic_action = actions_detail::basic_action<
+            set_field<MatchField>, typename SetFieldInfo::raw_ofp_type
+        >;
+        using basic_protocol_type = typename basic_action::basic_protocol_type;
         using value_type = typename MatchField::value_type;
 
     public:
+        using raw_ofp_type = typename basic_action::raw_ofp_type;
+
         static constexpr protocol::ofp_action_type action_type
             = SetFieldInfo::action_type;
 
@@ -176,7 +181,8 @@ namespace actions {
         }
 
     private:
-        friend actions_detail::basic_action<set_field<MatchField>, raw_ofp_type>;
+        friend basic_action;
+        friend basic_protocol_type;
 
         auto ofp_action() const noexcept
             -> raw_ofp_type const&
@@ -195,18 +201,15 @@ namespace actions {
             match_detail::validate(value(), typename MatchField::field_type{});
         }
 
+        auto equivalent_impl(set_field const& rhs) const noexcept
+            -> bool
+        {
+            return value() == rhs.value();
+        }
+
     private:
         raw_ofp_type set_field_;
     };
-
-    template <class MatchField>
-    auto equivalent(
-              set_field<MatchField> const& lhs
-            , set_field<MatchField> const& rhs) noexcept
-        -> bool
-    {
-        return lhs.value() == rhs.value();
-    }
 
     using set_eth_src = set_field<match::eth_src>;
     using set_eth_dst = set_field<match::eth_dst>;

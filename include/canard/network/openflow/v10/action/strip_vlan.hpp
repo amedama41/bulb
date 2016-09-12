@@ -15,8 +15,6 @@ namespace actions {
                 strip_vlan, v10_detail::ofp_action_header
           >
     {
-        using raw_ofp_type = v10_detail::ofp_action_header;
-
     public:
         static constexpr protocol::ofp_action_type action_type
             = protocol::OFPAT_STRIP_VLAN;
@@ -28,6 +26,7 @@ namespace actions {
 
     private:
         friend basic_action;
+        friend basic_protocol_type;
 
         explicit strip_vlan(raw_ofp_type const& action_header) noexcept
             : strip_vlan_(action_header)
@@ -45,16 +44,15 @@ namespace actions {
         {
         }
 
+        auto equivalent_impl(strip_vlan const&) const noexcept
+            -> bool
+        {
+            return true;
+        }
+
     private:
         raw_ofp_type strip_vlan_;
     };
-
-    constexpr inline auto equivalent(
-            strip_vlan const&, strip_vlan const&) noexcept
-        -> bool
-    {
-        return true;
-    }
 
     using pop_vlan = strip_vlan;
 

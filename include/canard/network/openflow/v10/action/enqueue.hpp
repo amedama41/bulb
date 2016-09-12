@@ -18,8 +18,6 @@ namespace actions {
                 enqueue, v10_detail::ofp_action_enqueue
           >
     {
-        using raw_ofp_type = v10_detail::ofp_action_enqueue;
-
     public:
         static constexpr protocol::ofp_action_type action_type
             = protocol::OFPAT_ENQUEUE;
@@ -50,6 +48,7 @@ namespace actions {
 
     private:
         friend basic_action;
+        friend basic_protocol_type;
 
         explicit enqueue(raw_ofp_type const& action_enqueue) noexcept
             : enqueue_(action_enqueue)
@@ -75,16 +74,16 @@ namespace actions {
             }
         }
 
+        auto equivalent_impl(enqueue const& rhs) const noexcept
+            -> bool
+        {
+            return queue_id() == rhs.queue_id()
+                && port_no() == rhs.port_no();
+        }
+
     private:
         raw_ofp_type enqueue_;
     };
-
-    inline auto equivalent(enqueue const& lhs, enqueue const& rhs) noexcept
-        -> bool
-    {
-        return lhs.queue_id() == rhs.queue_id()
-            && lhs.port_no() == rhs.port_no();
-    }
 
 } // namespace actions
 } // namespace v10

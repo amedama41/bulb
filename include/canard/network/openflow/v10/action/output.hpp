@@ -19,8 +19,6 @@ namespace actions {
                 output, v10_detail::ofp_action_output
           >
     {
-        using raw_ofp_type = v10_detail::ofp_action_output;
-
     public:
         static constexpr protocol::ofp_action_type action_type
             = protocol::OFPAT_OUTPUT;
@@ -60,6 +58,7 @@ namespace actions {
 
     private:
         friend basic_action;
+        friend basic_protocol_type;
 
         explicit output(raw_ofp_type const output) noexcept
             : action_output_(output)
@@ -80,19 +79,19 @@ namespace actions {
             }
         }
 
+        auto equivalent_impl(output const& rhs) const noexcept
+            -> bool
+        {
+            if (port_no() == protocol::OFPP_CONTROLLER) {
+                return rhs.port_no() == protocol::OFPP_CONTROLLER
+                    && max_length() == rhs.max_length();
+            }
+            return port_no() == rhs.port_no();
+        }
+
     private:
         raw_ofp_type action_output_;
     };
-
-    inline auto equivalent(output const& lhs, output const& rhs) noexcept
-        -> bool
-    {
-        if (lhs.port_no() == protocol::OFPP_CONTROLLER) {
-            return rhs.port_no() == protocol::OFPP_CONTROLLER
-                && lhs.max_length() == rhs.max_length();
-        }
-        return lhs.port_no() == rhs.port_no();
-    }
 
 } // namespace actions
 } // namespace v10
