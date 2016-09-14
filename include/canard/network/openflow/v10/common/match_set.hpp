@@ -6,8 +6,10 @@
 #include <utility>
 #include <boost/fusion/adapted/std_tuple.hpp>
 #include <boost/fusion/algorithm/query/all.hpp>
-#include <boost/operators.hpp>
 #include <boost/optional/optional.hpp>
+#include <canard/network/openflow/detail/basic_protocol_type.hpp>
+#include <canard/network/openflow/detail/decode.hpp>
+#include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/is_related.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/v10/common/match_fields.hpp>
@@ -19,11 +21,11 @@ namespace ofp {
 namespace v10 {
 
     class match_set
-        : boost::equality_comparable<match_set>
+        : public detail::basic_protocol_type<match_set>
     {
+    public:
         using raw_ofp_type = v10_detail::ofp_match;
 
-    public:
         template <
               class... MatchFields
             , typename std::enable_if<
@@ -55,7 +57,7 @@ namespace v10 {
                 && ((wildcards() & all_mask_wo_nw_addr) == all_mask_wo_nw_addr);
         }
 
-        auto length() const noexcept
+        static constexpr auto length() noexcept
             -> std::uint16_t
         {
             return sizeof(raw_ofp_type);
@@ -113,19 +115,40 @@ namespace v10 {
             set_impl(std::forward<MatchFields>(fields)...);
         }
 
-    private:
-        raw_ofp_type match_;
-    };
+        friend basic_protocol_type;
 
-    inline auto operator==(match_set const& lhs, match_set const& rhs) noexcept
-        -> bool
-    {
-        return detail::memcmp(lhs.ofp_match(), rhs.ofp_match());
-    }
+        template <class Validator>
+        void validate_impl(Validator)
+        {
+            // TODO
+        }
 
-    namespace match_set_detail {
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, match_);
+        }
 
-        struct equivalent_impl
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> match_set
+        {
+            return match_set{detail::decode<raw_ofp_type>(first, last)};
+        }
+
+        auto equal_impl(match_set const& rhs) const noexcept
+            -> bool
+        {
+            return detail::memcmp(match_, rhs.match_);
+        }
+
+        auto equivalent_impl(match_set const& rhs) const noexcept
+            -> bool
+        {
+            return equivalent_for_each_field{this, &rhs};
+        }
+
+        struct equivalent_for_each_field
         {
             template <class FieldType>
             auto operator()(FieldType*) const noexcept
@@ -160,13 +183,9 @@ namespace v10 {
             match_set const* rhs;
         };
 
-    } // namespace match_set_detail
-
-    inline auto equivalent(match_set const& lhs, match_set const& rhs) noexcept
-        -> bool
-    {
-        return match_set_detail::equivalent_impl{&lhs, &rhs};
-    }
+    private:
+        raw_ofp_type match_;
+    };
 
 } // namespace v10
 } // namespace ofp
