@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <stdexcept>
-#include <boost/operators.hpp>
 #include <canard/mac_address.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
@@ -22,7 +21,6 @@ namespace messages {
 
     class port_mod
         : public v10_detail::basic_openflow_message<port_mod>
-        , private boost::equality_comparable<port_mod>
     {
     public:
         using raw_ofp_type = v10_detail::ofp_port_mod;
@@ -106,21 +104,7 @@ namespace messages {
             return port_mod_.advertise;
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            return detail::encode(container, port_mod_);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> port_mod
-        {
-            return port_mod{detail::decode<raw_ofp_type>(first, last)};
-        }
-
-        static void validate(v10_detail::ofp_header const& header)
+        static void validate_header(v10_detail::ofp_header const& header)
         {
             if (header.version != protocol::OFP_VERSION) {
                 throw std::runtime_error{"invalid version"};
@@ -133,13 +117,25 @@ namespace messages {
             }
         }
 
-        friend auto operator==(port_mod const&, port_mod const&) noexcept
-            -> bool;
-
     private:
+        friend basic_openflow_message::basic_protocol_type;
+
         explicit port_mod(raw_ofp_type const& port_mod) noexcept
             : port_mod_(port_mod)
         {
+        }
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, port_mod_);
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> port_mod
+        {
+            return port_mod{detail::decode<raw_ofp_type>(first, last)};
         }
 
         auto equal_impl(port_mod const& rhs) const noexcept
@@ -151,12 +147,6 @@ namespace messages {
     private:
         raw_ofp_type port_mod_;
     };
-
-    inline auto operator==(port_mod const& lhs, port_mod const& rhs) noexcept
-        -> bool
-    {
-        return lhs.equal_impl(rhs);
-    }
 
 } // namespace messages
 } // namespace v10
