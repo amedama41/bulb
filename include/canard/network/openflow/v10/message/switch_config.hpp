@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <stdexcept>
-#include <boost/operators.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
@@ -23,7 +22,6 @@ namespace messages {
         template <class T>
         class switch_config_base
             : public v10_detail::basic_openflow_message<T>
-            , private boost::equality_comparable<T>
         {
         public:
             using raw_ofp_type = v10_detail::ofp_switch_config;
@@ -70,21 +68,7 @@ namespace messages {
                 return config_.miss_send_len;
             }
 
-            template <class Container>
-            auto encode(Container& container) const
-                -> Container&
-            {
-                return detail::encode(container, config_);
-            }
-
-            template <class Iterator>
-            static auto decode(Iterator& first, Iterator last)
-                -> T
-            {
-                return T{detail::decode<raw_ofp_type>(first, last)};
-            }
-
-            static void validate(v10_detail::ofp_header const& header)
+            static void validate_header(v10_detail::ofp_header const& header)
             {
                 if (header.version != protocol::OFP_VERSION) {
                     throw std::runtime_error{"invalid version"};
@@ -97,13 +81,23 @@ namespace messages {
                 }
             }
 
-            friend auto operator==(T const& lhs, T const& rhs) noexcept
-                -> bool
+        private:
+            friend typename
+                v10_detail::basic_openflow_message<T>::basic_protocol_type;
+
+            template <class Container>
+            void encode_impl(Container& container) const
             {
-                return lhs.equal_impl(rhs);
+                detail::encode(container, config_);
             }
 
-        private:
+            template <class Iterator>
+            static auto decode_impl(Iterator& first, Iterator last)
+                -> T
+            {
+                return T{detail::decode<raw_ofp_type>(first, last)};
+            }
+
             auto equal_impl(T const& rhs) const noexcept
                 -> bool
             {
@@ -119,7 +113,6 @@ namespace messages {
 
     class get_config_request
         : public v10_detail::basic_openflow_message<get_config_request>
-        , private boost::equality_comparable<get_config_request>
     {
     public:
         using raw_ofp_type = v10_detail::ofp_header;
@@ -144,23 +137,7 @@ namespace messages {
             return header_;
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            return detail::encode(container, header_);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> get_config_request
-        {
-            return get_config_request{
-                detail::decode<raw_ofp_type>(first, last)
-            };
-        }
-
-        static void validate(v10_detail::ofp_header const& header)
+        static void validate_header(v10_detail::ofp_header const& header)
         {
             if (header.version != protocol::OFP_VERSION) {
                 throw std::runtime_error{"invalid version"};
@@ -173,14 +150,27 @@ namespace messages {
             }
         }
 
-        friend auto operator==(
-                get_config_request const&, get_config_request const&) noexcept
-            -> bool;
-
     private:
+        friend basic_openflow_message::basic_protocol_type;
+
         explicit get_config_request(raw_ofp_type const header) noexcept
             : header_(header)
         {
+        }
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, header_);
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> get_config_request
+        {
+            return get_config_request{
+                detail::decode<raw_ofp_type>(first, last)
+            };
         }
 
         auto equal_impl(get_config_request const& rhs) const noexcept
@@ -192,14 +182,6 @@ namespace messages {
     private:
         raw_ofp_type header_;
     };
-
-    inline auto operator==(
-              get_config_request const& lhs
-            , get_config_request const& rhs) noexcept
-        -> bool
-    {
-        return lhs.equal_impl(rhs);
-    }
 
 
     class get_config_reply
