@@ -5,7 +5,6 @@
 #include <iterator>
 #include <stdexcept>
 #include <utility>
-#include <boost/operators.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
@@ -26,7 +25,6 @@ namespace flow_mod_detail {
     template <class FlowMod>
     class flow_mod_base
         : public v10_detail::basic_openflow_message<FlowMod>
-        , private boost::equality_comparable<FlowMod>
     {
     public:
         using raw_ofp_type = v10_detail::ofp_flow_mod;
@@ -61,27 +59,7 @@ namespace flow_mod_detail {
             return actions;
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            detail::encode(container, flow_mod_);
-            return actions_.encode(container);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> FlowMod
-        {
-            auto const flow_mod = detail::decode<raw_ofp_type>(first, last);
-            last = std::next(
-                    first
-                  , flow_mod.header.length - sizeof(raw_ofp_type));
-            auto actions = action_list::decode(first, last);
-            return FlowMod{flow_mod, std::move(actions)};
-        }
-
-        static void validate(v10_detail::ofp_header const& header)
+        static void validate_header(v10_detail::ofp_header const& header)
         {
             if (header.version != protocol::OFP_VERSION) {
                 throw std::runtime_error{"invalid version"};
@@ -92,12 +70,6 @@ namespace flow_mod_detail {
             if (header.length < sizeof(raw_ofp_type)) {
                 throw std::runtime_error{"too small length"};
             }
-        }
-
-        friend auto operator==(FlowMod const& lhs, FlowMod const& rhs) noexcept
-            -> bool
-        {
-            return lhs.equal_impl(rhs);
         }
 
     protected:
@@ -191,6 +163,29 @@ namespace flow_mod_detail {
         }
 
     private:
+        friend typename
+            v10_detail::basic_openflow_message<FlowMod>::basic_protocol_type;
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, flow_mod_);
+            actions_.encode(container);
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> FlowMod
+        {
+            auto const flow_mod = detail::decode<raw_ofp_type>(first, last);
+            auto const actions_length
+                = flow_mod.header.length - sizeof(raw_ofp_type);
+            last = std::next(first, actions_length);
+
+            auto actions = action_list::decode(first, last);
+            return FlowMod{flow_mod, std::move(actions)};
+        }
+
         auto equal_impl(FlowMod const& rhs) const noexcept
             -> bool
         {
