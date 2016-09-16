@@ -5,7 +5,6 @@
 #include <stdexcept> // TODO
 #include <utility>
 #include <vector>
-#include <boost/operators.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
@@ -23,7 +22,6 @@ namespace messages {
 
     class features_request
         : public v10_detail::basic_openflow_message<features_request>
-        , private boost::equality_comparable<features_request>
     {
     public:
         using raw_ofp_type = v10_detail::ofp_header;
@@ -47,22 +45,7 @@ namespace messages {
             return header_;
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            return detail::encode(container, header_);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> features_request
-        {
-            auto const header = detail::decode<raw_ofp_type>(first, last);
-            return features_request{header};
-        }
-
-        static void validate(raw_ofp_type const& header)
+        static void validate_header(raw_ofp_type const& header)
         {
             if (header.version != protocol::OFP_VERSION) {
                 throw std::runtime_error{"invalid version"};
@@ -75,14 +58,26 @@ namespace messages {
             }
         }
 
-        friend auto operator==(
-                features_request const&, features_request const&) noexcept
-            -> bool;
-
     private:
+        friend basic_openflow_message::basic_protocol_type;
+
         explicit features_request(raw_ofp_type const& header) noexcept
             : header_(header)
         {
+        }
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, header_);
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> features_request
+        {
+            auto const header = detail::decode<raw_ofp_type>(first, last);
+            return features_request{header};
         }
 
         auto equal_impl(features_request const& rhs) const noexcept
@@ -95,17 +90,9 @@ namespace messages {
         raw_ofp_type header_;
     };
 
-    inline auto operator==(
-            features_request const& lhs, features_request const& rhs) noexcept
-        -> bool
-    {
-        return lhs.equal_impl(rhs);
-    }
-
 
     class features_reply
         : public v10_detail::basic_openflow_message<features_reply>
-        , private boost::equality_comparable<features_reply>
     {
     public:
         using raw_ofp_type = v10_detail::ofp_switch_features;
@@ -229,37 +216,7 @@ namespace messages {
             return tmp;
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            detail::encode(container, switch_features_);
-            boost::for_each(ports_, [&](port const& p) {
-                p.encode(container);
-            });
-            return container;
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> features_reply
-        {
-            auto const features
-                = detail::decode<raw_ofp_type>(first, last);
-
-            auto const remaining_length
-                = features.header.length - sizeof(features);
-            last = std::next(first, remaining_length);
-
-            auto ports = port_list{};
-            ports.reserve(remaining_length / sizeof(port::raw_ofp_type));
-            while (first != last) {
-                ports.emplace_back(port::decode(first, last));
-            }
-            return features_reply{features, std::move(ports)};
-        }
-
-        static void validate(v10_detail::ofp_header const& header)
+        static void validate_header(v10_detail::ofp_header const& header)
         {
             if (header.version != protocol::OFP_VERSION) {
                 throw std::runtime_error{"invalid version"};
@@ -276,16 +233,38 @@ namespace messages {
             }
         }
 
-        friend auto operator==(
-                features_reply const&, features_reply const&) noexcept
-            -> bool;
-
     private:
-        features_reply(raw_ofp_type const& features
-                     , port_list&& ports)
+        friend basic_openflow_message::basic_protocol_type;
+
+        features_reply(raw_ofp_type const& features, port_list&& ports)
             : switch_features_(features)
             , ports_(std::move(ports))
         {
+        }
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, switch_features_);
+            boost::for_each(
+                    ports_, [&](port const& p) { p.encode(container); });
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> features_reply
+        {
+            auto const features = detail::decode<raw_ofp_type>(first, last);
+
+            auto const ports_length = features.header.length - sizeof(features);
+            last = std::next(first, ports_length);
+
+            auto ports = port_list{};
+            ports.reserve(ports_length / sizeof(port::raw_ofp_type));
+            while (first != last) {
+                ports.emplace_back(port::decode(first, last));
+            }
+            return features_reply{features, std::move(ports)};
         }
 
         auto equal_impl(features_reply const& rhs) const noexcept
@@ -299,13 +278,6 @@ namespace messages {
         raw_ofp_type switch_features_;
         port_list ports_;
     };
-
-    inline auto operator==(
-            features_reply const& lhs, features_reply const& rhs) noexcept
-        -> bool
-    {
-        return lhs.equal_impl(rhs);
-    }
 
 } // namespace messages
 } // namespace v10
