@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <utility>
-#include <boost/operators.hpp>
+#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
@@ -21,12 +21,10 @@ namespace messages {
 namespace statistics {
 
     class port_stats
-        : private boost::equality_comparable<port_stats>
+        : public detail::basic_protocol_type<port_stats>
     {
     public:
         using raw_ofp_type = v10_detail::ofp_port_stats;
-
-        static std::uint16_t const base_size = sizeof(raw_ofp_type);
 
         port_stats(std::uint16_t const port_no
                  , std::uint64_t const rx_packets
@@ -144,27 +142,25 @@ namespace statistics {
             return port_stats_.collisions;
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            return detail::encode(container, port_stats_);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> port_stats
-        {
-            return port_stats{detail::decode<raw_ofp_type>(first, last)};
-        }
-
-        friend auto operator==(port_stats const&, port_stats const&) noexcept
-            -> bool;
-
     private:
         explicit port_stats(raw_ofp_type const& port_stats) noexcept
             : port_stats_(port_stats)
         {
+        }
+
+        friend basic_protocol_type;
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, port_stats_);
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> port_stats
+        {
+            return port_stats{detail::decode<raw_ofp_type>(first, last)};
         }
 
         auto equal_impl(port_stats const& rhs) const noexcept
@@ -176,13 +172,6 @@ namespace statistics {
     private:
         raw_ofp_type port_stats_;
     };
-
-    inline auto operator==(
-            port_stats const& lhs, port_stats const& rhs) noexcept
-        -> bool
-    {
-        return lhs.equal_impl(rhs);
-    }
 
 
     class port_stats_request
