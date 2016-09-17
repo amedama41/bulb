@@ -6,7 +6,6 @@
 #include <memory>
 #include <stdexcept>
 #include <utility>
-#include <boost/operators.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <canard/network/openflow/binary_data.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
@@ -28,7 +27,6 @@ namespace messages {
         template <class T>
         class echo_base
             : public v10_detail::basic_openflow_message<T>
-            , private boost::equality_comparable<T>
         {
         public:
             using raw_ofp_type = v10_detail::ofp_header;
@@ -107,28 +105,7 @@ namespace messages {
                 return binary_data{std::move(data_), data_len};
             }
 
-            template <class Container>
-            auto encode(Container& container) const
-                -> Container&
-            {
-                detail::encode(container, header_);
-                return detail::encode_byte_array(
-                        container, data_.get(), data_length());
-            }
-
-            template <class Iterator>
-            static auto decode(Iterator& first, Iterator last)
-                -> T
-            {
-                auto const header = detail::decode<raw_ofp_type>(first, last);
-                last = std::next(first, header.length - sizeof(raw_ofp_type));
-                auto data = binary_data::copy_data(first, last);
-                first = last;
-
-                return T{header, std::move(data)};
-            }
-
-            static void validate(v10_detail::ofp_header const& header)
+            static void validate_header(v10_detail::ofp_header const& header)
             {
                 if (header.version != protocol::OFP_VERSION) {
                     throw std::runtime_error{"invalid version"};
@@ -141,13 +118,30 @@ namespace messages {
                 }
             }
 
-            friend auto operator==(T const& lhs, T const& rhs) noexcept
-                -> bool
+        private:
+            friend typename
+                v10_detail::basic_openflow_message<T>::basic_protocol_type;
+
+            template <class Container>
+            void encode_impl(Container& container) const
             {
-                return lhs.equal_impl(rhs);
+                detail::encode(container, header_);
+                detail::encode_byte_array(
+                        container, data_.get(), data_length());
             }
 
-        private:
+            template <class Iterator>
+            static auto decode_impl(Iterator& first, Iterator last)
+                -> T
+            {
+                auto const header = detail::decode<raw_ofp_type>(first, last);
+                last = std::next(first, header.length - sizeof(raw_ofp_type));
+                auto data = binary_data::copy_data(first, last);
+                first = last;
+
+                return T{header, std::move(data)};
+            }
+
             auto equal_impl(T const& rhs) const noexcept
                 -> bool
             {
