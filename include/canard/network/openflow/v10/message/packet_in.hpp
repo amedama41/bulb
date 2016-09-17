@@ -7,7 +7,6 @@
 #include <iterator>
 #include <stdexcept>
 #include <utility>
-#include <boost/operators.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <canard/network/openflow/binary_data.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
@@ -25,11 +24,16 @@ namespace messages {
 
     class packet_in
         : public v10_detail::basic_openflow_message<packet_in>
-        , private boost::equality_comparable<packet_in>
     {
-        static constexpr std::uint16_t base_pkt_in_size
+        static constexpr std::uint16_t min_pkt_in_len
             = offsetof(v10_detail::ofp_packet_in, pad)
             + sizeof(v10_detail::ofp_packet_in::pad);
+
+        friend constexpr auto get_min_length(packet_in*) noexcept
+            -> std::uint16_t
+        {
+            return packet_in::min_pkt_in_len;
+        }
 
     public:
         using raw_ofp_type = v10_detail::ofp_packet_in;
@@ -48,7 +52,7 @@ namespace messages {
                   v10_detail::ofp_header{
                       protocol::OFP_VERSION
                     , message_type
-                    , std::uint16_t(base_pkt_in_size + data.size())
+                    , std::uint16_t(min_pkt_in_len + data.size())
                     , xid
                   }
                 , buffer_id
@@ -71,7 +75,7 @@ namespace messages {
             : packet_in_(other.packet_in_)
             , data_(std::move(other).data_)
         {
-            other.packet_in_.header.length = base_pkt_in_size;
+            other.packet_in_.header.length = min_pkt_in_len;
         }
 
         auto operator=(packet_in const& other)
@@ -128,41 +132,18 @@ namespace messages {
         auto frame_length() const noexcept
             -> std::uint16_t
         {
-            return length() - base_pkt_in_size;
+            return length() - min_pkt_in_len;
         }
 
         auto extract_frame() noexcept
             -> binary_data
         {
             auto data = binary_data{std::move(data_), frame_length()};
-            packet_in_.header.length = base_pkt_in_size;
+            packet_in_.header.length = min_pkt_in_len;
             return data;
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            detail::encode(container, packet_in_, base_pkt_in_size);
-            return detail::encode_byte_array(
-                    container, data_.get(), frame_length());
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> packet_in
-        {
-            auto pkt_in
-                = detail::decode<raw_ofp_type>(first, last, base_pkt_in_size);
-            last = std::next(first, pkt_in.header.length - base_pkt_in_size);
-
-            auto data = binary_data::copy_data(first, last);
-            first = last;
-
-            return packet_in{pkt_in, std::move(data)};
-        }
-
-        static void validate(v10_detail::ofp_header const& header)
+        static void validate_header(v10_detail::ofp_header const& header)
         {
             if (header.version != protocol::OFP_VERSION) {
                 throw std::runtime_error{"invalid version"};
@@ -170,26 +151,46 @@ namespace messages {
             if (header.type != message_type) {
                 throw std::runtime_error{"invalid message type"};
             }
-            if (header.length < base_pkt_in_size) {
+            if (header.length < min_pkt_in_len) {
                 throw std::runtime_error{"invalid length"};
             }
         }
 
-        friend auto operator==(packet_in const&, packet_in const&) noexcept
-            -> bool;
-
     private:
+        friend basic_openflow_message::basic_protocol_type;
+
         packet_in(raw_ofp_type const& pkt_in, data_type&& data)
             : packet_in_(pkt_in)
             , data_(std::move(data))
         {
         }
 
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, packet_in_, min_pkt_in_len);
+            detail::encode_byte_array(container, data_.get(), frame_length());
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> packet_in
+        {
+            auto pkt_in
+                = detail::decode<raw_ofp_type>(first, last, min_pkt_in_len);
+            last = std::next(first, pkt_in.header.length - min_pkt_in_len);
+
+            auto data = binary_data::copy_data(first, last);
+            first = last;
+
+            return packet_in{pkt_in, std::move(data)};
+        }
+
         auto equal_impl(packet_in const& rhs) const noexcept
             -> bool
         {
             return std::memcmp(
-                    &packet_in_, &rhs.packet_in_, base_pkt_in_size) == 0
+                    &packet_in_, &rhs.packet_in_, min_pkt_in_len) == 0
                 && frame() == rhs.frame();
         }
 
@@ -197,12 +198,6 @@ namespace messages {
         raw_ofp_type packet_in_;
         data_type data_;
     };
-
-    inline auto operator==(packet_in const& lhs, packet_in const& rhs) noexcept
-        -> bool
-    {
-        return lhs.equal_impl(rhs);
-    }
 
 } // namespace message
 } // namespace v10
