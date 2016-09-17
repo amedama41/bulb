@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <stdexcept>
-#include <boost/operators.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
@@ -23,7 +22,6 @@ namespace messages {
         template <class T>
         class barrier_base
             : public v10_detail::basic_openflow_message<T>
-            , private boost::equality_comparable<T>
         {
         public:
             using raw_ofp_type = v10_detail::ofp_header;
@@ -34,21 +32,7 @@ namespace messages {
                 return header_;
             }
 
-            template <class Container>
-            auto encode(Container& container) const
-                -> Container&
-            {
-                return detail::encode(container, header_);
-            }
-
-            template <class Iterator>
-            static auto decode(Iterator& first, Iterator last)
-                -> T
-            {
-                return T{detail::decode<raw_ofp_type>(first, last)};
-            }
-
-            static void validate(v10_detail::ofp_header const& header)
+            static void validate_header(v10_detail::ofp_header const& header)
             {
                 if (header.version != protocol::OFP_VERSION) {
                     throw std::runtime_error{"invalid version"};
@@ -59,12 +43,6 @@ namespace messages {
                 if (header.length != sizeof(raw_ofp_type)) {
                     throw std::runtime_error{"invalid length"};
                 }
-            }
-
-            friend auto operator==(T const& lhs, T const& rhs) noexcept
-                -> bool
-            {
-                return detail::memcmp(lhs.header_, rhs.header_);
             }
 
         protected:
@@ -81,6 +59,29 @@ namespace messages {
             explicit barrier_base(raw_ofp_type const& header) noexcept
                 : header_(header)
             {
+            }
+
+        private:
+            friend typename
+                v10_detail::basic_openflow_message<T>::basic_protocol_type;
+
+            template <class Container>
+            void encode_impl(Container& container) const
+            {
+                detail::encode(container, header_);
+            }
+
+            template <class Iterator>
+            static auto decode_impl(Iterator& first, Iterator last)
+                -> T
+            {
+                return T{detail::decode<raw_ofp_type>(first, last)};
+            }
+
+            auto equal_impl(T const& rhs) const noexcept
+                -> bool
+            {
+                return detail::memcmp(header_, rhs.header_);
             }
 
         private:
