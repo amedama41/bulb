@@ -9,7 +9,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include <boost/operators.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/numeric.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
@@ -47,7 +46,6 @@ namespace stats_detail {
     template <class T, class StatsType>
     class basic_stats
         : public v10_detail::basic_openflow_message<T>
-        , private boost::equality_comparable<T>
     {
     public:
         using raw_ofp_type = StatsType;
@@ -73,7 +71,7 @@ namespace stats_detail {
             return static_cast<T const*>(this)->stats().flags;
         }
 
-        static void validate(v10_detail::ofp_header const& header)
+        static void validate_header(v10_detail::ofp_header const& header)
         {
             if (header.version != protocol::OFP_VERSION) {
                 throw std::runtime_error{"invalid version"};
@@ -84,12 +82,6 @@ namespace stats_detail {
             if (header.length < sizeof(raw_ofp_type)) {
                 throw std::runtime_error{"invalid length"};
             }
-        }
-
-        friend auto operator==(T const& lhs, T const& rhs) noexcept
-            -> bool
-        {
-            return lhs.equal_impl(rhs);
         }
     };
 
@@ -103,23 +95,7 @@ namespace stats_detail {
     public:
         using raw_ofp_type = typename base_t::raw_ofp_type;
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            return detail::encode(container, stats_);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> T
-        {
-            return T{detail::decode<raw_ofp_type>(first, last)};
-        }
-
-        using base_t::validate;
-
-        static void validate(raw_ofp_type const& stats)
+        static void validate_stats(raw_ofp_type const& stats)
         {
             if (stats.type != T::stats_type_value) {
                 throw std::runtime_error{"invalid stats type"};
@@ -151,13 +127,28 @@ namespace stats_detail {
         }
 
     private:
-        friend base_t;
+        friend typename base_t::basic_openflow_message::basic_protocol_type;
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, stats_);
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> T
+        {
+            return T{detail::decode<raw_ofp_type>(first, last)};
+        }
 
         auto equal_impl(T const& rhs) const noexcept
             -> bool
         {
             return detail::memcmp(stats_, rhs.stats_);
         }
+
+        friend base_t;
 
         auto stats() const noexcept
             -> raw_ofp_type const&
@@ -180,25 +171,7 @@ namespace stats_detail {
         using raw_ofp_type = typename base_t::raw_ofp_type;
         using raw_ofp_stats_type = BodyType;
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            detail::encode(container, stats_);
-            return detail::encode(container, body_);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> T
-        {
-            auto const stats = detail::decode<raw_ofp_type>(first, last);
-            return T{stats, detail::decode<raw_ofp_stats_type>(first, last)};
-        }
-
-        using base_t::validate;
-
-        static void validate(raw_ofp_type const& stats)
+        static void validate_stats(raw_ofp_type const& stats)
         {
             if (stats.type != T::stats_type_value) {
                 throw std::runtime_error{"invalid stats type"};
@@ -243,7 +216,22 @@ namespace stats_detail {
         }
 
     private:
-        friend base_t;
+        friend typename base_t::basic_openflow_message::basic_protocol_type;
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, stats_);
+            detail::encode(container, body_);
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> T
+        {
+            auto const stats = detail::decode<raw_ofp_type>(first, last);
+            return T{stats, detail::decode<raw_ofp_stats_type>(first, last)};
+        }
 
         auto equal_impl(T const& rhs) const noexcept
             -> bool
@@ -251,6 +239,8 @@ namespace stats_detail {
             return detail::memcmp(stats_, rhs.stats_)
                 && detail::memcmp(body_, rhs.body_);
         }
+
+        friend base_t;
 
         auto stats() const noexcept
             -> StatsType const&
@@ -290,41 +280,7 @@ namespace stats_detail {
             return body;
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            detail::encode(container, stats_);
-            boost::for_each(
-                      body_
-                    , [&](elem_type const& body) { body.encode(container); });
-            return container;
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> T
-        {
-            auto const stats = detail::decode<raw_ofp_type>(first, last);
-            auto const body_length
-                = stats.header.length - sizeof(raw_ofp_type);
-            last = std::next(first, body_length);
-
-            auto body = body_type{};
-            body.reserve(body_length / elem_type::base_size);
-            while (std::distance(first, last) >= elem_type::base_size) {
-                body.push_back(elem_type::decode(first, last));
-            }
-
-            if (first != last) {
-                throw std::runtime_error{"invalid stats length"};
-            }
-            return T{stats, std::move(body)};
-        }
-
-        using base_t::validate;
-
-        static void validate(raw_ofp_type const& stats)
+        static void validate_stats(raw_ofp_type const& stats)
         {
             if (stats.type != T::stats_type_value) {
                 throw std::runtime_error{"invalid stats type"};
@@ -385,7 +341,35 @@ namespace stats_detail {
         }
 
     private:
-        friend base_t;
+        friend typename base_t::basic_openflow_message::basic_protocol_type;
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, stats_);
+            boost::for_each(
+                    body_, [&](elem_type const& e) { e.encode(container); });
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> T
+        {
+            auto const stats = detail::decode<raw_ofp_type>(first, last);
+            auto const body_length = stats.header.length - sizeof(raw_ofp_type);
+            last = std::next(first, body_length);
+
+            auto body = body_type{};
+            body.reserve(body_length / elem_type::min_length());
+            while (std::distance(first, last) >= elem_type::min_length()) {
+                body.push_back(elem_type::decode(first, last));
+            }
+
+            if (first != last) {
+                throw std::runtime_error{"invalid stats length"};
+            }
+            return T{stats, std::move(body)};
+        }
 
         auto equal_impl(T const& rhs) const noexcept
             -> bool
@@ -393,6 +377,8 @@ namespace stats_detail {
             return detail::memcmp(stats_, rhs.stats_)
                 && body_ == rhs.body_;
         }
+
+        friend base_t;
 
         auto stats() const noexcept
             -> raw_ofp_type const&
