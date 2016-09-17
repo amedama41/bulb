@@ -21,7 +21,6 @@ namespace messages {
     class port_status
         : public v10_detail::basic_openflow_message<port_status>
         , public v10_detail::port_adaptor<port_status>
-        , private boost::equality_comparable<port_status>
     {
     public:
         using raw_ofp_type = v10_detail::ofp_port_status;
@@ -64,22 +63,7 @@ namespace messages {
             return v10::port::from_ofp_port(port_status_.desc);
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            return detail::encode(container, port_status_);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> port_status
-        {
-            return port_status{detail::decode<raw_ofp_type>(first, last)
-            };
-        }
-
-        static void validate(v10_detail::ofp_header const& header)
+        static void validate_header(v10_detail::ofp_header const& header)
         {
             if (header.version != protocol::OFP_VERSION) {
                 throw std::runtime_error{"invalid version"};
@@ -92,13 +76,25 @@ namespace messages {
             }
         }
 
-        friend auto operator==(port_status const&, port_status const&) noexcept
-            -> bool;
-
     private:
+        friend basic_openflow_message::basic_protocol_type;
+
         explicit port_status(raw_ofp_type const& status) noexcept
             : port_status_(status)
         {
+        }
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, port_status_);
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> port_status
+        {
+            return port_status{detail::decode<raw_ofp_type>(first, last)};
         }
 
         auto equal_impl(port_status const& rhs) const noexcept
@@ -118,13 +114,6 @@ namespace messages {
     private:
         raw_ofp_type port_status_;
     };
-
-    inline auto operator==(
-            port_status const& lhs, port_status const& rhs) noexcept
-        -> bool
-    {
-        return lhs.equal_impl(rhs);
-    }
 
 } // namespace messages
 } // namespace v10
