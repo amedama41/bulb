@@ -5,14 +5,14 @@
 #include <cstdint>
 #include <algorithm>
 #include <utility>
-#include <boost/operators.hpp>
 #include <boost/range/adaptor/sliced.hpp>
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/utility/string_ref.hpp>
-#include <canard/network/openflow/get_xid.hpp>
+#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
+#include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/v10/detail/basic_stats.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
@@ -25,12 +25,10 @@ namespace messages {
 namespace statistics {
 
     class table_stats
-        : private boost::equality_comparable<table_stats>
+        : public detail::basic_protocol_type<table_stats>
     {
     public:
         using raw_ofp_type = v10_detail::ofp_table_stats;
-
-        static constexpr std::size_t base_size = sizeof(raw_ofp_type);
 
         table_stats(std::uint8_t const table_id
                   , boost::string_ref name
@@ -104,27 +102,25 @@ namespace statistics {
             return table_stats_.matched_count;
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            return detail::encode(container, table_stats_);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> table_stats
-        {
-            return table_stats{detail::decode<raw_ofp_type>(first, last)};
-        }
-
-        friend auto operator==(table_stats const&, table_stats const&) noexcept
-            -> bool;
-
     private:
         explicit table_stats(raw_ofp_type const& table_stats) noexcept
             : table_stats_(table_stats)
         {
+        }
+
+        friend basic_protocol_type;
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, table_stats_);
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> table_stats
+        {
+            return table_stats{detail::decode<raw_ofp_type>(first, last)};
         }
 
         auto equal_impl(table_stats const& rhs) const noexcept
@@ -136,13 +132,6 @@ namespace statistics {
     private:
         raw_ofp_type table_stats_;
     };
-
-    inline auto operator==(
-            table_stats const& lhs, table_stats const& rhs) noexcept
-        -> bool
-    {
-        return lhs.equal_impl(rhs);
-    }
 
 
     class table_stats_request
