@@ -6,7 +6,6 @@
 #include <memory>
 #include <stdexcept>
 #include <utility>
-#include <boost/operators.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <canard/network/openflow/binary_data.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
@@ -26,7 +25,6 @@ namespace messages {
 
     class packet_out
         : public v10_detail::basic_openflow_message<packet_out>
-        , private boost::equality_comparable<packet_out>
     {
     public:
         using raw_ofp_type = v10_detail::ofp_packet_out;
@@ -193,18 +191,41 @@ namespace messages {
             return length() - sizeof(raw_ofp_type) - actions_length();
         }
 
+        static void validate_header(v10_detail::ofp_header const& header)
+        {
+            if (header.version != protocol::OFP_VERSION) {
+                throw std::runtime_error{"invalid version"};
+            }
+            if (header.type != message_type) {
+                throw std::runtime_error{"invalid message type"};
+            }
+            if (header.length < sizeof(raw_ofp_type)) {
+                throw std::runtime_error{"invalid length"};
+            }
+        }
+
+    private:
+        friend basic_openflow_message::basic_protocol_type;
+
+        packet_out(raw_ofp_type const& pkt_out
+                 , action_list&& actions
+                 , data_type&& data)
+            : packet_out_(pkt_out)
+            , actions_(std::move(actions))
+            , data_(std::move(data))
+        {
+        }
+
         template <class Container>
-        auto encode(Container& container) const
-            -> Container&
+        void encode_impl(Container& container) const
         {
             detail::encode(container, packet_out_);
             actions_.encode(container);
-            return detail::encode_byte_array(
-                    container, data_.get(), frame_length());
+            detail::encode_byte_array(container, data_.get(), frame_length());
         }
 
         template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
+        static auto decode_impl(Iterator& first, Iterator last)
             -> packet_out
         {
             auto const pkt_out = detail::decode<raw_ofp_type>(first, last);
@@ -222,32 +243,6 @@ namespace messages {
             return packet_out{pkt_out, std::move(actions), std::move(data)};
         }
 
-        static void validate(v10_detail::ofp_header const& header)
-        {
-            if (header.version != protocol::OFP_VERSION) {
-                throw std::runtime_error{"invalid version"};
-            }
-            if (header.type != message_type) {
-                throw std::runtime_error{"invalid message type"};
-            }
-            if (header.length < sizeof(raw_ofp_type)) {
-                throw std::runtime_error{"invalid length"};
-            }
-        }
-
-        friend auto operator==(packet_out const&, packet_out const&) noexcept
-            -> bool;
-
-    private:
-        packet_out(raw_ofp_type const& pkt_out
-                 , action_list&& actions
-                 , data_type&& data)
-            : packet_out_(pkt_out)
-            , actions_(std::move(actions))
-            , data_(std::move(data))
-        {
-        }
-
         auto equal_impl(packet_out const& rhs) const noexcept
             -> bool
         {
@@ -261,13 +256,6 @@ namespace messages {
         action_list actions_;
         data_type data_;
     };
-
-    inline auto operator==(
-            packet_out const& lhs, packet_out const& rhs) noexcept
-        -> bool
-    {
-        return lhs.equal_impl(rhs);
-    }
 
 } // namespace messages
 } // namespace v10
