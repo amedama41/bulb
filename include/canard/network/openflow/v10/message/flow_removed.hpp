@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <stdexcept>
-#include <boost/operators.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
@@ -22,7 +21,6 @@ namespace messages {
 
     class flow_removed
         : public v10_detail::basic_openflow_message<flow_removed>
-        , private boost::equality_comparable<flow_removed>
     {
     public:
         using raw_ofp_type = v10_detail::ofp_flow_removed;
@@ -147,21 +145,7 @@ namespace messages {
             return v10::counters{packet_count(), byte_count()};
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            return detail::encode(container, flow_removed_);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> flow_removed
-        {
-            return flow_removed{detail::decode<raw_ofp_type>(first, last)};
-        }
-
-        static void validate(v10_detail::ofp_header const& header)
+        static void validate_header(v10_detail::ofp_header const& header)
         {
             if (header.version != protocol::OFP_VERSION) {
                 throw std::runtime_error{"invalid version"};
@@ -174,14 +158,25 @@ namespace messages {
             }
         }
 
-        friend auto operator==(
-                flow_removed const&, flow_removed const&) noexcept
-            -> bool;
-
     private:
+        friend basic_openflow_message::basic_protocol_type;
+
         explicit flow_removed(raw_ofp_type const& removed) noexcept
             : flow_removed_(removed)
         {
+        }
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, flow_removed_);
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> flow_removed
+        {
+            return flow_removed{detail::decode<raw_ofp_type>(first, last)};
         }
 
         auto equal_impl(flow_removed const& rhs) const noexcept
@@ -193,13 +188,6 @@ namespace messages {
     private:
         raw_ofp_type flow_removed_;
     };
-
-    inline auto operator==(
-            flow_removed const& lhs, flow_removed const& rhs) noexcept
-        -> bool
-    {
-        return lhs.equal_impl(rhs);
-    }
 
 } // namespace messages
 } // namespace v10
