@@ -15,7 +15,7 @@ namespace detail {
   constexpr auto get_min_length(T*) noexcept
     -> std::uint16_t
   {
-    return sizeof(T::raw_ofp_type);
+    return sizeof(typename T::raw_ofp_type);
   };
 
   template <class T>
