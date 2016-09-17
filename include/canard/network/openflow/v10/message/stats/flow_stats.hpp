@@ -6,7 +6,7 @@
 #include <iterator>
 #include <stdexcept>
 #include <utility>
-#include <boost/operators.hpp>
+#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
@@ -26,12 +26,10 @@ namespace messages {
 namespace statistics {
 
     class flow_stats
-        : private boost::equality_comparable<flow_stats>
+        : public detail::basic_protocol_type<flow_stats>
     {
     public:
         using raw_ofp_type = v10_detail::ofp_flow_stats;
-
-        static constexpr std::uint16_t base_size = sizeof(raw_ofp_type);
 
         flow_stats(v10::flow_entry entry
                  , std::uint8_t const table_id
@@ -39,8 +37,7 @@ namespace statistics {
                  , v10::elapsed_time const& elapsed_time
                  , v10::counters const& counters)
             : flow_stats_{
-                  std::uint16_t(
-                          sizeof(raw_ofp_type) + entry.actions().length())
+                  std::uint16_t(sizeof(raw_ofp_type) + entry.actions().length())
                 , table_id
                 , 0
                 , entry.match().ofp_match()
@@ -197,16 +194,24 @@ namespace statistics {
             return v10::counters{packet_count(), byte_count()};
         }
 
+    private:
+        flow_stats(raw_ofp_type const& stats, action_list&& actions)
+            : flow_stats_(stats)
+            , actions_(std::move(actions))
+        {
+        }
+
+        friend basic_protocol_type;
+
         template <class Container>
-        auto encode(Container& container) const
-            -> Container&
+        void encode_impl(Container& container) const
         {
             detail::encode(container, flow_stats_);
-            return actions_.encode(container);
+            actions_.encode(container);
         }
 
         template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
+        static auto decode_impl(Iterator& first, Iterator last)
             -> flow_stats
         {
             auto const stats = detail::decode<raw_ofp_type>(first, last);
@@ -224,16 +229,6 @@ namespace statistics {
             return flow_stats{stats, std::move(actions)};
         }
 
-        friend auto operator==(flow_stats const&, flow_stats const&) noexcept
-            -> bool;
-
-    private:
-        flow_stats(raw_ofp_type const& stats, action_list&& actions)
-            : flow_stats_(stats)
-            , actions_(std::move(actions))
-        {
-        }
-
         auto equal_impl(flow_stats const& rhs) const noexcept
             -> bool
         {
@@ -245,13 +240,6 @@ namespace statistics {
         raw_ofp_type flow_stats_;
         action_list actions_;
     };
-
-    inline auto operator==(
-            flow_stats const& lhs, flow_stats const& rhs) noexcept
-        -> bool
-    {
-        return lhs.equal_impl(rhs);
-    }
 
 
     class flow_stats_request
