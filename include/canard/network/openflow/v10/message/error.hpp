@@ -7,7 +7,6 @@
 #include <stdexcept>
 #include <utility>
 #include <vector>
-#include <boost/operators.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <canard/network/openflow/binary_data.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
@@ -26,7 +25,6 @@ namespace messages {
 
     class error
         : public v10_detail::basic_openflow_message<error>
-        , private boost::equality_comparable<error>
     {
     public:
         using raw_ofp_type = v10_detail::ofp_error_msg;
@@ -136,31 +134,7 @@ namespace messages {
             return detail::decode<v10_detail::ofp_header>(it, it_end);
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            detail::encode(container, error_msg_);
-            return detail::encode_byte_array(
-                    container, data_.get(), data_length());
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> error
-        {
-            auto const error_msg = detail::decode<raw_ofp_type>(first, last);
-
-            auto const data_length
-                = error_msg.header.length - sizeof(raw_ofp_type);
-            last = std::next(first, data_length);
-            auto data = binary_data::copy_data(first, last);
-            first = last;
-
-            return error{error_msg, std::move(data)};
-        }
-
-        static void validate(v10_detail::ofp_header const& header)
+        static void validate_header(v10_detail::ofp_header const& header)
         {
             if (header.version != protocol::OFP_VERSION) {
                 throw std::runtime_error{"invalid version"};
@@ -173,15 +147,36 @@ namespace messages {
             }
         }
 
-        friend auto operator==(error const&, error const&) noexcept
-            -> bool;
-
     private:
+        friend basic_openflow_message::basic_protocol_type;
+
         error(raw_ofp_type const& error_msg
             , data_type&& data) noexcept
             : error_msg_(error_msg)
             , data_(std::move(data))
         {
+        }
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, error_msg_);
+            detail::encode_byte_array(container, data_.get(), data_length());
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> error
+        {
+            auto const error_msg = detail::decode<raw_ofp_type>(first, last);
+
+            auto const data_length
+                = error_msg.header.length - sizeof(raw_ofp_type);
+            last = std::next(first, data_length);
+            auto data = binary_data::copy_data(first, last);
+            first = last;
+
+            return error{error_msg, std::move(data)};
         }
 
         auto equal_impl(error const& rhs) const noexcept
@@ -217,12 +212,6 @@ namespace messages {
         raw_ofp_type error_msg_;
         data_type data_;
     };
-
-    inline auto operator==(error const& lhs, error const& rhs) noexcept
-        -> bool
-    {
-        return lhs.equal_impl(rhs);
-    }
 
 } // namespace messages
 } // namespace v10
