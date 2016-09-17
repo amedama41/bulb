@@ -8,7 +8,6 @@
 #include <stdexcept>
 #include <utility>
 #include <vector>
-#include <boost/operators.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/numeric.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
@@ -28,7 +27,6 @@ namespace messages {
 
     class queue_get_config_request
         : public v10_detail::basic_openflow_message<queue_get_config_request>
-        , private boost::equality_comparable<queue_get_config_request>
     {
     public:
         using raw_ofp_type = v10_detail::ofp_queue_get_config_request;
@@ -64,23 +62,7 @@ namespace messages {
             return queue_get_config_request_.port;
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            return detail::encode(container, queue_get_config_request_);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> queue_get_config_request
-        {
-            return queue_get_config_request{
-                detail::decode<raw_ofp_type>(first, last)
-            };
-        }
-
-        static void validate(v10_detail::ofp_header const& header)
+        static void validate_header(v10_detail::ofp_header const& header)
         {
             if (header.version != protocol::OFP_VERSION) {
                 throw std::runtime_error{"invalid version"};
@@ -93,16 +75,28 @@ namespace messages {
             }
         }
 
-        friend auto operator==(
-                  queue_get_config_request const&
-                , queue_get_config_request const&) noexcept
-            -> bool;
-
     private:
+        friend basic_openflow_message::basic_protocol_type;
+
         explicit queue_get_config_request(
                 raw_ofp_type const& queue_get_config_request) noexcept
             : queue_get_config_request_(queue_get_config_request)
         {
+        }
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, queue_get_config_request_);
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> queue_get_config_request
+        {
+            return queue_get_config_request{
+                detail::decode<raw_ofp_type>(first, last)
+            };
         }
 
         auto equal_impl(queue_get_config_request const& rhs) const noexcept
@@ -116,18 +110,9 @@ namespace messages {
         raw_ofp_type queue_get_config_request_;
     };
 
-    inline auto operator==(
-              queue_get_config_request const& lhs
-            , queue_get_config_request const& rhs) noexcept
-        -> bool
-    {
-        return lhs.equal_impl(rhs);
-    }
-
 
     class queue_get_config_reply
         : public v10_detail::basic_openflow_message<queue_get_config_reply>
-        , private boost::equality_comparable<queue_get_config_reply>
     {
     public:
         using raw_ofp_type = v10_detail::ofp_queue_get_config_reply;
@@ -205,44 +190,7 @@ namespace messages {
             return queues;
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            detail::encode(container, queue_get_config_reply_);
-            boost::for_each(queues_, [&](queues_type::const_reference e) {
-                e.encode(container);
-            });
-            return container;
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> queue_get_config_reply
-        {
-            auto const queue_get_config
-                = detail::decode<raw_ofp_type>(first, last);
-
-            auto const queues_length
-                = queue_get_config.header.length - sizeof(raw_ofp_type);
-            last = std::next(first, queues_length);
-
-            auto queues = queues_type{};
-            queues.reserve(
-                    queues_length / sizeof(v10_detail::ofp_packet_queue));
-            while (std::distance(first, last)
-                    >= sizeof(v10_detail::ofp_packet_queue)) {
-                queues.push_back(packet_queue::decode(first, last));
-            }
-            if (first != last) {
-                throw std::runtime_error{
-                    "invalid queue_get_config_reply length"
-                };
-            }
-            return queue_get_config_reply{queue_get_config, std::move(queues)};
-        }
-
-        static void validate(v10_detail::ofp_header const& header)
+        static void validate_header(v10_detail::ofp_header const& header)
         {
             if (header.version != protocol::OFP_VERSION) {
                 throw std::runtime_error{"invalid version"};
@@ -255,18 +203,50 @@ namespace messages {
             }
         }
 
-        friend auto operator==(
-                  queue_get_config_reply const&
-                , queue_get_config_reply const&) noexcept
-            -> bool;
-
     private:
+        friend basic_openflow_message::basic_protocol_type;
+
         queue_get_config_reply(
                   raw_ofp_type const& queue_get_config_reply
                 , queues_type&& queues)
             : queue_get_config_reply_(queue_get_config_reply)
             , queues_(std::move(queues))
         {
+        }
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, queue_get_config_reply_);
+            boost::for_each(queues_, [&](queues_type::const_reference e) {
+                e.encode(container);
+            });
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> queue_get_config_reply
+        {
+            auto const queue_get_config
+                = detail::decode<raw_ofp_type>(first, last);
+
+            auto const queues_length
+                = queue_get_config.header.length - sizeof(raw_ofp_type);
+            last = std::next(first, queues_length);
+
+            auto queues = queues_type{};
+            constexpr auto min_queue_length
+                = queues_type::value_type::min_length();
+            queues.reserve(queues_length / min_queue_length);
+            while (std::distance(first, last) >= min_queue_length) {
+                queues.push_back(packet_queue::decode(first, last));
+            }
+            if (first != last) {
+                throw std::runtime_error{
+                    "invalid queue_get_config_reply length"
+                };
+            }
+            return queue_get_config_reply{queue_get_config, std::move(queues)};
         }
 
         auto equal_impl(queue_get_config_reply const& rhs) const noexcept
@@ -295,14 +275,6 @@ namespace messages {
         raw_ofp_type queue_get_config_reply_;
         queues_type queues_;
     };
-
-    inline auto operator==(
-              queue_get_config_reply const& lhs
-            , queue_get_config_reply const& rhs) noexcept
-        -> bool
-    {
-        return lhs.equal_impl(rhs);
-    }
 
 } // namespace messages
 } // namespace v10
