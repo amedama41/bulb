@@ -50,6 +50,18 @@ constexpr auto ofp_packet_in_size = 18;
 BOOST_AUTO_TEST_SUITE(message_test)
 BOOST_AUTO_TEST_SUITE(packet_in)
 
+  BOOST_AUTO_TEST_SUITE(type_test)
+    BOOST_AUTO_TEST_CASE(min_length_always_returns_18)
+    {
+      using sut = msg::packet_in;
+
+      using min_length
+        = std::integral_constant<std::uint16_t, sut::min_length()>;
+
+      BOOST_TEST(min_length::value == 18);
+    }
+  BOOST_AUTO_TEST_SUITE_END() // type_test
+
   BOOST_FIXTURE_TEST_SUITE(constructor, parameters)
     BOOST_AUTO_TEST_CASE(is_constructible_from_all_parameters)
     {
