@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <stdexcept>
-#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/v13/detail/basic_action.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -37,12 +36,6 @@ namespace actions {
             return action_set_queue_.queue_id;
         }
 
-        friend auto operator==(set_queue const& lhs, set_queue const& rhs) noexcept
-            -> bool
-        {
-            return detail::memcmp(lhs.action_set_queue_, rhs.action_set_queue_);
-        }
-
     private:
         friend basic_action;
 
@@ -57,23 +50,22 @@ namespace actions {
             return action_set_queue_;
         }
 
-        template <class Validator>
-        void validate_impl(Validator) const
+        void validate_action() const
         {
             if (queue_id() == protocol::OFPQ_ALL) {
                 throw std::runtime_error{"invalid queue_id"};
             }
         }
 
+        auto is_equivalent_action(set_queue const& rhs) const noexcept
+            -> bool
+        {
+            return queue_id() == rhs.queue_id();
+        }
+
     private:
         raw_ofp_type action_set_queue_;
     };
-
-    inline auto equivalent(set_queue const& lhs, set_queue const& rhs) noexcept
-        -> bool
-    {
-        return lhs.queue_id() == rhs.queue_id();
-    }
 
 } // namespace actions
 } // namespace v13
