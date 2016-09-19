@@ -2,7 +2,6 @@
 #define CANARD_NET_OFP_V13_ACTIONS_SET_NW_TTL_HPP
 
 #include <cstdint>
-#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/v13/detail/basic_action.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -37,13 +36,6 @@ namespace actions {
             return action_nw_ttl_.nw_ttl;
         }
 
-        friend auto operator==(
-                set_nw_ttl const& lhs, set_nw_ttl const& rhs) noexcept
-            -> bool
-        {
-            return detail::memcmp(lhs.action_nw_ttl_, rhs.action_nw_ttl_);
-        }
-
     private:
         friend basic_action;
 
@@ -58,21 +50,19 @@ namespace actions {
             return action_nw_ttl_;
         }
 
-        template <class Validator>
-        void validate_impl(Validator) const
+        void validate_action() const
         {
+        }
+
+        auto is_equivalent_action(set_nw_ttl const& rhs) const noexcept
+            -> bool
+        {
+            return ttl() == rhs.ttl();
         }
 
     private:
         raw_ofp_type action_nw_ttl_;
     };
-
-    inline auto equivalent(
-            set_nw_ttl const& lhs, set_nw_ttl const& rhs) noexcept
-        -> bool
-    {
-        return lhs.ttl() == rhs.ttl();
-    }
 
 } // namespace actions
 } // namespace v13
