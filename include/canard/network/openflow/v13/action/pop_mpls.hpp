@@ -2,7 +2,6 @@
 #define CANARD_NET_OFP_V13_ACTIONS_POP_MPLS_HPP
 
 #include <cstdint>
-#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/v13/detail/basic_action.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -55,12 +54,6 @@ namespace actions {
             return pop_mpls{0x8848};
         }
 
-        friend auto operator==(pop_mpls const& lhs, pop_mpls const& rhs) noexcept
-            -> bool
-        {
-            return detail::memcmp(lhs.action_pop_mpls_, rhs.action_pop_mpls_);
-        }
-
     private:
         friend basic_action;
 
@@ -75,20 +68,19 @@ namespace actions {
             return action_pop_mpls_;
         }
 
-        template <class Validator>
-        void validate_impl(Validator) const
+        void validate_action() const
         {
+        }
+
+        auto is_equivalent_action(pop_mpls const& rhs) const noexcept
+            -> bool
+        {
+            return ethertype() == rhs.ethertype();
         }
 
     private:
         raw_ofp_type action_pop_mpls_;
     };
-
-    inline auto equivalent(pop_mpls const& lhs, pop_mpls const& rhs) noexcept
-        -> bool
-    {
-        return lhs.ethertype() == rhs.ethertype();
-    }
 
 } // namespace actions
 } // namespace v13
