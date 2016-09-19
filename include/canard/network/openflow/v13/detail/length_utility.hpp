@@ -9,13 +9,13 @@ namespace ofp {
 namespace detail {
 namespace v13 {
 
-    inline auto exact_length(std::uint16_t const length)
+    constexpr inline auto exact_length(std::uint16_t const length) noexcept
         -> std::uint16_t
     {
         return (length + 7) / 8 * 8;
     }
 
-    inline auto padding_length(std::uint16_t const length)
+    constexpr inline auto padding_length(std::uint16_t const length) noexcept
         -> std::uint16_t
     {
         return exact_length(length) - length;
