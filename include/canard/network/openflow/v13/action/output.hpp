@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <stdexcept>
-#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/v13/detail/basic_action.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -56,12 +55,6 @@ namespace actions {
             return output{protocol::OFPP_CONTROLLER, max_length};
         }
 
-        friend auto operator==(output const& lhs, output const& rhs) noexcept
-            -> bool
-        {
-            return detail::memcmp(lhs.action_output_, rhs.action_output_);
-        }
-
     private:
         friend basic_action;
 
@@ -76,8 +69,7 @@ namespace actions {
             return action_output_;
         }
 
-        template <class Validator>
-        void validate_impl(Validator) const
+        void validate_action() const
         {
             if (port_no() == 0 || port_no() == protocol::OFPP_ANY) {
                 throw std::runtime_error{"invalid port_no"};
@@ -88,18 +80,18 @@ namespace actions {
             }
         }
 
+        auto is_equivalent_action(output const& rhs) const noexcept
+            -> bool
+        {
+            return port_no() == protocol::OFPP_CONTROLLER
+                ? (rhs.port_no() == protocol::OFPP_CONTROLLER
+                        && max_length() == rhs.max_length())
+                : port_no() == rhs.port_no();
+        }
+
     private:
         raw_ofp_type action_output_;
     };
-
-    inline auto equivalent(output const& lhs, output const& rhs) noexcept
-        -> bool
-    {
-        return lhs.port_no() == protocol::OFPP_CONTROLLER
-            ? (rhs.port_no() == protocol::OFPP_CONTROLLER
-                    && lhs.max_length() == rhs.max_length())
-            : lhs.port_no() == rhs.port_no();
-    }
 
 } // namespace actions
 } // namespace v13
