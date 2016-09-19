@@ -2,7 +2,6 @@
 #define CANARD_NET_OFP_DETAIL_V13_BASIC_ACTION_PUSH_HPP
 
 #include <cstdint>
-#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/v13/detail/basic_action.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -28,18 +27,6 @@ namespace v13 {
             return action_push_.ethertype;
         }
 
-        friend auto operator==(T const& lhs, T const& rhs) noexcept
-            -> bool
-        {
-            return detail::memcmp(lhs.action_push_, rhs.action_push_);
-        }
-
-        friend auto equivalent(T const& lhs, T const& rhs) noexcept
-            -> bool
-        {
-            return lhs.ethertype() == rhs.ethertype();
-        }
-
     protected:
         explicit basic_action_push(std::uint16_t const ethertype) noexcept
             : action_push_{
@@ -63,6 +50,12 @@ namespace v13 {
             -> raw_ofp_type const&
         {
             return action_push_;
+        }
+
+        auto is_equivalent_action(T const& rhs) const noexcept
+            -> bool
+        {
+            return ethertype() == rhs.ethertype();
         }
 
     private:

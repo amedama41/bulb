@@ -1,7 +1,6 @@
 #ifndef CANARD_NET_OFP_DETAIL_V13_BASIC_GENERIC_ACTION_HPP
 #define CANARD_NET_OFP_DETAIL_V13_BASIC_GENERIC_ACTION_HPP
 
-#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/v13/detail/basic_action.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -20,18 +19,6 @@ namespace v13 {
 
     public:
         using raw_ofp_type = typename base_type::raw_ofp_type;
-
-        friend auto operator==(T const& lhs, T const& rhs) noexcept
-            -> bool
-        {
-            return detail::memcmp(lhs.action_header_, rhs.action_header_);
-        }
-
-        friend auto equivalent(T const&, T const&) noexcept
-            -> bool
-        {
-            return true;
-        }
 
     protected:
         basic_generic_action() noexcept
@@ -58,9 +45,14 @@ namespace v13 {
             return action_header_;
         }
 
-        template <class Validator>
-        void validate_impl(Validator) const
+        void validate_action() const
         {
+        }
+
+        auto is_equivalent_action(T const&) const noexcept
+            -> bool
+        {
+            return true;
         }
 
     private:
