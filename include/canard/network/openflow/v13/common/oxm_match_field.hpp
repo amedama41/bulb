@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <stdexcept>
 #include <tuple>
-#include <type_traits>
 #include <boost/asio/ip/address.hpp>
 #include <boost/asio/ip/address_v4.hpp>
 #include <boost/asio/ip/address_v6.hpp>
@@ -12,10 +11,7 @@
 #include <boost/fusion/container/map.hpp>
 #include <boost/fusion/sequence/intrinsic/value_at_key.hpp>
 #include <boost/fusion/support/pair.hpp>
-#include <boost/optional/optional.hpp>
-#include <boost/range/algorithm_ext/for_each.hpp>
 #include <canard/mac_address.hpp>
-#include <canard/network/openflow/detail/as_byte_range.hpp>
 #include <canard/network/openflow/v13/detail/basic_oxm_match_field.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -27,17 +23,59 @@ namespace oxm_match {
 
     namespace oxm_match_detail {
 
+        template <class T, bool NeedsByteOrderConversion = true>
+        struct generic_type
+        {
+            using value_type = T;
+            using oxm_value_type = value_type;
+
+            static constexpr bool needs_byte_order_conversion
+                = NeedsByteOrderConversion;
+
+            static auto to_oxm_value(value_type const& v) noexcept
+                -> oxm_value_type
+            { return v; }
+        };
+
+        struct mac_address_type
+        {
+            using value_type = canard::mac_address;
+            using oxm_value_type = value_type::bytes_type;
+
+            static constexpr bool needs_byte_order_conversion = false;
+
+            static auto to_oxm_value(value_type const& v) noexcept
+                -> oxm_value_type
+            { return v.to_bytes(); }
+        };
+
+        struct address_v4_type
+        {
+            using value_type = boost::asio::ip::address_v4;
+            using oxm_value_type = value_type::bytes_type;
+
+            static constexpr bool needs_byte_order_conversion = false;
+
+            static auto to_oxm_value(value_type const& v) noexcept
+                -> oxm_value_type
+            { return v.to_bytes(); }
+        };
+
+        struct address_v6_type
+        {
+            using value_type = boost::asio::ip::address_v6;
+            using oxm_value_type = value_type::bytes_type;
+
+            static constexpr bool needs_byte_order_conversion = false;
+
+            static auto to_oxm_value(value_type const& v) noexcept
+                -> oxm_value_type
+            { return v.to_bytes(); }
+        };
+
         template <protocol::ofp_oxm_class OXMClass, std::uint8_t OXMField>
         struct oxm_type
         {
-        };
-
-        template <class OXMValueType, bool NeedsByteOrderConversion = true>
-        struct oxm_type_info
-        {
-            using oxm_value_type = OXMValueType;
-            using needs_byte_order_conversion
-                = std::integral_constant<bool, NeedsByteOrderConversion>;
         };
 
         template <std::uint8_t OXMField>
@@ -45,63 +83,50 @@ namespace oxm_match {
             = oxm_type<protocol::OFPXMC_OPENFLOW_BASIC, OXMField>;
 
         using boost::fusion::pair;
+        using boost::endian::big_uint24_t;
 
         using oxm_type_info_table = boost::fusion::map<
-              pair<basic_oxm_class<protocol::OFPXMT_OFB_IN_PORT>        , oxm_type_info<std::uint32_t>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_IN_PHY_PORT>    , oxm_type_info<std::uint32_t>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_METADATA>       , oxm_type_info<std::uint64_t>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_ETH_DST>        , oxm_type_info<canard::mac_address, false>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_ETH_SRC>        , oxm_type_info<canard::mac_address, false>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_ETH_TYPE>       , oxm_type_info<std::uint16_t>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_VLAN_VID>       , oxm_type_info<std::uint16_t>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_VLAN_PCP>       , oxm_type_info<std::uint8_t>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_IP_DSCP>        , oxm_type_info<std::uint8_t>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_IP_ECN>         , oxm_type_info<std::uint8_t>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_IP_PROTO>       , oxm_type_info<std::uint8_t>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV4_SRC>       , oxm_type_info<boost::asio::ip::address_v4>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV4_DST>       , oxm_type_info<boost::asio::ip::address_v4>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_TCP_SRC>        , oxm_type_info<std::uint16_t>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_TCP_DST>        , oxm_type_info<std::uint16_t>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_UDP_SRC>        , oxm_type_info<std::uint16_t>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_UDP_DST>        , oxm_type_info<std::uint16_t>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_SCTP_SRC>       , oxm_type_info<std::uint16_t>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_SCTP_DST>       , oxm_type_info<std::uint16_t>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_ICMPV4_TYPE>    , oxm_type_info<std::uint8_t>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_ICMPV4_CODE>    , oxm_type_info<std::uint8_t>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_ARP_OP>         , oxm_type_info<std::uint16_t>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_ARP_SPA>        , oxm_type_info<boost::asio::ip::address_v4>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_ARP_TPA>        , oxm_type_info<boost::asio::ip::address_v4>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_ARP_SHA>        , oxm_type_info<canard::mac_address, false>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_ARP_THA>        , oxm_type_info<canard::mac_address, false>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV6_SRC>       , oxm_type_info<boost::asio::ip::address_v6, false>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV6_DST>       , oxm_type_info<boost::asio::ip::address_v6, false>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV6_FLABEL>    , oxm_type_info<std::uint32_t>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_ICMPV6_TYPE>    , oxm_type_info<std::uint8_t>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_ICMPV6_CODE>    , oxm_type_info<std::uint8_t>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV6_ND_TARGET> , oxm_type_info<boost::asio::ip::address_v6, false>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV6_ND_SLL>    , oxm_type_info<canard::mac_address, false>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV6_ND_TLL>    , oxm_type_info<canard::mac_address, false>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_MPLS_LABEL>     , oxm_type_info<std::uint32_t>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_MPLS_TC>        , oxm_type_info<std::uint8_t>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_MPLS_BOS>       , oxm_type_info<std::uint8_t>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_PBB_ISID>       , oxm_type_info<boost::endian::big_uint24_t, false>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_TUNNEL_ID>      , oxm_type_info<std::uint64_t>>
-            , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV6_EXTHDR>    , oxm_type_info<std::uint16_t>>
+              pair<basic_oxm_class<protocol::OFPXMT_OFB_IN_PORT>        , generic_type<std::uint32_t>>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_IN_PHY_PORT>    , generic_type<std::uint32_t>>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_METADATA>       , generic_type<std::uint64_t>>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_ETH_DST>        , mac_address_type>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_ETH_SRC>        , mac_address_type>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_ETH_TYPE>       , generic_type<std::uint16_t>>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_VLAN_VID>       , generic_type<std::uint16_t>>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_VLAN_PCP>       , generic_type<std::uint8_t>>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_IP_DSCP>        , generic_type<std::uint8_t>>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_IP_ECN>         , generic_type<std::uint8_t>>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_IP_PROTO>       , generic_type<std::uint8_t>>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV4_SRC>       , address_v4_type>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV4_DST>       , address_v4_type>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_TCP_SRC>        , generic_type<std::uint16_t>>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_TCP_DST>        , generic_type<std::uint16_t>>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_UDP_SRC>        , generic_type<std::uint16_t>>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_UDP_DST>        , generic_type<std::uint16_t>>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_SCTP_SRC>       , generic_type<std::uint16_t>>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_SCTP_DST>       , generic_type<std::uint16_t>>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_ICMPV4_TYPE>    , generic_type<std::uint8_t>>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_ICMPV4_CODE>    , generic_type<std::uint8_t>>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_ARP_OP>         , generic_type<std::uint16_t>>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_ARP_SPA>        , address_v4_type>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_ARP_TPA>        , address_v4_type>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_ARP_SHA>        , mac_address_type>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_ARP_THA>        , mac_address_type>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV6_SRC>       , address_v6_type>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV6_DST>       , address_v6_type>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV6_FLABEL>    , generic_type<std::uint32_t>>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_ICMPV6_TYPE>    , generic_type<std::uint8_t>>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_ICMPV6_CODE>    , generic_type<std::uint8_t>>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV6_ND_TARGET> , address_v6_type>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV6_ND_SLL>    , mac_address_type>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV6_ND_TLL>    , mac_address_type>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_MPLS_LABEL>     , generic_type<std::uint32_t>>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_MPLS_TC>        , generic_type<std::uint8_t>>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_MPLS_BOS>       , generic_type<std::uint8_t>>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_PBB_ISID>       , generic_type<big_uint24_t, false>>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_TUNNEL_ID>      , generic_type<std::uint64_t>>
+            , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV6_EXTHDR>    , generic_type<std::uint16_t>>
         >;
-
-        template <protocol::ofp_oxm_class OXMClass, std::uint8_t OXMField>
-        using oxm_type_info_t = typename boost::fusion::result_of::value_at_key<
-              oxm_type_info_table, oxm_type<OXMClass, OXMField>
-        >::type;
-
-        template <protocol::ofp_oxm_class OXMClass, std::uint8_t OXMField>
-        using oxm_value_type
-            = typename oxm_type_info_t<OXMClass, OXMField>::oxm_value_type;
-
-        template <protocol::ofp_oxm_class OXMClass, std::uint8_t OXMField>
-        using needs_byte_order_conversion = typename oxm_type_info_t<
-            OXMClass, OXMField
-        >::needs_byte_order_conversion;
 
         template <class T, class OXMTypeInfo>
         void validate_value(T const&, OXMTypeInfo)
@@ -219,214 +244,126 @@ namespace oxm_match {
             }
         }
 
-        template <class T>
-        void validate_mask(T const& value, T const& mask)
-        {
-            boost::for_each(
-                      detail::as_byte_range(value)
-                    , detail::as_byte_range(mask)
-                    , [](std::uint8_t const v, std::uint8_t const m) {
-                if (v & ~m) {
-                    throw std::runtime_error{"invalid wildcard"};
-                }
-            });
-        }
+        template <protocol::ofp_oxm_class OXMClass, std::uint8_t OXMField>
+        using oxm_type_info_t = typename boost::fusion::result_of::value_at_key<
+              oxm_type_info_table, oxm_type<OXMClass, OXMField>
+        >::type;
 
     } // namespace oxm_match_detail
 
 
     template <
-          protocol::ofp_oxm_class OXMClass
-        , std::uint8_t OXMField
-        , class ValueType = oxm_match_detail::oxm_value_type<OXMClass, OXMField>
+          protocol::ofp_oxm_class OXMClass, std::uint8_t OXMField
+        , class TypeInfo = oxm_match_detail::oxm_type_info_t<OXMClass, OXMField>
+    >
+    class oxm_match_field;
+
+    namespace oxm_match_detail {
+
+        template <protocol::ofp_oxm_class OXMClass, std::uint8_t OXMField>
+        using oxm_match_field_base_t = detail::v13::basic_oxm_match_field<
+              oxm_match_field<OXMClass, OXMField>
+            , oxm_type_info_t<OXMClass, OXMField>
+        >;
+
+    } // namespace oxm_match_detail
+
+
+    template <
+        protocol::ofp_oxm_class OXMClass, std::uint8_t OXMField, class TypeInfo
     >
     class oxm_match_field
-        : public detail::v13::basic_oxm_match_field<
-            oxm_match_field<OXMClass, OXMField>
-          >
+        : public oxm_match_detail::oxm_match_field_base_t<OXMClass, OXMField>
     {
+        using base_t
+            = oxm_match_detail::oxm_match_field_base_t<OXMClass, OXMField>;
+
     public:
-        using value_type = ValueType;
+        using value_type = typename base_t::value_type;
 
         explicit oxm_match_field(value_type const value) noexcept
-            : value_(value)
-            , mask_(boost::none)
+            : base_t{value}
         {
         }
 
         oxm_match_field(value_type const value, value_type const mask)
-            : value_(value)
-            , mask_{mask}
+            : base_t{value, mask}
         {
         }
 
-        static constexpr auto oxm_class() noexcept
-            -> protocol::ofp_oxm_class
-        {
-            return OXMClass;
-        }
+    private:
+        friend base_t;
 
-        static constexpr auto oxm_field() noexcept
-            -> std::uint8_t
-        {
-            return OXMField;
-        }
+        static constexpr protocol::ofp_oxm_class oxm_class_value = OXMClass;
+        static constexpr std::uint8_t oxm_field_value = OXMField;
 
-        auto oxm_value() const noexcept
-            -> value_type
-        {
-            return value_;
-        }
-
-        auto oxm_mask() const noexcept
-            -> boost::optional<value_type> const&
-        {
-            return mask_;
-        }
-
-        template <class Validator>
-        void validate(Validator) const
+        static void validate_value(value_type const& value)
         {
             oxm_match_detail::validate_value(
-                      oxm_value()
-                    , oxm_match_detail::oxm_type<OXMClass, OXMField>{});
-            if (this->oxm_has_mask()) {
-                oxm_match_detail::validate_mask(raw_value(), raw_mask());
-            }
+                    value, oxm_match_detail::oxm_type<OXMClass, OXMField>{});
         }
-
-    private:
-        friend detail::v13::basic_oxm_match_field<oxm_match_field>;
-
-        using oxm_value_type = ValueType;
-        using needs_byte_order_conversion
-            = oxm_match_detail::needs_byte_order_conversion<OXMClass, OXMField>;
-
-        auto raw_value() const noexcept
-            -> oxm_value_type
-        {
-            return value_;
-        }
-
-        auto raw_mask() const noexcept
-            -> oxm_value_type
-        {
-            return *mask_;
-        }
-
-    private:
-        value_type value_;
-        boost::optional<value_type> mask_;
     };
 
     template <protocol::ofp_oxm_class OXMClass, std::uint8_t OXMField>
-    class oxm_match_field<OXMClass, OXMField, canard::mac_address>
-        : public detail::v13::basic_oxm_match_field<
-            oxm_match_field<OXMClass, OXMField, canard::mac_address>
-          >
+    class oxm_match_field<OXMClass, OXMField, oxm_match_detail::mac_address_type>
+        : public oxm_match_detail::oxm_match_field_base_t<OXMClass, OXMField>
     {
+        using base_t
+            = oxm_match_detail::oxm_match_field_base_t<OXMClass, OXMField>;
+
     public:
-        using value_type = canard::mac_address;
+        using value_type = typename base_t::value_type;
 
         explicit oxm_match_field(value_type const& value) noexcept
-            : value_(value)
-            , mask_(boost::none)
+            : base_t{value}
         {
         }
 
         oxm_match_field(value_type const& value, value_type const& mask)
-            : value_(value)
-            , mask_{mask}
+            : base_t{value, mask}
         {
-        }
-
-        static constexpr auto oxm_class() noexcept
-            -> protocol::ofp_oxm_class
-        {
-            return OXMClass;
-        }
-
-        static constexpr auto oxm_field() noexcept
-            -> std::uint8_t
-        {
-            return OXMField;
-        }
-
-        auto oxm_value() const noexcept
-            -> value_type
-        {
-            return value_;
-        }
-
-        auto oxm_mask() const noexcept
-            -> boost::optional<value_type> const&
-        {
-            return mask_;
-        }
-
-        template <class Validator>
-        void validate(Validator) const
-        {
-            if (this->oxm_has_mask()) {
-                oxm_match_detail::validate_mask(raw_value(), raw_mask());
-            }
         }
 
     private:
-        friend detail::v13::basic_oxm_match_field<oxm_match_field>;
+        friend base_t;
 
-        using oxm_value_type = value_type::bytes_type;
-        using needs_byte_order_conversion
-            = oxm_match_detail::needs_byte_order_conversion<OXMClass, OXMField>;
+        using oxm_value_type = typename base_t::oxm_value_type;
+
+        static constexpr protocol::ofp_oxm_class oxm_class_value = OXMClass;
+        static constexpr std::uint8_t oxm_field_value = OXMField;
 
         explicit oxm_match_field(oxm_value_type const& value)
-            : value_{value}
-            , mask_(boost::none)
+            : base_t{value_type{value}}
         {
         }
 
-        oxm_match_field(
-                oxm_value_type const& value, oxm_value_type const& mask)
-            : value_{value}
-            , mask_{value_type{mask}}
+        oxm_match_field(oxm_value_type const& value, oxm_value_type const& mask)
+            : base_t{value_type{value}, value_type{mask}}
         {
         }
 
-        auto raw_value() const noexcept
-            -> oxm_value_type
+        static void validate_value(value_type const& value)
         {
-            return value_.to_bytes();
         }
-
-        auto raw_mask() const noexcept
-            -> oxm_value_type
-        {
-            return mask_->to_bytes();
-        }
-
-    private:
-        value_type value_;
-        boost::optional<value_type> mask_;
     };
 
     template <protocol::ofp_oxm_class OXMClass, std::uint8_t OXMField>
-    class oxm_match_field<OXMClass, OXMField, boost::asio::ip::address_v4>
-        : public detail::v13::basic_oxm_match_field<
-            oxm_match_field<OXMClass, OXMField, boost::asio::ip::address_v4>
-          >
+    class oxm_match_field<OXMClass, OXMField, oxm_match_detail::address_v4_type>
+        : public oxm_match_detail::oxm_match_field_base_t<OXMClass, OXMField>
     {
+        using base_t
+            = oxm_match_detail::oxm_match_field_base_t<OXMClass, OXMField>;
+
     public:
-        using value_type = boost::asio::ip::address_v4;
+        using value_type = typename base_t::value_type;
 
         explicit oxm_match_field(value_type const& value)
-            : value_(value)
-            , mask_(boost::none)
+            : base_t{value}
         {
         }
 
         oxm_match_field(value_type const& value, value_type const& mask)
-            : value_(value)
-            , mask_{mask}
+            : base_t{value, mask}
         {
         }
 
@@ -444,8 +381,7 @@ namespace oxm_match {
 
         oxm_match_field(
                 value_type const& value, std::uint8_t const prefix_length)
-            : value_(value)
-            , mask_{create_ipv4_addr(prefix_length)}
+            : base_t{value, create_ipv4_addr(prefix_length)}
         {
         }
 
@@ -456,101 +392,54 @@ namespace oxm_match {
         {
         }
 
-        static constexpr auto oxm_class() noexcept
-            -> protocol::ofp_oxm_class
-        {
-            return OXMClass;
-        }
-
-        static constexpr auto oxm_field() noexcept
-            -> std::uint8_t
-        {
-            return OXMField;
-        }
-
-        auto oxm_value() const noexcept
-            -> value_type const&
-        {
-            return value_;
-        }
-
-        auto oxm_mask() const noexcept
-            -> boost::optional<value_type> const&
-        {
-            return mask_;
-        }
-
-        template <class Validator>
-        void validate(Validator) const
-        {
-            if (this->oxm_has_mask()) {
-                oxm_match_detail::validate_mask(raw_value(), raw_mask());
-            }
-        }
-
     private:
-        friend detail::v13::basic_oxm_match_field<oxm_match_field>;
+        friend base_t;
 
-        using oxm_value_type = std::uint32_t;
-        using needs_byte_order_conversion
-            = oxm_match_detail::needs_byte_order_conversion<OXMClass, OXMField>;
+        using oxm_value_type = typename base_t::oxm_value_type;
+
+        static constexpr protocol::ofp_oxm_class oxm_class_value = OXMClass;
+        static constexpr std::uint8_t oxm_field_value = OXMField;
 
         explicit oxm_match_field(oxm_value_type const value)
-            : value_{value}
-            , mask_(boost::none)
+            : base_t{value_type{value}}
         {
         }
 
-        oxm_match_field(
-                oxm_value_type const value, oxm_value_type const mask)
-            : value_{value}
-            , mask_{value_type{mask}}
+        oxm_match_field(oxm_value_type const value, oxm_value_type const mask)
+            : base_t{value_type{value}, value_type{mask}}
         {
         }
 
-        auto raw_value() const noexcept
-            -> oxm_value_type
+        static void validate_value(value_type const&)
         {
-            return value_.to_ulong();
-        }
-
-        auto raw_mask() const noexcept
-            -> oxm_value_type
-        {
-            return mask_->to_ulong();
         }
 
         static auto create_ipv4_addr(std::uint8_t const prefix_length)
-            -> boost::asio::ip::address_v4
+            -> value_type
         {
-            return boost::asio::ip::address_v4{
+            return value_type{
                 std::uint32_t(std::uint64_t{0xffffffff} << (32 - prefix_length))
             };
         }
-
-    private:
-        value_type value_;
-        boost::optional<value_type> mask_;
     };
 
     template <protocol::ofp_oxm_class OXMClass, std::uint8_t OXMField>
-    class oxm_match_field<OXMClass, OXMField, boost::asio::ip::address_v6>
-        : public detail::v13::basic_oxm_match_field<
-            oxm_match_field<OXMClass, OXMField, boost::asio::ip::address_v6>
-          >
+    class oxm_match_field<OXMClass, OXMField, oxm_match_detail::address_v6_type>
+        : public oxm_match_detail::oxm_match_field_base_t<OXMClass, OXMField>
     {
+        using base_t
+            = oxm_match_detail::oxm_match_field_base_t<OXMClass, OXMField>;
+
     public:
-        using value_type = boost::asio::ip::address_v6;
+        using value_type = typename base_t::value_type;
 
         explicit oxm_match_field(value_type const& value)
-            : value_(value)
-            , mask_(boost::none)
+            : base_t{value}
         {
         }
 
         oxm_match_field(value_type const& value, value_type const& mask)
-            : value_(value)
-            , mask_{mask}
+            : base_t{value, mask}
         {
         }
 
@@ -568,8 +457,7 @@ namespace oxm_match {
 
         oxm_match_field(
                 value_type const& value, std::uint8_t const prefix_length)
-            : value_(value)
-            , mask_{create_ipv6_addr(prefix_length)}
+            : base_t{value, create_ipv6_addr(prefix_length)}
         {
         }
 
@@ -580,72 +468,30 @@ namespace oxm_match {
         {
         }
 
-        static constexpr auto oxm_class() noexcept
-            -> protocol::ofp_oxm_class
-        {
-            return OXMClass;
-        }
-
-        static constexpr auto oxm_field() noexcept
-            -> std::uint8_t
-        {
-            return OXMField;
-        }
-
-        auto oxm_value() const noexcept
-            -> value_type const&
-        {
-            return value_;
-        }
-
-        auto oxm_mask() const noexcept
-            -> boost::optional<value_type> const&
-        {
-            return mask_;
-        }
-
-        template <class Validator>
-        void validate(Validator) const
-        {
-            if (this->oxm_has_mask()) {
-                oxm_match_detail::validate_mask(raw_value(), raw_mask());
-            }
-        }
-
     private:
-        friend detail::v13::basic_oxm_match_field<oxm_match_field>;
+        friend base_t;
 
-        using oxm_value_type = value_type::bytes_type;
-        using needs_byte_order_conversion
-            = oxm_match_detail::needs_byte_order_conversion<OXMClass, OXMField>;
+        using oxm_value_type = typename base_t::oxm_value_type;
+
+        static constexpr protocol::ofp_oxm_class oxm_class_value = OXMClass;
+        static constexpr std::uint8_t oxm_field_value = OXMField;
 
         explicit oxm_match_field(oxm_value_type const value)
-            : value_{value}
-            , mask_(boost::none)
+            : base_t{value_type{value}}
         {
         }
 
-        oxm_match_field(
-                oxm_value_type const value, oxm_value_type const mask)
-            : value_{value}
-            , mask_{value_type{mask}}
+        oxm_match_field(oxm_value_type const value, oxm_value_type const mask)
+            : base_t{value_type{value}, value_type{mask}}
         {
         }
 
-        auto raw_value() const noexcept
-            -> oxm_value_type
+        static void validate_value(value_type const&)
         {
-            return value_.to_bytes();
-        }
-
-        auto raw_mask() const noexcept
-            -> oxm_value_type
-        {
-            return mask_->to_bytes();
         }
 
         static auto create_ipv6_addr(std::uint8_t prefix_length)
-            -> boost::asio::ip::address_v6
+            -> value_type
         {
             auto bytes = oxm_value_type{};
             for (std::uint8_t& byte : bytes) {
@@ -656,12 +502,8 @@ namespace oxm_match {
                 byte = 0xff;
                 prefix_length -= 8;
             }
-            return boost::asio::ip::address_v6{bytes};
+            return value_type{bytes};
         }
-
-    private:
-        value_type value_;
-        boost::optional<value_type> mask_;
     };
 
     using in_port        = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IN_PORT>;

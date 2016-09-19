@@ -4,17 +4,16 @@
 #include <cstddef>
 #include <cstdint>
 #include <array>
-#include <limits>
 #include <stdexcept>
 #include <type_traits>
-#include <utility>
 #include <boost/algorithm/cxx11/all_of.hpp>
-#include <boost/endian/arithmetic.hpp>
-#include <boost/operators.hpp>
+#include <boost/endian/conversion.hpp>
+#include <boost/optional/optional.hpp>
+#include <boost/range/algorithm_ext/for_each.hpp>
 #include <canard/network/openflow/detail/as_byte_range.hpp>
+#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
-#include <canard/network/openflow/validator.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -42,53 +41,90 @@ namespace v13 {
                     mask, [=](std::uint8_t const e) { return e == t; });
         }
 
+        template <class T>
+        void validate_mask(T const& value, T const& mask)
+        {
+            boost::for_each(
+                      detail::as_byte_range(value)
+                    , detail::as_byte_range(mask)
+                    , [](std::uint8_t const v, std::uint8_t const m) {
+                if (v & ~m) {
+                    throw std::runtime_error{"invalid wildcard"};
+                }
+            });
+        }
+
     } // namespace basic_oxm_match_field_detail
 
-    template <class T>
+    template <class T, class OXMMatchFieldTraits>
     class basic_oxm_match_field
-        : private boost::equality_comparable<T>
+        : public detail::basic_protocol_type<T>
     {
     public:
+        using oxm_header_type = std::uint32_t;
+        using value_type = typename OXMMatchFieldTraits::value_type;
+
+        static constexpr auto oxm_class() noexcept
+            -> ofp::v13::protocol::ofp_oxm_class
+        {
+            return T::oxm_class_value;
+        }
+
+        static constexpr auto oxm_field() noexcept
+            -> std::uint8_t
+        {
+            return T::oxm_field_value;
+        }
+
         static constexpr auto oxm_type() noexcept
             -> std::uint32_t
         {
-            return std::uint32_t{T::oxm_class()} << 7 | T::oxm_field();
-        }
-
-        auto oxm_header() const noexcept
-            -> std::uint32_t
-        {
-            return (oxm_type() << 9)
-                | (std::uint32_t{oxm_has_mask()} << 8)
-                | oxm_length();
+            return std::uint32_t{oxm_class()} << 7 | oxm_field();
         }
 
         auto oxm_has_mask() const noexcept
             -> bool
         {
-            return static_cast<bool>(derived().oxm_mask());
+            return static_cast<bool>(oxm_mask());
         }
 
         auto oxm_length() const noexcept
             -> std::uint8_t
         {
-            using oxm_value_type = typename T::oxm_value_type;
-            return oxm_has_mask()
-                ? sizeof(oxm_value_type) * 2 : sizeof(oxm_value_type);
+            return oxm_has_mask() ? value_length() * 2 : value_length();
+        }
+
+        auto oxm_header() const noexcept
+            -> oxm_header_type
+        {
+            return (oxm_type() << 9)
+                | (oxm_header_type{oxm_has_mask()} << 8)
+                | oxm_length();
+        }
+
+        auto oxm_value() const noexcept
+            -> value_type const&
+        {
+            return value_;
+        }
+
+        auto oxm_mask() const noexcept
+            -> boost::optional<value_type> const&
+        {
+            return mask_;
         }
 
         auto length() const noexcept
             -> std::uint16_t
         {
-            return sizeof(oxm_header()) + oxm_length();
+            return sizeof(oxm_header_type) + oxm_length();
         }
 
         auto is_wildcard() const noexcept
             -> bool
         {
             return oxm_has_mask()
-                ? basic_oxm_match_field_detail::all_of(
-                        derived().raw_mask(), 0)
+                ? basic_oxm_match_field_detail::all_of(raw_mask(), 0)
                 : false;
         }
 
@@ -96,43 +132,104 @@ namespace v13 {
             -> bool
         {
             return oxm_has_mask()
-                ? basic_oxm_match_field_detail::all_of(
-                        derived().raw_mask(), 0xff)
+                ? basic_oxm_match_field_detail::all_of(raw_mask(), 0xff)
                 : true;
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
+        static void validate_oxm_header(oxm_header_type const oxm_header)
         {
-            using oxm_value_type = typename T::oxm_value_type;
+            if ((oxm_header >> 16) != oxm_class()) {
+                throw std::runtime_error{"invalid oxm class"};
+            }
+            if (((oxm_header >> 9) & 0x7f) == oxm_field()) {
+                throw std::runtime_error{"invalid oxm field"};
+            }
+            auto const expected_length = (oxm_header & 0x00000100)
+                ? value_length() * 2 : value_length();
+            if ((oxm_header & 0xff) != expected_length) {
+                throw std::runtime_error{"invalid oxm length"};
+            }
+        }
+
+    protected:
+        using oxm_value_type = typename OXMMatchFieldTraits::oxm_value_type;
+
+        explicit basic_oxm_match_field(value_type const& value)
+            : value_(value)
+            , mask_{boost::none}
+        {
+        }
+
+        basic_oxm_match_field(value_type const& value, value_type const& mask)
+            : value_(value)
+            , mask_{mask}
+        {
+        }
+
+    private:
+        using byte_order = std::integral_constant<
+            bool, OXMMatchFieldTraits::needs_byte_order_conversion
+        >;
+
+        auto raw_value() const noexcept
+            -> oxm_value_type
+        {
+            return OXMMatchFieldTraits::to_oxm_value(oxm_value());
+        }
+
+        auto raw_mask() const noexcept
+            -> oxm_value_type
+        {
+            return OXMMatchFieldTraits::to_oxm_value(*oxm_mask());
+        }
+
+        friend detail::basic_protocol_type<T>;
+
+        friend constexpr auto get_min_length(T*) noexcept
+            -> std::uint16_t
+        {
+            return sizeof(oxm_header_type) + value_length();
+        }
+
+        static constexpr auto value_length() noexcept
+            -> std::uint16_t
+        {
+            return sizeof(oxm_value_type);
+        }
+
+        template <class Validator>
+        void validate_impl(Validator) const
+        {
+            T::validate_value(oxm_value());
+            if (oxm_has_mask()) {
+                basic_oxm_match_field_detail::validate_mask(
+                        raw_value(), raw_mask());
+            }
+        }
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
             detail::encode(container, oxm_header());
             detail::encode(
-                      container
-                    , derived().raw_value(), sizeof(oxm_value_type)
-                    , typename T::needs_byte_order_conversion{});
+                    container, raw_value(), value_length(), byte_order{});
             if (oxm_has_mask()) {
                 detail::encode(
-                          container
-                        , derived().raw_mask(), sizeof(oxm_value_type)
-                        , typename T::needs_byte_order_conversion{});
+                        container, raw_mask(), value_length(), byte_order{});
             }
-            return container;
         }
 
         template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
+        static auto decode_impl(Iterator& first, Iterator last)
             -> T
         {
-            using oxm_value_type = typename T::oxm_value_type;
-            auto const oxm_header = detail::decode<std::uint32_t>(first, last);
+            auto const oxm_header
+                = detail::decode<oxm_header_type>(first, last);
             auto const value = detail::decode<oxm_value_type>(
-                      first, last, sizeof(oxm_value_type)
-                    , typename T::needs_byte_order_conversion{});
+                      first, last, value_length(), byte_order{});
             if (oxm_header & 0x00000100) {
                 auto const mask = detail::decode<oxm_value_type>(
-                          first, last, sizeof(oxm_value_type)
-                        , typename T::needs_byte_order_conversion{});
+                          first, last, value_length(), byte_order{});
                 return T{value, mask};
             }
             else {
@@ -140,54 +237,30 @@ namespace v13 {
             }
         }
 
-        static void validate_oxm_header(std::uint32_t const oxm_header)
-        {
-            if ((oxm_header >> 16) != T::oxm_class()) {
-                throw std::runtime_error{"invalid oxm class"};
-            }
-            if (((oxm_header >> 9) & 0x7f) == T::oxm_field()) {
-                throw std::runtime_error{"invalid oxm field"};
-            }
-            using oxm_value_type = typename T::oxm_value_type;
-            auto const expected_length = (oxm_header & 0x00000100)
-                ? sizeof(oxm_value_type) * 2 : sizeof(oxm_value_type);
-            if ((oxm_header & 0xff) != expected_length) {
-                throw std::runtime_error{"invalid oxm length"};
-            }
-        }
-
-        template <class... Args>
-        static auto create(Args&&... args)
-            -> T
-        {
-            return validation::validate(T(std::forward<Args>(args)...));
-        }
-
-        friend auto operator==(T const& lhs, T const& rhs) noexcept
+        auto equal_impl(T const& rhs) const noexcept
             -> bool
         {
-            return lhs.oxm_mask() == rhs.oxm_mask()
-                && lhs.oxm_value() == rhs.oxm_value();
+            return oxm_mask() == rhs.oxm_mask()
+                && oxm_value() == rhs.oxm_value();
         }
 
-        friend auto equivalent(T const& lhs, T const& rhs) noexcept
+        auto equivalent_impl(T const& rhs) const noexcept
             -> bool
         {
-            if (lhs.is_wildcard()) {
+            if (is_wildcard()) {
                 return rhs.is_wildcard();
             }
-            if (lhs.is_exact()) {
-                return rhs.is_exact() && lhs.oxm_value() == rhs.oxm_value();
+            if (is_exact()) {
+                return rhs.is_exact()
+                    && oxm_value() == rhs.oxm_value();
             }
-            return lhs == rhs;
+            return oxm_mask() == rhs.oxm_mask()
+                && oxm_value() == rhs.oxm_value();
         }
 
     private:
-        auto derived() const noexcept
-            -> T const&
-        {
-            return static_cast<T const&>(*this);
-        }
+        value_type value_;
+        boost::optional<value_type> mask_;
     };
 
 } // namespace detail
