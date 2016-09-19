@@ -7,11 +7,10 @@
 #include <stdexcept>
 #include <tuple>
 #include <utility>
-#include <boost/operators.hpp>
+#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/padding.hpp>
-#include <canard/network/openflow/validator.hpp>
 #include <canard/network/openflow/v13/common/oxm_match_field.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/detail/length_utility.hpp>
@@ -64,11 +63,12 @@ namespace actions {
     template <class OXMMatchField>
     class set_field
         : public basic_set_field
-        , private boost::equality_comparable<set_field<OXMMatchField>>
+        , public detail::basic_protocol_type<set_field<OXMMatchField>>
     {
     public:
         static constexpr std::size_t base_size = offsetof(raw_ofp_type, field);
 
+        using raw_ofp_type = basic_set_field::raw_ofp_type;
         using value_type = typename OXMMatchField::value_type;
 
         explicit set_field(value_type const& value)
@@ -89,40 +89,9 @@ namespace actions {
         }
 
         auto value() const noexcept
-            -> value_type
+            -> value_type const&
         {
             return field_.oxm_value();
-        }
-
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            detail::encode(container, std::uint16_t{type()});
-            detail::encode(container, length());
-            field_.encode(container);
-            return detail::encode_byte_array(
-                      container
-                    , detail::padding
-                    , detail::v13::padding_length(base_size + field_.length()));
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> set_field
-        {
-            std::advance(first, sizeof(raw_ofp_type::type));
-            auto const length = detail::decode<std::uint16_t>(first, last);
-            auto field = OXMMatchField::decode(first, last);
-            std::advance(first, length - (base_size + field.length()));
-            return set_field{std::move(field)};
-        }
-
-        template <class... Args>
-        static auto create(Args&&... args)
-            -> set_field
-        {
-            return validation::validate(set_field(std::forward<Args>(args)...));
         }
 
         static auto create_from_match_field(OXMMatchField field)
@@ -136,17 +105,29 @@ namespace actions {
             auto const oxm_header = extract_oxm_header(set_field);
 
             OXMMatchField::validate_oxm_header(oxm_header);
-            if (oxm_header & 0x00000100) {
-                throw std::runtime_error{"invalid oxm_hasmask"};
-            }
             if (set_field.len != detail::v13::exact_length(
                         base_size + (oxm_header & 0xff))) {
                 throw std::runtime_error{"invalid set_field length"};
             }
         }
 
+    private:
+        set_field(OXMMatchField&& field)
+            : field_(std::move(field))
+        {
+        }
+
+        friend detail::basic_protocol_type<set_field>;
+
+        friend constexpr auto get_min_length(set_field*) noexcept
+            -> std::uint16_t
+        {
+            return detail::v13::exact_length(
+                    base_size + OXMMatchField::min_length());
+        }
+
         template <class Validator>
-        void validate(Validator validator) const
+        void validate_impl(Validator validator) const
         {
             field_.validate(validator);
             if (field_.oxm_has_mask()) {
@@ -154,24 +135,39 @@ namespace actions {
             }
         }
 
-        friend auto operator==(
-                set_field const& lhs, set_field const& rhs) noexcept
-            -> bool
+        template <class Container>
+        void encode_impl(Container& container) const
         {
-            return lhs.field_ == rhs.field_;
+            detail::encode(container, std::uint16_t{type()});
+            detail::encode(container, length());
+            field_.encode(container);
+            detail::encode_byte_array(
+                      container
+                    , detail::padding
+                    , detail::v13::padding_length(base_size + field_.length()));
         }
 
-        friend auto equivalent(
-                set_field const& lhs, set_field const& rhs) noexcept
-            -> bool
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> set_field
         {
-            return lhs == rhs;
+            std::advance(first, sizeof(raw_ofp_type::type));
+            auto const length = detail::decode<std::uint16_t>(first, last);
+            auto field = OXMMatchField::decode(first, last);
+            std::advance(first, length - (base_size + field.length()));
+            return set_field{std::move(field)};
         }
 
-    private:
-        set_field(OXMMatchField&& field)
-            : field_(std::move(field))
+        auto equal_impl(set_field const& rhs) const noexcept
+            -> bool
         {
+            return field_ == rhs.field_;
+        }
+
+        auto equivalent_impl(set_field const& rhs) const noexcept
+            -> bool
+        {
+            return field_ == rhs.field_;
         }
 
     private:
