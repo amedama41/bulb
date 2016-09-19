@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <stdexcept>
-#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/v13/detail/basic_action.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -35,12 +34,6 @@ namespace actions {
             return action_group_.group_id;
         }
 
-        friend auto operator==(group const& lhs, group const& rhs) noexcept
-            -> bool
-        {
-            return detail::memcmp(lhs.action_group_, rhs.action_group_);
-        }
-
     private:
         friend basic_action;
 
@@ -56,23 +49,22 @@ namespace actions {
             return action_group_;
         }
 
-        template <class Validator>
-        void validate_impl(Validator) const
+        void validate_action() const
         {
             if (group_id() > protocol::OFPG_MAX) {
                 throw std::runtime_error{"invalid group_id"};
             }
         }
 
+        auto is_equivalent_action(group const& rhs) const noexcept
+            -> bool
+        {
+            return group_id() == rhs.group_id();
+        }
+
     private:
         raw_ofp_type action_group_;
     };
-
-    inline auto equivalent(group const& lhs, group const& rhs) noexcept
-        -> bool
-    {
-        return lhs.group_id() == rhs.group_id();
-    }
 
 } // namespace actions
 } // namespace v13
