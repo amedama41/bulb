@@ -5,11 +5,10 @@
 #include <iterator>
 #include <stdexcept>
 #include <utility>
-#include <boost/operators.hpp>
+#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
-#include <canard/network/openflow/validator.hpp>
 #include <canard/network/openflow/v13/action_list.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
@@ -22,12 +21,11 @@ namespace v13 {
 
     template <class T>
     class basic_instruction_actions
-        : private boost::equality_comparable<T>
+        : public detail::basic_protocol_type<T>
     {
-    protected:
+    public:
         using raw_ofp_type = ofp::v13::v13_detail::ofp_instruction_actions;
 
-    public:
         static constexpr auto type() noexcept
             -> ofp::v13::protocol::ofp_instruction_type
         {
@@ -46,56 +44,24 @@ namespace v13 {
             return actions_;
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
+        auto extract_actions()
+            -> ofp::v13::action_list
         {
-            detail::encode(container, instruction_actions_);
-            return actions_.encode(container);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> T
-        {
-            auto const instruction_actions
-                = detail::decode<raw_ofp_type>(first, last);
-            last = std::next(
-                    first, instruction_actions.len - sizeof(raw_ofp_type));
-            auto actions = ofp::v13::action_list::decode(first, last);
-            return T{instruction_actions, std::move(actions)};
-        }
-
-        template <class... Args>
-        static auto create(Args&&... args)
-            -> T
-        {
-            return validation::validate(T(std::forward<Args>(args)...));
+            auto actions = ofp::v13::action_list{};
+            actions.swap(actions_);
+            instruction_actions_.len = sizeof(raw_ofp_type);
+            return actions;
         }
 
         static void validate_instruction(
                 ofp::v13::v13_detail::ofp_instruction const& instruction)
         {
-            if (instruction.type != T::instruction_type) {
+            if (instruction.type != type()) {
                 throw std::runtime_error{"invalid instruction type"};
             }
             if (instruction.len < sizeof(raw_ofp_type)) {
                 throw std::runtime_error{"instruction length is too small"};
             }
-        }
-
-        template <class Validator>
-        void validate(Validator validator) const
-        {
-            static_cast<T const*>(this)->validate_impl(validator);
-        }
-
-        friend auto operator==(T const& lhs, T const& rhs)
-            -> bool
-        {
-            return detail::memcmp(
-                    lhs.instruction_actions_, rhs.instruction_actions_)
-                && lhs.actions() == rhs.actions();
         }
 
     protected:
@@ -121,13 +87,15 @@ namespace v13 {
 
         basic_instruction_actions(basic_instruction_actions&& other)
             : instruction_actions_(other.instruction_actions_)
-            , actions_(std::move(other).actions_)
+            , actions_(other.extract_actions())
         {
-            other.instruction_actions_.len = sizeof(raw_ofp_type);
         }
 
-        auto operator=(basic_instruction_actions const&)
-            -> basic_instruction_actions& = default;
+        auto operator=(basic_instruction_actions const& other)
+            -> basic_instruction_actions&
+        {
+            return operator=(basic_instruction_actions{other});
+        }
 
         auto operator=(basic_instruction_actions&& other)
             -> basic_instruction_actions&
@@ -136,6 +104,49 @@ namespace v13 {
             std::swap(instruction_actions_, tmp.instruction_actions_);
             actions_.swap(tmp.actions_);
             return *this;
+        }
+
+    private:
+        friend detail::basic_protocol_type<T>;
+
+        template <class Validator>
+        void validate_impl(Validator&& validator) const
+        {
+            static_cast<T const*>(this)->validate_instruction(
+                    std::forward<Validator>(validator));
+        }
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, instruction_actions_);
+            actions_.encode(container);
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> T
+        {
+            auto const instruction_actions
+                = detail::decode<raw_ofp_type>(first, last);
+            last = std::next(
+                    first, instruction_actions.len - sizeof(raw_ofp_type));
+            auto actions = ofp::v13::action_list::decode(first, last);
+            return T{instruction_actions, std::move(actions)};
+        }
+
+        auto equal_impl(T const& rhs) const noexcept
+            -> bool
+        {
+            return detail::memcmp(
+                    instruction_actions_, rhs.instruction_actions_)
+                && actions_ == rhs.actions_;
+        }
+
+        auto equivalent_impl(T const& rhs) const noexcept
+            -> bool
+        {
+            return static_cast<T const*>(this)->is_equivalent_instruction(rhs);
         }
 
     private:

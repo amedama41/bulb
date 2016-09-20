@@ -1,7 +1,9 @@
 #ifndef CANARD_NET_OFP_V13_INSTRUCTIONS_CLEAR_ACTIONS_HPP
 #define CANARD_NET_OFP_V13_INSTRUCTIONS_CLEAR_ACTIONS_HPP
 
-#include <canard/network/openflow/v13/detail/basic_instruction.hpp>
+#include <utility>
+#include <canard/network/openflow/v13/action_list.hpp>
+#include <canard/network/openflow/v13/detail/basic_instruction_actions.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -11,52 +13,37 @@ namespace v13 {
 namespace instructions {
 
     class clear_actions
-        : public detail::v13::basic_instruction<
-            clear_actions, v13_detail::ofp_instruction_actions
-          >
+        : public detail::v13::basic_instruction_actions<clear_actions>
     {
     public:
         static constexpr protocol::ofp_instruction_type instruction_type
             = protocol::OFPIT_CLEAR_ACTIONS;
 
-        clear_actions() noexcept
-            : instruction_actions_{
-                  instruction_type
-                , sizeof(raw_ofp_type)
-                , { 0, 0, 0, 0 }
-              }
+        clear_actions()
+            : basic_instruction_actions{action_list{}}
         {
         }
 
     private:
-        friend basic_instruction;
+        friend basic_instruction_actions;
 
-        explicit clear_actions(raw_ofp_type const& instruction_actions) noexcept
-            : instruction_actions_(instruction_actions)
+        explicit clear_actions(
+                raw_ofp_type const& instruction_actions, action_list&& actions)
+            : basic_instruction_actions{instruction_actions, std::move(actions)}
         {
-        }
-
-        auto ofp_instruction() const noexcept
-            -> raw_ofp_type const&
-        {
-            return instruction_actions_;
         }
 
         template <class Validator>
-        void validate_impl(Validator) const
+        void validate_instruction(Validator) const
         {
         }
 
-    private:
-        raw_ofp_type instruction_actions_;
+        auto is_equivalent_instruction(clear_actions const&) const noexcept
+            -> bool
+        {
+            return true;
+        }
     };
-
-    constexpr inline auto equivalent(
-            clear_actions const&, clear_actions const&) noexcept
-        -> bool
-    {
-        return true;
-    }
 
 } // namespace instructions
 } // namespace v13

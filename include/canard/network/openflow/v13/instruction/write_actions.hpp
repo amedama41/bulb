@@ -54,26 +54,21 @@ namespace instructions {
         }
 
         template <class Validator>
-        void validate_impl(Validator validator) const
+        void validate_instruction(Validator validator) const
         {
             if (!action_set::is_action_set(actions())) {
                 throw std::runtime_error{"duplicated action type"};
             }
             validator(actions());
         }
-    };
 
-    inline auto equivalent(
-            write_actions const& lhs, write_actions const& rhs) noexcept
-        -> bool
-    {
-        if (lhs.actions().size() != rhs.actions().size()) {
-            return false;
+        auto is_equivalent_instruction(write_actions const& rhs) const noexcept
+            -> bool
+        {
+            return action_set::equivalent_as_action_set(
+                    actions(), rhs.actions());
         }
-
-        return action_set::equivalent_as_action_set(
-                lhs.actions(), rhs.actions());
-    }
+    };
 
 } // namespace instructions
 } // namespace v13

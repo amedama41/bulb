@@ -47,18 +47,17 @@ namespace instructions {
         }
 
         template <class Validator>
-        void validate_impl(Validator validator) const
+        void validate_instruction(Validator validator) const
         {
             validator(actions());
         }
-    };
 
-    inline auto equivalent(
-            apply_actions const& lhs, apply_actions const& rhs) noexcept
-        -> bool
-    {
-        return equivalent(lhs.actions(), rhs.actions());
-    }
+        auto is_equivalent_instruction(apply_actions const& rhs) const noexcept
+            -> bool
+        {
+            return equivalent(actions(), rhs.actions());
+        }
+    };
 
 } // namespace instructions
 } // namespace v13

@@ -224,8 +224,11 @@ namespace v13 {
       action_list const& lhs, action_list const& rhs) noexcept
     -> bool
   {
-    auto rhs_action_set_info
-      = action_set_detail::action_set_info{rhs};
+    if (lhs.size() != rhs.size()) {
+      return false;
+    }
+
+    auto rhs_action_set_info = action_set_detail::action_set_info{rhs};
     for (auto const& lhs_action : lhs) {
       if (!rhs_action_set_info.has_equivalent_action(lhs_action)) {
         return false;
