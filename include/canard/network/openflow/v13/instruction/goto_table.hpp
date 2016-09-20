@@ -51,24 +51,22 @@ namespace instructions {
             return instruction_goto_table_;
         }
 
-        template <class Validator>
-        void validate_impl(Validator) const
+        void validate_instruction() const
         {
             if (table_id() > protocol::OFPTT_MAX) {
                 throw std::runtime_error{"invalid table id"};
             }
         }
 
+        auto is_equivalent_instruction(goto_table const& rhs) const noexcept
+            -> bool
+        {
+            return table_id() == rhs.table_id();
+        }
+
     private:
         raw_ofp_type instruction_goto_table_;
     };
-
-    inline auto equivalent(
-            goto_table const& lhs, goto_table const& rhs) noexcept
-        -> bool
-    {
-        return lhs.table_id() == rhs.table_id();
-    }
 
 } // namespace instructions
 } // namespace v13

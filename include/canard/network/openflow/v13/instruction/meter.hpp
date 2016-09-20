@@ -50,23 +50,22 @@ namespace instructions {
             return instruction_meter_;
         }
 
-        template <class Validator>
-        void validate_impl(Validator) const
+        void validate_instruction() const
         {
             if (meter_id() == 0 || meter_id() > protocol::OFPM_MAX) {
                 throw std::runtime_error{"invalid meter id"};
             }
         }
 
+        auto is_equivalent_instruction(meter const& rhs) const noexcept
+            -> bool
+        {
+            return meter_id() == rhs.meter_id();
+        }
+
     private:
         raw_ofp_type instruction_meter_;
     };
-
-    inline auto equivalent(meter const& lhs, meter const& rhs) noexcept
-        -> bool
-    {
-        return lhs.meter_id() == rhs.meter_id();
-    }
 
 } // namespace instructions
 } // namespace v13

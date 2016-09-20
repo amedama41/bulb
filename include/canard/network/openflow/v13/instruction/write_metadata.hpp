@@ -62,23 +62,21 @@ namespace instructions {
             return instruction_write_metadata_;
         }
 
-        template <class Validator>
-        void validate_impl(Validator) const
+        void validate_instruction() const
         {
+        }
+
+        auto is_equivalent_instruction(write_metadata const& rhs) const noexcept
+            -> bool
+        {
+            return metadata_mask() == rhs.metadata_mask()
+                && ((metadata() & metadata_mask())
+                        == (rhs.metadata() & rhs.metadata_mask()));
         }
 
     private:
         raw_ofp_type instruction_write_metadata_;
     };
-
-    inline auto equivalent(
-            write_metadata const& lhs, write_metadata const& rhs) noexcept
-        -> bool
-    {
-        return lhs.metadata_mask() == rhs.metadata_mask()
-            && ((lhs.metadata() & lhs.metadata_mask())
-                    == (rhs.metadata() & lhs.metadata_mask()));
-    }
 
 } // namespace instructions
 } // namespace v13
