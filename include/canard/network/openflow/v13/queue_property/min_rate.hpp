@@ -3,10 +3,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <stdexcept>
-#include <canard/network/openflow/detail/decode.hpp>
-#include <canard/network/openflow/detail/encode.hpp>
-#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/detail/basic_queue_property.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
@@ -18,32 +14,27 @@ namespace v13 {
 namespace queue_properties {
 
     class min_rate
-        : public queue_property_detail::basic_queue_property<min_rate>
+        : public queue_property_detail::basic_queue_property<
+            min_rate, v13_detail::ofp_queue_prop_min_rate
+          >
     {
     public:
         static constexpr protocol::ofp_queue_properties queue_property
             = protocol::OFPQT_MIN_RATE;
 
-        static constexpr std::size_t base_size
-            = sizeof(v13_detail::ofp_queue_prop_min_rate);
+        static constexpr std::size_t base_size = sizeof(raw_ofp_type);
 
         explicit min_rate(std::uint16_t const rate) noexcept
             : min_rate_{
                   v13_detail::ofp_queue_prop_header{
                       queue_property
-                    , sizeof(v13_detail::ofp_queue_prop_min_rate)
+                    , sizeof(raw_ofp_type)
                     , { 0, 0, 0, 0 }
                   }
                 , rate
                 , { 0, 0, 0, 0, 0, 0 }
               }
         {
-        }
-
-        auto queue_property_header() const noexcept
-            -> v13_detail::ofp_queue_prop_header const&
-        {
-            return min_rate_.prop_header;
         }
 
         auto rate() const noexcept
@@ -64,57 +55,30 @@ namespace queue_properties {
             return rate() > 1000 && is_configurable();
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            return detail::encode(container, min_rate_);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> min_rate
-        {
-            return min_rate{
-                detail::decode<v13_detail::ofp_queue_prop_min_rate>(first, last)
-            };
-        }
-
-        static void validate(
-                v13_detail::ofp_queue_prop_header const& prop_header)
-        {
-            if (prop_header.property != queue_property) {
-                throw std::runtime_error{"invalid queue property"};
-            }
-            if (prop_header.len != base_size) {
-                throw std::runtime_error{"invalid queue property length"};
-            }
-        }
-
-        friend auto operator==(
-                min_rate const& lhs, min_rate const& rhs) noexcept
-            -> bool
-        {
-            return detail::memcmp(lhs.min_rate_, rhs.min_rate_);
-        }
-
     private:
-        explicit min_rate(
-                v13_detail::ofp_queue_prop_min_rate const& min_rate) noexcept
+        friend basic_queue_property;
+
+        explicit min_rate(raw_ofp_type const& min_rate) noexcept
             : min_rate_(min_rate)
         {
         }
 
-    private:
-        v13_detail::ofp_queue_prop_min_rate min_rate_;
-    };
+        auto ofp_queue_property() const noexcept
+            -> raw_ofp_type const&
+        {
+            return min_rate_;
+        }
 
-    inline auto equivalent(min_rate const& lhs, min_rate const& rhs) noexcept
-        -> bool
-    {
-        return lhs.rate() == rhs.rate()
-            || (lhs.is_disabled() && rhs.is_disabled());
-    }
+        auto is_equivalent_property(min_rate const& rhs) const noexcept
+            -> bool
+        {
+            return rate() == rhs.rate()
+                || (is_disabled() && rhs.is_disabled());
+        }
+
+    private:
+        raw_ofp_type min_rate_;
+    };
 
 } // namespace queue_properties
 } // namespace v13
