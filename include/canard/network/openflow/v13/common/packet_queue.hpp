@@ -8,10 +8,10 @@
 #include <stdexcept>
 #include <utility>
 #include <vector>
-#include <boost/operators.hpp>
 #include <boost/range/algorithm/equal.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/numeric.hpp>
+#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
@@ -27,12 +27,10 @@ namespace ofp {
 namespace v13 {
 
     class packet_queue
-        : private boost::equality_comparable<packet_queue>
+        : public detail::basic_protocol_type<packet_queue>
     {
-        static constexpr std::size_t base_packet_queue_size
-            = sizeof(v13_detail::ofp_packet_queue);
-
     public:
+        using raw_ofp_type = v13_detail::ofp_packet_queue;
         using properties_type = std::vector<any_queue_property>;
         using iterator = properties_type::const_iterator;
         using const_iterator = properties_type::const_iterator;
@@ -44,7 +42,7 @@ namespace v13 {
                   queue_id
                 , port_no
                 , std::uint16_t(
-                          base_packet_queue_size
+                          sizeof(raw_ofp_type)
                         + calc_propertis_length(properties))
                 , { 0, 0, 0, 0, 0, 0 }
               }
@@ -61,13 +59,15 @@ namespace v13 {
 
         packet_queue(packet_queue&& other)
             : packet_queue_(other.packet_queue_)
-            , properties_(std::move(other).properties_)
+            , properties_(other.extract_properties())
         {
-            other.packet_queue_.len = base_packet_queue_size;
         }
 
-        auto operator=(packet_queue const&)
-            -> packet_queue& = default;
+        auto operator=(packet_queue const& other)
+            -> packet_queue&
+        {
+            return operator=(packet_queue{other});
+        }
 
         auto operator=(packet_queue&& other)
             -> packet_queue&
@@ -102,6 +102,15 @@ namespace v13 {
             return properties_;
         }
 
+        auto extract_properties()
+            -> properties_type
+        {
+            auto properties = properties_type{};
+            properties.swap(properties_);
+            packet_queue_.len = sizeof(raw_ofp_type);
+            return properties;
+        }
+
         auto begin() const noexcept
             -> const_iterator
         {
@@ -114,59 +123,8 @@ namespace v13 {
             return properties_.end();
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            detail::encode(container, packet_queue_);
-            boost::for_each(properties_, [&](any_queue_property const& e) {
-                e.encode(container);
-            });
-            return container;
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> packet_queue
-        {
-            auto const pkt_queue
-                = detail::decode<v13_detail::ofp_packet_queue>(first, last);
-            if (pkt_queue.len < base_packet_queue_size) {
-                throw std::runtime_error{"packet_queue length is too small"};
-            }
-            if (std::distance(first, last)
-                    < pkt_queue.len - base_packet_queue_size) {
-                throw std::runtime_error{"packet_queue length is too big"};
-            }
-            auto const properties_length
-                = pkt_queue.len - base_packet_queue_size;
-            last = std::next(first, properties_length);
-
-            auto properties = properties_type{};
-            constexpr auto min_base_size = detail::min_base_size_element<
-                any_queue_property::type_list
-            >::value;
-            properties.reserve(properties_length / min_base_size);
-            while (std::distance(first, last)
-                    >= sizeof(v13_detail::ofp_queue_prop_header)) {
-                properties.push_back(any_queue_property::decode(first, last));
-            }
-            if (first != last) {
-                throw std::runtime_error{"invalid packet_queue length"};
-            }
-
-            return packet_queue{pkt_queue, std::move(properties)};
-        }
-
-        friend auto operator==(packet_queue const& lhs, packet_queue const& rhs)
-            -> bool
-        {
-            return detail::memcmp(lhs.packet_queue_, rhs.packet_queue_)
-                && lhs.properties() == rhs.properties();
-        }
-
     private:
-        packet_queue(v13_detail::ofp_packet_queue const& pkt_queue
+        packet_queue(raw_ofp_type const& pkt_queue
                    , properties_type&& properties)
             : packet_queue_(pkt_queue)
             , properties_(std::move(properties))
@@ -181,30 +139,77 @@ namespace v13 {
                     , [](std::size_t const sum, any_queue_property const& e) {
                             return sum + e.length();
                       });
-            if (properties_length + sizeof(v13_detail::ofp_packet_queue)
+            if (properties_length + sizeof(raw_ofp_type)
                     > std::numeric_limits<std::uint16_t>::max()) {
                 throw std::runtime_error{"properties length is too big"};
             }
             return properties_length;
         }
 
+        friend basic_protocol_type;
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, packet_queue_);
+            boost::for_each(properties_, [&](any_queue_property const& e) {
+                e.encode(container);
+            });
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> packet_queue
+        {
+            auto const pkt_queue = detail::decode<raw_ofp_type>(first, last);
+            if (pkt_queue.len < sizeof(raw_ofp_type)) {
+                throw std::runtime_error{"packet_queue length is too small"};
+            }
+            auto const properties_length = pkt_queue.len - sizeof(raw_ofp_type);
+            if (std::distance(first, last) < properties_length) {
+                throw std::runtime_error{"packet_queue length is too big"};
+            }
+            last = std::next(first, properties_length);
+
+            auto properties = properties_type{};
+            constexpr auto min_base_size = detail::min_base_size_element<
+                any_queue_property::type_list
+            >::value;
+            properties.reserve(properties_length / min_base_size);
+            while (std::distance(first, last)
+                    >= sizeof(any_queue_property::header_type)) {
+                properties.push_back(any_queue_property::decode(first, last));
+            }
+            if (first != last) {
+                throw std::runtime_error{"invalid packet_queue length"};
+            }
+
+            return packet_queue{pkt_queue, std::move(properties)};
+        }
+
+        auto equal_impl(packet_queue const& rhs) const noexcept
+            -> bool
+        {
+            return detail::memcmp(packet_queue_, rhs.packet_queue_)
+                && properties() == rhs.properties();
+        }
+
+        auto equivalent_impl(packet_queue const& rhs) const noexcept
+            -> bool
+        {
+            using const_reference = properties_type::const_reference;
+            return queue_id() == rhs.queue_id()
+                && port_no() == rhs.port_no()
+                && boost::equal(
+                          properties_, rhs.properties_
+                        , [](const_reference lhs_prop, const_reference rhs_prop)
+                          { return equivalent(lhs_prop, rhs_prop); });
+        }
+
     private:
-        v13_detail::ofp_packet_queue packet_queue_;
+        raw_ofp_type packet_queue_;
         properties_type properties_;
     };
-
-    inline auto equivalent(
-            packet_queue const& lhs, packet_queue const& rhs) noexcept
-        -> bool
-    {
-        using const_reference = packet_queue::properties_type::const_reference;
-        return lhs.queue_id() == rhs.queue_id()
-            && lhs.port_no() == rhs.port_no()
-            && boost::equal(
-                      lhs.properties(), rhs.properties()
-                    , [](const_reference lhs_prop, const_reference rhs_prop)
-                      { return equivalent(lhs_prop, rhs_prop); });
-    }
 
 } // namespace v13
 } // namespace ofp
