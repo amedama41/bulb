@@ -6,10 +6,9 @@
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
-#include <boost/operators.hpp>
+#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
-#include <canard/network/openflow/validator.hpp>
 #include <canard/network/openflow/v13/action_list.hpp>
 #include <canard/network/openflow/v13/action_set.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
@@ -21,11 +20,11 @@ namespace ofp {
 namespace v13 {
 
     class bucket
-        : private boost::equality_comparable<bucket>
+        : public detail::basic_protocol_type<bucket>
     {
+    public:
         using raw_ofp_type = v13_detail::ofp_bucket;
 
-    public:
         bucket(std::uint16_t const weight
              , std::uint32_t const watch_port
              , std::uint32_t const watch_group
@@ -83,13 +82,15 @@ namespace v13 {
 
         bucket(bucket&& other)
             : bucket_(other.bucket_)
-            , actions_(std::move(other).actions_)
+            , actions_(other.extract_actions())
         {
-            other.bucket_.len = sizeof(raw_ofp_type);
         }
 
-        auto operator=(bucket const&)
-            -> bucket& = default;
+        auto operator=(bucket const& other)
+            -> bucket&
+        {
+            return operator=(bucket{other});
+        }
 
         auto operator=(bucket&& other)
             -> bucket&
@@ -130,31 +131,13 @@ namespace v13 {
             return actions_;
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
+        auto extract_actions()
+            -> action_list
         {
-            detail::encode(container, bucket_);
-            return actions_.encode(container);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> bucket
-        {
-            auto const bkt = detail::decode<raw_ofp_type>(first, last);
-            if (bkt.len < sizeof(raw_ofp_type)) {
-                throw std::runtime_error{"bucket length is too small"};
-            }
-            if (std::distance(first, last) < bkt.len - sizeof(raw_ofp_type)) {
-                throw std::runtime_error{"bucket length is too big"};
-            }
-
-            last = std::next(first, bkt.len - sizeof(raw_ofp_type));
-
-            auto actions = action_list::decode(first, last);
-
-            return bucket{bkt, std::move(actions)};
+            auto actions = action_list{};
+            actions.swap(actions_);
+            bucket_.len = sizeof(raw_ofp_type);
+            return actions;
         }
 
         static auto all(action_set actions)
@@ -184,29 +167,6 @@ namespace v13 {
             return bucket{watch_port, watch_group, std::move(actions)};
         }
 
-        template <class Validator>
-        void validate(Validator validator) const
-        {
-            if (!action_set::is_action_set(actions_)) {
-                throw std::runtime_error{"duplicated action type"};
-            }
-            validator(actions_);
-        }
-
-        template <class... Args>
-        static auto create(Args&&... args)
-            -> bucket
-        {
-            return validation::validate(bucket(std::forward<Args>(args)...));
-        }
-
-        friend auto operator==(bucket const& lhs, bucket const& rhs)
-            -> bool
-        {
-            return detail::memcmp(lhs.bucket_, rhs.bucket_)
-                && lhs.actions() == rhs.actions();
-        }
-
     private:
         bucket(raw_ofp_type const& bkt, action_list&& actions)
             : bucket_(bkt)
@@ -214,21 +174,66 @@ namespace v13 {
         {
         }
 
+        friend basic_protocol_type;
+
+        template <class Validator>
+        void validate_impl(Validator validator) const
+        {
+            if (!action_set::is_action_set(actions_)) {
+                throw std::runtime_error{"duplicated action type"};
+            }
+            validator(actions_);
+        }
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, bucket_);
+            actions_.encode(container);
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> bucket
+        {
+            auto const bkt = detail::decode<raw_ofp_type>(first, last);
+
+            if (bkt.len < sizeof(raw_ofp_type)) {
+                throw std::runtime_error{"bucket length is too small"};
+            }
+            auto const actions_length = bkt.len - sizeof(raw_ofp_type);
+            if (std::distance(first, last) < actions_length) {
+                throw std::runtime_error{"bucket length is too big"};
+            }
+
+            last = std::next(first, actions_length);
+
+            auto actions = action_list::decode(first, last);
+
+            return bucket{bkt, std::move(actions)};
+        }
+
+        auto equal_impl(bucket const& rhs) const noexcept
+            -> bool
+        {
+            return detail::memcmp(bucket_, rhs.bucket_)
+                && actions_ == rhs.actions_;
+        }
+
+        auto equivalent_impl(bucket const& rhs) const noexcept
+            -> bool
+        {
+            return length() == rhs.length()
+                && weight() == rhs.weight()
+                && watch_port() == rhs.watch_port()
+                && watch_group() == rhs.watch_group()
+                && action_set::equivalent_as_action_set(actions_, rhs.actions_);
+        }
+
     private:
         raw_ofp_type bucket_;
         action_list actions_;
     };
-
-    inline auto equivalent(bucket const& lhs, bucket const& rhs)
-        -> bool
-    {
-        return lhs.length() == rhs.length()
-            && lhs.weight() == rhs.weight()
-            && lhs.watch_port() == rhs.watch_port()
-            && lhs.watch_group() == rhs.watch_group()
-            && action_set::equivalent_as_action_set(
-                    lhs.actions(), rhs.actions());
-    }
 
 } // namespace v13
 } // namespace ofp
