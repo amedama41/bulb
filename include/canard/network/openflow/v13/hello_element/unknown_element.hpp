@@ -3,9 +3,10 @@
 
 #include <cstdint>
 #include <iterator>
+#include <stdexcept>
 #include <utility>
 #include <vector>
-#include <boost/operators.hpp>
+#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
@@ -21,7 +22,7 @@ namespace v13 {
 namespace hello_elements {
 
   class unknown_element
-    : private boost::equality_comparable<unknown_element>
+    : public detail::basic_protocol_type<unknown_element>
   {
   public:
     using raw_ofp_type = v13_detail::ofp_hello_elem_header;
@@ -89,18 +90,33 @@ namespace hello_elements {
       return data;
     }
 
+    static void validate_header(v13_detail::ofp_hello_elem_header const& header)
+    {
+      if (header.length < sizeof(raw_ofp_type)) {
+        throw std::runtime_error{"hello_element length is too small"};
+      }
+    }
+
+  private:
+    unknown_element(raw_ofp_type const& header, data_type&& data)
+      : header_(header)
+      , data_(std::move(data))
+    {
+    }
+
+    friend basic_protocol_type;
+
     template <class Container>
-    auto encode(Container& container) const
-      -> Container&
+    void encode_impl(Container& container) const
     {
       detail::encode(container, header_);
       detail::encode_byte_array(container, data_.data(), data_.size());
-      return detail::encode_byte_array(
+      detail::encode_byte_array(
           container, detail::padding, v13_detail::padding_length(length()));
     }
 
     template <class Iterator>
-    static auto decode(Iterator& first, Iterator last)
+    static auto decode_impl(Iterator& first, Iterator last)
       -> unknown_element
     {
       auto const header = detail::decode<raw_ofp_type>(first, last);
@@ -114,17 +130,6 @@ namespace hello_elements {
       return unknown_element(header, std::move(data));
     }
 
-    friend auto operator==(
-        unknown_element const&, unknown_element const&) noexcept
-      -> bool;
-
-  private:
-    unknown_element(raw_ofp_type const& header, data_type&& data)
-      : header_(header)
-      , data_(std::move(data))
-    {
-    }
-
     auto equal_impl(unknown_element const& rhs) const noexcept
       -> bool
     {
@@ -132,24 +137,16 @@ namespace hello_elements {
           && data_ == rhs.data_;
     }
 
+    auto equivalent_impl(unknown_element const& rhs) const noexcept
+      -> bool
+    {
+      return *this == rhs;
+    }
+
   private:
     raw_ofp_type header_;
     data_type data_;
   };
-
-  inline auto operator==(
-      unknown_element const& lhs, unknown_element const& rhs) noexcept
-    -> bool
-  {
-    return lhs.equal_impl(rhs);
-  }
-
-  inline auto equivalent(
-      unknown_element const& lhs, unknown_element const& rhs) noexcept
-    -> bool
-  {
-    return lhs == rhs;
-  }
 
 } // namespace hello_elements
 } // namespace v13

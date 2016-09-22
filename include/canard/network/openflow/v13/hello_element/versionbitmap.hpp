@@ -10,11 +10,11 @@
 #include <vector>
 #include <boost/algorithm/cxx11/all_of.hpp>
 #include <boost/endian/conversion.hpp>
-#include <boost/operators.hpp>
 #include <boost/range/adaptor/reversed.hpp>
 #include <boost/range/algorithm/find_if.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/algorithm/mismatch.hpp>
+#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
@@ -30,7 +30,7 @@ namespace v13 {
 namespace hello_elements {
 
   class versionbitmap
-    : private boost::equality_comparable<versionbitmap>
+    : public detail::basic_protocol_type<versionbitmap>
   {
   public:
     using raw_ofp_type = v13_detail::ofp_hello_elem_versionbitmap;
@@ -135,20 +135,41 @@ namespace hello_elements {
       return shift + std::distance(bitmaps_.begin(), it) * bitmap_bits;
     }
 
+    static void validate_header(v13_detail::ofp_hello_elem_header const& header)
+    {
+      if (header.type != type()) {
+        throw std::runtime_error{"type is not versionbitmap"};
+      }
+      if (header.length < min_length()) {
+        throw std::runtime_error{"versionbitmap length is too small"};
+      }
+      if ((header.length - min_length()) % sizeof(bitmap_type) != 0) {
+        throw std::runtime_error{"versionbitmap length is invalid"};
+      }
+    }
+
+  private:
+    versionbitmap(raw_ofp_type const& versionbitmap, bitmaps_type&& bitmaps)
+      : versionbitmap_(versionbitmap)
+      , bitmaps_(std::move(bitmaps))
+    {
+    }
+
+    friend basic_protocol_type;
+
     template <class Container>
-    auto encode(Container& container) const
-      -> Container&
+    void encode_impl(Container& container) const
     {
       detail::encode(container, versionbitmap_);
       boost::for_each(bitmaps_, [&](bitmap_type bitmap) {
           detail::encode(container, bitmap);
       });
-      return detail::encode_byte_array(
+      detail::encode_byte_array(
           container, detail::padding, v13_detail::padding_length(length()));
     }
 
     template <class Iterator>
-    static auto decode(Iterator& first, Iterator last)
+    static auto decode_impl(Iterator& first, Iterator last)
       -> versionbitmap
     {
       auto const vbitmap = detail::decode<raw_ofp_type>(first, last);
@@ -169,7 +190,7 @@ namespace hello_elements {
     }
 
     template <class Validator>
-    void validate(Validator) const
+    void validate_impl(Validator) const
     {
       if (bitmaps_.empty()) {
         throw std::runtime_error{"bitmaps is never empty"};
@@ -182,34 +203,30 @@ namespace hello_elements {
       }
     }
 
-    static void validate_header(v13_detail::ofp_hello_elem_header const& header)
-    {
-      if (header.type != hello_element_type) {
-        throw std::runtime_error{"type is not versionbitmap"};
-      }
-      if (header.length < sizeof(raw_ofp_type)) {
-        throw std::runtime_error{"versionbitmap length is too small"};
-      }
-      if ((header.length - sizeof(raw_ofp_type)) % sizeof(bitmap_type) != 0) {
-        throw std::runtime_error{"versionbitmap length is invalid"};
-      }
-    }
-
-    friend auto operator==(versionbitmap const&, versionbitmap const&) noexcept
-      -> bool;
-
-  private:
-    versionbitmap(raw_ofp_type const& versionbitmap, bitmaps_type&& bitmaps)
-      : versionbitmap_(versionbitmap)
-      , bitmaps_(std::move(bitmaps))
-    {
-    }
-
     auto equal_impl(versionbitmap const& rhs) const noexcept
       -> bool
     {
       return detail::memcmp(versionbitmap_, rhs.versionbitmap_)
           && bitmaps_ == rhs.bitmaps_;
+    }
+
+    auto equivalent_impl(versionbitmap const& rhs) const noexcept
+      -> bool
+    {
+      using bt = versionbitmap::bitmaps_type;
+      auto const compare = [](bt const& larger, bt const& smaller) -> bool {
+        auto const result = boost::mismatch(smaller, larger);
+        if (result.first != smaller.end()) {
+          return false;
+        }
+        return std::all_of(
+              result.second, larger.end()
+            , [](bt::value_type const b) { return b == 0; });
+      };
+
+      return (bitmaps_.size() >= rhs.bitmaps_.size())
+        ? compare(bitmaps_, rhs.bitmaps_)
+        : compare(rhs.bitmaps_, bitmaps_);
     }
 
     static auto calc_length(bitmaps_type const& bitmaps)
@@ -228,35 +245,6 @@ namespace hello_elements {
     raw_ofp_type versionbitmap_;
     bitmaps_type bitmaps_;
   };
-
-  inline auto operator==(
-      versionbitmap const& lhs, versionbitmap const& rhs) noexcept
-    -> bool
-  {
-    return lhs.equal_impl(rhs);
-  }
-
-  inline auto equivalent(
-      versionbitmap const& lhs, versionbitmap const& rhs) noexcept
-    -> bool
-  {
-    using bt = versionbitmap::bitmaps_type;
-    auto const compare = [](bt const& larger, bt const& smaller) -> bool {
-      auto const result = boost::mismatch(smaller, larger);
-      if (result.first != smaller.end()) {
-        return false;
-      }
-      return std::all_of(
-            result.second, larger.end()
-          , [](bt::value_type const b) { return b == 0; });
-    };
-
-    auto const& lhs_bitmaps = lhs.bitmaps();
-    auto const& rhs_bitmaps = rhs.bitmaps();
-    return (lhs_bitmaps.size() >= rhs_bitmaps.size())
-      ? compare(lhs_bitmaps, rhs_bitmaps)
-      : compare(rhs_bitmaps, lhs_bitmaps);
-  }
 
 } // namespace hello_elements
 } // namespace v13
