@@ -5,9 +5,9 @@
 #include <cstdint>
 #include <cstring>
 #include <algorithm>
-#include <boost/operators.hpp>
 #include <boost/utility/string_ref.hpp>
 #include <canard/mac_address.hpp>
+#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
@@ -22,7 +22,7 @@ namespace v13 {
 
     class port
         : public v13_detail::port_adaptor<port>
-        , private boost::equality_comparable<port>
+        , public detail::basic_protocol_type<port>
     {
     public:
         using raw_ofp_type = v13_detail::ofp_port;
@@ -92,20 +92,6 @@ namespace v13 {
             return port_no() == protocol::OFPP_NORMAL;
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            return detail::encode(container, port_);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> port
-        {
-            return port{detail::decode<raw_ofp_type>(first, last)};
-        }
-
         static auto from_ofp_port(raw_ofp_type const& ofp_port) noexcept
             -> port
         {
@@ -118,31 +104,46 @@ namespace v13 {
         {
         }
 
+        friend basic_protocol_type;
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, port_);
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> port
+        {
+            return port{detail::decode<raw_ofp_type>(first, last)};
+        }
+
+        auto equal_impl(port const& rhs) const noexcept
+            -> bool
+        {
+            return detail::memcmp(port_, rhs.port_);
+        }
+
+        auto equivalent_impl(port const& rhs) const noexcept
+            -> bool
+        {
+            return port_no() == rhs.port_no()
+                && hardware_address() == rhs.hardware_address()
+                && name() == rhs.name()
+                && config() == rhs.config()
+                && state() == rhs.state()
+                && current_features() == rhs.current_features()
+                && advertised_features() == rhs.advertised_features()
+                && supported_features() == rhs.supported_features()
+                && peer_advertised_features() == rhs.peer_advertised_features()
+                && current_speed() == rhs.current_speed()
+                && max_speed() == rhs.max_speed();
+        }
+
     private:
         raw_ofp_type port_;
     };
-
-    inline auto operator==(port const& lhs, port const& rhs) noexcept
-        -> bool
-    {
-        return detail::memcmp(lhs.ofp_port(), rhs.ofp_port());
-    }
-
-    inline auto equivalent(port const& lhs, port const& rhs) noexcept
-        -> bool
-    {
-        return lhs.port_no() == rhs.port_no()
-            && lhs.hardware_address() == rhs.hardware_address()
-            && lhs.name() == rhs.name()
-            && lhs.config() == rhs.config()
-            && lhs.state() == rhs.state()
-            && lhs.current_features() == rhs.current_features()
-            && lhs.advertised_features() == rhs.advertised_features()
-            && lhs.supported_features() == rhs.supported_features()
-            && lhs.peer_advertised_features() == rhs.peer_advertised_features()
-            && lhs.current_speed() == rhs.current_speed()
-            && lhs.max_speed() == rhs.max_speed();
-    }
 
 } // namespace v13
 } // namespace ofp
