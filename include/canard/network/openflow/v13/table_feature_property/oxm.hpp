@@ -7,10 +7,10 @@
 #include <stdexcept>
 #include <utility>
 #include <vector>
-#include <boost/operators.hpp>
 #include <boost/range/algorithm/find_if.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/numeric.hpp>
+#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/is_related.hpp>
@@ -28,14 +28,13 @@ namespace table_feature_properties {
 
     template <class T>
     class basic_prop_oxm
-        : private boost::equality_comparable<basic_prop_oxm<T>>
+        : public detail::basic_protocol_type<basic_prop_oxm<T>>
     {
-        using raw_ofp_type = v13_detail::ofp_table_feature_prop_oxm;
-
     public:
         static constexpr protocol::ofp_table_feature_prop_type prop_type
             = T::prop_type;
 
+        using raw_ofp_type = v13_detail::ofp_table_feature_prop_oxm;
         using oxm_id_container = std::vector<any_oxm_id>;
         using iterator = oxm_id_container::iterator;
         using const_iterator = oxm_id_container::const_iterator;
@@ -64,13 +63,15 @@ namespace table_feature_properties {
 
         basic_prop_oxm(basic_prop_oxm&& other)
             : table_feature_prop_oxm_(other.table_feature_prop_oxm_)
-            , oxm_ids_(std::move(other).oxm_ids_)
+            , oxm_ids_(other.extract_oxm_ids())
         {
-            other.table_feature_prop_oxm_.length = sizeof(raw_ofp_type);
         }
 
-        auto operator=(basic_prop_oxm const&)
-            -> basic_prop_oxm& = default;
+        auto operator=(basic_prop_oxm const& other)
+            -> basic_prop_oxm&
+        {
+            return operator=(basic_prop_oxm{other});
+        }
 
         auto operator=(basic_prop_oxm&& other)
             -> basic_prop_oxm&
@@ -102,8 +103,10 @@ namespace table_feature_properties {
         auto extract_oxm_ids()
             -> oxm_id_container
         {
+            auto oxm_ids = oxm_id_container{};
+            oxm_ids.swap(oxm_ids_);
             table_feature_prop_oxm_.length = sizeof(raw_ofp_type);
-            return std::move(oxm_ids_);
+            return oxm_ids;
         }
 
         auto begin() noexcept
@@ -130,22 +133,41 @@ namespace table_feature_properties {
             return oxm_ids_.end();
         }
 
+    private:
+        basic_prop_oxm(
+                  raw_ofp_type const& table_feature_prop_oxm
+                , oxm_id_container&& oxm_ids)
+            : table_feature_prop_oxm_(table_feature_prop_oxm)
+            , oxm_ids_(std::move(oxm_ids))
+        {
+        }
+
+        static auto calc_length(oxm_id_container const& oxm_ids) noexcept
+            -> std::size_t
+        {
+            return boost::accumulate(
+                      oxm_ids, sizeof(raw_ofp_type)
+                    , [](std::size_t const length, any_oxm_id const& id)
+                      { return length + id.length(); });
+        }
+
+        friend detail::basic_protocol_type<basic_prop_oxm>;
+
         template <class Container>
-        auto encode(Container& container) const
-            -> Container&
+        void encode_impl(Container& container) const
         {
             detail::encode(container, table_feature_prop_oxm_);
             boost::for_each(oxm_ids_, [&](any_oxm_id const& id) {
                 id.encode(container);
             });
-            return detail::encode_byte_array(
+            detail::encode_byte_array(
                       container
                     , detail::padding
                     , v13_detail::padding_length(length()));
         }
 
         template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
+        static auto decode_impl(Iterator& first, Iterator last)
             -> basic_prop_oxm
         {
             auto const property = detail::decode<raw_ofp_type>(first, last);
@@ -169,51 +191,30 @@ namespace table_feature_properties {
             return basic_prop_oxm{property, std::move(oxm_ids)};
         }
 
-        friend auto operator==(
-                basic_prop_oxm const& lhs, basic_prop_oxm const& rhs)
+        auto equal_impl(basic_prop_oxm const& rhs) const noexcept
             -> bool
         {
-            return lhs.oxm_ids_ == rhs.oxm_ids_;
+            return oxm_ids_ == rhs.oxm_ids_;
         }
 
-        friend auto equivalent(
-                basic_prop_oxm const& lhs, basic_prop_oxm const& rhs) noexcept
+        auto equivalent_impl(basic_prop_oxm const& rhs) const noexcept
             -> bool
         {
-            auto const& lhs_oxm_ids = lhs.oxm_ids();
-            auto const& rhs_oxm_ids = rhs.oxm_ids();
-            if (lhs_oxm_ids.size() != rhs_oxm_ids.size()) {
+            if (oxm_ids_.size() != rhs.oxm_ids_.size()) {
                 return false;
             }
-            for (auto const& lhs_id : lhs_oxm_ids) {
+            auto const rhs_ids_end = rhs.oxm_ids_.end();
+            for (auto const& lhs_id : oxm_ids_) {
                 using const_reference = oxm_id_container::const_reference;
                 if (boost::find_if(
-                              rhs_oxm_ids
+                              rhs.oxm_ids_
                             , [&lhs_id](const_reference rhs_id)
                               { return equivalent(lhs_id, rhs_id); })
-                        == rhs_oxm_ids.end()) {
+                        == rhs_ids_end) {
                     return false;
                 }
             }
             return true;
-        }
-
-    private:
-        basic_prop_oxm(
-                  raw_ofp_type const& table_feature_prop_oxm
-                , oxm_id_container&& oxm_ids)
-            : table_feature_prop_oxm_(table_feature_prop_oxm)
-            , oxm_ids_(std::move(oxm_ids))
-        {
-        }
-
-        static auto calc_length(oxm_id_container const& oxm_ids) noexcept
-            -> std::size_t
-        {
-            return boost::accumulate(
-                      oxm_ids, sizeof(raw_ofp_type)
-                    , [](std::size_t const length, any_oxm_id const& id)
-                      { return length + id.length(); });
         }
 
     private:
