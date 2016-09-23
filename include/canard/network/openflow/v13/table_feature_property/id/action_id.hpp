@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <utility>
 #include <vector>
-#include <boost/operators.hpp>
+#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
@@ -19,11 +19,11 @@ namespace ofp {
 namespace v13 {
 
     class action_id
-        : private boost::equality_comparable<action_id>
+        : public detail::basic_protocol_type<action_id>
     {
+    public:
         using raw_ofp_type = v13_detail::ofp_action_header;
 
-    public:
         explicit action_id(std::uint16_t const type) noexcept
             : type_(type)
         {
@@ -38,26 +38,7 @@ namespace v13 {
         static constexpr auto length() noexcept
             -> std::uint16_t
         {
-            return offsetof(v13_detail::ofp_action_header, pad);
-        }
-
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            return detail::encode(
-                      container
-                    , raw_ofp_type{std::uint16_t(type()), length()}
-                    , length());
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> action_id
-        {
-            auto const action_header
-                = detail::decode<raw_ofp_type>(first, last, length());
-            return action_id{action_header.type};
+            return offsetof(raw_ofp_type, pad);
         }
 
         static void validate_action_header(
@@ -72,37 +53,63 @@ namespace v13 {
         }
 
     private:
+        friend basic_protocol_type;
+
+        friend auto get_min_length(action_id*) noexcept
+            -> std::uint16_t
+        {
+            return action_id::length();
+        }
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(
+                      container
+                    , raw_ofp_type{std::uint16_t(type()), length()}
+                    , length());
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> action_id
+        {
+            auto const action_header
+                = detail::decode<raw_ofp_type>(first, last, length());
+            return action_id{action_header.type};
+        }
+
+        auto equal_impl(action_id const& rhs) const noexcept
+            -> bool
+        {
+            return type_ == rhs.type_;
+        }
+
+        auto equivalent_impl(action_id const& rhs) const noexcept
+            -> bool
+        {
+            return type_ == rhs.type_;
+        }
+
+    private:
         std::uint16_t type_;
     };
 
-    inline auto operator==(action_id const& lhs, action_id const& rhs) noexcept
-        -> bool
-    {
-        return lhs.type() == rhs.type();
-    }
-
-    inline auto equivalent(action_id const& lhs, action_id const& rhs) noexcept
-        -> bool
-    {
-        return lhs.type() == rhs.type();
-    }
-
 
     class action_experimenter_id
-        : private boost::equality_comparable<action_experimenter_id>
+        : public detail::basic_protocol_type<action_experimenter_id>
     {
-        using raw_ofp_type = v13_detail::ofp_action_experimenter_header;
-
     public:
+        using raw_ofp_type = v13_detail::ofp_action_experimenter_header;
+        using data_type = std::vector<unsigned char>;
+
         explicit action_experimenter_id(std::uint32_t const experimenter)
             : experimenter_(experimenter)
             , data_{}
         {
         }
 
-        action_experimenter_id(
-                  std::uint32_t const experimenter
-                , std::vector<unsigned char> data)
+        action_experimenter_id(std::uint32_t const experimenter, data_type data)
             : experimenter_(experimenter)
             , data_(std::move(data))
         {
@@ -127,42 +134,17 @@ namespace v13 {
         }
 
         auto data() const noexcept
-            -> std::vector<unsigned char> const&
+            -> data_type const&
         {
             return data_;
         }
 
         auto extract_data()
-            -> std::vector<unsigned char>
+            -> data_type
         {
-            return std::move(data_);
-        }
-
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            auto const exp_header = raw_ofp_type{
-                std::uint16_t(type()), length(), experimenter()
-            };
-            detail::encode(container, exp_header);
-            return detail::encode_byte_array(
-                    container, data_.data(), data_.size());
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> action_experimenter_id
-        {
-            auto const exp_header = detail::decode<raw_ofp_type>(first, last);
-
-            last = std::next(first, exp_header.len - sizeof(raw_ofp_type));
-            auto data = std::vector<unsigned char>(first, last);
-            first = last;
-
-            return action_experimenter_id{
-                exp_header.experimenter, std::move(data)
-            };
+            auto data = data_type{};
+            data.swap(data_);
+            return data;
         }
 
         static void validate_action_header(
@@ -171,7 +153,7 @@ namespace v13 {
             if (header.type != protocol::OFPAT_EXPERIMENTER) {
                 throw std::runtime_error{"invalid action type"};
             }
-            if (header.len < sizeof(raw_ofp_type)) {
+            if (header.len < min_length()) {
                 throw std::runtime_error{
                     "experimenter action id length is too small"
                 };
@@ -179,27 +161,51 @@ namespace v13 {
         }
 
     private:
+        friend basic_protocol_type;
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            auto const exp_header = raw_ofp_type{
+                std::uint16_t(type()), length(), experimenter()
+            };
+            detail::encode(container, exp_header);
+            detail::encode_byte_array(container, data_.data(), data_.size());
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> action_experimenter_id
+        {
+            auto const exp_header = detail::decode<raw_ofp_type>(first, last);
+
+            last = std::next(first, exp_header.len - sizeof(raw_ofp_type));
+            auto data = data_type(first, last);
+            first = last;
+
+            return action_experimenter_id{
+                exp_header.experimenter, std::move(data)
+            };
+        }
+
+        auto equal_impl(action_experimenter_id const& rhs) const noexcept
+            -> bool
+        {
+            return experimenter_ == rhs.experimenter_
+                && data_ == rhs.data_;
+        }
+
+        auto equivalent_impl(action_experimenter_id const& rhs) const noexcept
+            -> bool
+        {
+            return experimenter_ == rhs.experimenter_
+                && data_ == rhs.data_;
+        }
+
+    private:
         std::uint32_t experimenter_;
-        std::vector<unsigned char> data_;
+        data_type data_;
     };
-
-    inline auto operator==(
-              action_experimenter_id const& lhs
-            , action_experimenter_id const& rhs) noexcept
-        -> bool
-    {
-        return lhs.experimenter() == rhs.experimenter()
-            && lhs.data() == rhs.data();
-    }
-
-    inline auto equivalent(
-              action_experimenter_id const& lhs
-            , action_experimenter_id const& rhs) noexcept
-        -> bool
-    {
-        return lhs.experimenter() == rhs.experimenter()
-            && lhs.data() == rhs.data();
-    }
 
 } // namespace v13
 } // namespace ofp

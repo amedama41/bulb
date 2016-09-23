@@ -8,10 +8,10 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include <boost/operators.hpp>
 #include <boost/range/numeric.hpp>
 #include <boost/range/algorithm/find_if.hpp>
 #include <boost/range/algorithm/for_each.hpp>
+#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/is_related.hpp>
@@ -29,14 +29,13 @@ namespace table_feature_properties {
 
     template <class T>
     class basic_prop_actions
-        : private boost::equality_comparable<basic_prop_actions<T>>
+        : public detail::basic_protocol_type<basic_prop_actions<T>>
     {
-        using raw_ofp_type = v13_detail::ofp_table_feature_prop_actions;
-
     public:
         static constexpr protocol::ofp_table_feature_prop_type prop_type
             = T::prop_type;
 
+        using raw_ofp_type = v13_detail::ofp_table_feature_prop_actions;
         using action_id_container = std::vector<any_action_id>;
         using iterator = action_id_container::iterator;
         using const_iterator = action_id_container::const_iterator;
@@ -66,13 +65,15 @@ namespace table_feature_properties {
 
         basic_prop_actions(basic_prop_actions&& other)
             : table_feature_prop_actions_(other.table_feature_prop_actions_)
-            , action_ids_(std::move(other).action_ids_)
+            , action_ids_(other.extract_action_ids())
         {
-            other.table_feature_prop_actions_.length = sizeof(raw_ofp_type);
         }
 
-        auto operator=(basic_prop_actions const&)
-            -> basic_prop_actions& = default;
+        auto operator=(basic_prop_actions const& other)
+            -> basic_prop_actions&
+        {
+            return operator=(basic_prop_actions{other});
+        }
 
         auto operator=(basic_prop_actions&& other)
             -> basic_prop_actions&
@@ -105,8 +106,10 @@ namespace table_feature_properties {
         auto extract_action_ids()
             -> action_id_container
         {
+            auto action_ids = action_id_container{};
+            action_ids.swap(action_ids_);
             table_feature_prop_actions_.length = sizeof(raw_ofp_type);
-            return std::move(action_ids_);
+            return action_ids;
         }
 
         auto begin() noexcept
@@ -133,22 +136,41 @@ namespace table_feature_properties {
             return action_ids_.end();
         }
 
+    private:
+        basic_prop_actions(
+                  raw_ofp_type const& table_feature_prop_actions
+                , action_id_container&& action_ids)
+            : table_feature_prop_actions_(table_feature_prop_actions)
+            , action_ids_(std::move(action_ids))
+        {
+        }
+
+        static auto calc_length(action_id_container const& action_ids)
+            -> std::size_t
+        {
+            return boost::accumulate(
+                      action_ids, sizeof(raw_ofp_type)
+                    , [](std::size_t const length, any_action_id const& id)
+                      { return length + id.length(); });
+        }
+
+        friend detail::basic_protocol_type<basic_prop_actions>;
+
         template <class Container>
-        auto encode(Container& container) const
-            -> Container&
+        void encode_impl(Container& container) const
         {
             detail::encode(container, table_feature_prop_actions_);
             boost::for_each(action_ids_, [&](any_action_id const& id) {
                 id.encode(container);
             });
-            return detail::encode_byte_array(
+            detail::encode_byte_array(
                       container
                     , detail::padding
                     , v13_detail::padding_length(length()));
         }
 
         template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
+        static auto decode_impl(Iterator& first, Iterator last)
             -> basic_prop_actions
         {
             auto const property = detail::decode<raw_ofp_type>(first, last);
@@ -172,52 +194,30 @@ namespace table_feature_properties {
             return basic_prop_actions{property, std::move(action_ids)};
         }
 
-        friend auto operator==(
-                basic_prop_actions const& lhs, basic_prop_actions const& rhs)
+        auto equal_impl(basic_prop_actions const& rhs) const noexcept
             -> bool
         {
-            return lhs.action_ids() == rhs.action_ids();
+            return action_ids_ == rhs.action_ids_;
         }
 
-        friend auto equivalent(
-                  basic_prop_actions const& lhs
-                , basic_prop_actions const& rhs) noexcept
+        auto equivalent_impl(basic_prop_actions const& rhs) const noexcept
             -> bool
         {
-            auto const& lhs_action_ids = lhs.action_ids();
-            auto const& rhs_action_ids = rhs.action_ids();
-            if (lhs_action_ids.size() != rhs_action_ids.size()) {
+            if (action_ids_.size() != rhs.action_ids_.size()) {
                 return false;
             }
-            for (auto const& lhs_id : lhs_action_ids) {
+            auto const rhs_ids_end = rhs.action_ids_.end();
+            for (auto const& lhs_id : action_ids_) {
                 using const_reference = action_id_container::const_reference;
                 if (boost::find_if(
-                              rhs_action_ids
+                              rhs.action_ids_
                             , [&lhs_id](const_reference rhs_id)
                               { return equivalent(lhs_id, rhs_id); })
-                        == rhs_action_ids.end()) {
+                        == rhs_ids_end) {
                     return false;
                 }
             }
             return true;
-        }
-
-    private:
-        basic_prop_actions(
-                  raw_ofp_type const& table_feature_prop_actions
-                , action_id_container&& action_ids)
-            : table_feature_prop_actions_(table_feature_prop_actions)
-            , action_ids_(std::move(action_ids))
-        {
-        }
-
-        static auto calc_length(action_id_container const& action_ids)
-            -> std::size_t
-        {
-            return boost::accumulate(
-                      action_ids, sizeof(raw_ofp_type)
-                    , [](std::size_t const length, any_action_id const& id)
-                      { return length + id.length(); });
         }
 
     private:
