@@ -10,8 +10,8 @@
 #include <utility>
 #include <vector>
 #include <boost/algorithm/cxx11/all_of.hpp>
-#include <boost/operators.hpp>
 #include <boost/range/algorithm/for_each.hpp>
+#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/padding.hpp>
@@ -27,14 +27,13 @@ namespace table_feature_properties {
 
     template <class T>
     class basic_prop_next_tables
-        : private boost::equality_comparable<basic_prop_next_tables<T>>
+        : public detail::basic_protocol_type<basic_prop_next_tables<T>>
     {
-        using raw_ofp_type = v13_detail::ofp_table_feature_prop_next_tables;
-
     public:
         static constexpr protocol::ofp_table_feature_prop_type prop_type
             = T::prop_type;
 
+        using raw_ofp_type = v13_detail::ofp_table_feature_prop_next_tables;
         using next_table_id_container = std::vector<std::uint8_t>;
         using iterator = next_table_id_container::iterator;
         using const_iterator = next_table_id_container::const_iterator;
@@ -59,13 +58,15 @@ namespace table_feature_properties {
         basic_prop_next_tables(basic_prop_next_tables&& other)
             : table_feature_prop_next_tables_(
                     other.table_feature_prop_next_tables_)
-            , next_table_ids_(std::move(other).next_table_ids_)
+            , next_table_ids_(other.extract_next_table_ids())
         {
-            other.table_feature_prop_next_tables_.length = sizeof(raw_ofp_type);
         }
 
-        auto operator=(basic_prop_next_tables const&)
-            -> basic_prop_next_tables& = default;
+        auto operator=(basic_prop_next_tables const& other)
+            -> basic_prop_next_tables&
+        {
+            return operator=(basic_prop_next_tables{other});
+        }
 
         auto operator=(basic_prop_next_tables&& other)
             -> basic_prop_next_tables&
@@ -98,8 +99,10 @@ namespace table_feature_properties {
         auto extract_next_table_ids()
             -> next_table_id_container
         {
+            auto next_table_ids = next_table_id_container{};
+            next_table_ids.swap(next_table_ids_);
             table_feature_prop_next_tables_.length = sizeof(raw_ofp_type);
-            return std::move(next_table_ids_);
+            return next_table_ids;
         }
 
         auto begin() noexcept
@@ -126,63 +129,6 @@ namespace table_feature_properties {
             return next_table_ids_.end();
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            detail::encode(container, table_feature_prop_next_tables_);
-            detail::encode_byte_array(
-                    container, next_table_ids_.data(), next_table_ids_.size());
-            return detail::encode_byte_array(
-                      container
-                    , detail::padding
-                    , v13_detail::padding_length(length()));
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> basic_prop_next_tables
-        {
-            auto const property = detail::decode<raw_ofp_type>(first, last);
-
-            auto const id_last
-                = std::next(first, property.length - sizeof(raw_ofp_type));
-            auto next_table_ids = next_table_id_container(first, id_last);
-            first = id_last;
-
-            std::advance(first, v13_detail::padding_length(property.length));
-
-            return basic_prop_next_tables{property, std::move(next_table_ids)};
-        }
-
-        friend auto operator==(
-                  basic_prop_next_tables const& lhs
-                , basic_prop_next_tables const& rhs)
-            -> bool
-        {
-            return lhs.next_table_ids_ == rhs.next_table_ids_;
-        }
-
-        friend auto equivalent(
-                  basic_prop_next_tables const& lhs
-                , basic_prop_next_tables const& rhs) noexcept
-            -> bool
-        {
-            if (lhs.next_table_ids().size() != rhs.next_table_ids().size()) {
-                return false;
-            }
-            using value_type = next_table_id_container::value_type;
-            constexpr auto array_size
-                = std::size_t{std::numeric_limits<value_type>::max() + 1};
-            auto bitmap = std::array<bool, array_size>{};
-            boost::for_each(
-                      lhs.next_table_ids()
-                    , [&bitmap](value_type id) { bitmap[id] = true; });
-            return boost::algorithm::all_of(
-                      rhs.next_table_ids()
-                    , [&bitmap](value_type id) { return bitmap[id]; });
-        }
-
     private:
         basic_prop_next_tables(
                   raw_ofp_type const& table_feature_prop_next_tables
@@ -197,6 +143,60 @@ namespace table_feature_properties {
         {
             return sizeof(raw_ofp_type)
                 + table_ids.size() * sizeof(next_table_id_container::value_type);
+        }
+
+        friend detail::basic_protocol_type<basic_prop_next_tables>;
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, table_feature_prop_next_tables_);
+            detail::encode_byte_array(
+                    container, next_table_ids_.data(), next_table_ids_.size());
+            detail::encode_byte_array(
+                      container
+                    , detail::padding
+                    , v13_detail::padding_length(length()));
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> basic_prop_next_tables
+        {
+            auto const property = detail::decode<raw_ofp_type>(first, last);
+
+            auto const id_last
+                = std::next(first, property.length - sizeof(raw_ofp_type));
+            auto next_table_ids = next_table_id_container(first, id_last);
+            first = id_last;
+
+            std::advance(first, v13_detail::padding_length(property.length));
+
+            return basic_prop_next_tables{property, std::move(next_table_ids)};
+        }
+
+        auto equal_impl(basic_prop_next_tables const& rhs) const noexcept
+            -> bool
+        {
+            return next_table_ids_ == rhs.next_table_ids_;
+        }
+
+        auto equivalent_impl(basic_prop_next_tables const& rhs) const noexcept
+            -> bool
+        {
+            if (next_table_ids_.size() != rhs.next_table_ids_.size()) {
+                return false;
+            }
+            using value_type = next_table_id_container::value_type;
+            constexpr auto array_size
+                = std::size_t{std::numeric_limits<value_type>::max() + 1};
+            auto bitmap = std::array<bool, array_size>{};
+            boost::for_each(
+                      next_table_ids_
+                    , [&bitmap](value_type id) { bitmap[id] = true; });
+            return boost::algorithm::all_of(
+                      rhs.next_table_ids_
+                    , [&bitmap](value_type id) { return bitmap[id]; });
         }
 
     private:
