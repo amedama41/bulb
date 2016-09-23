@@ -8,10 +8,10 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include <boost/operators.hpp>
 #include <boost/range/numeric.hpp>
 #include <boost/range/algorithm/find_if.hpp>
 #include <boost/range/algorithm/for_each.hpp>
+#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/is_related.hpp>
@@ -29,11 +29,10 @@ namespace table_feature_properties {
 
     template <class T>
     class basic_prop_instructions
-        : private boost::equality_comparable<basic_prop_instructions<T>>
+        : public detail::basic_protocol_type<basic_prop_instructions<T>>
     {
-        using raw_ofp_type = v13_detail::ofp_table_feature_prop_instructions;
-
     public:
+        using raw_ofp_type = v13_detail::ofp_table_feature_prop_instructions;
         using instruction_id_container = std::vector<any_instruction_id>;
         using iterator = instruction_id_container::iterator;
         using const_iterator = instruction_id_container::const_iterator;
@@ -72,14 +71,15 @@ namespace table_feature_properties {
         basic_prop_instructions(basic_prop_instructions&& other)
             : table_feature_prop_instructions_(
                     other.table_feature_prop_instructions_)
-            , instruction_ids_(std::move(other).instruction_ids_)
+            , instruction_ids_(other.extract_instruction_ids())
         {
-            other.table_feature_prop_instructions_.length
-                = sizeof(raw_ofp_type);
         }
 
-        auto operator=(basic_prop_instructions const&)
-            -> basic_prop_instructions& = default;
+        auto operator=(basic_prop_instructions const& other)
+            -> basic_prop_instructions&
+        {
+            return operator=(basic_prop_instructions{other});
+        }
 
         auto operator=(basic_prop_instructions&& other)
             -> basic_prop_instructions&
@@ -112,8 +112,10 @@ namespace table_feature_properties {
         auto extract_instruction_ids()
             -> instruction_id_container
         {
+            auto instruction_ids = instruction_id_container{};
+            instruction_ids.swap(instruction_ids_);
             table_feature_prop_instructions_.length = sizeof(raw_ofp_type);
-            return std::move(instruction_ids_);
+            return instruction_ids;
         }
 
         auto begin() noexcept
@@ -140,23 +142,43 @@ namespace table_feature_properties {
             return instruction_ids_.end();
         }
 
+    private:
+        basic_prop_instructions(
+                  raw_ofp_type const& table_feature_prop_instructions
+                , instruction_id_container&& instruction_ids)
+            : table_feature_prop_instructions_(table_feature_prop_instructions)
+            , instruction_ids_(std::move(instruction_ids))
+        {
+        }
+
+        static auto calc_length(
+                instruction_id_container const& instruction_ids) noexcept
+            -> std::size_t
+        {
+            return boost::accumulate(
+                      instruction_ids, sizeof(raw_ofp_type)
+                    , [](std::size_t const length, any_instruction_id const& id)
+                      { return length + id.length(); });
+        }
+
+        friend detail::basic_protocol_type<basic_prop_instructions>;
+
         template <class Container>
-        auto encode(Container& container) const
-            -> Container&
+        void encode_impl(Container& container) const
         {
             detail::encode(container, table_feature_prop_instructions_);
             boost::for_each(
                     instruction_ids_, [&](any_instruction_id const& id) {
                 id.encode(container);
             });
-            return detail::encode_byte_array(
+            detail::encode_byte_array(
                       container
                     , detail::padding
                     , v13_detail::padding_length(length()));
         }
 
         template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
+        static auto decode_impl(Iterator& first, Iterator last)
             -> basic_prop_instructions
         {
             auto const property = detail::decode<raw_ofp_type>(first, last);
@@ -180,55 +202,31 @@ namespace table_feature_properties {
             return basic_prop_instructions{property, std::move(ids)};
         }
 
-        friend auto operator==(
-                  basic_prop_instructions const& lhs
-                , basic_prop_instructions const& rhs)
+        auto equal_impl(basic_prop_instructions const& rhs) const noexcept
             -> bool
         {
-            return lhs.instruction_ids_ == rhs.instruction_ids_;
+            return instruction_ids_ == rhs.instruction_ids_;
         }
 
-        friend auto equivalent(
-                  basic_prop_instructions const& lhs
-                , basic_prop_instructions const& rhs) noexcept
+        auto equivalent_impl(basic_prop_instructions const& rhs) const noexcept
             -> bool
         {
-            auto const& lhs_instruction_ids = lhs.instruction_ids();
-            auto const& rhs_instruction_ids = rhs.instruction_ids();
-            if (lhs_instruction_ids.size() != rhs_instruction_ids.size()) {
+            if (instruction_ids_.size() != rhs.instruction_ids_.size()) {
                 return false;
             }
-            for (auto const& lhs_id : lhs_instruction_ids) {
+            auto const rhs_ids_end = rhs.instruction_ids_.end();
+            for (auto const& lhs_id : instruction_ids_) {
                 using const_reference
                     = instruction_id_container::const_reference;
                 if (boost::find_if(
-                              rhs_instruction_ids
+                              rhs.instruction_ids_
                             , [&lhs_id](const_reference rhs_id)
                               { return equivalent(lhs_id, rhs_id); })
-                        == rhs_instruction_ids.end()) {
+                        == rhs_ids_end) {
                     return false;
                 }
             }
             return true;
-        }
-
-    private:
-        basic_prop_instructions(
-                  raw_ofp_type const& table_feature_prop_instructions
-                , instruction_id_container&& instruction_ids)
-            : table_feature_prop_instructions_(table_feature_prop_instructions)
-            , instruction_ids_(std::move(instruction_ids))
-        {
-        }
-
-        static auto calc_length(
-                instruction_id_container const& instruction_ids) noexcept
-            -> std::size_t
-        {
-            return boost::accumulate(
-                      instruction_ids, sizeof(raw_ofp_type)
-                    , [](std::size_t const length, any_instruction_id const& id)
-                      { return length + id.length(); });
         }
 
     private:
