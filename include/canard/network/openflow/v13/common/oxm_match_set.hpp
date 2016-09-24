@@ -10,11 +10,11 @@
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
-#include <boost/operators.hpp>
 #include <boost/optional.hpp>
 #include <boost/range/adaptor/map.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/iterator.hpp>
+#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/is_related.hpp>
@@ -29,16 +29,15 @@ namespace ofp {
 namespace v13 {
 
     class oxm_match_set
-        : private boost::equality_comparable<oxm_match_set>
+        : public detail::basic_protocol_type<oxm_match_set>
     {
         using container_type = std::map<std::uint32_t, any_oxm_match_field>;
 
     public:
         static constexpr protocol::ofp_match_type match_type
             = protocol::OFPMT_OXM;
-        static constexpr std::size_t base_length
-            = offsetof(v13_detail::ofp_match, pad);
 
+        using raw_ofp_type = v13_detail::ofp_match;
         using key_type = std::uint32_t;
         using value_type = any_oxm_match_field;
         using reference = value_type const&;
@@ -167,23 +166,38 @@ namespace v13 {
             return v13::any_cast<OXMMatchField>(it->second);
         }
 
+        CANARD_NET_OFP_DECL static void validate_ofp_match(
+                v13_detail::ofp_match const&);
+
+    private:
+        CANARD_NET_OFP_DECL oxm_match_set(container_type&&);
+
+        static constexpr std::size_t base_length = offsetof(raw_ofp_type, pad);
+
+        friend basic_protocol_type;
+
+        friend constexpr auto get_min_length(oxm_match_set*) noexcept
+            -> std::uint16_t
+        {
+            return oxm_match_set::base_length;
+        }
+
         template <class Container>
-        auto encode(Container& container) const
-            -> Container&
+        void encode_impl(Container& container) const
         {
             detail::encode(container, std::uint16_t{match_type});
             detail::encode(container, length());
             boost::for_each(*this, [&](any_oxm_match_field const& field) {
                 field.encode(container);
             });
-            return detail::encode_byte_array(
+            detail::encode_byte_array(
                       container
                     , detail::padding
                     , v13_detail::padding_length(length()));
         }
 
         template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
+        static auto decode_impl(Iterator& first, Iterator last)
             -> oxm_match_set
         {
             std::advance(first, sizeof(std::uint16_t));
@@ -204,26 +218,6 @@ namespace v13 {
 
             return oxm_match_set{std::move(oxm_tlvs)};
         }
-
-        CANARD_NET_OFP_DECL static void validate_ofp_match(
-                v13_detail::ofp_match const&);
-
-        friend auto operator==(
-                oxm_match_set const& lhs, oxm_match_set const& rhs)
-            -> bool
-        {
-            return lhs.equal_impl(rhs);
-        }
-
-        friend auto equivalent(
-                oxm_match_set const& lhs, oxm_match_set const& rhs) noexcept
-            -> bool
-        {
-            return lhs.equivalent_impl(rhs);
-        }
-
-    private:
-        CANARD_NET_OFP_DECL oxm_match_set(container_type&&);
 
         CANARD_NET_OFP_DECL auto equal_impl(oxm_match_set const&) const
             -> bool;

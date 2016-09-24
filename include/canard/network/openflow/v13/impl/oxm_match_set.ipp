@@ -104,7 +104,7 @@ namespace v13 {
     if (match.type != protocol::OFPMT_OXM) {
       throw std::runtime_error{"match_type is not OFPMT_OXM"};
     }
-    if (match.length < base_length) {
+    if (match.length < min_length()) {
       throw std::runtime_error{"oxm_match length is too short"};
     }
   }
