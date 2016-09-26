@@ -3,8 +3,6 @@
 
 #include <cstdint>
 #include <iterator>
-#include <memory>
-#include <stdexcept>
 #include <utility>
 #include <boost/range/iterator_range.hpp>
 #include <canard/network/openflow/binary_data.hpp>
@@ -25,60 +23,14 @@ namespace messages {
 
         template <class T>
         class echo_base
-            : public v13_detail::basic_openflow_message<T>
+            : public detail::v13::basic_openflow_message<T>
         {
+            using base_t = detail::v13::basic_openflow_message<T>;
+
         public:
+            using raw_ofp_type = v13_detail::ofp_header;
             using data_type = binary_data::pointer_type;
 
-        protected:
-            echo_base(binary_data&& data, std::uint32_t const xid) noexcept
-                : header_{
-                      protocol::OFP_VERSION
-                    , T::message_type
-                    , std::uint16_t(
-                            sizeof(v13_detail::ofp_header) + data.size())
-                    , xid
-                  }
-                , data_(std::move(data).data())
-            {
-            }
-
-            echo_base(v13_detail::ofp_header const& header, data_type&& data)
-                : header_(header)
-                , data_(std::move(data))
-            {
-            }
-
-            echo_base(echo_base const& other)
-                : header_(other.header_)
-                , data_(binary_data::copy_data(other.data()))
-            {
-            }
-
-            echo_base(echo_base&& other) noexcept
-                : header_(other.header_)
-                , data_(std::move(other.data_))
-            {
-                other.header_.length = sizeof(v13_detail::ofp_header);
-            }
-
-            auto operator=(echo_base const& other)
-                -> echo_base&
-            {
-                auto tmp = other;
-                return operator=(std::move(tmp));
-            }
-
-            auto operator=(echo_base&& other) noexcept
-                -> echo_base&
-            {
-                auto tmp = std::move(other);
-                header_ = tmp.header_;
-                data_ = std::move(tmp.data_);
-                return *this;
-            }
-
-        public:
             auto header() const noexcept
                 -> v13_detail::ofp_header const&
             {
@@ -94,55 +46,88 @@ namespace messages {
             auto data_length() const noexcept
                 -> std::uint16_t
             {
-                return this->length() - sizeof(v13_detail::ofp_header);
+                return this->length() - sizeof(raw_ofp_type);
             }
 
             auto extract_data() noexcept
                 -> binary_data
             {
                 auto const data_len = data_length();
-                header_.length = sizeof(v13_detail::ofp_header);
+                header_.length = sizeof(raw_ofp_type);
                 return binary_data{std::move(data_), data_len};
             }
 
+        protected:
+            echo_base(binary_data&& data, std::uint32_t const xid) noexcept
+                : header_{
+                      base_t::version()
+                    , base_t::type()
+                    , std::uint16_t(sizeof(raw_ofp_type) + data.size())
+                    , xid
+                  }
+                , data_(std::move(data).data())
+            {
+            }
+
+            echo_base(raw_ofp_type const& header, data_type&& data)
+                : header_(header)
+                , data_(std::move(data))
+            {
+            }
+
+            echo_base(echo_base const& other)
+                : header_(other.header_)
+                , data_(binary_data::copy_data(other.data()))
+            {
+            }
+
+            echo_base(echo_base&& other) noexcept
+                : header_(other.header_)
+                , data_(std::move(other.data_))
+            {
+                other.header_.length = sizeof(raw_ofp_type);
+            }
+
+            auto operator=(echo_base const& other)
+                -> echo_base&
+            {
+                return operator=(echo_base{other});
+            }
+
+            auto operator=(echo_base&& other) noexcept
+                -> echo_base&
+            {
+                auto tmp = std::move(other);
+                header_ = tmp.header_;
+                data_ = std::move(tmp.data_);
+                return *this;
+            }
+
+        private:
+            friend typename base_t::basic_protocol_type;
+
             template <class Container>
-            auto encode(Container& container) const
-                -> Container&
+            void encode_impl(Container& container) const
             {
                 detail::encode(container, header_);
-                return detail::encode_byte_array(
+                detail::encode_byte_array(
                         container, data_.get(), data_length());
             }
 
             template <class Iterator>
-            static auto decode(Iterator& first, Iterator last)
+            static auto decode_impl(Iterator& first, Iterator last)
                 -> T
             {
-                auto const header
-                    = detail::decode<v13_detail::ofp_header>(first, last);
-                last = std::next(
-                        first, header.length - sizeof(v13_detail::ofp_header));
+                auto const header = detail::decode<raw_ofp_type>(first, last);
+                last = std::next(first, header.length - sizeof(raw_ofp_type));
                 auto data = binary_data::copy_data(first, last);
                 first = last;
 
                 return T{header, std::move(data)};
             }
 
-            static void validate(v13_detail::ofp_header const& header)
-            {
-                if (header.version != protocol::OFP_VERSION) {
-                    throw std::runtime_error{"invalid version"};
-                }
-                if (header.type != T::message_type) {
-                    throw std::runtime_error{"invalid message type"};
-                }
-                if (header.length < sizeof(v13_detail::ofp_header)) {
-                    throw std::runtime_error{"invalid length"};
-                }
-            }
-
         private:
-            v13_detail::ofp_header header_;
+            raw_ofp_type header_;
             data_type data_;
         };
 
@@ -170,7 +155,7 @@ namespace messages {
     private:
         friend echo_base;
 
-        echo_request(v13_detail::ofp_header const& header
+        echo_request(raw_ofp_type const& header
                    , echo_base::data_type&& data) noexcept
             : echo_base{header, std::move(data)}
         {
@@ -204,7 +189,7 @@ namespace messages {
     private:
         friend echo_base;
 
-        echo_reply(v13_detail::ofp_header const& header
+        echo_reply(raw_ofp_type const& header
                  , echo_base::data_type&& data) noexcept
             : echo_base{header, std::move(data)}
         {
