@@ -2,7 +2,6 @@
 #define CANARD_NET_OFP_V13_MESSAGES_TABLE_MOD_HPP
 
 #include <cstdint>
-#include <stdexcept>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/get_xid.hpp>
@@ -17,20 +16,22 @@ namespace v13 {
 namespace messages {
 
     class table_mod
-        : public v13_detail::basic_openflow_message<table_mod>
+        : public detail::v13::basic_openflow_message<table_mod>
     {
     public:
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_TABLE_MOD;
+
+        using raw_ofp_type = v13_detail::ofp_table_mod;
 
         table_mod(std::uint8_t const table_id
                 , std::uint32_t const config
                 , std::uint32_t const xid = get_xid())
             : table_mod_{
                   v13_detail::ofp_header{
-                      protocol::OFP_VERSION
-                    , message_type
-                    , sizeof(v13_detail::ofp_table_mod)
+                      version()
+                    , type()
+                    , sizeof(raw_ofp_type)
                     , xid
                   }
                 , table_id
@@ -58,43 +59,29 @@ namespace messages {
             return table_mod_.config;
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            return detail::encode(container, table_mod_);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> table_mod
-        {
-            return table_mod{
-                detail::decode<v13_detail::ofp_table_mod>(first, last)
-            };
-        }
-
-        static void validate(v13_detail::ofp_header const& header)
-        {
-            if (header.version != protocol::OFP_VERSION) {
-                throw std::runtime_error{"invalid version"};
-            }
-            if (header.type != message_type) {
-                throw std::runtime_error{"invalid message type"};
-            }
-            if (header.length != sizeof(v13_detail::ofp_table_mod)) {
-                throw std::runtime_error{"invalid length"};
-            }
-        }
-
     private:
-        explicit table_mod(v13_detail::ofp_table_mod const table_mod) noexcept
+        explicit table_mod(raw_ofp_type const& table_mod) noexcept
             : table_mod_(table_mod)
         {
         }
 
+        friend basic_protocol_type;
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, table_mod_);
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> table_mod
+        {
+            return table_mod{detail::decode<raw_ofp_type>(first, last)};
+        }
+
     private:
-        v13_detail::ofp_table_mod table_mod_;
+        raw_ofp_type table_mod_;
     };
 
 } // namespace messages
