@@ -2,7 +2,6 @@
 #define CANARD_NET_OFP_V13_MESSAGES_SWITCH_CONFIG_HPP
 
 #include <cstdint>
-#include <stdexcept>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/get_xid.hpp>
@@ -20,33 +19,13 @@ namespace messages {
 
         template <class T>
         class switch_config_base
-             : public v13_detail::basic_openflow_message<T>
+             : public detail::v13::basic_openflow_message<T>
         {
-        protected:
-            switch_config_base(
-                      std::uint16_t const flags
-                    , std::uint16_t const miss_send_len
-                    , std::uint32_t const xid) noexcept
-                : switch_config_{
-                      v13_detail::ofp_header{
-                          protocol::OFP_VERSION
-                        , T::message_type
-                        , sizeof(v13_detail::ofp_switch_config)
-                        , xid
-                      }
-                    , flags
-                    , miss_send_len
-                  }
-            {
-            }
-
-            explicit switch_config_base(
-                    v13_detail::ofp_switch_config const& config) noexcept
-                : switch_config_(config)
-            {
-            }
+            using base_t = detail::v13::basic_openflow_message<T>;
 
         public:
+            using raw_ofp_type = v13_detail::ofp_switch_config;
+
             auto header() const noexcept
                 -> v13_detail::ofp_header const&
             {
@@ -65,55 +44,67 @@ namespace messages {
                 return switch_config_.miss_send_len;
             }
 
-            template <class Container>
-            auto encode(Container& container) const
-                -> Container&
+        protected:
+            switch_config_base(
+                      std::uint16_t const flags
+                    , std::uint16_t const miss_send_len
+                    , std::uint32_t const xid) noexcept
+                : switch_config_{
+                      v13_detail::ofp_header{
+                          base_t::version()
+                        , base_t::type()
+                        , sizeof(raw_ofp_type)
+                        , xid
+                      }
+                    , flags
+                    , miss_send_len
+                  }
             {
-                return detail::encode(container, switch_config_);
             }
 
-            template <class Iterator>
-            static auto decode(Iterator& first, Iterator last)
-                -> T
+            explicit switch_config_base(raw_ofp_type const& config) noexcept
+                : switch_config_(config)
             {
-                return T{
-                    detail::decode<v13_detail::ofp_switch_config>(first, last)
-                };
-            }
-
-            static void validate(v13_detail::ofp_header const& header)
-            {
-                if (header.version != protocol::OFP_VERSION) {
-                    throw std::runtime_error{"invalid version"};
-                }
-                if (header.type != T::message_type) {
-                    throw std::runtime_error{"invalid message type"};
-                }
-                if (header.length != sizeof(v13_detail::ofp_switch_config)) {
-                    throw std::runtime_error{"invalid length"};
-                }
             }
 
         private:
-            v13_detail::ofp_switch_config switch_config_;
+            friend typename base_t::basic_protocol_type;
+
+            template <class Container>
+            void encode_impl(Container& container) const
+            {
+                detail::encode(container, switch_config_);
+            }
+
+            template <class Iterator>
+            static auto decode_impl(Iterator& first, Iterator last)
+                -> T
+            {
+                return T{detail::decode<raw_ofp_type>(first, last)};
+            }
+
+        private:
+            raw_ofp_type switch_config_;
         };
 
     } // namespace switch_config_detail
 
 
     class get_config_request
-        : public v13_detail::basic_openflow_message<get_config_request>
+        : public detail::v13::basic_openflow_message<get_config_request>
     {
     public:
+        using raw_ofp_type = v13_detail::ofp_header;
+
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_GET_CONFIG_REQUEST;
 
         explicit get_config_request(
                 std::uint32_t const xid = get_xid()) noexcept
             : header_{
-                  protocol::OFP_VERSION
-                , message_type
-                , sizeof(v13_detail::ofp_header)
+                  version()
+                , type()
+                , sizeof(raw_ofp_type)
                 , xid
               }
         {
@@ -125,44 +116,31 @@ namespace messages {
             return header_;
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            return detail::encode(container, header_);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> get_config_request
-        {
-            return get_config_request{
-                detail::decode<v13_detail::ofp_header>(first, last)
-            };
-        }
-
-        static void validate(v13_detail::ofp_header const& header)
-        {
-            if (header.version != protocol::OFP_VERSION) {
-                throw std::runtime_error{"invalid version"};
-            }
-            if (header.type != message_type) {
-                throw std::runtime_error{"invalid type"};
-            }
-            if (header.length != sizeof(v13_detail::ofp_header)) {
-                throw std::runtime_error{"invalid length"};
-            }
-        }
-
     private:
-        explicit get_config_request(
-                v13_detail::ofp_header const& header) noexcept
+        explicit get_config_request(raw_ofp_type const& header) noexcept
             : header_(header)
         {
         }
 
+        friend basic_protocol_type;
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, header_);
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> get_config_request
+        {
+            return get_config_request{
+                detail::decode<raw_ofp_type>(first, last)
+            };
+        }
+
     private:
-        v13_detail::ofp_header header_;
+        raw_ofp_type header_;
     };
 
 
@@ -198,6 +176,7 @@ namespace messages {
         {
         }
     };
+
 
     class set_config
         : public switch_config_detail::switch_config_base<set_config>
