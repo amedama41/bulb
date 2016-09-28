@@ -1,9 +1,10 @@
 #ifndef CANARD_NET_OFP_V13_MESSAGES_PORT_STATUS_HPP
 #define CANARD_NET_OFP_V13_MESSAGES_PORT_STATUS_HPP
 
-#include <stdexcept>
+#include <cstdint>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/v13/common/port.hpp>
 #include <canard/network/openflow/v13/detail/basic_openflow_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
@@ -17,21 +18,23 @@ namespace v13 {
 namespace messages {
 
     class port_status
-        : public v13_detail::basic_openflow_message<port_status>
+        : public detail::v13::basic_openflow_message<port_status>
         , public v13_detail::port_adaptor<port_status>
     {
     public:
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_PORT_STATUS;
 
+        using raw_ofp_type = v13_detail::ofp_port_status;
+
         port_status(v13::protocol::ofp_port_reason const reason
                   , v13::port const& port
                   , std::uint32_t const xid = get_xid()) noexcept
             : port_status_{
                   v13_detail::ofp_header{
-                      protocol::OFP_VERSION
-                    , message_type
-                    , sizeof(v13_detail::ofp_port_status)
+                      version()
+                    , type()
+                    , sizeof(raw_ofp_type)
                     , xid
                   }
                 , std::uint8_t(reason)
@@ -77,39 +80,25 @@ namespace messages {
             return reason() == protocol::OFPPR_MODIFY;
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
+    private:
+        explicit port_status(raw_ofp_type const& status) noexcept
+            : port_status_(status)
         {
-            return detail::encode(container, port_status_);
+        }
+
+        friend basic_protocol_type;
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+             detail::encode(container, port_status_);
         }
 
         template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
+        static auto decode_impl(Iterator& first, Iterator last)
             -> port_status
         {
-            return port_status{
-                detail::decode<v13_detail::ofp_port_status>(first, last)
-            };
-        }
-
-        static void validate(v13_detail::ofp_header const& header)
-        {
-            if (header.version != protocol::OFP_VERSION) {
-                throw std::runtime_error{"invalid version"};
-            }
-            if (header.type != message_type) {
-                throw std::runtime_error{"invalid message type"};
-            }
-            if (header.length != sizeof(v13_detail::ofp_port_status)) {
-                throw std::runtime_error{"invalid length"};
-            }
-        }
-
-    private:
-        explicit port_status(v13_detail::ofp_port_status const& status) noexcept
-            : port_status_(status)
-        {
+            return port_status{detail::decode<raw_ofp_type>(first, last)};
         }
 
         friend port_adaptor;
@@ -121,7 +110,7 @@ namespace messages {
         }
 
     private:
-        v13_detail::ofp_port_status port_status_;
+        raw_ofp_type port_status_;
     };
 
 } // namespace messages
