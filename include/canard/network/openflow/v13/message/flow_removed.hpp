@@ -24,18 +24,20 @@ namespace v13 {
 namespace messages {
 
     class flow_removed
-        : public v13_detail::basic_openflow_message<flow_removed>
+        : public detail::v13::basic_openflow_message<flow_removed>
         , public v13_detail::flow_entry_adaptor<
                 flow_removed, v13_detail::ofp_flow_removed
           >
     {
         static constexpr std::size_t base_flow_removed_size
             = sizeof(v13_detail::ofp_flow_removed)
-            + sizeof(v13_detail::ofp_match);
+            + v13_detail::exact_length(oxm_match_set::min_length());
 
     public:
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_FLOW_REMOVED;
+
+        using raw_ofp_type = v13_detail::ofp_flow_removed;
 
         flow_removed(
                   oxm_match_set match
@@ -49,10 +51,10 @@ namespace messages {
                 , std::uint32_t const xid = get_xid())
             : flow_removed_{
                   v13_detail::ofp_header{
-                      protocol::OFP_VERSION
-                    , message_type
+                      version()
+                    , type()
                     , std::uint16_t(
-                            sizeof(v13_detail::ofp_flow_removed)
+                            sizeof(raw_ofp_type)
                           + v13_detail::exact_length(match.length()))
                     , xid
                   }
@@ -95,13 +97,15 @@ namespace messages {
 
         flow_removed(flow_removed&& other)
             : flow_removed_(other.flow_removed_)
-            , match_(std::move(other).match_)
+            , match_(other.extract_match())
         {
-            other.flow_removed_.header.length = base_flow_removed_size;
         }
 
-        auto operator=(flow_removed const&)
-            -> flow_removed& = default;
+        auto operator=(flow_removed const& other)
+            -> flow_removed&
+        {
+            return operator=(flow_removed{other});
+        }
 
         auto operator=(flow_removed&& other)
             -> flow_removed&
@@ -130,23 +134,45 @@ namespace messages {
             return match_;
         }
 
+        auto extract_match()
+            -> oxm_match_set
+        {
+            auto match = oxm_match_set{};
+            match.swap(match_);
+            flow_removed_.header.length = base_flow_removed_size;
+            return match;
+        }
+
+    private:
+        flow_removed(raw_ofp_type const& fremoved, oxm_match_set&& match)
+            : flow_removed_(fremoved)
+            , match_(std::move(match))
+        {
+        }
+
+        friend basic_protocol_type;
+
+        friend constexpr auto get_min_length(flow_removed*) noexcept
+            -> std::uint16_t
+        {
+            return flow_removed::base_flow_removed_size;
+        }
+
         template <class Container>
-        auto encode(Container& container) const
-            -> Container&
+        void encode_impl(Container& container) const
         {
             detail::encode(container, flow_removed_);
-            return match_.encode(container);
+            match_.encode(container);
         }
 
         template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
+        static auto decode_impl(Iterator& first, Iterator last)
             -> flow_removed
         {
-            auto const fremoved
-                = detail::decode<v13_detail::ofp_flow_removed>(first, last);
+            auto const fremoved = detail::decode<raw_ofp_type>(first, last);
 
             auto const match_length
-                = fremoved.header.length - sizeof(v13_detail::ofp_flow_removed);
+                = fremoved.header.length - sizeof(raw_ofp_type);
             last = std::next(first, match_length);
 
             auto copy_first = first;
@@ -161,27 +187,6 @@ namespace messages {
             return flow_removed{fremoved, std::move(match)};
         }
 
-        static void validate(v13_detail::ofp_header const& header)
-        {
-            if (header.version != protocol::OFP_VERSION) {
-                throw std::runtime_error{"invalid version"};
-            }
-            if (header.type != message_type) {
-                throw std::runtime_error{"invalid message type"};
-            }
-            if (header.length < base_flow_removed_size) {
-                throw std::runtime_error{"invalid length"};
-            }
-        }
-
-    private:
-        flow_removed(v13_detail::ofp_flow_removed const& fremoved
-                   , oxm_match_set&& match)
-            : flow_removed_(fremoved)
-            , match_(std::move(match))
-        {
-        }
-
         friend flow_entry_adaptor;
 
         auto ofp_flow_entry() const noexcept
@@ -191,7 +196,7 @@ namespace messages {
         }
 
     private:
-        v13_detail::ofp_flow_removed flow_removed_;
+        raw_ofp_type flow_removed_;
         oxm_match_set match_;
     };
 
