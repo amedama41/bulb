@@ -22,16 +22,17 @@ namespace v13 {
 namespace messages {
 namespace flow_mod_detail {
 
-    template <class FlowModType>
+    template <class FlowMod>
     class flow_mod_base
-        : public v13_detail::basic_openflow_message<FlowModType>
+        : public detail::v13::basic_openflow_message<FlowMod>
     {
-        static constexpr std::size_t base_flow_mod_size
-            = sizeof(v13_detail::ofp_flow_mod) + sizeof(v13_detail::ofp_match);
+        using base_t = detail::v13::basic_openflow_message<FlowMod>;
 
     public:
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_FLOW_MOD;
+
+        using raw_ofp_type = v13_detail::ofp_flow_mod;
 
         auto header() const noexcept
             -> v13_detail::ofp_header const&
@@ -45,65 +46,30 @@ namespace flow_mod_detail {
             return match_;
         }
 
+        auto extract_match()
+            -> oxm_match_set
+        {
+            auto match = std::move(match_);
+            flow_mod_.header.length
+                = base_t::min_length() + instructions_.length();
+            return match;
+        }
+
         auto instructions() const noexcept
             -> instruction_set const&
         {
             return instructions_;
         }
 
-        auto buffer_id() const noexcept
-            -> std::uint32_t
+        auto extract_instructions()
+            -> instruction_set
         {
-            return flow_mod_.buffer_id;
-        }
-
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            detail::encode(container, flow_mod_);
-            match_.encode(container);
-            return instructions_.encode(container);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> FlowModType
-        {
-            auto const flow_mod
-                = detail::decode<v13_detail::ofp_flow_mod>(first, last);
-            last = std::next(
-                    first
-                  , flow_mod.header.length - sizeof(v13_detail::ofp_flow_mod));
-
-            auto copy_first = first;
-            auto const ofp_match
-                = detail::decode<v13_detail::ofp_match>(copy_first, last);
-            oxm_match_set::validate_ofp_match(ofp_match);
-            if (std::distance(first, last)
-                    < v13_detail::exact_length(ofp_match.length)) {
-                throw std::runtime_error{"oxm_match length is too big"};
-            }
-            auto match = oxm_match_set::decode(first, last);
-
-            auto instructions = instruction_set::decode(first, last);
-
-            return FlowModType{
-                flow_mod, std::move(match), std::move(instructions)
-            };
-        }
-
-        static void validate(v13_detail::ofp_header const& header)
-        {
-            if (header.version != protocol::OFP_VERSION) {
-                throw std::runtime_error{"invalid version"};
-            }
-            if (header.type != message_type) {
-                throw std::runtime_error{"invalid message type"};
-            }
-            if (header.length < base_flow_mod_size) {
-                throw std::runtime_error{"invalid length"};
-            }
+            auto instructions = instruction_set{};
+            instructions.swap(instructions_);
+            flow_mod_.header.length
+                = sizeof(raw_ofp_type)
+                + v13_detail::exact_length(match_.length());
+            return instructions;
         }
 
     protected:
@@ -121,10 +87,10 @@ namespace flow_mod_detail {
                 , std::uint32_t const xid)
             : flow_mod_{
                   v13_detail::ofp_header{
-                      protocol::OFP_VERSION
-                    , message_type
+                      base_t::version()
+                    , base_t::type()
                     , std::uint16_t(
-                              sizeof(v13_detail::ofp_flow_mod)
+                              sizeof(raw_ofp_type)
                             + v13_detail::exact_length(match.length())
                             + instructions.length())
                     , xid
@@ -132,7 +98,7 @@ namespace flow_mod_detail {
                 , cookie
                 , cookie_mask
                 , table_id
-                , FlowModType::command_type
+                , FlowMod::command_type
                 , idle_timeout
                 , hard_timeout
                 , priority
@@ -148,7 +114,43 @@ namespace flow_mod_detail {
         }
 
         flow_mod_base(
-                 v13_detail::ofp_flow_mod const& flow_mod
+                  oxm_match_set&& match
+                , std::uint16_t const priority
+                , std::uint64_t const cookie
+                , std::uint64_t const cookie_mask
+                , std::uint8_t const table_id
+                , std::uint32_t const out_port
+                , std::uint32_t const out_group
+                , std::uint32_t const xid)
+            : flow_mod_{
+                  v13_detail::ofp_header{
+                      base_t::version()
+                    , base_t::type()
+                    , std::uint16_t(
+                              sizeof(raw_ofp_type)
+                            + v13_detail::exact_length(match.length()))
+                    , xid
+                  }
+                , cookie
+                , cookie_mask
+                , table_id
+                , FlowMod::command_type
+                , 0
+                , 0
+                , priority
+                , 0
+                , out_port
+                , out_group
+                , 0
+                , { 0, 0 }
+              }
+            , match_(std::move(match))
+            , instructions_{}
+        {
+        }
+
+        flow_mod_base(
+                 raw_ofp_type const& flow_mod
                , oxm_match_set&& match
                , instruction_set&& instructions)
             : flow_mod_(flow_mod)
@@ -161,14 +163,16 @@ namespace flow_mod_detail {
 
         flow_mod_base(flow_mod_base&& other)
             : flow_mod_(other.flow_mod_)
-            , match_(std::move(other).match_)
-            , instructions_(std::move(other).instructions_)
+            , match_(other.extract_match())
+            , instructions_(other.extract_instructions())
         {
-            other.flow_mod_.header.length = base_flow_mod_size;
         }
 
-        auto operator=(flow_mod_base const&)
-            -> flow_mod_base& = default;
+        auto operator=(flow_mod_base const& other)
+            -> flow_mod_base&
+        {
+            return operator=(flow_mod_base{other});
+        }
 
         auto operator=(flow_mod_base&& other)
             -> flow_mod_base&
@@ -187,7 +191,50 @@ namespace flow_mod_detail {
         }
 
     private:
-        v13_detail::ofp_flow_mod flow_mod_;
+        friend typename base_t::basic_protocol_type;
+
+        friend constexpr auto get_min_length(FlowMod*) noexcept
+            -> std::uint16_t
+        {
+            return sizeof(v13_detail::ofp_flow_mod)
+                 + v13_detail::exact_length(oxm_match_set::min_length());
+        }
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, flow_mod_);
+            match_.encode(container);
+            instructions_.encode(container);
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> FlowMod
+        {
+            auto const flow_mod = detail::decode<raw_ofp_type>(first, last);
+            last = std::next(
+                    first, flow_mod.header.length - sizeof(raw_ofp_type));
+
+            auto copy_first = first;
+            auto const ofp_match
+                = detail::decode<v13_detail::ofp_match>(copy_first, last);
+            oxm_match_set::validate_ofp_match(ofp_match);
+            if (std::distance(first, last)
+                    < v13_detail::exact_length(ofp_match.length)) {
+                throw std::runtime_error{"oxm_match length is too big"};
+            }
+            auto match = oxm_match_set::decode(first, last);
+
+            auto instructions = instruction_set::decode(first, last);
+
+            return FlowMod{
+                flow_mod, std::move(match), std::move(instructions)
+            };
+        }
+
+    private:
+        raw_ofp_type flow_mod_;
         oxm_match_set match_;
         instruction_set instructions_;
     };

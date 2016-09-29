@@ -84,6 +84,12 @@ namespace messages {
             return ofp_flow_mod().table_id;
         }
 
+        auto buffer_id() const noexcept
+            -> std::uint32_t
+        {
+            return ofp_flow_mod().buffer_id;
+        }
+
         auto reset_counter() const noexcept
             -> bool
         {
@@ -204,6 +210,12 @@ namespace messages {
             -> std::uint8_t
         {
             return ofp_flow_mod().table_id;
+        }
+
+        auto buffer_id() const noexcept
+            -> std::uint32_t
+        {
+            return ofp_flow_mod().buffer_id;
         }
 
         auto reset_counter() const noexcept

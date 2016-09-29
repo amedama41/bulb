@@ -77,6 +77,12 @@ namespace messages {
         {
         }
 
+        auto buffer_id() const noexcept
+            -> std::uint32_t
+        {
+            return ofp_flow_mod().buffer_id;
+        }
+
         auto entry() const
             -> flow_entry
         {
