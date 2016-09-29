@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <iterator>
-#include <memory>
 #include <stdexcept>
 #include <utility>
 #include <boost/range/iterator_range.hpp>
@@ -23,12 +22,10 @@ namespace v13 {
 namespace messages {
 
     class packet_out
-        : public v13_detail::basic_openflow_message<packet_out>
+        : public detail::v13::basic_openflow_message<packet_out>
     {
-        static constexpr std::uint16_t base_pkt_out_size
-            = sizeof(v13_detail::ofp_packet_out);
-
     public:
+        using raw_ofp_type = v13_detail::ofp_packet_out;
         using data_type = binary_data::pointer_type;
 
         static constexpr protocol::ofp_type message_type
@@ -42,10 +39,10 @@ namespace messages {
                  , std::uint32_t const xid)
             : packet_out_{
                   v13_detail::ofp_header{
-                        protocol::OFP_VERSION
-                      , message_type
+                        version()
+                      , type()
                       , std::uint16_t(
-                                base_pkt_out_size
+                                sizeof(raw_ofp_type)
                               + actions.length() + data.size())
                       , xid
                   }
@@ -93,18 +90,16 @@ namespace messages {
 
         packet_out(packet_out&& other)
             : packet_out_(other.packet_out_)
-            , actions_(std::move(other.actions_))
+            , actions_(other.extract_actions())
             , data_(std::move(other.data_))
         {
-            other.packet_out_.header.length = base_pkt_out_size;
-            other.packet_out_.actions_len = 0;
+            other.packet_out_.header.length = sizeof(raw_ofp_type);
         }
 
         auto operator=(packet_out const& other)
             -> packet_out&
         {
-            auto tmp = other;
-            return operator=(std::move(tmp));
+            return operator=(packet_out{other});
         }
 
         auto operator=(packet_out&& other)
@@ -147,36 +142,63 @@ namespace messages {
             return actions_;
         }
 
+        auto extract_actions()
+            -> action_list
+        {
+            auto actions = action_list{};
+            actions.swap(actions_);
+            packet_out_.header.length -= packet_out_.actions_len;
+            packet_out_.actions_len = 0;
+            return actions;
+        }
+
         auto frame() const noexcept
             -> boost::iterator_range<unsigned char const*>
         {
             return boost::make_iterator_range_n(data_.get(), frame_length());
         }
 
+        auto extract_frame() noexcept
+            -> binary_data
+        {
+            auto data = binary_data{std::move(data_), frame_length()};
+            packet_out_.header.length = sizeof(raw_ofp_type) + actions_length();
+            return data;
+        }
+
         auto frame_length() const noexcept
             -> std::uint16_t
         {
-            return length() - base_pkt_out_size - actions_length();
+            return length() - sizeof(raw_ofp_type) - actions_length();
         }
 
+    private:
+        packet_out(raw_ofp_type const& pkt_out
+                 , action_list&& actions
+                 , data_type&& data)
+            : packet_out_(pkt_out)
+            , actions_(std::move(actions))
+            , data_(std::move(data))
+        {
+        }
+
+        friend basic_protocol_type;
+
         template <class Container>
-        auto encode(Container& container) const
-            -> Container&
+        void encode_impl(Container& container) const
         {
             detail::encode(container, packet_out_);
             actions_.encode(container);
-            return detail::encode_byte_array(
-                    container, data_.get(), frame_length());
+            detail::encode_byte_array(container, data_.get(), frame_length());
         }
 
         template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
+        static auto decode_impl(Iterator& first, Iterator last)
             -> packet_out
         {
-            auto const pkt_out
-                = detail::decode<v13_detail::ofp_packet_out>(first, last);
+            auto const pkt_out = detail::decode<raw_ofp_type>(first, last);
             last = std::next(
-                    first, pkt_out.header.length - base_pkt_out_size);
+                    first, pkt_out.header.length - sizeof(raw_ofp_type));
             if (std::distance(first, last) < pkt_out.actions_len) {
                 throw std::runtime_error{"invalid actions length"};
             }
@@ -189,31 +211,8 @@ namespace messages {
             return packet_out{pkt_out, std::move(actions), std::move(data)};
         }
 
-        static void validate(v13_detail::ofp_header const& header)
-        {
-            if (header.version != protocol::OFP_VERSION) {
-                throw std::runtime_error{"invalid version"};
-            }
-            if (header.type != message_type) {
-                throw std::runtime_error{"invalid message type"};
-            }
-            if (header.length < base_pkt_out_size) {
-                throw std::runtime_error{"invalid length"};
-            }
-        }
-
     private:
-        packet_out(v13_detail::ofp_packet_out const& pkt_out
-                 , action_list&& actions
-                 , data_type&& data)
-            : packet_out_(pkt_out)
-            , actions_(std::move(actions))
-            , data_(std::move(data))
-        {
-        }
-
-    private:
-        v13_detail::ofp_packet_out packet_out_;
+        raw_ofp_type packet_out_;
         action_list actions_;
         data_type data_;
     };
