@@ -46,7 +46,7 @@ namespace multipart_detail {
 
     template <class T, class MultipartType>
     class basic_multipart
-        : public v13_detail::basic_openflow_message<T>
+        : public detail::v13::basic_openflow_message<T>
     {
     public:
         static constexpr protocol::ofp_type message_type
@@ -58,7 +58,7 @@ namespace multipart_detail {
             return static_cast<T const*>(this)->multipart().header;
         }
 
-        auto multipart_type() const noexcept
+        static constexpr auto multipart_type() noexcept
             -> protocol::ofp_multipart_type
         {
             return T::multipart_type_value;
@@ -70,16 +70,13 @@ namespace multipart_detail {
             return static_cast<T const*>(this)->multipart().flags;
         }
 
-        static void validate(v13_detail::ofp_header const& header)
+        static void validate_multipart(MultipartType const& multipart)
         {
-            if (header.version != protocol::OFP_VERSION) {
-                throw std::runtime_error{"invalid version"};
+            if (multipart.type != multipart_type()) {
+                throw std::runtime_error{"invalid multipart type"};
             }
-            if (header.type != message_type) {
-                throw std::runtime_error{"invalid message type"};
-            }
-            if (header.length < sizeof(MultipartType)) {
-                throw std::runtime_error{"invalid length"};
+            if (multipart.header.length < T::min_length()) {
+                throw std::runtime_error{"too small multipart length"};
             }
         }
     };
@@ -89,41 +86,19 @@ namespace multipart_detail {
     class empty_body_multipart
         : public basic_multipart<T, MultipartType>
     {
+        using base_t = basic_multipart<T, MultipartType>;
+
     public:
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            return detail::encode(container, multipart_);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> T
-        {
-            return T{detail::decode<MultipartType>(first, last)};
-        }
-
-        using basic_multipart<T, MultipartType>::validate;
-
-        static void validate(MultipartType const& multipart)
-        {
-            if (multipart.type != T::multipart_type_value) {
-                throw std::runtime_error{"invalid multipart type"};
-            }
-            if (multipart.header.length != sizeof(MultipartType)) {
-                throw std::runtime_error{"invalid multipart length"};
-            }
-        }
+        using raw_ofp_type = MultipartType;
 
     protected:
         empty_body_multipart(
                 std::uint16_t const flags, std::uint32_t const xid) noexcept
             : multipart_{
                   v13_detail::ofp_header{
-                      protocol::OFP_VERSION
-                    , T::message_type
-                    , sizeof(MultipartType)
+                      base_t::version()
+                    , base_t::type()
+                    , sizeof(raw_ofp_type)
                     , xid
                   }
                 , T::multipart_type_value
@@ -133,13 +108,13 @@ namespace multipart_detail {
         {
         }
 
-        explicit empty_body_multipart(MultipartType const& multipart) noexcept
+        explicit empty_body_multipart(raw_ofp_type const& multipart) noexcept
             : multipart_(multipart)
         {
         }
 
     private:
-        friend basic_multipart<T, MultipartType>;
+        friend base_t;
 
         auto multipart() const noexcept
             -> MultipartType const&
@@ -147,8 +122,23 @@ namespace multipart_detail {
             return multipart_;
         }
 
+        friend typename base_t::basic_protocol_type;
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, multipart_);
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> T
+        {
+            return T{detail::decode<raw_ofp_type>(first, last)};
+        }
+
     private:
-        MultipartType multipart_;
+        raw_ofp_type multipart_;
     };
 
 
@@ -156,46 +146,22 @@ namespace multipart_detail {
     class single_element_multipart
         : public basic_multipart<T, MultipartType>
     {
+        using base_t = basic_multipart<T, MultipartType>;
+
     public:
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            detail::encode(container, multipart_);
-            return detail::encode(container, body_);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> T
-        {
-            auto const multipart = detail::decode<MultipartType>(first, last);
-            return T{multipart, detail::decode<BodyType>(first, last)};
-        }
-
-        using basic_multipart<T, MultipartType>::validate;
-
-        static void validate(MultipartType const& multipart)
-        {
-            if (multipart.type != T::multipart_type_value) {
-                throw std::runtime_error{"invalid multipart type"};
-            }
-            if (multipart.header.length
-                    != sizeof(MultipartType) + sizeof(BodyType)) {
-                throw std::runtime_error{"invalid multipart length"};
-            }
-        }
+        using raw_ofp_type = MultipartType;
+        using body_type = BodyType;
 
     protected:
         single_element_multipart(
                   std::uint16_t const flags
-                , BodyType const& body
+                , body_type const& body
                 , std::uint32_t const xid) noexcept
             : multipart_{
                   v13_detail::ofp_header{
-                      protocol::OFP_VERSION
-                    , T::message_type
-                    , sizeof(MultipartType) + sizeof(BodyType)
+                      base_t::version()
+                    , base_t::type()
+                    , sizeof(raw_ofp_type) + sizeof(body_type)
                     , xid
                   }
                 , T::multipart_type_value
@@ -207,14 +173,14 @@ namespace multipart_detail {
         }
 
         single_element_multipart(
-                MultipartType const& multipart, BodyType const& body) noexcept
+                raw_ofp_type const& multipart, body_type const& body) noexcept
             : multipart_(multipart)
             , body_(body)
         {
         }
 
         auto body() const noexcept
-            -> BodyType const&
+            -> body_type const&
         {
             return body_;
         }
@@ -228,9 +194,26 @@ namespace multipart_detail {
             return multipart_;
         }
 
+        friend typename base_t::basic_protocol_type;
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, multipart_);
+            detail::encode(container, body_);
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> T
+        {
+            auto const multipart = detail::decode<raw_ofp_type>(first, last);
+            return T{multipart, detail::decode<body_type>(first, last)};
+        }
+
     private:
-        MultipartType multipart_;
-        BodyType body_;
+        raw_ofp_type multipart_;
+        body_type body_;
     };
 
 
@@ -238,74 +221,39 @@ namespace multipart_detail {
     class single_element_with_match_multipart
         : public basic_multipart<T, MultipartType>
     {
-        static constexpr std::size_t base_multipart_size
-            = sizeof(MultipartType)
-            + sizeof(BodyType) + sizeof(v13_detail::ofp_match);
+        using base_t = basic_multipart<T, MultipartType>;
 
     public:
+        using raw_ofp_type = MultipartType;
+        using body_type = BodyType;
+
         auto match() const noexcept
             -> oxm_match_set const&
         {
             return match_;
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
+        auto extract_match()
+            -> oxm_match_set
         {
-            detail::encode(container, multipart_);
-            detail::encode(container, body_);
-            return match_.encode(container);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> T
-        {
-            auto const multipart = detail::decode<MultipartType>(first, last);
-            last = std::next(
-                    first, multipart.header.length - sizeof(MultipartType));
-
-            auto const body = detail::decode<BodyType>(first, last);
-
-            auto it = first;
-            auto const ofp_match
-                = detail::decode<v13_detail::ofp_match>(it, last);
-            oxm_match_set::validate_ofp_match(ofp_match);
-            if (std::distance(first, last)
-                    != v13_detail::exact_length(ofp_match.length)) {
-                throw std::runtime_error{"invalid oxm_match length"};
-            }
-            auto match = oxm_match_set::decode(first, last);
-
-            return T{multipart, body, std::move(match)};
-        }
-
-        using basic_multipart<T, MultipartType>::validate;
-
-        static void validate(MultipartType const& multipart)
-        {
-            if (multipart.type != T::multipart_type_value) {
-                throw std::runtime_error{"invalid multipart type"};
-            }
-            if (multipart.header.length < base_multipart_size) {
-                throw std::runtime_error{"invalid multipart length"};
-            }
+            auto match = std::move(match_);
+            multipart_.header.length = base_t::min_length();
+            return match;
         }
 
     protected:
         single_element_with_match_multipart(
                   std::uint16_t const flags
-                , BodyType const& body
+                , body_type const& body
                 , oxm_match_set&& match
                 , std::uint32_t const xid) noexcept
             : multipart_{
                   v13_detail::ofp_header{
-                      protocol::OFP_VERSION
-                    , T::message_type
+                      base_t::version()
+                    , base_t::type()
                     , std::uint16_t(
-                              sizeof(MultipartType)
-                            + sizeof(BodyType)
+                              sizeof(raw_ofp_type)
+                            + sizeof(body_type)
                             + v13_detail::exact_length(match.length()))
                     , xid
                   }
@@ -319,8 +267,8 @@ namespace multipart_detail {
         }
 
         single_element_with_match_multipart(
-                  MultipartType const& multipart
-                , BodyType const& body
+                  raw_ofp_type const& multipart
+                , body_type const& body
                 , oxm_match_set&& match) noexcept
             : multipart_(multipart)
             , body_(body)
@@ -335,13 +283,15 @@ namespace multipart_detail {
                 single_element_with_match_multipart&& other)
             : multipart_(other.multipart_)
             , body_(other.body_)
-            , match_(std::move(other).match_)
+            , match_(other.extract_match())
         {
-            other.multipart_.header.length = base_multipart_size;
         }
 
-        auto operator=(single_element_with_match_multipart const&)
-            -> single_element_with_match_multipart& = default;
+        auto operator=(single_element_with_match_multipart const& other)
+            -> single_element_with_match_multipart&
+        {
+            return operator=(single_element_with_match_multipart{other});
+        }
 
         auto operator=(single_element_with_match_multipart&& other)
             -> single_element_with_match_multipart&
@@ -354,7 +304,7 @@ namespace multipart_detail {
         }
 
         auto body() const noexcept
-            -> BodyType const&
+            -> body_type const&
         {
             return body_;
         }
@@ -368,9 +318,50 @@ namespace multipart_detail {
             return multipart_;
         }
 
+        friend typename base_t::basic_protocol_type;
+
+        friend constexpr auto get_min_length(T*) noexcept
+            -> std::uint16_t
+        {
+            return sizeof(raw_ofp_type)
+                 + sizeof(body_type)
+                 + v13_detail::exact_length(oxm_match_set::min_length());
+        }
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, multipart_);
+            detail::encode(container, body_);
+            match_.encode(container);
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> T
+        {
+            auto const multipart = detail::decode<raw_ofp_type>(first, last);
+            last = std::next(
+                    first, multipart.header.length - sizeof(raw_ofp_type));
+
+            auto const body = detail::decode<body_type>(first, last);
+
+            auto it = first;
+            auto const ofp_match
+                = detail::decode<v13_detail::ofp_match>(it, last);
+            oxm_match_set::validate_ofp_match(ofp_match);
+            if (std::distance(first, last)
+                    != v13_detail::exact_length(ofp_match.length)) {
+                throw std::runtime_error{"invalid oxm_match length"};
+            }
+            auto match = oxm_match_set::decode(first, last);
+
+            return T{multipart, body, std::move(match)};
+        }
+
     private:
-        MultipartType multipart_;
-        BodyType body_;
+        raw_ofp_type multipart_;
+        body_type body_;
         oxm_match_set match_;
     };
 
@@ -379,12 +370,29 @@ namespace multipart_detail {
     class array_body_multipart
         : public basic_multipart<T, MultipartType>
     {
+        using base_t = basic_multipart<T, MultipartType>;
         using elem_type = typename std::remove_all_extents<BodyType>::type;
 
     public:
+        using raw_ofp_type = MultipartType;
         using body_type = std::vector<elem_type>;
         using iterator = typename body_type::iterator;
         using const_iterator = typename body_type::const_iterator;
+
+        auto body() const noexcept
+            -> body_type const&
+        {
+            return body_;
+        }
+
+        auto extract_body()
+            -> body_type
+        {
+            auto body = body_type{};
+            body.swap(body_);
+            multipart_.header.length = base_t::min_length();
+            return body;
+        }
 
         auto size() const noexcept
             -> std::size_t
@@ -416,50 +424,6 @@ namespace multipart_detail {
             return body_.end();
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            detail::encode(container, multipart_);
-            boost::for_each(
-                      body_
-                    , [&](elem_type const& body) { body.encode(container); });
-            return container;
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> T
-        {
-            auto const multipart = detail::decode<MultipartType>(first, last);
-            auto const body_length
-                = multipart.header.length - sizeof(MultipartType);
-            last = std::next(first, body_length);
-
-            auto body = body_type{};
-            body.reserve(body_length / elem_type::base_size);
-            while (std::distance(first, last) >= elem_type::base_size) {
-                body.push_back(elem_type::decode(first, last));
-            }
-
-            if (first != last) {
-                throw std::runtime_error{"invalid multipart length"};
-            }
-            return T{multipart, std::move(body)};
-        }
-
-        using basic_multipart<T, MultipartType>::validate;
-
-        static void validate(MultipartType const& multipart)
-        {
-            if (multipart.type != T::multipart_type_value) {
-                throw std::runtime_error{"invalid multipart type"};
-            }
-            if (multipart.header.length < sizeof(MultipartType)) {
-                throw std::runtime_error{"invalid multipart length"};
-            }
-        }
-
     protected:
         array_body_multipart(
                   std::uint16_t const flags
@@ -467,10 +431,10 @@ namespace multipart_detail {
                 , std::uint32_t const xid)
             : multipart_{
                   v13_detail::ofp_header{
-                      protocol::OFP_VERSION
-                    , T::message_type
+                      base_t::version()
+                    , base_t::type()
                     , std::uint16_t(
-                            sizeof(MultipartType) + calc_body_length(body))
+                            sizeof(raw_ofp_type) + calc_body_length(body))
                     , xid
                   }
                 , T::multipart_type_value
@@ -481,8 +445,7 @@ namespace multipart_detail {
         {
         }
 
-        array_body_multipart(
-                MultipartType const& multipart, body_type&& body)
+        array_body_multipart(raw_ofp_type const& multipart, body_type&& body)
             : multipart_(multipart)
             , body_(std::move(body))
         {
@@ -493,13 +456,15 @@ namespace multipart_detail {
 
         array_body_multipart(array_body_multipart&& other)
             : multipart_(other.multipart_)
-            , body_(std::move(other).body_)
+            , body_(other.extract_body())
         {
-            other.multipart_.header.length = sizeof(MultipartType);
         }
 
-        auto operator=(array_body_multipart const&)
-            -> array_body_multipart& = default;
+        auto operator=(array_body_multipart const& other)
+            -> array_body_multipart&
+        {
+            return operator=(array_body_multipart{other});
+        }
 
         auto operator=(array_body_multipart&& other)
             -> array_body_multipart&
@@ -527,15 +492,46 @@ namespace multipart_detail {
                     , [](std::size_t const sum, elem_type const& e) {
                             return sum + e.length();
                       });
-            if (body_length + sizeof(MultipartType)
+            if (body_length + sizeof(raw_ofp_type)
                     > std::numeric_limits<std::uint16_t>::max()) {
                 throw std::runtime_error{"body size is too big"};
             }
             return std::uint16_t(body_length);
         }
 
+        friend typename base_t::basic_protocol_type;
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, multipart_);
+            boost::for_each(
+                    body_, [&](elem_type const& e) { e.encode(container); });
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> T
+        {
+            auto const multipart = detail::decode<raw_ofp_type>(first, last);
+            auto const body_length
+                = multipart.header.length - sizeof(raw_ofp_type);
+            last = std::next(first, body_length);
+
+            auto body = body_type{};
+            body.reserve(body_length / elem_type::base_size);
+            while (std::distance(first, last) >= elem_type::base_size) {
+                body.push_back(elem_type::decode(first, last));
+            }
+
+            if (first != last) {
+                throw std::runtime_error{"invalid multipart length"};
+            }
+            return T{multipart, std::move(body)};
+        }
+
     private:
-        MultipartType multipart_;
+        raw_ofp_type multipart_;
         body_type body_;
     };
 
