@@ -2,7 +2,6 @@
 #define CANARD_NET_OFP_V13_MESSAGES_BARRIER_HPP
 
 #include <cstdint>
-#include <stdexcept>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/get_xid.hpp>
@@ -20,64 +19,57 @@ namespace messages {
 
         template <class T>
         class barrier_base
-            : public v13_detail::basic_openflow_message<T>
+            : public detail::v13::basic_openflow_message<T>
         {
-        protected:
-            explicit barrier_base(std::uint32_t const xid) noexcept
-                : header_{
-                      protocol::OFP_VERSION
-                    , T::message_type
-                    , sizeof(v13_detail::ofp_header)
-                    , xid
-                  }
-            {
-            }
+            using base_t = detail::v13::basic_openflow_message<T>;
 
         public:
+            using raw_ofp_type = v13_detail::ofp_header;
+
             auto header() const noexcept
                 -> v13_detail::ofp_header const&
             {
                 return header_;
             }
 
-            template <class Container>
-            auto encode(Container& container) const
-                -> Container&
-            {
-                return detail::encode(container, header_);
-            }
-
-            template <class Iterator>
-            static auto decode(Iterator& first, Iterator last)
-                -> T
-            {
-                return T{detail::decode<v13_detail::ofp_header>(first, last)};
-            }
-
-            static void validate(v13_detail::ofp_header const& header)
-            {
-                if (header.version != protocol::OFP_VERSION) {
-                    throw std::runtime_error{"invalid version"};
-                }
-                if (header.type != T::message_type) {
-                    throw std::runtime_error{"invalid message type"};
-                }
-                if (header.length != sizeof(v13_detail::ofp_header)) {
-                    throw std::runtime_error{"invalid length"};
-                }
-            }
-
         protected:
-            explicit barrier_base(v13_detail::ofp_header const& header) noexcept
+            explicit barrier_base(std::uint32_t const xid) noexcept
+                : header_{
+                      base_t::version()
+                    , base_t::type()
+                    , sizeof(raw_ofp_type)
+                    , xid
+                  }
+            {
+            }
+
+            explicit barrier_base(raw_ofp_type const& header) noexcept
                 : header_(header)
             {
             }
 
         private:
-            v13_detail::ofp_header header_;
+            friend typename base_t::basic_protocol_type;
+
+            template <class Container>
+            void encode_impl(Container& container) const
+            {
+                detail::encode(container, header_);
+            }
+
+            template <class Iterator>
+            static auto decode_impl(Iterator& first, Iterator last)
+                -> T
+            {
+                return T{detail::decode<raw_ofp_type>(first, last)};
+            }
+
+        private:
+            raw_ofp_type header_;
         };
 
     } // namespace barrier_detail
+
 
     class barrier_request
         : public barrier_detail::barrier_base<barrier_request>
@@ -94,7 +86,7 @@ namespace messages {
     private:
         friend barrier_base;
 
-        explicit barrier_request(v13_detail::ofp_header const& header) noexcept
+        explicit barrier_request(raw_ofp_type const& header) noexcept
             : barrier_base{header}
         {
         }
@@ -121,7 +113,7 @@ namespace messages {
     private:
         friend barrier_base;
 
-        explicit barrier_reply(v13_detail::ofp_header const& header) noexcept
+        explicit barrier_reply(raw_ofp_type const& header) noexcept
             : barrier_base{header}
         {
         }
