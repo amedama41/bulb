@@ -2,7 +2,6 @@
 #define CANARD_NET_OFP_V13_MESSAGES_PORT_MOD_HPP
 
 #include <cstdint>
-#include <stdexcept>
 #include <canard/mac_address.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
@@ -19,11 +18,13 @@ namespace v13 {
 namespace messages {
 
     class port_mod
-        : public v13_detail::basic_openflow_message<port_mod>
+        : public detail::v13::basic_openflow_message<port_mod>
     {
     public:
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_PORT_MOD;
+
+        using raw_ofp_type = v13_detail::ofp_port_mod;
 
         port_mod(std::uint32_t const port_no
                , canard::mac_address const& macaddr
@@ -33,9 +34,9 @@ namespace messages {
                , std::uint32_t const xid = get_xid()) noexcept
             : port_mod_{
                   v13_detail::ofp_header{
-                      protocol::OFP_VERSION
-                    , message_type
-                    , sizeof(port_mod_)
+                      version()
+                    , type()
+                    , sizeof(raw_ofp_type)
                     , xid
                   }
                 , port_no
@@ -60,9 +61,9 @@ namespace messages {
                , std::uint32_t const advertise
                , std::uint32_t const xid = get_xid()) noexcept
             : port_mod{
-                  port.port_no()
-                , port.hardware_address()
-                , config, mask, advertise, xid
+                  port.port_no(), port.hardware_address()
+                , config, mask, advertise
+                , xid
               }
         {
         }
@@ -103,43 +104,29 @@ namespace messages {
             return port_mod_.advertise;
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            return detail::encode(container, port_mod_);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> port_mod
-        {
-            return port_mod{
-                detail::decode<v13_detail::ofp_port_mod>(first, last)
-            };
-        }
-
-        static void validate(v13_detail::ofp_header const& header)
-        {
-            if (header.version != protocol::OFP_VERSION) {
-                throw std::runtime_error{"invalid version"};
-            }
-            if (header.type != message_type) {
-                throw std::runtime_error{"invalid message type"};
-            }
-            if (header.length != sizeof(v13_detail::ofp_port_mod)) {
-                throw std::runtime_error{"invalid length"};
-            }
-        }
-
     private:
-        explicit port_mod(v13_detail::ofp_port_mod const& port_mod) noexcept
+        explicit port_mod(raw_ofp_type const& port_mod) noexcept
             : port_mod_(port_mod)
         {
         }
 
+        friend basic_protocol_type;
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, port_mod_);
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> port_mod
+        {
+            return port_mod{detail::decode<raw_ofp_type>(first, last)};
+        }
+
     private:
-        v13_detail::ofp_port_mod port_mod_;
+        raw_ofp_type port_mod_;
     };
 
 } // namespace messages
