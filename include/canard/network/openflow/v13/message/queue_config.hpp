@@ -25,21 +25,21 @@ namespace v13 {
 namespace messages {
 
     class queue_get_config_request
-        : public v13_detail::basic_openflow_message<queue_get_config_request>
+        : public detail::v13::basic_openflow_message<queue_get_config_request>
     {
-        using raw_ofp_type = v13_detail::ofp_queue_get_config_request;
-
     public:
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_QUEUE_GET_CONFIG_REQUEST;
+
+        using raw_ofp_type = v13_detail::ofp_queue_get_config_request;
 
         explicit queue_get_config_request(
                   std::uint32_t const port_no
                 , std::uint32_t const xid = get_xid()) noexcept
             : queue_get_config_request_{
                   v13_detail::ofp_header{
-                      protocol::OFP_VERSION
-                    , message_type
+                      version()
+                    , type()
                     , sizeof(raw_ofp_type)
                     , xid
                   }
@@ -61,40 +61,28 @@ namespace messages {
             return queue_get_config_request_.port;
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            return detail::encode(container, queue_get_config_request_);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> queue_get_config_request
-        {
-            return queue_get_config_request{
-                detail::decode<raw_ofp_type>(first, last)
-            };
-        }
-
-        static void validate(v13_detail::ofp_header const& header)
-        {
-            if (header.version != protocol::OFP_VERSION) {
-                throw std::runtime_error{"invalid version"};
-            }
-            if (header.type != message_type) {
-                throw std::runtime_error{"invalid message type"};
-            }
-            if (header.length != sizeof(raw_ofp_type)) {
-                throw std::runtime_error{"invalid length"};
-            }
-        }
-
     private:
         explicit queue_get_config_request(
                 raw_ofp_type const& queue_get_config_request) noexcept
             : queue_get_config_request_(queue_get_config_request)
         {
+        }
+
+        friend basic_protocol_type;
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, queue_get_config_request_);
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> queue_get_config_request
+        {
+            return queue_get_config_request{
+                detail::decode<raw_ofp_type>(first, last)
+            };
         }
 
     private:
@@ -103,14 +91,13 @@ namespace messages {
 
 
     class queue_get_config_reply
-        : public v13_detail::basic_openflow_message<queue_get_config_reply>
+        : public detail::v13::basic_openflow_message<queue_get_config_reply>
     {
-        using raw_ofp_type = v13_detail::ofp_queue_get_config_reply;
-
     public:
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_QUEUE_GET_CONFIG_REPLY;
 
+        using raw_ofp_type = v13_detail::ofp_queue_get_config_reply;
         using queues_type = std::vector<packet_queue>;
         using iterator = queues_type::const_iterator;
         using const_iterator = queues_type::const_iterator;
@@ -121,8 +108,8 @@ namespace messages {
                 , std::uint32_t const xid = get_xid())
             : queue_get_config_reply_{
                   v13_detail::ofp_header{
-                      protocol::OFP_VERSION
-                    , message_type
+                      version()
+                    , type()
                     , std::uint16_t(
                             sizeof(raw_ofp_type) + calc_queues_length(queues))
                     , xid
@@ -138,13 +125,15 @@ namespace messages {
 
         queue_get_config_reply(queue_get_config_reply&& other)
             : queue_get_config_reply_(other.queue_get_config_reply_)
-            , queues_(std::move(other).queues_)
+            , queues_(other.extract_queues())
         {
-            other.queue_get_config_reply_.header.length = sizeof(raw_ofp_type);
         }
 
-        auto operator=(queue_get_config_reply const&)
-            -> queue_get_config_reply& = default;
+        auto operator=(queue_get_config_reply const& other)
+            -> queue_get_config_reply&
+        {
+            return operator=(queue_get_config_reply{other});
+        }
 
         auto operator=(queue_get_config_reply&& other)
             -> queue_get_config_reply&
@@ -173,6 +162,15 @@ namespace messages {
             return queues_;
         }
 
+        auto extract_queues()
+            -> queues_type
+        {
+            auto queues = queues_type{};
+            queues.swap(queues_);
+            queue_get_config_reply_.header.length = min_length();
+            return queues;
+        }
+
         auto begin() const noexcept
             -> const_iterator
         {
@@ -183,56 +181,6 @@ namespace messages {
             -> const_iterator
         {
             return queues_.end();
-        }
-
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            detail::encode(container, queue_get_config_reply_);
-            boost::for_each(queues_, [&](packet_queue const& e) {
-                e.encode(container);
-            });
-            return container;
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> queue_get_config_reply
-        {
-            auto const queue_get_config
-                = detail::decode<raw_ofp_type>(first, last);
-
-            auto const queues_length
-                = queue_get_config.header.length - sizeof(raw_ofp_type);
-            last = std::next(first, queues_length);
-
-            auto queues = queues_type{};
-            queues.reserve(
-                    queues_length / sizeof(v13_detail::ofp_packet_queue));
-            while (std::distance(first, last)
-                    >= sizeof(v13_detail::ofp_packet_queue)) {
-                queues.push_back(packet_queue::decode(first, last));
-            }
-            if (first != last) {
-                throw std::runtime_error{
-                    "invalid queue_get_config_reply length"
-                };
-            }
-            return queue_get_config_reply{queue_get_config, std::move(queues)};
-        }
-
-        static void validate(v13_detail::ofp_header const& header)
-        {
-            if (header.version != protocol::OFP_VERSION) {
-                throw std::runtime_error{"invalid version"};
-            }
-            if (header.type != message_type) {
-                throw std::runtime_error{"invalid message type"};
-            }
-            if (header.length < sizeof(raw_ofp_type)) {
-                throw std::runtime_error{"invalid length"};
-            }
         }
 
     private:
@@ -249,14 +197,51 @@ namespace messages {
         {
             auto const queues_length = boost::accumulate(
                       queues, std::size_t{0}
-                    , [](std::size_t const sum, packet_queue const& e) {
-                            return sum + e.length();
-                      });
+                    , [](std::size_t const sum, queues_type::const_reference q)
+                      { return sum + q.length(); });
             if (queues_length + sizeof(raw_ofp_type)
                     > std::numeric_limits<std::uint16_t>::max()) {
                 throw std::runtime_error{"queues length is too big"};
             }
             return queues_length;
+        }
+
+        friend basic_protocol_type;
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, queue_get_config_reply_);
+            boost::for_each(
+                      queues_
+                    , [&](queues_type::const_reference q)
+                      { q.encode(container); });
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> queue_get_config_reply
+        {
+            auto const queue_get_config
+                = detail::decode<raw_ofp_type>(first, last);
+
+            auto const queues_length
+                = queue_get_config.header.length - sizeof(raw_ofp_type);
+            last = std::next(first, queues_length);
+
+            auto queues = queues_type{};
+            queues.reserve(
+                    queues_length / sizeof(v13_detail::ofp_packet_queue));
+            while (std::distance(first, last)
+                    >= sizeof(v13_detail::ofp_packet_queue)) {
+                queues.push_back(queues_type::value_type::decode(first, last));
+            }
+            if (first != last) {
+                throw std::runtime_error{
+                    "invalid queue_get_config_reply length"
+                };
+            }
+            return queue_get_config_reply{queue_get_config, std::move(queues)};
         }
 
     private:
