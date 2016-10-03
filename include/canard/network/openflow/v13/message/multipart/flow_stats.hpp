@@ -7,6 +7,7 @@
 #include <limits>
 #include <stdexcept>
 #include <utility>
+#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/get_xid.hpp>
@@ -27,14 +28,17 @@ namespace messages {
 namespace multipart {
 
     class flow_stats
-        : public v13_detail::flow_entry_adaptor<
+        : public detail::basic_protocol_type<flow_stats>
+        , public v13_detail::flow_entry_adaptor<
                 flow_stats, v13_detail::ofp_flow_stats
           >
     {
     public:
+        using raw_ofp_type = v13_detail::ofp_flow_stats;
+
         static constexpr std::size_t base_size
-            = sizeof(v13_detail::ofp_flow_stats)
-            + sizeof(v13_detail::ofp_match);
+            = sizeof(raw_ofp_type)
+            + v13_detail::exact_length(oxm_match_set::min_length());
 
         flow_stats(v13::flow_entry entry
                  , std::uint8_t const table_id
@@ -44,7 +48,7 @@ namespace multipart {
                  , v13::counters const& counters)
             : flow_stats_{
                   std::uint16_t(
-                          sizeof(v13_detail::ofp_flow_stats)
+                          sizeof(raw_ofp_type)
                         + v13_detail::exact_length(entry.match().length())
                         + entry.instructions().length())
                 , table_id
@@ -69,14 +73,16 @@ namespace multipart {
 
         flow_stats(flow_stats&& other)
             : flow_stats_(other.flow_stats_)
-            , match_(std::move(other).match_)
-            , instructions_(std::move(other).instructions_)
+            , match_(other.extract_match())
+            , instructions_(other.extract_instructions())
         {
-            other.flow_stats_.length = base_size;
         }
 
-        auto operator=(flow_stats const&)
-            -> flow_stats& = default;
+        auto operator=(flow_stats const& other)
+            -> flow_stats&
+        {
+            return operator=(flow_stats{other});
+        }
 
         auto operator=(flow_stats&& other)
             -> flow_stats&
@@ -105,10 +111,28 @@ namespace multipart {
             return match_;
         }
 
+        auto extract_match()
+            -> oxm_match_set
+        {
+            auto match = std::move(match_);
+            flow_stats_.length = base_size + instructions_.length();
+            return match;
+        }
+
         auto instructions() const noexcept
             -> instruction_set const&
         {
             return instructions_;
+        }
+
+        auto extract_instructions()
+            -> instruction_set
+        {
+            auto instructions = std::move(instructions_);
+            flow_stats_.length
+                = sizeof(raw_ofp_type)
+                + v13_detail::exact_length(match_.length());
+            return instructions;
         }
 
         auto entry() const
@@ -117,30 +141,53 @@ namespace multipart {
             return flow_entry{match(), priority(), cookie(), instructions()};
         }
 
+    private:
+        flow_stats(raw_ofp_type const& stats
+                 , oxm_match_set&& match
+                 , instruction_set&& instructions)
+            : flow_stats_(stats)
+            , match_(std::move(match))
+            , instructions_(std::move(instructions))
+        {
+        }
+
+        friend flow_entry_adaptor;
+
+        auto ofp_flow_entry() const noexcept
+            -> v13_detail::ofp_flow_stats const&
+        {
+            return flow_stats_;
+        }
+
+        friend basic_protocol_type;
+
+        friend constexpr auto get_min_length(flow_stats*) noexcept
+            -> std::uint16_t
+        {
+            return base_size;
+        }
+
         template <class Container>
-        auto encode(Container& container) const
-            -> Container&
+        void encode_impl(Container& container) const
         {
             detail::encode(container, flow_stats_);
             match_.encode(container);
-            return instructions_.encode(container);
+            instructions_.encode(container);
         }
 
         template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
+        static auto decode_impl(Iterator& first, Iterator last)
             -> flow_stats
         {
-            auto const stats
-                = detail::decode<v13_detail::ofp_flow_stats>(first, last);
+            auto const stats = detail::decode<raw_ofp_type>(first, last);
             if (stats.length < base_size) {
                 throw std::runtime_error{"flow_stats length is too small"};
             }
-            if (std::distance(first, last) + sizeof(v13_detail::ofp_flow_stats)
-                    < stats.length) {
+            auto const rest_length = stats.length - sizeof(raw_ofp_type);
+            if (std::distance(first, last) < rest_length) {
                 throw std::runtime_error{"flow_stats length is too big"};
             }
-            last = std::next(
-                    first, stats.length - sizeof(v13_detail::ofp_flow_stats));
+            last = std::next(first, rest_length);
 
             auto copy_first = first;
             auto const ofp_match
@@ -158,25 +205,7 @@ namespace multipart {
         }
 
     private:
-        flow_stats(v13_detail::ofp_flow_stats const& stats
-                 , oxm_match_set&& match
-                 , instruction_set&& instructions)
-            : flow_stats_(stats)
-            , match_(std::move(match))
-            , instructions_(std::move(instructions))
-        {
-        }
-
-        friend flow_entry_adaptor;
-
-        auto ofp_flow_entry() const noexcept
-            -> v13_detail::ofp_flow_stats const&
-        {
-            return flow_stats_;
-        }
-
-    private:
-        v13_detail::ofp_flow_stats flow_stats_;
+        raw_ofp_type flow_stats_;
         oxm_match_set match_;
         instruction_set instructions_;
     };
