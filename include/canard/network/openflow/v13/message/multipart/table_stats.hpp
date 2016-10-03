@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <utility>
 #include <canard/network/openflow/get_xid.hpp>
+#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/v13/detail/basic_multipart.hpp>
@@ -19,10 +20,12 @@ namespace messages {
 namespace multipart {
 
     class table_stats
+        : public detail::basic_protocol_type<table_stats>
     {
     public:
-        static constexpr std::size_t base_size
-            = sizeof(v13_detail::ofp_table_stats);
+        using raw_ofp_type = v13_detail::ofp_table_stats;
+
+        static constexpr std::size_t base_size = sizeof(raw_ofp_type);
 
         table_stats(std::uint8_t const table_id
                   , std::uint32_t const active_count
@@ -41,7 +44,7 @@ namespace multipart {
         static constexpr auto length() noexcept
             -> std::uint16_t
         {
-            return sizeof(v13_detail::ofp_table_stats);
+            return sizeof(raw_ofp_type);
         }
 
         auto table_id() const noexcept
@@ -68,30 +71,29 @@ namespace multipart {
             return table_stats_.matched_count;
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            return detail::encode(container, table_stats_);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> table_stats
-        {
-            return table_stats{
-                detail::decode<v13_detail::ofp_table_stats>(first, last)
-            };
-        }
-
     private:
-        explicit table_stats(v13_detail::ofp_table_stats const& table_stats)
+        explicit table_stats(raw_ofp_type const& table_stats) noexcept
             : table_stats_(table_stats)
         {
         }
 
+        friend basic_protocol_type;
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, table_stats_);
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> table_stats
+        {
+            return table_stats{detail::decode<raw_ofp_type>(first, last)};
+        }
+
     private:
-        v13_detail::ofp_table_stats table_stats_;
+        raw_ofp_type table_stats_;
     };
 
 
