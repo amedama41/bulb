@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <utility>
+#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/get_xid.hpp>
@@ -20,10 +21,11 @@ namespace messages {
 namespace multipart {
 
     class queue_stats
+        : public detail::basic_protocol_type<queue_stats>
     {
+    public:
         using raw_ofp_type = v13_detail::ofp_queue_stats;
 
-    public:
         static constexpr std::size_t base_size = sizeof(raw_ofp_type);
 
         queue_stats(std::uint32_t const queue_id
@@ -98,24 +100,25 @@ namespace multipart {
             return v13::elapsed_time{duration_sec(), duration_nsec()};
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            return detail::encode(container, queue_stats_);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> queue_stats
-        {
-            return queue_stats{detail::decode<raw_ofp_type>(first, last)};
-        }
-
     private:
         explicit queue_stats(raw_ofp_type const& queue_stats) noexcept
             : queue_stats_(queue_stats)
         {
+        }
+
+        friend basic_protocol_type;
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, queue_stats_);
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> queue_stats
+        {
+            return queue_stats{detail::decode<raw_ofp_type>(first, last)};
         }
 
     private:
