@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <utility>
+#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/get_xid.hpp>
@@ -20,10 +21,12 @@ namespace messages {
 namespace multipart {
 
     class port_stats
+        : public detail::basic_protocol_type<port_stats>
     {
     public:
-        static std::uint16_t const base_size
-            = sizeof(v13_detail::ofp_port_stats);
+        using raw_ofp_type = v13_detail::ofp_port_stats;
+
+        static std::uint16_t const base_size = sizeof(raw_ofp_type);
 
         port_stats(std::uint32_t const port_no
                  , std::uint64_t const rx_packets
@@ -63,7 +66,7 @@ namespace multipart {
         static constexpr auto length() noexcept
             -> std::uint16_t
         {
-            return sizeof(v13_detail::ofp_port_stats);
+            return sizeof(raw_ofp_type);
         }
 
         auto port_no() const noexcept
@@ -156,31 +159,29 @@ namespace multipart {
             return port_stats_.duration_nsec;
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            return detail::encode(container, port_stats_);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> port_stats
-        {
-            return port_stats{
-                detail::decode<v13_detail::ofp_port_stats>(first, last)
-            };
-        }
-
     private:
-        explicit port_stats(
-                v13_detail::ofp_port_stats const& port_stats) noexcept
+        explicit port_stats(raw_ofp_type const& port_stats) noexcept
             : port_stats_(port_stats)
         {
         }
 
+        friend basic_protocol_type;
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, port_stats_);
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> port_stats
+        {
+            return port_stats{detail::decode<raw_ofp_type>(first, last)};
+        }
+
     private:
-        v13_detail::ofp_port_stats port_stats_;
+        raw_ofp_type port_stats_;
     };
 
 
