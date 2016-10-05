@@ -11,6 +11,7 @@
 #include <boost/range/adaptor/sliced.hpp>
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/utility/string_ref.hpp>
+#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/get_xid.hpp>
@@ -28,10 +29,11 @@ namespace messages {
 namespace multipart {
 
     class table_features
+        : public detail::basic_protocol_type<table_features>
     {
+    public:
         using raw_ofp_type = v13_detail::ofp_table_features;
 
-    public:
         static constexpr std::size_t base_size = sizeof(raw_ofp_type);
 
         table_features(
@@ -43,9 +45,7 @@ namespace multipart {
                 , std::uint32_t const max_entries
                 , table_feature_property_set properties)
             : table_features_{
-                  std::uint16_t(
-                            sizeof(v13_detail::ofp_table_features)
-                          + properties.length())
+                  std::uint16_t(sizeof(raw_ofp_type) + properties.length())
                 , table_id
                 , { 0, 0, 0, 0, 0 }
                 , ""
@@ -66,13 +66,15 @@ namespace multipart {
 
         table_features(table_features&& other)
             : table_features_(other.table_features_)
-            , properties_(std::move(other).properties_)
+            , properties_(other.extract_properties())
         {
-            other.table_features_.length = base_size;
         }
 
-        auto operator=(table_features const&)
-            -> table_features& = default;
+        auto operator=(table_features const& other)
+            -> table_features&
+        {
+            return operator=(table_features{other});
+        }
 
         auto operator=(table_features&& other)
             -> table_features&
@@ -131,43 +133,53 @@ namespace multipart {
             return properties_;
         }
 
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
+        auto extract_properties()
+            -> table_feature_property_set
         {
-            detail::encode(container, table_features_);
-            return properties_.encode(container);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> table_features
-        {
-            auto const features = detail::decode<raw_ofp_type>(first, last);
-            if (features.length < sizeof(raw_ofp_type)) {
-                throw std::runtime_error{"table_features length is too small"};
-            }
-            if (std::distance(first, last)
-                    < features.length - sizeof(raw_ofp_type)) {
-                throw std::runtime_error{"table_features length is too big"};
-            }
-
-            last = std::next(first, features.length - sizeof(raw_ofp_type));
-            auto properties = table_feature_property_set::decode(first, last);
-            return table_features{features, std::move(properties)};
+            auto properties = table_feature_property_set{};
+            properties.swap(properties_);
+            table_features_.length = min_length();
+            return properties;
         }
 
     private:
         table_features(
-                  v13_detail::ofp_table_features const& features
+                  raw_ofp_type const& features
                 , table_feature_property_set&& properties)
             : table_features_(features)
             , properties_(std::move(properties))
         {
         }
 
+        friend basic_protocol_type;
+
+        template <class Container>
+        void encode_impl(Container& container) const
+        {
+            detail::encode(container, table_features_);
+            properties_.encode(container);
+        }
+
+        template <class Iterator>
+        static auto decode_impl(Iterator& first, Iterator last)
+            -> table_features
+        {
+            auto const features = detail::decode<raw_ofp_type>(first, last);
+            if (features.length < min_length()) {
+                throw std::runtime_error{"table_features length is too small"};
+            }
+            auto const prop_length = features.length - sizeof(raw_ofp_type);
+            if (std::distance(first, last) < prop_length) {
+                throw std::runtime_error{"table_features length is too big"};
+            }
+
+            last = std::next(first, prop_length);
+            auto properties = table_feature_property_set::decode(first, last);
+            return table_features{features, std::move(properties)};
+        }
+
     private:
-        v13_detail::ofp_table_features table_features_;
+        raw_ofp_type table_features_;
         table_feature_property_set properties_;
     };
 
