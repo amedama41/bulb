@@ -22,11 +22,11 @@ namespace v13 {
         : public detail::basic_protocol_type<T>
     {
     protected:
-        using raw_ofp_type = OFPAction;
-
         basic_action() = default;
 
     public:
+        using raw_ofp_type = OFPAction;
+
         static constexpr auto type() noexcept
             -> ofp::v13::protocol::ofp_action_type
         {
