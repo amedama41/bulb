@@ -8,11 +8,15 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
+#include <boost/mpl/bool.hpp>
 #include <boost/mpl/contains.hpp>
-#include <boost/operators.hpp>
+#include <boost/mpl/deref.hpp>
+#include <boost/mpl/min_element.hpp>
+#include <boost/mpl/placeholders.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/get.hpp>
 #include <boost/variant/variant.hpp>
+#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/type_list.hpp>
 #include <canard/network/openflow/detail/visitors.hpp>
 
@@ -36,7 +40,7 @@ namespace detail {
 
   template <class Derived, class Decoder = get_decoder_t<Derived>>
   class any_type
-    : private boost::equality_comparable<Derived>
+    : public detail::basic_protocol_type<Derived>
   {
   public:
     using header_type = typename Decoder::header_type;
@@ -84,32 +88,6 @@ namespace detail {
       return boost::apply_visitor(std::forward<Visitor>(visitor), variant_);
     }
 
-    template <class Container>
-    auto encode(Container& container) const
-      -> Container&
-    {
-      return visit(detail::encoding_visitor<Container>{container});
-    }
-
-    template <class Iterator>
-    static auto decode(Iterator& first, Iterator last)
-      -> Derived
-    {
-      return Decoder::template decode<Derived>(first, last, to_any{});
-    }
-
-    template <class Validator>
-    void validate(Validator validator) const
-    {
-      visit(detail::validation_visitor<Validator>{validator});
-    }
-
-    friend auto operator==(Derived const& lhs, Derived const& rhs) noexcept
-      -> bool
-    {
-      return lhs.equal_impl(rhs);
-    }
-
     template <class T, class = containable_if_t<T>>
     friend auto operator==(Derived const& lhs, T const& rhs) noexcept
       -> bool
@@ -139,12 +117,6 @@ namespace detail {
       -> bool
     {
       return !(rhs == lhs);
-    }
-
-    friend auto equivalent(Derived const& lhs, Derived const& rhs) noexcept
-      -> bool
-    {
-      return lhs.equivalent_impl(rhs);
     }
 
     template <class T, class = containable_if_t<T>>
@@ -181,6 +153,46 @@ namespace detail {
       -> T const*;
 
   private:
+    friend detail::basic_protocol_type<Derived>;
+
+    template <class LHS, class RHS>
+    struct less_min_length
+    {
+      using type = boost::mpl::bool_<(LHS::min_length() < RHS::min_length())>;
+    };
+
+    friend constexpr auto get_min_length(Derived*) noexcept
+      -> std::uint16_t
+    {
+      return boost::mpl::deref<
+        typename boost::mpl::min_element<
+            any_type::inner_type_list
+          , any_type::less_min_length<
+              boost::mpl::placeholders::_1, boost::mpl::placeholders::_2
+            >
+        >::type
+      >::type::min_length();
+    }
+
+    template <class Validator>
+    void validate_impl(Validator validator) const
+    {
+      visit(detail::validation_visitor<Validator>{validator});
+    }
+
+    template <class Container>
+    void encode_impl(Container& container) const
+    {
+      visit(detail::encoding_visitor<Container>{container});
+    }
+
+    template <class Iterator>
+    static auto decode_impl(Iterator& first, Iterator last)
+      -> Derived
+    {
+      return Decoder::template decode<Derived>(first, last, to_any{});
+    }
+
     CANARD_NET_OFP_DECL auto equal_impl(any_type const&) const noexcept
       -> bool;
 
