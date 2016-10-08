@@ -9,6 +9,11 @@
 #include <type_traits>
 #include <utility>
 #include <boost/mpl/contains.hpp>
+#include <boost/mpl/deref.hpp>
+#include <boost/mpl/integral_c.hpp>
+#include <boost/mpl/min_element.hpp>
+#include <boost/mpl/placeholders.hpp>
+#include <boost/mpl/transform_view.hpp>
 #include <boost/operators.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/get.hpp>
@@ -50,6 +55,18 @@ namespace detail {
     >::type;
 
   public:
+    static constexpr auto min_length() noexcept
+      -> std::uint16_t
+    {
+      return min_element_t<min_length_t>::value;
+    }
+
+    static constexpr auto min_byte_length() noexcept
+      -> std::uint16_t
+    {
+      return min_element_t<min_byte_length_t>::value;
+    }
+
     template <class T, class = containable_if_t<T>>
     any_type(T&& t)
       : variant_(std::forward<T>(t))
@@ -65,6 +82,9 @@ namespace detail {
     }
 
     CANARD_NET_OFP_DECL auto length() const noexcept
+      -> std::uint16_t;
+
+    CANARD_NET_OFP_DECL auto byte_length() const noexcept
       -> std::uint16_t;
 
     CANARD_NET_OFP_DECL auto index() const noexcept
@@ -84,6 +104,12 @@ namespace detail {
       return boost::apply_visitor(std::forward<Visitor>(visitor), variant_);
     }
 
+    template <class Validator>
+    void validate(Validator validator) const
+    {
+      visit(detail::validation_visitor<Validator>{validator});
+    }
+
     template <class Container>
     auto encode(Container& container) const
       -> Container&
@@ -96,12 +122,6 @@ namespace detail {
       -> Derived
     {
       return Decoder::template decode<Derived>(first, last, to_any{});
-    }
-
-    template <class Validator>
-    void validate(Validator validator) const
-    {
-      visit(detail::validation_visitor<Validator>{validator});
     }
 
     friend auto operator==(Derived const& lhs, Derived const& rhs) noexcept
@@ -181,6 +201,25 @@ namespace detail {
       -> T const*;
 
   private:
+    template <template <class> class F>
+    using min_element_t = typename boost::mpl::deref<
+      typename boost::mpl::min_element<
+          typename boost::mpl::transform_view<
+            inner_type_list, F<boost::mpl::placeholders::_>
+          >::type
+      >::type
+    >::type;
+
+    template <class T>
+    struct min_length_t
+      : boost::mpl::integral_c<std::uint16_t, T::min_length()>
+    {};
+
+    template <class T>
+    struct min_byte_length_t
+      : boost::mpl::integral_c<std::uint16_t, T::min_byte_length()>
+    {};
+
     CANARD_NET_OFP_DECL auto equal_impl(any_type const&) const noexcept
       -> bool;
 

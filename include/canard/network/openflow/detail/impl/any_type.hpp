@@ -22,6 +22,13 @@ namespace detail {
   }
 
   template <class Derived, class Decoder>
+  auto any_type<Derived, Decoder>::byte_length() const noexcept
+    -> std::uint16_t
+  {
+    return visit(detail::byte_length_visitor{});
+  }
+
+  template <class Derived, class Decoder>
   auto any_type<Derived, Decoder>::index() const noexcept
     -> std::size_t
   {
