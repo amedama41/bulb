@@ -15,9 +15,7 @@
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/is_related.hpp>
-#include <canard/network/openflow/detail/padding.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
-#include <canard/network/openflow/v13/detail/length_utility.hpp>
 #include <canard/network/openflow/v13/any_action_id.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -156,6 +154,12 @@ namespace table_feature_properties {
 
         friend detail::basic_protocol_type<basic_prop_actions>;
 
+        friend constexpr auto exclude_padding(basic_prop_actions*) noexcept
+          -> bool
+        {
+          return true;
+        }
+
         template <class Container>
         void encode_impl(Container& container) const
         {
@@ -163,10 +167,6 @@ namespace table_feature_properties {
             boost::for_each(action_ids_, [&](any_action_id const& id) {
                 id.encode(container);
             });
-            detail::encode_byte_array(
-                      container
-                    , detail::padding
-                    , v13_detail::padding_length(length()));
         }
 
         template <class Iterator>
@@ -190,7 +190,6 @@ namespace table_feature_properties {
                 };
             }
 
-            std::advance(first, v13_detail::padding_length(property.length));
             return basic_prop_actions{property, std::move(action_ids)};
         }
 

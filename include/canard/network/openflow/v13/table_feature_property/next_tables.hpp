@@ -14,9 +14,7 @@
 #include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
-#include <canard/network/openflow/detail/padding.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
-#include <canard/network/openflow/v13/detail/length_utility.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -147,16 +145,18 @@ namespace table_feature_properties {
 
         friend detail::basic_protocol_type<basic_prop_next_tables>;
 
+        friend constexpr auto exclude_padding(basic_prop_next_tables*) noexcept
+          -> bool
+        {
+          return true;
+        }
+
         template <class Container>
         void encode_impl(Container& container) const
         {
             detail::encode(container, table_feature_prop_next_tables_);
             detail::encode_byte_array(
                     container, next_table_ids_.data(), next_table_ids_.size());
-            detail::encode_byte_array(
-                      container
-                    , detail::padding
-                    , v13_detail::padding_length(length()));
         }
 
         template <class Iterator>
@@ -169,8 +169,6 @@ namespace table_feature_properties {
                 = std::next(first, property.length - sizeof(raw_ofp_type));
             auto next_table_ids = next_table_id_container(first, id_last);
             first = id_last;
-
-            std::advance(first, v13_detail::padding_length(property.length));
 
             return basic_prop_next_tables{property, std::move(next_table_ids)};
         }
