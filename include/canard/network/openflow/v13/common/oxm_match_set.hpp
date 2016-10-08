@@ -18,9 +18,7 @@
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/is_related.hpp>
-#include <canard/network/openflow/detail/padding.hpp>
 #include <canard/network/openflow/v13/any_oxm_match_field.hpp>
-#include <canard/network/openflow/v13/detail/length_utility.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -182,6 +180,12 @@ namespace v13 {
             return oxm_match_set::base_length;
         }
 
+        friend constexpr auto exclude_padding(oxm_match_set*) noexcept
+          -> bool
+        {
+          return true;
+        }
+
         template <class Container>
         void encode_impl(Container& container) const
         {
@@ -190,10 +194,6 @@ namespace v13 {
             boost::for_each(*this, [&](any_oxm_match_field const& field) {
                 field.encode(container);
             });
-            detail::encode_byte_array(
-                      container
-                    , detail::padding
-                    , v13_detail::padding_length(length()));
         }
 
         template <class Iterator>
@@ -213,8 +213,6 @@ namespace v13 {
             if (first != last) {
                 throw std::runtime_error{"invalid oxm_match length"};
             }
-
-            std::advance(first, v13_detail::padding_length(length));
 
             return oxm_match_set{std::move(oxm_tlvs)};
         }
