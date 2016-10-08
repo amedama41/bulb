@@ -18,9 +18,7 @@
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
-#include <canard/network/openflow/detail/padding.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
-#include <canard/network/openflow/v13/detail/length_utility.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -157,6 +155,12 @@ namespace hello_elements {
 
     friend basic_protocol_type;
 
+    friend constexpr auto exclude_padding(versionbitmap*) noexcept
+      -> bool
+    {
+      return true;
+    }
+
     template <class Container>
     void encode_impl(Container& container) const
     {
@@ -164,8 +168,6 @@ namespace hello_elements {
       boost::for_each(bitmaps_, [&](bitmap_type bitmap) {
           detail::encode(container, bitmap);
       });
-      detail::encode_byte_array(
-          container, detail::padding, v13_detail::padding_length(length()));
     }
 
     template <class Iterator>
@@ -183,8 +185,6 @@ namespace hello_elements {
       boost::for_each(bitmaps, [](bitmap_type& bitmap) {
           boost::endian::big_to_native_inplace(bitmap);
       });
-
-      std::advance(first, v13_detail::padding_length(vbitmap.length));
 
       return versionbitmap{vbitmap, std::move(bitmaps)};
     }

@@ -10,9 +10,7 @@
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
-#include <canard/network/openflow/detail/padding.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
-#include <canard/network/openflow/v13/detail/length_utility.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -106,13 +104,17 @@ namespace hello_elements {
 
     friend basic_protocol_type;
 
+    friend constexpr auto exclude_padding(unknown_element*) noexcept
+      -> bool
+    {
+      return true;
+    }
+
     template <class Container>
     void encode_impl(Container& container) const
     {
       detail::encode(container, header_);
       detail::encode_byte_array(container, data_.data(), data_.size());
-      detail::encode_byte_array(
-          container, detail::padding, v13_detail::padding_length(length()));
     }
 
     template <class Iterator>
@@ -124,8 +126,6 @@ namespace hello_elements {
       auto const data_length = header.length - sizeof(raw_ofp_type);
       auto data = data_type(first, std::next(first, data_length));
       std::advance(first, data_length);
-
-      std::advance(first, v13_detail::padding_length(header.length));
 
       return unknown_element(header, std::move(data));
     }
