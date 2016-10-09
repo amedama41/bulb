@@ -2,6 +2,7 @@
 #include <canard/network/openflow/v13/table_feature_property/next_tables.hpp>
 #include <boost/test/unit_test.hpp>
 
+#include <type_traits>
 #include "../../test_utility.hpp"
 
 namespace of = canard::net::ofp;
@@ -27,12 +28,34 @@ BOOST_AUTO_TEST_SUITE(table_feature_property_test)
 
 BOOST_AUTO_TEST_SUITE(next_tables_test)
 
-    BOOST_AUTO_TEST_CASE(type_definition_test)
-    {
+    BOOST_AUTO_TEST_SUITE(type_definition_test)
+      BOOST_AUTO_TEST_CASE(type)
+      {
         using sut = table_feature_properties::next_tables;
 
-        BOOST_TEST(sut::type() == protocol::OFPTFPT_NEXT_TABLES);
-    }
+        using type = std::integral_constant<std::uint16_t, sut::type()>;
+
+        BOOST_TEST(type::value == protocol::OFPTFPT_NEXT_TABLES);
+      }
+      BOOST_AUTO_TEST_CASE(min_length)
+      {
+        using sut = table_feature_properties::next_tables;
+
+        using min_length
+          = std::integral_constant<std::uint16_t, sut::min_length()>;
+
+        BOOST_TEST(min_length::value == 4);
+      }
+      BOOST_AUTO_TEST_CASE(min_byte_length)
+      {
+        using sut = table_feature_properties::next_tables;
+
+        using min_byte_length
+          = std::integral_constant<std::uint16_t, sut::min_byte_length()>;
+
+        BOOST_TEST(min_byte_length::value == 8);
+      }
+    BOOST_AUTO_TEST_SUITE_END() // type_definition_test
 
     BOOST_AUTO_TEST_CASE(default_construct_test)
     {
@@ -232,12 +255,34 @@ BOOST_AUTO_TEST_SUITE_END() // next_tables_test
 
 BOOST_AUTO_TEST_SUITE(next_tables_miss_test)
 
-    BOOST_AUTO_TEST_CASE(type_definition_test)
-    {
+    BOOST_AUTO_TEST_SUITE(type_definition_test)
+      BOOST_AUTO_TEST_CASE(type)
+      {
         using sut = table_feature_properties::next_tables_miss;
 
-        BOOST_TEST(sut::type() == protocol::OFPTFPT_NEXT_TABLES_MISS);
-    }
+        using type = std::integral_constant<std::uint16_t, sut::type()>;
+
+        BOOST_TEST(type::value == protocol::OFPTFPT_NEXT_TABLES_MISS);
+      }
+      BOOST_AUTO_TEST_CASE(min_length)
+      {
+        using sut = table_feature_properties::next_tables_miss;
+
+        using min_length
+          = std::integral_constant<std::uint16_t, sut::min_length()>;
+
+        BOOST_TEST(min_length::value == 4);
+      }
+      BOOST_AUTO_TEST_CASE(min_byte_length)
+      {
+        using sut = table_feature_properties::next_tables_miss;
+
+        using min_byte_length
+          = std::integral_constant<std::uint16_t, sut::min_byte_length()>;
+
+        BOOST_TEST(min_byte_length::value == 8);
+      }
+    BOOST_AUTO_TEST_SUITE_END() // type_definition_test
 
 BOOST_AUTO_TEST_SUITE_END() // next_tables_test
 

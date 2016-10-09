@@ -5,6 +5,7 @@
 #include <boost/test/data/monomorphic.hpp>
 
 #include <cstdint>
+#include <type_traits>
 #include <utility>
 #include <vector>
 #include <boost/asio/ip/address_v4.hpp>
@@ -73,6 +74,27 @@ namespace {
 BOOST_AUTO_TEST_SUITE(common_type_test)
 BOOST_AUTO_TEST_SUITE(any_oxm_match_field_test)
 
+    BOOST_AUTO_TEST_SUITE(type_definition_test)
+      BOOST_AUTO_TEST_CASE(min_length)
+      {
+        using sut = v13::any_oxm_match_field;
+
+        using min_length
+            = std::integral_constant<std::uint16_t, sut::min_length()>;
+
+        BOOST_TEST(min_length::value == 4 + 1);
+      }
+      BOOST_AUTO_TEST_CASE(min_byte_length)
+      {
+        using sut = v13::any_oxm_match_field;
+
+        using min_byte_length
+            = std::integral_constant<std::uint16_t, sut::min_byte_length()>;
+
+        BOOST_TEST(min_byte_length::value == 4 + 1);
+      }
+    BOOST_AUTO_TEST_SUITE_END() // type_test
+
     BOOST_AUTO_TEST_CASE(construct_from_no_mask_field_test)
     {
         auto const field = match::in_port{1};
@@ -85,6 +107,7 @@ BOOST_AUTO_TEST_SUITE(any_oxm_match_field_test)
         BOOST_TEST(sut.oxm_has_mask() == field.oxm_has_mask());
         BOOST_TEST(sut.oxm_length() == field.oxm_length());
         BOOST_TEST(sut.length() == field.length());
+        BOOST_TEST(sut.byte_length() == field.byte_length());
         BOOST_TEST(sut.is_wildcard() == field.is_wildcard());
         BOOST_TEST(sut.is_exact() == field.is_exact());
         BOOST_TEST((v13::any_cast<match::in_port>(sut) == field));
@@ -103,6 +126,7 @@ BOOST_AUTO_TEST_SUITE(any_oxm_match_field_test)
         BOOST_TEST(sut.oxm_has_mask() == field.oxm_has_mask());
         BOOST_TEST(sut.oxm_length() == field.oxm_length());
         BOOST_TEST(sut.length() == field.length());
+        BOOST_TEST(sut.byte_length() == field.byte_length());
         BOOST_TEST(sut.is_wildcard() == field.is_wildcard());
         BOOST_TEST(sut.is_exact() == field.is_exact());
         BOOST_TEST((v13::any_cast<match::vlan_vid>(sut) == field));
@@ -124,6 +148,7 @@ BOOST_AUTO_TEST_SUITE(any_oxm_match_field_test)
         BOOST_TEST(sut.oxm_has_mask() == field2.oxm_has_mask());
         BOOST_TEST(sut.oxm_length() == field2.oxm_length());
         BOOST_TEST(sut.length() == field2.length());
+        BOOST_TEST(sut.byte_length() == field2.byte_length());
         BOOST_TEST(sut.is_wildcard() == field2.is_wildcard());
         BOOST_TEST(sut.is_exact() == field2.is_exact());
         BOOST_TEST((v13::any_cast<match::ipv4_src>(sut) == field2));
@@ -145,6 +170,7 @@ BOOST_AUTO_TEST_SUITE(any_oxm_match_field_test)
         BOOST_TEST(sut.oxm_has_mask() == field2.oxm_has_mask());
         BOOST_TEST(sut.oxm_length() == field2.oxm_length());
         BOOST_TEST(sut.length() == field2.length());
+        BOOST_TEST(sut.byte_length() == field2.byte_length());
         BOOST_TEST(sut.is_wildcard() == field2.is_wildcard());
         BOOST_TEST(sut.is_exact() == field2.is_exact());
         BOOST_TEST((v13::any_cast<match::ipv4_src>(sut) == field2));
@@ -166,6 +192,7 @@ BOOST_AUTO_TEST_SUITE(any_oxm_match_field_test)
         BOOST_TEST(sut.oxm_has_mask() == field2.oxm_has_mask());
         BOOST_TEST(sut.oxm_length() == field2.oxm_length());
         BOOST_TEST(sut.length() == field2.length());
+        BOOST_TEST(sut.byte_length() == field2.byte_length());
         BOOST_TEST(sut.is_wildcard() == field2.is_wildcard());
         BOOST_TEST(sut.is_exact() == field2.is_exact());
         BOOST_TEST((v13::any_cast<match::ipv6_src>(sut) == field2));
@@ -187,6 +214,7 @@ BOOST_AUTO_TEST_SUITE(any_oxm_match_field_test)
         BOOST_TEST(sut.oxm_has_mask() == field2.oxm_has_mask());
         BOOST_TEST(sut.oxm_length() == field2.oxm_length());
         BOOST_TEST(sut.length() == field2.length());
+        BOOST_TEST(sut.byte_length() == field2.byte_length());
         BOOST_TEST(sut.is_wildcard() == field2.is_wildcard());
         BOOST_TEST(sut.is_exact() == field2.is_exact());
         BOOST_TEST((v13::any_cast<match::ipv6_src>(sut) == field2));
@@ -271,7 +299,7 @@ BOOST_AUTO_TEST_SUITE(any_oxm_match_field_test)
 
         sut.encode(buffer);
 
-        BOOST_TEST(buffer.size() == sut.length());
+        BOOST_TEST(buffer.size() == sut.byte_length());
         BOOST_TEST(buffer == binary, boost::test_tools::per_element{});
     }
 

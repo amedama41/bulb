@@ -4,6 +4,7 @@
 
 #include <canard/network/openflow/v13/queue_properties.hpp>
 
+#include <type_traits>
 #include "../../test_utility.hpp"
 
 namespace ofp = canard::net::ofp;
@@ -12,6 +13,27 @@ namespace queue_props = v13::queue_properties;
 
 BOOST_AUTO_TEST_SUITE(common_type_test)
 BOOST_AUTO_TEST_SUITE(any_queue_property_test)
+
+  BOOST_AUTO_TEST_SUITE(type_definition_test)
+    BOOST_AUTO_TEST_CASE(min_length)
+    {
+      using sut = v13::any_queue_property;
+
+      using min_length
+          = std::integral_constant<std::uint16_t, sut::min_length()>;
+
+      BOOST_TEST(min_length::value == 16);
+    }
+    BOOST_AUTO_TEST_CASE(min_byte_length)
+    {
+      using sut = v13::any_queue_property;
+
+      using min_byte_length
+          = std::integral_constant<std::uint16_t, sut::min_byte_length()>;
+
+      BOOST_TEST(min_byte_length::value == 16);
+    }
+  BOOST_AUTO_TEST_SUITE_END() // type_test
 
   BOOST_AUTO_TEST_SUITE(equality)
     BOOST_AUTO_TEST_CASE(true_if_same_object)

@@ -3,9 +3,9 @@
 #include <boost/test/unit_test.hpp>
 
 #include <cstdint>
+#include <type_traits>
 #include <utility>
 #include <vector>
-#include <canard/network/openflow/v13/detail/length_utility.hpp>
 
 #include "../../test_utility.hpp"
 
@@ -40,12 +40,34 @@ struct oxm_match_set_fixture
 BOOST_AUTO_TEST_SUITE(common_type_test)
 BOOST_AUTO_TEST_SUITE(oxm_match_test)
 
+    BOOST_AUTO_TEST_SUITE(type_definition_test)
+      BOOST_AUTO_TEST_CASE(min_length)
+      {
+        using sut = v13::oxm_match_set;
+
+        using min_length
+          = std::integral_constant<std::uint16_t, sut::min_length()>;
+
+        BOOST_TEST(min_length::value == 4);
+      }
+      BOOST_AUTO_TEST_CASE(min_byte_length)
+      {
+        using sut = v13::oxm_match_set;
+
+        using min_byte_length
+          = std::integral_constant<std::uint16_t, sut::min_byte_length()>;
+
+        BOOST_TEST(min_byte_length::value == 8);
+      }
+    BOOST_AUTO_TEST_SUITE_END() // type_test
+
     BOOST_AUTO_TEST_CASE(default_construct_test)
     {
         auto const sut = v13::oxm_match_set{};
 
         BOOST_TEST(sut.type() == proto::OFPMT_OXM);
         BOOST_TEST(sut.length() == 4);
+        BOOST_TEST(sut.byte_length() == 8);
         BOOST_TEST(sut.empty());
         BOOST_TEST(sut.size() == 0);
         BOOST_TEST((sut.begin() == sut.end()));
@@ -58,6 +80,7 @@ BOOST_AUTO_TEST_SUITE(oxm_match_test)
         auto const sut = v13::oxm_match_set{in_phy_port};
 
         BOOST_TEST(sut.length() == 4 + 12);
+        BOOST_TEST(sut.byte_length() == 16);
         BOOST_TEST(!sut.empty());
         BOOST_TEST(sut.size() == 1);
         BOOST_TEST((sut.begin() != sut.end()));
@@ -86,6 +109,7 @@ BOOST_AUTO_TEST_SUITE(oxm_match_test)
         };
 
         BOOST_TEST(sut.length() == 4 + 8 + 10 + 16 + 12);
+        BOOST_TEST(sut.byte_length() == 56);
         BOOST_TEST(!sut.empty());
         BOOST_TEST(sut.size() == 4);
         BOOST_TEST((sut.begin() != sut.end()));
@@ -112,6 +136,7 @@ BOOST_AUTO_TEST_SUITE(oxm_match_test)
         auto const sut = v13::oxm_match_set{in_port1, eth_type, in_port2};
 
         BOOST_TEST(sut.length() == 4 + 8 + 6);
+        BOOST_TEST(sut.byte_length() == 24);
         BOOST_TEST(!sut.empty());
         BOOST_TEST(sut.size() == 2);
 
@@ -404,7 +429,7 @@ BOOST_AUTO_TEST_SUITE(oxm_match_test)
 
         sut.encode(buffer);
 
-        BOOST_TEST(buffer.size() == detail::exact_length(sut.length()));
+        BOOST_TEST(buffer.size() == sut.byte_length());
         BOOST_TEST(buffer == binary, boost::test_tools::per_element{});
     }
 

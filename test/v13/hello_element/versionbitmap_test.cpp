@@ -4,6 +4,7 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
+#include <type_traits>
 #include <boost/range/algorithm/max_element.hpp>
 #include <boost/range/adaptor/filtered.hpp>
 #include "../../test_utility.hpp"
@@ -47,6 +48,35 @@ struct versionbitmap_fixture
 
 BOOST_AUTO_TEST_SUITE(hello_element_test)
 BOOST_AUTO_TEST_SUITE(versionbitmap)
+
+  BOOST_AUTO_TEST_SUITE(type_definition_test)
+    BOOST_AUTO_TEST_CASE(type)
+    {
+      using sut = helems::versionbitmap;
+
+      using type = std::integral_constant<std::uint16_t, sut::type()>;
+
+      BOOST_TEST(type::value == proto::OFPHET_VERSIONBITMAP);
+    }
+    BOOST_AUTO_TEST_CASE(min_length)
+    {
+      using sut = helems::versionbitmap;
+
+      using min_length
+        = std::integral_constant<std::uint16_t, sut::min_length()>;
+
+      BOOST_TEST(min_length::value == 4);
+    }
+    BOOST_AUTO_TEST_CASE(min_byte_length)
+    {
+      using sut = helems::versionbitmap;
+
+      using min_byte_length
+        = std::integral_constant<std::uint16_t, sut::min_byte_length()>;
+
+      BOOST_TEST(min_byte_length::value == 8);
+    }
+  BOOST_AUTO_TEST_SUITE_END() // type_definition_test
 
   BOOST_AUTO_TEST_SUITE(constructor)
     BOOST_AUTO_TEST_CASE(is_constructible_from_single_bitmap)

@@ -2,6 +2,7 @@
 #include <canard/network/openflow/v13/hello_element/unknown_element.hpp>
 #include <boost/test/unit_test.hpp>
 
+#include <type_traits>
 #include "../../test_utility.hpp"
 
 namespace ofp = canard::net::ofp;
@@ -27,6 +28,27 @@ struct no_data_fixture {
 
 BOOST_AUTO_TEST_SUITE(hello_element_test)
 BOOST_AUTO_TEST_SUITE(unknown_element)
+
+  BOOST_AUTO_TEST_SUITE(type_definition_test)
+    BOOST_AUTO_TEST_CASE(min_length)
+    {
+      using sut = helems::unknown_element;
+
+      using min_length
+        = std::integral_constant<std::uint16_t, sut::min_length()>;
+
+      BOOST_TEST(min_length::value == 4);
+    }
+    BOOST_AUTO_TEST_CASE(min_byte_length)
+    {
+      using sut = helems::unknown_element;
+
+      using min_byte_length
+        = std::integral_constant<std::uint16_t, sut::min_byte_length()>;
+
+      BOOST_TEST(min_byte_length::value == 8);
+    }
+  BOOST_AUTO_TEST_SUITE_END() // type_definition_test
 
   BOOST_AUTO_TEST_SUITE(constructor)
     BOOST_AUTO_TEST_CASE(is_constructible_from_type)

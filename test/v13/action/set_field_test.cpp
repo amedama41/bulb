@@ -5,6 +5,7 @@
 #include <boost/test/data/test_case.hpp>
 
 #include <cstdint>
+#include <type_traits>
 #include <vector>
 #include <canard/network/openflow/v13/common/oxm_match_field.hpp>
 
@@ -61,13 +62,42 @@ BOOST_AUTO_TEST_SUITE(set_field_test)
 
 BOOST_AUTO_TEST_SUITE(set_eth_dst_test)
 
-    BOOST_AUTO_TEST_CASE(type_definition_test)
-    {
+    BOOST_AUTO_TEST_SUITE(type_definition_test)
+      BOOST_AUTO_TEST_CASE(type)
+      {
         using sut = actions::set_eth_dst;
 
-        BOOST_TEST(sut::type() == protocol::OFPAT_SET_FIELD);
-        BOOST_TEST(sut::oxm_type() == match::eth_dst::oxm_type());
-    }
+        using type = std::integral_constant<std::uint16_t, sut::type()>;
+
+        BOOST_TEST(type::value == protocol::OFPAT_SET_FIELD);
+      }
+      BOOST_AUTO_TEST_CASE(oxm_type)
+      {
+        using sut = actions::set_eth_dst;
+
+        using oxm_type = std::integral_constant<std::uint32_t, sut::oxm_type()>;
+
+        BOOST_TEST(oxm_type::value == match::eth_dst::oxm_type());
+      }
+      BOOST_AUTO_TEST_CASE(min_length)
+      {
+        using sut = actions::set_eth_dst;
+
+        using min_length
+          = std::integral_constant<std::uint16_t, sut::min_length()>;
+
+        BOOST_TEST(min_length::value == 4 + 10 + 2);
+      }
+      BOOST_AUTO_TEST_CASE(min_byte_length)
+      {
+        using sut = actions::set_eth_dst;
+
+        using min_byte_length
+          = std::integral_constant<std::uint16_t, sut::min_byte_length()>;
+
+        BOOST_TEST(min_byte_length::value == 4 + 10 + 2);
+      }
+    BOOST_AUTO_TEST_SUITE_END() // type_definition_test
 
     BOOST_AUTO_TEST_CASE(construct_test)
     {
@@ -76,6 +106,7 @@ BOOST_AUTO_TEST_SUITE(set_eth_dst_test)
         auto const sut = actions::set_eth_dst{field.oxm_value()};
 
         BOOST_TEST(sut.length() == ((4 + field.length()) + 7) / 8 * 8);
+        BOOST_TEST(sut.byte_length() == ((4 + field.length() + 7) / 8 * 8));
         BOOST_TEST(sut.value() == field.oxm_value());
     }
 
@@ -86,6 +117,7 @@ BOOST_AUTO_TEST_SUITE(set_eth_dst_test)
         auto const sut = actions::set_eth_dst::create(field.oxm_value());
 
         BOOST_TEST(sut.length() == ((4 + field.length()) + 7) / 8 * 8);
+        BOOST_TEST(sut.byte_length() == ((4 + field.length() + 7) / 8 * 8));
         BOOST_TEST(sut.value() == field.oxm_value());
     }
 
@@ -159,7 +191,7 @@ BOOST_AUTO_TEST_SUITE(set_eth_dst_test)
 
         sut.encode(buffer);
 
-        BOOST_TEST(buffer.size() == sut.length());
+        BOOST_TEST(buffer.size() == sut.byte_length());
         BOOST_TEST(buffer == binary, boost::test_tools::per_element{});
     }
 
@@ -178,13 +210,42 @@ BOOST_AUTO_TEST_SUITE_END() // set_eth_dst_test
 
 BOOST_AUTO_TEST_SUITE(set_vlan_vid_test)
 
-    BOOST_AUTO_TEST_CASE(type_definition_test)
-    {
+    BOOST_AUTO_TEST_SUITE(type_definition_test)
+      BOOST_AUTO_TEST_CASE(type)
+      {
         using sut = actions::set_vlan_vid;
 
-        BOOST_TEST(sut::type() == protocol::OFPAT_SET_FIELD);
-        BOOST_TEST(sut::oxm_type() == match::vlan_vid::oxm_type());
-    }
+        using type = std::integral_constant<std::uint16_t, sut::type()>;
+
+        BOOST_TEST(type::value == protocol::OFPAT_SET_FIELD);
+      }
+      BOOST_AUTO_TEST_CASE(oxm_type)
+      {
+        using sut = actions::set_vlan_vid;
+
+        using oxm_type = std::integral_constant<std::uint32_t, sut::oxm_type()>;
+
+        BOOST_TEST(oxm_type::value == match::vlan_vid::oxm_type());
+      }
+      BOOST_AUTO_TEST_CASE(min_length)
+      {
+        using sut = actions::set_vlan_vid;
+
+        using min_length
+          = std::integral_constant<std::uint16_t, sut::min_length()>;
+
+        BOOST_TEST(min_length::value == 4 + 6 + 6);
+      }
+      BOOST_AUTO_TEST_CASE(min_byte_length)
+      {
+        using sut = actions::set_vlan_vid;
+
+        using min_byte_length
+          = std::integral_constant<std::uint16_t, sut::min_byte_length()>;
+
+        BOOST_TEST(min_byte_length::value == 4 + 6 + 6);
+      }
+    BOOST_AUTO_TEST_SUITE_END() // type_definition_test
 
     BOOST_AUTO_TEST_CASE(construct_test)
     {
@@ -193,6 +254,7 @@ BOOST_AUTO_TEST_SUITE(set_vlan_vid_test)
         auto const sut = actions::set_vlan_vid{field.oxm_value()};
 
         BOOST_TEST(sut.length() == ((4 + field.length()) + 7) / 8 * 8);
+        BOOST_TEST(sut.byte_length() == ((4 + field.length() + 7) / 8 * 8));
         BOOST_TEST(sut.value() == field.oxm_value());
     }
 
@@ -210,6 +272,7 @@ BOOST_AUTO_TEST_SUITE(set_vlan_vid_test)
         auto const sut = actions::set_vlan_vid::create(field.oxm_value());
 
         BOOST_TEST(sut.length() == ((4 + field.length()) + 7) / 8 * 8);
+        BOOST_TEST(sut.byte_length() == ((4 + field.length() + 7) / 8 * 8));
         BOOST_TEST(sut.value() == field.oxm_value());
     }
 
@@ -307,7 +370,7 @@ BOOST_AUTO_TEST_SUITE(set_vlan_vid_test)
 
         sut.encode(buffer);
 
-        BOOST_TEST(buffer.size() == sut.length());
+        BOOST_TEST(buffer.size() == sut.byte_length());
         BOOST_TEST(buffer == binary, boost::test_tools::per_element{});
     }
 
@@ -326,13 +389,42 @@ BOOST_AUTO_TEST_SUITE_END() // set_vlan_vid_test
 
 BOOST_AUTO_TEST_SUITE(set_ipv4_src_test)
 
-    BOOST_AUTO_TEST_CASE(type_definition_test)
-    {
+    BOOST_AUTO_TEST_SUITE(type_definition_test)
+      BOOST_AUTO_TEST_CASE(type)
+      {
         using sut = actions::set_ipv4_src;
 
-        BOOST_TEST(sut::type() == protocol::OFPAT_SET_FIELD);
-        BOOST_TEST(sut::oxm_type() == match::ipv4_src::oxm_type());
-    }
+        using type = std::integral_constant<std::uint16_t, sut::type()>;
+
+        BOOST_TEST(type::value == protocol::OFPAT_SET_FIELD);
+      }
+      BOOST_AUTO_TEST_CASE(oxm_type)
+      {
+        using sut = actions::set_ipv4_src;
+
+        using oxm_type = std::integral_constant<std::uint32_t, sut::oxm_type()>;
+
+        BOOST_TEST(oxm_type::value == match::ipv4_src::oxm_type());
+      }
+      BOOST_AUTO_TEST_CASE(min_length)
+      {
+        using sut = actions::set_ipv4_src;
+
+        using min_length
+          = std::integral_constant<std::uint16_t, sut::min_length()>;
+
+        BOOST_TEST(min_length::value == 4 + 8 + 4);
+      }
+      BOOST_AUTO_TEST_CASE(min_byte_length)
+      {
+        using sut = actions::set_ipv4_src;
+
+        using min_byte_length
+          = std::integral_constant<std::uint16_t, sut::min_byte_length()>;
+
+        BOOST_TEST(min_byte_length::value == 4 + 8 + 4);
+      }
+    BOOST_AUTO_TEST_SUITE_END() // type_definition_test
 
     BOOST_AUTO_TEST_CASE(construct_from_value_test)
     {
@@ -341,6 +433,7 @@ BOOST_AUTO_TEST_SUITE(set_ipv4_src_test)
         auto const sut = actions::set_ipv4_src{field.oxm_value()};
 
         BOOST_TEST(sut.length() == (4 + field.length() + 7) / 8 * 8);
+        BOOST_TEST(sut.byte_length() == ((4 + field.length() + 7) / 8 * 8));
         BOOST_TEST(sut.value() == field.oxm_value());
     }
 
@@ -357,6 +450,7 @@ BOOST_AUTO_TEST_SUITE(set_ipv4_src_test)
         auto const sut = actions::set_ipv4_src{field.oxm_value()};
 
         BOOST_TEST(sut.length() == (4 + field.length() + 7) / 8 * 8);
+        BOOST_TEST(sut.byte_length() == ((4 + field.length() + 7) / 8 * 8));
         BOOST_TEST(sut.value() == field.oxm_value());
     }
 
@@ -430,7 +524,7 @@ BOOST_AUTO_TEST_SUITE(set_ipv4_src_test)
 
         sut.encode(buffer);
 
-        BOOST_TEST(buffer.size() == sut.length());
+        BOOST_TEST(buffer.size() == sut.byte_length());
         BOOST_TEST(buffer == binary, boost::test_tools::per_element{});
     }
 
@@ -449,13 +543,42 @@ BOOST_AUTO_TEST_SUITE_END() // set_ipv6_src_test
 
 BOOST_AUTO_TEST_SUITE(set_ipv6_src_test)
 
-    BOOST_AUTO_TEST_CASE(type_definition_test)
-    {
+    BOOST_AUTO_TEST_SUITE(type_definition_test)
+      BOOST_AUTO_TEST_CASE(type)
+      {
         using sut = actions::set_ipv6_src;
 
-        BOOST_TEST(sut::type() == protocol::OFPAT_SET_FIELD);
-        BOOST_TEST(sut::oxm_type() == match::ipv6_src::oxm_type());
-    }
+        using type = std::integral_constant<std::uint16_t, sut::type()>;
+
+        BOOST_TEST(type::value == protocol::OFPAT_SET_FIELD);
+      }
+      BOOST_AUTO_TEST_CASE(oxm_type)
+      {
+        using sut = actions::set_ipv6_src;
+
+        using oxm_type = std::integral_constant<std::uint32_t, sut::oxm_type()>;
+
+        BOOST_TEST(oxm_type::value == match::ipv6_src::oxm_type());
+      }
+      BOOST_AUTO_TEST_CASE(min_length)
+      {
+        using sut = actions::set_ipv6_src;
+
+        using min_length
+          = std::integral_constant<std::uint16_t, sut::min_length()>;
+
+        BOOST_TEST(min_length::value == 4 + 20);
+      }
+      BOOST_AUTO_TEST_CASE(min_byte_length)
+      {
+        using sut = actions::set_ipv6_src;
+
+        using min_byte_length
+          = std::integral_constant<std::uint16_t, sut::min_byte_length()>;
+
+        BOOST_TEST(min_byte_length::value == 4 + 20);
+      }
+    BOOST_AUTO_TEST_SUITE_END() // type_definition_test
 
     BOOST_AUTO_TEST_CASE(construct_from_value_test)
     {
@@ -465,6 +588,7 @@ BOOST_AUTO_TEST_SUITE(set_ipv6_src_test)
         auto const sut = actions::set_ipv6_src{field.oxm_value()};
 
         BOOST_TEST(sut.length() == (4 + field.length() + 7) / 8 * 8);
+        BOOST_TEST(sut.byte_length() == ((4 + field.length() + 7) / 8 * 8));
         BOOST_TEST(sut.value() == field.oxm_value());
     }
 
@@ -488,6 +612,7 @@ BOOST_AUTO_TEST_SUITE(set_ipv6_src_test)
         auto const sut = actions::set_ipv6_src{field.oxm_value()};
 
         BOOST_TEST(sut.length() == (4 + field.length() + 7) / 8 * 8);
+        BOOST_TEST(sut.byte_length() == ((4 + field.length() + 7) / 8 * 8));
         BOOST_TEST(sut.value() == field.oxm_value());
     }
 
@@ -561,7 +686,7 @@ BOOST_AUTO_TEST_SUITE(set_ipv6_src_test)
 
         sut.encode(buffer);
 
-        BOOST_TEST(buffer.size() == sut.length());
+        BOOST_TEST(buffer.size() == sut.byte_length());
         BOOST_TEST(buffer == binary, boost::test_tools::per_element{});
     }
 

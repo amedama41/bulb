@@ -4,6 +4,7 @@
 
 #include <canard/network/openflow/v13/table_feature_property/id/oxm_id.hpp>
 
+#include <type_traits>
 #include "../oxm_headers.hpp"
 #include "../../test_utility.hpp"
 
@@ -38,12 +39,34 @@ BOOST_AUTO_TEST_SUITE(table_feature_property_test)
 
 BOOST_AUTO_TEST_SUITE(match_test)
 
-    BOOST_AUTO_TEST_CASE(type_definition_test)
-    {
+    BOOST_AUTO_TEST_SUITE(type_definition_test)
+      BOOST_AUTO_TEST_CASE(type)
+      {
         using sut = table_feature_properties::match;
 
-        BOOST_TEST(sut::type() == protocol::OFPTFPT_MATCH);
-    }
+        using type = std::integral_constant<std::uint16_t, sut::type()>;
+
+        BOOST_TEST(type::value == protocol::OFPTFPT_MATCH);
+      }
+      BOOST_AUTO_TEST_CASE(min_length)
+      {
+        using sut = table_feature_properties::match;
+
+        using min_length
+          = std::integral_constant<std::uint16_t, sut::min_length()>;
+
+        BOOST_TEST(min_length::value == 4);
+      }
+      BOOST_AUTO_TEST_CASE(min_byte_length)
+      {
+        using sut = table_feature_properties::match;
+
+        using min_byte_length
+          = std::integral_constant<std::uint16_t, sut::min_byte_length()>;
+
+        BOOST_TEST(min_byte_length::value == 8);
+      }
+    BOOST_AUTO_TEST_SUITE_END() // type_definition_test
 
     BOOST_AUTO_TEST_CASE(default_construct_test)
     {
@@ -339,56 +362,166 @@ BOOST_AUTO_TEST_SUITE_END() // match_test
 
 BOOST_AUTO_TEST_SUITE(wildcards_test)
 
-    BOOST_AUTO_TEST_CASE(type_definition_test)
-    {
+    BOOST_AUTO_TEST_SUITE(type_definition_test)
+      BOOST_AUTO_TEST_CASE(type)
+      {
         using sut = table_feature_properties::wildcards;
 
-        BOOST_TEST(sut::type() == protocol::OFPTFPT_WILDCARDS);
-    }
+        using type = std::integral_constant<std::uint16_t, sut::type()>;
+
+        BOOST_TEST(type::value == protocol::OFPTFPT_WILDCARDS);
+      }
+      BOOST_AUTO_TEST_CASE(min_length)
+      {
+        using sut = table_feature_properties::wildcards;
+
+        using min_length
+          = std::integral_constant<std::uint16_t, sut::min_length()>;
+
+        BOOST_TEST(min_length::value == 4);
+      }
+      BOOST_AUTO_TEST_CASE(min_byte_length)
+      {
+        using sut = table_feature_properties::wildcards;
+
+        using min_byte_length
+          = std::integral_constant<std::uint16_t, sut::min_byte_length()>;
+
+        BOOST_TEST(min_byte_length::value == 8);
+      }
+    BOOST_AUTO_TEST_SUITE_END() // type_definition_test
 
 BOOST_AUTO_TEST_SUITE_END() // wildcards_test
 
 BOOST_AUTO_TEST_SUITE(write_setfield_test)
 
-    BOOST_AUTO_TEST_CASE(type_definition_test)
-    {
+    BOOST_AUTO_TEST_SUITE(type_definition_test)
+      BOOST_AUTO_TEST_CASE(type)
+      {
         using sut = table_feature_properties::write_setfield;
 
-        BOOST_TEST(sut::type() == protocol::OFPTFPT_WRITE_SETFIELD);
-    }
+        using type = std::integral_constant<std::uint16_t, sut::type()>;
+
+        BOOST_TEST(type::value == protocol::OFPTFPT_WRITE_SETFIELD);
+      }
+      BOOST_AUTO_TEST_CASE(min_length)
+      {
+        using sut = table_feature_properties::write_setfield;
+
+        using min_length
+          = std::integral_constant<std::uint16_t, sut::min_length()>;
+
+        BOOST_TEST(min_length::value == 4);
+      }
+      BOOST_AUTO_TEST_CASE(min_byte_length)
+      {
+        using sut = table_feature_properties::write_setfield;
+
+        using min_byte_length
+          = std::integral_constant<std::uint16_t, sut::min_byte_length()>;
+
+        BOOST_TEST(min_byte_length::value == 8);
+      }
+    BOOST_AUTO_TEST_SUITE_END() // type_definition_test
 
 BOOST_AUTO_TEST_SUITE_END() // write_setfield_test
 
 BOOST_AUTO_TEST_SUITE(write_setfield_miss_test)
 
-    BOOST_AUTO_TEST_CASE(type_definition_test)
-    {
+    BOOST_AUTO_TEST_SUITE(type_definition_test)
+      BOOST_AUTO_TEST_CASE(type)
+      {
         using sut = table_feature_properties::write_setfield_miss;
 
-        BOOST_TEST(sut::type() == protocol::OFPTFPT_WRITE_SETFIELD_MISS);
-    }
+        using type = std::integral_constant<std::uint16_t, sut::type()>;
+
+        BOOST_TEST(type::value == protocol::OFPTFPT_WRITE_SETFIELD_MISS);
+      }
+      BOOST_AUTO_TEST_CASE(min_length)
+      {
+        using sut = table_feature_properties::write_setfield_miss;
+
+        using min_length
+          = std::integral_constant<std::uint16_t, sut::min_length()>;
+
+        BOOST_TEST(min_length::value == 4);
+      }
+      BOOST_AUTO_TEST_CASE(min_byte_length)
+      {
+        using sut = table_feature_properties::write_setfield_miss;
+
+        using min_byte_length
+          = std::integral_constant<std::uint16_t, sut::min_byte_length()>;
+
+        BOOST_TEST(min_byte_length::value == 8);
+      }
+    BOOST_AUTO_TEST_SUITE_END() // type_definition_test
 
 BOOST_AUTO_TEST_SUITE_END() // write_setfield_miss_test
 
 BOOST_AUTO_TEST_SUITE(apply_setfield_test)
 
-    BOOST_AUTO_TEST_CASE(type_definition_test)
-    {
+    BOOST_AUTO_TEST_SUITE(type_definition_test)
+      BOOST_AUTO_TEST_CASE(type)
+      {
         using sut = table_feature_properties::apply_setfield;
 
-        BOOST_TEST(sut::type() == protocol::OFPTFPT_APPLY_SETFIELD);
-    }
+        using type = std::integral_constant<std::uint16_t, sut::type()>;
+
+        BOOST_TEST(type::value == protocol::OFPTFPT_APPLY_SETFIELD);
+      }
+      BOOST_AUTO_TEST_CASE(min_length)
+      {
+        using sut = table_feature_properties::apply_setfield;
+
+        using min_length
+          = std::integral_constant<std::uint16_t, sut::min_length()>;
+
+        BOOST_TEST(min_length::value == 4);
+      }
+      BOOST_AUTO_TEST_CASE(min_byte_length)
+      {
+        using sut = table_feature_properties::apply_setfield;
+
+        using min_byte_length
+          = std::integral_constant<std::uint16_t, sut::min_byte_length()>;
+
+        BOOST_TEST(min_byte_length::value == 8);
+      }
+    BOOST_AUTO_TEST_SUITE_END() // type_definition_test
 
 BOOST_AUTO_TEST_SUITE_END() // apply_setfield_test
 
 BOOST_AUTO_TEST_SUITE(apply_setfield_miss_test)
 
-    BOOST_AUTO_TEST_CASE(type_definition_test)
-    {
+    BOOST_AUTO_TEST_SUITE(type_definition_test)
+      BOOST_AUTO_TEST_CASE(type)
+      {
         using sut = table_feature_properties::apply_setfield_miss;
 
-        BOOST_TEST(sut::type() == protocol::OFPTFPT_APPLY_SETFIELD_MISS);
-    }
+        using type = std::integral_constant<std::uint16_t, sut::type()>;
+
+        BOOST_TEST(type::value == protocol::OFPTFPT_APPLY_SETFIELD_MISS);
+      }
+      BOOST_AUTO_TEST_CASE(min_length)
+      {
+        using sut = table_feature_properties::apply_setfield_miss;
+
+        using min_length
+          = std::integral_constant<std::uint16_t, sut::min_length()>;
+
+        BOOST_TEST(min_length::value == 4);
+      }
+      BOOST_AUTO_TEST_CASE(min_byte_length)
+      {
+        using sut = table_feature_properties::apply_setfield_miss;
+
+        using min_byte_length
+          = std::integral_constant<std::uint16_t, sut::min_byte_length()>;
+
+        BOOST_TEST(min_byte_length::value == 8);
+      }
+    BOOST_AUTO_TEST_SUITE_END() // type_definition_test
 
 BOOST_AUTO_TEST_SUITE_END() // apply_setfield_miss_test
 
