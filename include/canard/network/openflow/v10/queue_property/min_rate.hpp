@@ -47,6 +47,12 @@ namespace queue_properties {
             return queue_property;
         }
 
+        static constexpr auto type() noexcept
+            -> protocol::ofp_queue_properties
+        {
+            return property();
+        }
+
         static constexpr auto length() noexcept
             -> std::uint16_t
         {
