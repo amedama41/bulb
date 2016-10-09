@@ -29,7 +29,6 @@ BOOST_AUTO_TEST_SUITE(clear_actions_test)
         using sut = instructions::clear_actions;
 
         BOOST_TEST(sut::type() == v13::protocol::OFPIT_CLEAR_ACTIONS);
-        BOOST_TEST(sut::length() == sizeof(detail::ofp_instruction_actions));
     }
 
     BOOST_AUTO_TEST_CASE(construct_test)

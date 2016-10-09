@@ -56,25 +56,6 @@ BOOST_AUTO_TEST_SUITE(error_test)
         BOOST_TEST(sut.data() == msg.encode(buffer), boost::test_tools::per_element{});
     }
 
-    BOOST_AUTO_TEST_CASE(construct_from_header_test)
-    {
-        auto const etype = proto::OFPET_BAD_REQUEST;
-        auto const ecode = proto::OFPBRC_BAD_TYPE;
-        auto const header = v13_detail::ofp_header{proto::OFP_VERSION, 0xff, 8, 0x1};
-
-        auto const sut = v13::messages::error{etype, ecode, header};
-
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_ERROR);
-        BOOST_TEST(sut.length() == error_size + sizeof(header));
-        BOOST_TEST(sut.xid() == header.xid);
-        BOOST_TEST(sut.error_type() == etype);
-        BOOST_TEST(sut.error_code() == ecode);
-        BOOST_TEST(sut.data_length() == sizeof(header));
-        auto buffer = std::vector<std::uint8_t>{};
-        BOOST_TEST(sut.data() == of::detail::encode(buffer, header), boost::test_tools::per_element{});
-    }
-
     struct error_fixture
     {
         v13::messages::set_config const msg{0xff01, 0xfffe, 0x12345678};

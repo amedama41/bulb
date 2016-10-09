@@ -212,7 +212,7 @@ BOOST_AUTO_TEST_SUITE(next_tables_test)
 
         sut.encode(buffer);
 
-        BOOST_TEST(buffer.size() == detail::exact_length(sut.length()));
+        BOOST_TEST(buffer.size() == (sut.length() + 7) / 8 * 8);
         BOOST_TEST(buffer == binary, boost::test_tools::per_element{});
     }
 

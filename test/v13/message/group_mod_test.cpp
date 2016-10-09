@@ -14,14 +14,14 @@ namespace v13 {
 
 BOOST_AUTO_TEST_SUITE(group_mod_test)
 
-BOOST_AUTO_TEST_SUITE(group_mod_add_test)
+BOOST_AUTO_TEST_SUITE(group_add_test)
 
 BOOST_AUTO_TEST_SUITE(instantiation_test)
 
     BOOST_AUTO_TEST_CASE(constructor_test)
     {
         auto const group_id = 0;
-        auto const sut = group_mod_add{group_id, protocol::OFPGT_INDIRECT, {bucket{actions::output{4}}}};
+        auto const sut = group_add{group_id, protocol::OFPGT_INDIRECT, {bucket{actions::output{4}}}};
 
         BOOST_CHECK_EQUAL(sut.version(), protocol::OFP_VERSION);
         BOOST_CHECK_EQUAL(sut.type(), protocol::OFPT_GROUP_MOD);
@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_SUITE(instantiation_test)
 
     BOOST_AUTO_TEST_CASE(move_constructor_test)
     {
-        auto sut = group_mod_add{protocol::OFPG_MAX, protocol::OFPGT_SELECT, {
+        auto sut = group_add{protocol::OFPG_MAX, protocol::OFPGT_SELECT, {
               bucket{2, {actions::pop_vlan{}, actions::output{1}}} // 16 + 8 + 16 = 40
             , bucket{1, {actions::set_vlan_vid{4}, actions::output{2}}} // 16 + 16 + 16 = 48
         }};
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_SUITE(instantiation_test)
 BOOST_AUTO_TEST_SUITE_END() // instantiation_test
 
 struct encode_decode_fixture {
-    group_mod_add const sut{1, protocol::OFPGT_ALL, {
+    group_add const sut{1, protocol::OFPGT_ALL, {
           bucket{{actions::push_vlan{0x8100}, actions::set_vlan_vid{4095}, actions::output{1}}}
         , bucket{{actions::set_ipv4_src{address_v4{0x7f000001}}, actions::set_ipv4_dst{address_v4{0x7f000002}}, actions::output{2}}}
     }};
@@ -75,7 +75,7 @@ BOOST_FIXTURE_TEST_SUITE(encode_decode_test, encode_decode_fixture)
         sut.encode(buffer);
         auto it = buffer.begin();
 
-        auto const decoded_message = group_mod_add::decode(it, buffer.end());
+        auto const decoded_message = group_add::decode(it, buffer.end());
         BOOST_CHECK(it == buffer.end());
         BOOST_CHECK_EQUAL(decoded_message.version(), sut.version());
         BOOST_CHECK_EQUAL(decoded_message.type(), sut.type());
@@ -89,17 +89,17 @@ BOOST_FIXTURE_TEST_SUITE(encode_decode_test, encode_decode_fixture)
 
 BOOST_AUTO_TEST_SUITE_END() // encode_decode_test
 
-BOOST_AUTO_TEST_SUITE_END() // group_mod_add_test
+BOOST_AUTO_TEST_SUITE_END() // group_add_test
 
 
-BOOST_AUTO_TEST_SUITE(group_mod_delete_test)
+BOOST_AUTO_TEST_SUITE(group_delete_test)
 
 BOOST_AUTO_TEST_SUITE(instantiation_test)
 
     BOOST_AUTO_TEST_CASE(constructor_test)
     {
         auto const group_id = protocol::OFPG_ANY;
-        auto const sut = group_mod_delete{group_id};
+        auto const sut = group_delete{group_id};
 
         BOOST_CHECK_EQUAL(sut.version(), protocol::OFP_VERSION);
         BOOST_CHECK_EQUAL(sut.type(), protocol::OFPT_GROUP_MOD);
@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_SUITE(instantiation_test)
 
     BOOST_AUTO_TEST_CASE(move_constructor_test)
     {
-        auto sut = group_mod_delete{0};
+        auto sut = group_delete{0};
 
         auto const copy = std::move(sut);
 
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_SUITE(instantiation_test)
 BOOST_AUTO_TEST_SUITE_END() // instantiation_test
 
 struct encode_decode_fixture {
-    group_mod_delete const sut{protocol::OFPG_MAX};
+    group_delete const sut{protocol::OFPG_MAX};
     std::vector<std::uint8_t> buffer;
 };
 BOOST_FIXTURE_TEST_SUITE(encode_decode_test, encode_decode_fixture)
@@ -141,7 +141,7 @@ BOOST_FIXTURE_TEST_SUITE(encode_decode_test, encode_decode_fixture)
         sut.encode(buffer);
         auto it = buffer.begin();
 
-        auto const decoded_message = group_mod_delete::decode(it, buffer.end());
+        auto const decoded_message = group_delete::decode(it, buffer.end());
         BOOST_CHECK(it == buffer.end());
         BOOST_CHECK_EQUAL(decoded_message.version(), sut.version());
         BOOST_CHECK_EQUAL(decoded_message.type(), sut.type());
@@ -153,7 +153,7 @@ BOOST_FIXTURE_TEST_SUITE(encode_decode_test, encode_decode_fixture)
 
 BOOST_AUTO_TEST_SUITE_END() // encode_decode_test
 
-BOOST_AUTO_TEST_SUITE_END() // group_mod_delete_test
+BOOST_AUTO_TEST_SUITE_END() // group_delete_test
 
 BOOST_AUTO_TEST_SUITE_END() // group_mod_test
 
