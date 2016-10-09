@@ -114,6 +114,12 @@ namespace v13 {
             return mask_;
         }
 
+        static constexpr auto type() noexcept
+            -> std::uint32_t
+        {
+            return oxm_type();
+        }
+
         auto length() const noexcept
             -> std::uint16_t
         {
