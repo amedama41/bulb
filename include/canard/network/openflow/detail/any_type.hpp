@@ -45,6 +45,7 @@ namespace detail {
   {
   public:
     using header_type = typename Decoder::header_type;
+    using type_id = typename Decoder::type_id;
     using type_list = typename Decoder::decode_type_list;
 
   private:
@@ -80,6 +81,9 @@ namespace detail {
       variant_ = std::forward<T>(t);
       return *this;
     }
+
+    CANARD_NET_OFP_DECL auto type() const noexcept
+      -> type_id;
 
     CANARD_NET_OFP_DECL auto length() const noexcept
       -> std::uint16_t;

@@ -15,6 +15,13 @@ namespace ofp {
 namespace detail {
 
   template <class Derived, class Decoder>
+  auto any_type<Derived, Decoder>::type() const noexcept
+    -> type_id
+  {
+    return visit(detail::type_visitor<type_id>{});
+  }
+
+  template <class Derived, class Decoder>
   auto any_type<Derived, Decoder>::length() const noexcept
     -> std::uint16_t
   {

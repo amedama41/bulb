@@ -1,6 +1,7 @@
 #ifndef CANARD_NET_OFP_V13_INSTRUCTION_DECODER_HPP
 #define CANARD_NET_OFP_V13_INSTRUCTION_DECODER_HPP
 
+#include <cstdint>
 #include <iterator>
 #include <stdexcept>
 #include <tuple>
@@ -19,6 +20,7 @@ struct instruction_decoder
 {
     using ofp_instruction_type = protocol::ofp_instruction_type;
     using header_type = v13_detail::ofp_instruction;
+    using type_id = std::uint16_t;
     using decode_type_list = default_instruction_list;
 
     static_assert(

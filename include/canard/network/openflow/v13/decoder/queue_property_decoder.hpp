@@ -1,6 +1,7 @@
 #ifndef CANARD_NET_OFP_V13_QUEUE_PROPERTY_DECODER_HPP
 #define CANARD_NET_OFP_V13_QUEUE_PROPERTY_DECODER_HPP
 
+#include <cstdint>
 #include <iterator>
 #include <stdexcept>
 #include <tuple>
@@ -18,6 +19,7 @@ namespace v13 {
 struct queue_property_decoder
 {
     using header_type = v13_detail::ofp_queue_prop_header;
+    using type_id = std::uint16_t;
     using decode_type_list = default_queue_property_list;
 
     static_assert(

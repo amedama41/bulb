@@ -16,6 +16,7 @@ namespace v13 {
 struct oxm_match_field_decoder
 {
     using header_type = std::uint32_t;
+    using type_id = std::uint32_t;
     using decode_type_list = default_oxm_match_field_list;
 
     template <class ReturnType, class Iterator, class Function>

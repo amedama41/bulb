@@ -1,6 +1,7 @@
 #ifndef CANARD_NET_OFP_V13_HELLO_ELEMENT_DECODER_HPP
 #define CANARD_NET_OFP_V13_HELLO_ELEMENT_DECODER_HPP
 
+#include <cstdint>
 #include <iterator>
 #include <stdexcept>
 #include <tuple>
@@ -41,6 +42,7 @@ namespace v13 {
         , "not match to the number of hello element types");
 
     using header_type = v13_detail::ofp_hello_elem_header;
+    using type_id = std::uint16_t;
     using decode_type_list = hello_element_decoder_detail::tuple_append_t<
       hello_element_list, unknwon_type
     >;

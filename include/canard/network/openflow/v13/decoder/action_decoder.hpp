@@ -1,6 +1,7 @@
 #ifndef CANARD_NET_OFP_V13_ACTION_DECODER_HPP
 #define CANARD_NET_OFP_V13_ACTION_DECODER_HPP
 
+#include <cstdint>
 #include <iterator>
 #include <stdexcept>
 #include <tuple>
@@ -20,6 +21,7 @@ struct action_decoder
 {
     using ofp_action_type = protocol::ofp_action_type;
     using header_type = v13_detail::ofp_action_header;
+    using type_id = std::uint16_t;
     using decode_type_list = default_all_action_list;
     using non_set_field_action_type_list = default_action_list;
 
