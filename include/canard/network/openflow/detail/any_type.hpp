@@ -26,22 +26,12 @@ namespace net {
 namespace ofp {
 namespace detail {
 
-  template <class T>
-  struct get_decoder;
+  template <class Derived> class empty_any_type_base {};
 
-  template <template <class> class T, class Decoder>
-  struct get_decoder<T<Decoder>>
-  {
-    using type = Decoder;
-  };
-
-  template <class T>
-  using get_decoder_t = typename get_decoder<T>::type;
-
-
-  template <class Derived, class Decoder = get_decoder_t<Derived>>
+  template <class Decoder, template <class> class Base = empty_any_type_base>
   class any_type
-    : private boost::equality_comparable<Derived>
+    : public Base<any_type<Decoder, Base>>
+    , private boost::equality_comparable<any_type<Decoder, Base>>
   {
   public:
     using header_type = typename Decoder::header_type;
@@ -123,19 +113,19 @@ namespace detail {
 
     template <class Iterator>
     static auto decode(Iterator& first, Iterator last)
-      -> Derived
+      -> any_type
     {
-      return Decoder::template decode<Derived>(first, last, to_any{});
+      return Decoder::template decode<any_type>(first, last, to_any{});
     }
 
-    friend auto operator==(Derived const& lhs, Derived const& rhs) noexcept
+    friend auto operator==(any_type const& lhs, any_type const& rhs) noexcept
       -> bool
     {
       return lhs.equal_impl(rhs);
     }
 
     template <class T, class = containable_if_t<T>>
-    friend auto operator==(Derived const& lhs, T const& rhs) noexcept
+    friend auto operator==(any_type const& lhs, T const& rhs) noexcept
       -> bool
     {
       if (auto const v = lhs.template ptr_any_cast<T>()) {
@@ -145,34 +135,34 @@ namespace detail {
     }
 
     template <class T, class = containable_if_t<T>>
-    friend auto operator==(T const& lhs, Derived const& rhs) noexcept
+    friend auto operator==(T const& lhs, any_type const& rhs) noexcept
       -> bool
     {
       return rhs == lhs;
     }
 
     template <class T, class = containable_if_t<T>>
-    friend auto operator!=(Derived const& lhs, T const& rhs) noexcept
+    friend auto operator!=(any_type const& lhs, T const& rhs) noexcept
       -> bool
     {
       return !(lhs == rhs);
     }
 
     template <class T, class = containable_if_t<T>>
-    friend auto operator!=(T const& lhs, Derived const& rhs) noexcept
+    friend auto operator!=(T const& lhs, any_type const& rhs) noexcept
       -> bool
     {
       return !(rhs == lhs);
     }
 
-    friend auto equivalent(Derived const& lhs, Derived const& rhs) noexcept
+    friend auto equivalent(any_type const& lhs, any_type const& rhs) noexcept
       -> bool
     {
       return lhs.equivalent_impl(rhs);
     }
 
     template <class T, class = containable_if_t<T>>
-    friend auto equivalent(Derived const& lhs, T const& rhs) noexcept
+    friend auto equivalent(any_type const& lhs, T const& rhs) noexcept
       -> bool
     {
       if (auto const v = lhs.template ptr_any_cast<T>()) {
@@ -182,26 +172,26 @@ namespace detail {
     }
 
     template <class T, class = containable_if_t<T>>
-    friend auto equivalent(T const& lhs, Derived const& rhs) noexcept
+    friend auto equivalent(T const& lhs, any_type const& rhs) noexcept
       -> bool
     {
       return equivalent(rhs, lhs);
     }
 
-    template <class T, class D1, class D2>
-    friend auto any_cast(any_type<D1, D2>&)
+    template <class T, class D, template <class> class B>
+    friend auto any_cast(any_type<D, B>&)
       -> T&;
 
-    template <class T, class D1, class D2>
-    friend auto any_cast(any_type<D1, D2> const&)
+    template <class T, class D, template <class> class B>
+    friend auto any_cast(any_type<D, B> const&)
       -> T const&;
 
-    template <class T, class D1, class D2>
-    friend auto any_cast(any_type<D1, D2>*)
+    template <class T, class D, template <class> class B>
+    friend auto any_cast(any_type<D, B>*)
       -> T*;
 
-    template <class T, class D1, class D2>
-    friend auto any_cast(any_type<D1, D2> const*)
+    template <class T, class D, template <class> class B>
+    friend auto any_cast(any_type<D, B> const*)
       -> T const*;
 
   private:
@@ -262,9 +252,9 @@ namespace detail {
     {
       template <class T>
       auto operator()(T&& t) const
-        -> Derived
+        -> any_type
       {
-        return Derived{std::forward<T>(t)};
+        return any_type{std::forward<T>(t)};
       }
     };
 
@@ -273,29 +263,29 @@ namespace detail {
     variant_t variant_;
   };
 
-  template <class T, class Derived, class Decoder>
-  auto any_cast(any_type<Derived, Decoder>& any)
+  template <class T, class Decoder, template <class> class Base>
+  auto any_cast(any_type<Decoder, Base>& any)
     -> T&
   {
     return any.template ref_any_cast<T>();
   }
 
-  template <class T, class Derived, class Decoder>
-  auto any_cast(any_type<Derived, Decoder> const& any)
+  template <class T, class Decoder, template <class> class Base>
+  auto any_cast(any_type<Decoder, Base> const& any)
     -> T const&
   {
     return any.template ref_any_cast<T>();
   }
 
-  template <class T, class Derived, class Decoder>
-  auto any_cast(any_type<Derived, Decoder>* const any)
+  template <class T, class Decoder, template <class> class Base>
+  auto any_cast(any_type<Decoder, Base>* const any)
     -> T*
   {
     return any->template ptr_any_cast<T>();
   }
 
-  template <class T, class Derived, class Decoder>
-  auto any_cast(any_type<Derived, Decoder> const* const any)
+  template <class T, class Decoder, template <class> class Base>
+  auto any_cast(any_type<Decoder, Base> const* const any)
     -> T const*
   {
     return any->template ptr_any_cast<T>();

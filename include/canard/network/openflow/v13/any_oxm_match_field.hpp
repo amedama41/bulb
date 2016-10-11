@@ -3,7 +3,7 @@
 
 #include <canard/network/openflow/detail/config.hpp>
 
-#include <canard/network/openflow/detail/any_oxm_match_field.hpp>
+#include <canard/network/openflow/detail/any_oxm_match_field_base.hpp>
 #include <canard/network/openflow/detail/any_type.hpp>
 #include <canard/network/openflow/v13/decoder/oxm_match_field_decoder.hpp>
 
@@ -12,8 +12,9 @@ namespace net {
 namespace ofp {
 namespace v13 {
 
-  using any_oxm_match_field
-    = detail::any_oxm_match_field<oxm_match_field_decoder>;
+  using any_oxm_match_field = detail::any_type<
+    oxm_match_field_decoder, detail::any_oxm_match_field_base
+  >;
 
   template <class T>
   auto any_cast(any_oxm_match_field& field)
@@ -56,9 +57,9 @@ namespace net {
 namespace ofp {
 namespace detail {
 
-  extern template class any_oxm_match_field<ofp::v13::oxm_match_field_decoder>;
-  extern template class any_type<
-    any_oxm_match_field<ofp::v13::oxm_match_field_decoder>
+  extern template class any_type<ofp::v13::oxm_match_field_decoder>;
+  extern template class any_oxm_match_field_base<
+    any_type<ofp::v13::oxm_match_field_decoder, any_oxm_match_field_base>
   >;
 
 } // namespace detail

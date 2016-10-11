@@ -1,25 +1,19 @@
-#ifndef CANARD_NET_OFP_DETAIL_ANY_OXM_MATCH_FIELD_HPP
-#define CANARD_NET_OFP_DETAIL_ANY_OXM_MATCH_FIELD_HPP
+#ifndef CANARD_NET_OFP_DETAIL_ANY_OXM_MATCH_FIELD_BASE_HPP
+#define CANARD_NET_OFP_DETAIL_ANY_OXM_MATCH_FIELD_BASE_HPP
 
 #include <canard/network/openflow/detail/config.hpp>
 
 #include <cstdint>
-#include <canard/network/openflow/detail/any_type.hpp>
 
 namespace canard {
 namespace net {
 namespace ofp {
 namespace detail {
 
-  template <class OXMMatchFieldDecoder>
-  class any_oxm_match_field
-    : public any_type<any_oxm_match_field<OXMMatchFieldDecoder>>
+  template <class Derived>
+  class any_oxm_match_field_base
   {
-    using base_t = any_type<any_oxm_match_field<OXMMatchFieldDecoder>>;
-
   public:
-    using base_t::base_t;
-
     CANARD_NET_OFP_DECL auto oxm_class() const noexcept
       -> std::uint16_t;
 
@@ -43,6 +37,10 @@ namespace detail {
 
     CANARD_NET_OFP_DECL auto is_exact() const noexcept
       -> bool;
+
+  private:
+    CANARD_NET_OFP_DECL auto derived() const noexcept
+      -> Derived const&;
   };
 
 } // namespace detail
@@ -51,7 +49,7 @@ namespace detail {
 } // namespace canard
 
 #if defined(CANARD_NET_OFP_HEADER_ONLY) || !defined(CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
-#   include <canard/network/openflow/detail/impl/any_oxm_match_field.hpp>
+#   include <canard/network/openflow/detail/impl/any_oxm_match_field_base.hpp>
 #endif
 
-#endif // CANARD_NET_OFP_DETAIL_ANY_OXM_MATCH_FIELD_HPP
+#endif // CANARD_NET_OFP_DETAIL_ANY_OXM_MATCH_FIELD_BASE_HPP

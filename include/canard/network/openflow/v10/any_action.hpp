@@ -3,18 +3,15 @@
 
 #include <canard/network/openflow/detail/config.hpp>
 
-#include <canard/network/openflow/detail/any_action.hpp>
 #include <canard/network/openflow/detail/any_type.hpp>
-#include <canard/network/openflow/v10/actions.hpp>
 #include <canard/network/openflow/v10/decoder/action_decoder.hpp>
-#include <canard/network/openflow/v10/openflow.hpp>
 
 namespace canard {
 namespace net {
 namespace ofp {
 namespace v10 {
 
-  using any_action = detail::any_action<action_decoder>;
+  using any_action = detail::any_type<action_decoder>;
 
   template <class T>
   auto any_cast(any_action& action)
@@ -57,8 +54,7 @@ namespace net {
 namespace ofp {
 namespace detail {
 
-  extern template class any_action<ofp::v10::action_decoder>;
-  extern template class any_type<any_action<ofp::v10::action_decoder>>;
+  extern template class any_type<ofp::v10::action_decoder>;
 
 } // namespace detail
 } // namespace ofp

@@ -1,7 +1,6 @@
 #ifndef CANARD_NET_OFP_V10_ANY_QUEUE_PROPEPRTY_HPP
 #define CANARD_NET_OFP_V10_ANY_QUEUE_PROPEPRTY_HPP
 
-#include <canard/network/openflow/detail/any_queue_property.hpp>
 #include <canard/network/openflow/detail/any_type.hpp>
 #include <canard/network/openflow/v10/decoder/queue_property_decoder.hpp>
 
@@ -10,8 +9,7 @@ namespace net {
 namespace ofp {
 namespace v10 {
 
-  using any_queue_property
-    = detail::any_queue_property<queue_property_decoder>;
+  using any_queue_property = detail::any_type<queue_property_decoder>;
 
   template <class T>
   auto any_cast(any_queue_property& property)
@@ -54,10 +52,7 @@ namespace net {
 namespace ofp {
 namespace detail {
 
-  // extern template class any_queue_property<ofp::v10::queue_property_decoder>;
-  extern template class any_type<
-    any_queue_property<ofp::v10::queue_property_decoder>
-  >;
+  extern template class any_type<ofp::v10::queue_property_decoder>;
 
 } // namespace detail
 } // namespace ofp

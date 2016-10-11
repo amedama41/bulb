@@ -4,7 +4,6 @@
 #include <canard/network/openflow/detail/config.hpp>
 
 #include <cstdint>
-#include <canard/network/openflow/detail/any_instruction.hpp>
 #include <canard/network/openflow/detail/any_type.hpp>
 #include <canard/network/openflow/v13/decoder/instruction_decoder.hpp>
 #include <canard/network/openflow/v13/instruction_order.hpp>
@@ -14,7 +13,7 @@ namespace net {
 namespace ofp {
 namespace v13 {
 
-  using any_instruction = detail::any_instruction<instruction_decoder>;
+  using any_instruction = detail::any_type<instruction_decoder>;
 
   template <class T>
   auto any_cast(any_instruction& instruction)
@@ -67,10 +66,7 @@ namespace net {
 namespace ofp {
 namespace detail {
 
-  extern template class any_instruction<ofp::v13::instruction_decoder>;
-  extern template class any_type<
-    any_instruction<ofp::v13::instruction_decoder>
-  >;
+  extern template class any_type<ofp::v13::instruction_decoder>;
 
 } // namespace detail
 } // namespace ofp

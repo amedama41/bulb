@@ -1,7 +1,7 @@
 #ifndef CANARD_NET_OFP_V13_ANY_HELLO_ELEMENT_HPP
 #define CANARD_NET_OFP_V13_ANY_HELLO_ELEMENT_HPP
 
-#include <canard/network/openflow/detail/any_hello_element.hpp>
+#include <canard/network/openflow/detail/any_type.hpp>
 #include <canard/network/openflow/v13/decoder/hello_element_decoder.hpp>
 
 namespace canard {
@@ -9,7 +9,7 @@ namespace net {
 namespace ofp {
 namespace v13 {
 
-  using any_hello_element = detail::any_hello_element<hello_element_decoder>;
+  using any_hello_element = detail::any_type<hello_element_decoder>;
 
   template <class T>
   auto any_cast(any_hello_element& hello_elem)
@@ -55,10 +55,7 @@ namespace net {
 namespace ofp {
 namespace detail {
 
-  extern template class any_hello_element<ofp::v13::hello_element_decoder>;
-  extern template class any_type<
-    any_hello_element<ofp::v13::hello_element_decoder>
-  >;
+  extern template class any_type<ofp::v13::hello_element_decoder>;
 
 } // namespace detail
 } // namespace ofp
