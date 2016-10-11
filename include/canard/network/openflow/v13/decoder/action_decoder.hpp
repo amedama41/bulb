@@ -19,7 +19,6 @@ namespace v13 {
 
 struct action_decoder
 {
-    using ofp_action_type = protocol::ofp_action_type;
     using header_type = v13_detail::ofp_action_header;
     using type_id = std::uint16_t;
     using decode_type_list = default_all_action_list;

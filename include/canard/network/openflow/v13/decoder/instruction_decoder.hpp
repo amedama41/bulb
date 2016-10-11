@@ -18,7 +18,6 @@ namespace v13 {
 
 struct instruction_decoder
 {
-    using ofp_instruction_type = protocol::ofp_instruction_type;
     using header_type = v13_detail::ofp_instruction;
     using type_id = std::uint16_t;
     using decode_type_list = default_instruction_list;
