@@ -4,17 +4,11 @@
 #include <cstdint>
 #include <iterator>
 #include <stdexcept>
-#include <type_traits>
-#include <utility>
-#include <boost/operators.hpp>
-#include <boost/variant/apply_visitor.hpp>
-#include <boost/variant/get.hpp>
-#include <boost/variant/variant.hpp>
-#include <boost/variant/static_visitor.hpp>
+#include <tuple>
+#include <canard/network/openflow/detail/any_type.hpp>
+#include <canard/network/openflow/detail/impl/any_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
-#include <canard/network/openflow/detail/is_related.hpp>
-#include <canard/network/openflow/detail/visitors.hpp>
-#include <canard/network/openflow/v13/detail/visitors.hpp>
+#include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 #include <canard/network/openflow/v13/table_feature_property/id/oxm_id.hpp>
 
@@ -23,138 +17,59 @@ namespace net {
 namespace ofp {
 namespace v13 {
 
-    class any_oxm_id
-        : private boost::equality_comparable<any_oxm_id>
+  struct oxm_id_decoder
+  {
+    using header_type = std::uint32_t;
+    using type_id = std::uint32_t;
+    using decode_type_list = std::tuple<oxm_id, oxm_experimenter_id>;
+
+    template <class ReturnType, class Iterator, class Function>
+    static auto decode(Iterator& first, Iterator last, Function function)
+      -> ReturnType
     {
-        using oxm_id_variant = boost::variant<oxm_id, oxm_experimenter_id>;
+      auto it = first;
+      auto const header = detail::decode<header_type>(it, last);
 
-    public:
-        template <
-              class OXMID
-            , class = typename std::enable_if<
-                    !detail::is_related<any_oxm_id, OXMID>::value
-              >::type
-        >
-        any_oxm_id(OXMID&& oxm_id)
-            : variant_(std::forward<OXMID>(oxm_id))
-        {
-        }
-
-        template <
-              class OXMID
-            , class = typename std::enable_if<
-                    !detail::is_related<any_oxm_id, OXMID>::value
-              >::type
-        >
-        auto operator=(OXMID&& oxm_id)
-            -> any_oxm_id&
-        {
-            variant_ = std::forward<OXMID>(oxm_id);
-            return *this;
-        }
-
-        auto oxm_type() const noexcept
-            -> std::uint32_t
-        {
-            auto visitor = detail::oxm_type_visitor{};
-            return boost::apply_visitor(visitor, variant_);
-        }
-
-        auto oxm_header() const noexcept
-            -> std::uint32_t
-        {
-            auto visitor = detail::oxm_header_visitor{};
-            return boost::apply_visitor(visitor, variant_);
-        }
-
-        auto oxm_has_mask() const noexcept
-            -> bool
-        {
-            auto visitor = detail::oxm_has_mask_visitor{};
-            return boost::apply_visitor(visitor, variant_);
-        }
-
-        auto oxm_length() const noexcept
-            -> std::uint8_t
-        {
-            auto visitor = detail::oxm_length_visitor{};
-            return boost::apply_visitor(visitor, variant_);
-        }
-
-        auto length() const noexcept
-            -> std::uint16_t
-        {
-            auto visitor = detail::length_visitor{};
-            return boost::apply_visitor(visitor, variant_);
-        }
-
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            auto visitor = detail::encoding_visitor<Container>{container};
-            return boost::apply_visitor(visitor, variant_);
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> any_oxm_id
-        {
-            auto copy_first = first;
-            auto const oxm_header
-                = detail::decode<std::uint32_t>(copy_first, last);
-            switch (oxm_header >> 16) {
-            case protocol::OFPXMC_EXPERIMENTER:
-                if (std::distance(first, last)
-                        < sizeof(v13_detail::ofp_oxm_experimenter_header)) {
-                    throw std::runtime_error{"invalid oxm_ids length"};
-                }
-                return oxm_experimenter_id::decode(first, last);
-            default:
-                return oxm_id::decode(first, last);
-            }
-        }
-
-        template <class T>
-        friend auto any_cast(any_oxm_id const&)
-            -> T const&;
-
-        template <class T>
-        friend auto any_cast(any_oxm_id const*)
-            -> T const*;
-
-        friend auto operator==(
-                any_oxm_id const& lhs, any_oxm_id const& rhs) noexcept
-            -> bool
-        {
-            return lhs.variant_ == rhs.variant_;
-        }
-
-        friend auto equivalent(
-                any_oxm_id const& lhs, any_oxm_id const& rhs) noexcept
-            -> bool
-        {
-            auto visitor = detail::equivalent_visitor{};
-            return boost::apply_visitor(visitor, lhs.variant_, rhs.variant_);
-        }
-
-    private:
-        oxm_id_variant variant_;
-    };
-
-    template <class T>
-    auto any_cast(any_oxm_id const& oxm_id)
-        -> T const&
-    {
-        return boost::get<T>(oxm_id.variant_);
+      if ((header >> 16) == protocol::OFPXMC_EXPERIMENTER) {
+        // oxm_experimenter_id::validate_oxm_header(header);
+        return function(oxm_experimenter_id::decode(first, last));
+      }
+      else {
+        // oxm_id::validate_oxm_header(header);
+        return function(oxm_id::decode(first, last));
+      }
     }
+  };
 
-    template <class T>
-    auto any_cast(any_oxm_id const* oxm_id)
-        -> T const*
-    {
-        return boost::get<T>(&oxm_id->variant_);
-    }
+  using any_oxm_id = detail::any_type<oxm_id_decoder>;
+
+  template <class T>
+  auto any_cast(any_oxm_id& oxm_id)
+    -> T&
+  {
+    return detail::any_cast<T>(oxm_id);
+  }
+
+  template <class T>
+  auto any_cast(any_oxm_id const& oxm_id)
+    -> T const&
+  {
+    return detail::any_cast<T>(oxm_id);
+  }
+
+  template <class T>
+  auto any_cast(any_oxm_id* const oxm_id)
+    -> T*
+  {
+    return detail::any_cast<T>(oxm_id);
+  }
+
+  template <class T>
+  auto any_cast(any_oxm_id const* const oxm_id)
+    -> T const*
+  {
+    return detail::any_cast<T>(oxm_id);
+  }
 
 } // namespace v13
 } // namespace ofp
