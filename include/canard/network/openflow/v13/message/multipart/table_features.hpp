@@ -17,7 +17,6 @@
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/v13/detail/basic_multipart.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
-#include <canard/network/openflow/v13/table_feature_property/table_feature_property.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 #include <canard/network/openflow/v13/utility/table_feature_property_set.hpp>
 
