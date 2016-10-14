@@ -11,11 +11,8 @@
 #include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/numeric.hpp>
-#include <boost/variant/apply_visitor.hpp>
 #include <canard/network/openflow/detail/add_helper.hpp>
-#include <canard/network/openflow/detail/visitors.hpp>
-#include <canard/network/openflow/v13/detail/visitors.hpp>
-#include <canard/network/openflow/v13/table_feature_property/table_feature_property.hpp>
+#include <canard/network/openflow/v13/any_table_feature_property.hpp>
 
 namespace canard {
 namespace net {
@@ -25,7 +22,7 @@ namespace v13 {
     class table_feature_property_set
     {
         using property_map
-            = std::map<std::uint16_t, table_feature_properties::variant>;
+            = std::map<std::uint16_t, any_table_feature_property>;
 
     public:
         using value_type = property_map::mapped_type;
@@ -68,11 +65,8 @@ namespace v13 {
         {
             using boost::adaptors::transformed;
             return boost::accumulate(
-                      *this | transformed([](const_reference prop) {
-                          auto const visitor
-                              = v13_detail::calculating_exact_length_visitor{};
-                          return boost::apply_visitor(visitor, prop);
-                      })
+                      *this | transformed(
+                          [](const_reference p) { return p.byte_length(); })
                     , std::uint16_t{0});
         }
 
@@ -98,10 +92,8 @@ namespace v13 {
         auto encode(Container& container) const
             -> Container&
         {
-            boost::for_each(*this, [&](const_reference prop) {
-                auto const visitor = detail::encoding_visitor<Container>{container};
-                boost::apply_visitor(visitor, prop);
-            });
+            boost::for_each(
+                    *this, [&](const_reference p) { p.encode(container); });
             return container;
         }
 
@@ -112,7 +104,7 @@ namespace v13 {
             auto properties = table_feature_property_set{};
             while (std::distance(first, last)
                     >= sizeof(v13_detail::ofp_table_feature_prop_header)) {
-                table_feature_properties::decode<void>(
+                table_feature_property_decoder::decode<void>(
                           first, last
                         , detail::add_helper<table_feature_property_set>{properties});
             }
