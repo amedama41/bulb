@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_SUITE(any_queue_property_test)
 
       auto const sut = ofp::v10::any_queue_property{min_rate};
 
-      BOOST_TEST(sut.property() == min_rate.property());
+      BOOST_TEST(sut.type() == min_rate.type());
       BOOST_TEST(sut.length() == min_rate.length());
       // TODO
     }

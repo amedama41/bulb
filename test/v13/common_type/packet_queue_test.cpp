@@ -52,9 +52,9 @@ BOOST_AUTO_TEST_SUITE(packet_queue_test)
         BOOST_TEST(sut.port_no() == queue_id.port());
         BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_packet_queue) + 32);
         BOOST_TEST(sut.properties().size() == properties.size());
-        BOOST_TEST(sut.properties()[0].property() == properties[0].property());
+        BOOST_TEST(sut.properties()[0].type() == properties[0].type());
         BOOST_TEST(sut.properties()[0].length() == properties[0].length());
-        BOOST_TEST(sut.properties()[1].property() == properties[1].property());
+        BOOST_TEST(sut.properties()[1].type() == properties[1].type());
         BOOST_TEST(sut.properties()[1].length() == properties[1].length());
     }
 
