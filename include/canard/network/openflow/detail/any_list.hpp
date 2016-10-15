@@ -18,30 +18,6 @@ namespace net {
 namespace ofp {
 namespace detail {
 
-  namespace any_list_detail {
-
-    template <class T>
-    auto is_input_iterator_impl(T&)
-      -> std::is_base_of<
-            std::input_iterator_tag
-          , typename std::iterator_traits<T>::iterator_category
-         >;
-
-    auto is_input_iterator_impl(...)
-      -> std::false_type;
-
-    template <class... T>
-    struct is_input_iterator : std::false_type
-    {};
-
-    template <class T>
-    struct is_input_iterator<T>
-      : decltype(is_input_iterator_impl(std::declval<T>()))
-    {};
-
-  } // namespace any_list_detail
-
-
   template <class AnyType>
   class any_list
     : private boost::equality_comparable<any_list<AnyType>>
@@ -141,7 +117,7 @@ namespace detail {
     template <class... Args>
     auto insert(const_iterator pos, Args&&... args)
       -> typename std::enable_if<
-          !any_list_detail::is_input_iterator<Args...>::value, iterator
+          !detail::is_input_iterator<Args...>::value, iterator
          >::type
     {
       return values_.insert(
@@ -151,7 +127,7 @@ namespace detail {
     template <class InputIterator>
     auto insert(const_iterator pos, InputIterator first, InputIterator last)
       -> typename std::enable_if<
-          any_list_detail::is_input_iterator<InputIterator>::value, iterator
+          detail::is_input_iterator<InputIterator>::value, iterator
          >::type
     {
       return values_.insert(pos, first, last);

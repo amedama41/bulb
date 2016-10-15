@@ -1,12 +1,36 @@
 #ifndef CANARD_NET_OFP_TYPE_TRAITS_HPP
 #define CANARD_NET_OFP_TYPE_TRAITS_HPP
 
+#include <iterator>
 #include <type_traits>
+#include <utility>
 
 namespace canard {
 namespace net {
 namespace ofp {
 namespace detail {
+
+  namespace type_traits_detail {
+
+    template <class T>
+    auto is_input_iterator_impl(T&)
+      -> std::is_base_of<
+            std::input_iterator_tag
+          , typename std::iterator_traits<T>::iterator_category
+         >;
+
+    auto is_input_iterator_impl(...)
+      -> std::false_type;
+
+  } // namespace type_traits_detail
+
+  template <class...>
+  struct is_input_iterator : std::false_type {};
+
+  template <class T>
+  struct is_input_iterator<T>
+    : decltype(type_traits_detail::is_input_iterator_impl(std::declval<T>()))
+  {};
 
   template <class...>
   struct conjuction : std::true_type {};
