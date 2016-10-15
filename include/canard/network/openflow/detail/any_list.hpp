@@ -11,6 +11,7 @@
 #include <vector>
 #include <boost/operators.hpp>
 #include <boost/range/algorithm/for_each.hpp>
+#include <canard/network/openflow/detail/type_traits.hpp>
 
 namespace canard {
 namespace net {
@@ -38,19 +39,6 @@ namespace detail {
       : decltype(is_input_iterator_impl(std::declval<T>()))
     {};
 
-    template <class...>
-    struct conjuction : std::true_type {};
-
-    template <class B1, class... Bn>
-    struct conjuction<B1, Bn...>
-      : std::conditional<B1::value, conjuction<Bn...>, B1>::type
-    {};
-
-    template <class T, class... Args>
-    using is_all_constructible_t = typename std::enable_if<
-      conjuction<std::is_constructible<T, Args>...>::value
-    >::type;
-
   } // namespace any_list_detail
 
 
@@ -74,7 +62,7 @@ namespace detail {
 
     template <
         class... Args
-      , class = any_list_detail::is_all_constructible_t<value_type, Args...>
+      , class = detail::is_all_constructible_t<value_type, Args...>
     >
     any_list(Args&&... args)
       : values_{value_type(std::forward<Args>(args))...}
