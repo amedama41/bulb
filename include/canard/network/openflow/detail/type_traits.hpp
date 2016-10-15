@@ -13,7 +13,7 @@ namespace detail {
   namespace type_traits_detail {
 
     template <class T>
-    auto is_input_iterator_impl(T&)
+    auto is_input_iterator_impl(T const&)
       -> std::is_base_of<
             std::input_iterator_tag
           , typename std::iterator_traits<T>::iterator_category
