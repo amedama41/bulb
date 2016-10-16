@@ -1,0 +1,344 @@
+#ifndef CANARD_NET_OFP_LIST_HPP
+#define CANARD_NET_OFP_LIST_HPP
+
+#include <canard/network/openflow/detail/config.hpp>
+
+#include <cstdint>
+#include <initializer_list>
+#include <iterator>
+#include <stdexcept>
+#include <type_traits>
+#include <utility>
+#include <vector>
+#include <boost/operators.hpp>
+#include <boost/range/algorithm/for_each.hpp>
+#include <canard/network/openflow/detail/type_traits.hpp>
+
+namespace canard {
+namespace net {
+namespace ofp {
+
+  namespace list_detail {
+
+    template <class T>
+    auto has_header_impl(T const&)
+      -> decltype(typename T::header_type{}, std::true_type{});
+
+    auto has_header_impl(...)
+      -> std::false_type;
+
+    template <class T>
+    struct has_header : decltype(has_header_impl(std::declval<T>())) {};
+
+    template <class ProtocolType, class = void>
+    struct header_size_impl
+    {
+      static constexpr std::uint16_t value = ProtocolType::min_byte_length();
+    };
+
+    template <class ProtocolType>
+    struct header_size_impl<
+        ProtocolType
+      , typename std::enable_if<has_header<ProtocolType>::value>::type
+    >
+    {
+      static constexpr std::uint16_t value
+        = sizeof(typename ProtocolType::header_type);
+    };
+
+    template <class ProtocolType>
+    constexpr auto header_size() noexcept
+      -> std::uint16_t
+    {
+      return header_size_impl<ProtocolType>::value;
+    }
+
+  } // namespace list_detail
+
+  template <class ProtocolType>
+  class list
+    : private boost::equality_comparable<list<ProtocolType>>
+  {
+    using container_type = std::vector<ProtocolType>;
+
+  public:
+    // types:
+    using value_type = typename container_type::value_type;
+    using reference = typename container_type::reference;
+    using const_reference = typename container_type::const_reference;
+    using iterator = typename container_type::iterator;
+    using const_iterator = typename container_type::const_iterator;
+    using difference_type = typename container_type::difference_type;
+    using size_type = typename container_type::size_type;
+
+    using reverse_iterator = typename container_type::reverse_iterator;
+    using const_reverse_iterator
+        = typename container_type::const_reverse_iterator;
+
+    // construct:
+    CANARD_NET_OFP_DECL list(size_type, const_reference);
+
+    template <
+        class InputIterator
+      , class = detail::enable_if_is_input_iterator_t<InputIterator>
+    >
+    list(InputIterator first, InputIterator last)
+      : values_(first, last)
+    {
+    }
+
+    template <
+        class... Args
+      , class = detail::enable_if_is_all_constructible_t<value_type, Args...>
+    >
+    list(Args&&... args)
+      : values_{ value_type(std::forward<Args>(args))... }
+    {
+    }
+
+    template <
+        class... Args
+      , class = detail::enable_if_is_all_constructible_t<value_type, Args...>
+    >
+    auto operator=(Args&&... args)
+      -> list&
+    {
+      assign_impl({ value_type(std::forward<Args>(args))... });
+      return *this;
+    }
+
+    template <
+        class InputIterator
+      , class = detail::enable_if_is_input_iterator_t<InputIterator>
+    >
+    void assign(InputIterator first, InputIterator last)
+    {
+      values_.assign(first, last);
+    }
+
+    CANARD_NET_OFP_DECL void assign(size_type, const_reference);
+
+    template <
+        class... Args
+      , class = detail::enable_if_is_all_constructible_t<value_type, Args...>
+    >
+    void assign(Args&&... args)
+    {
+      assign_impl({ value_type(std::forward<Args>(args))... });
+    }
+
+    // iterators:
+    CANARD_NET_OFP_DECL auto begin() noexcept
+      -> iterator;
+
+    CANARD_NET_OFP_DECL auto begin() const noexcept
+      -> const_iterator;
+
+    CANARD_NET_OFP_DECL auto end() noexcept
+      -> iterator;
+
+    CANARD_NET_OFP_DECL auto end() const noexcept
+      -> const_iterator;
+
+    CANARD_NET_OFP_DECL auto cbegin() const noexcept
+      -> const_iterator;
+
+    CANARD_NET_OFP_DECL auto cend() const noexcept
+      -> const_iterator;
+
+    CANARD_NET_OFP_DECL auto rbegin() noexcept
+      -> reverse_iterator;
+
+    CANARD_NET_OFP_DECL auto rbegin() const noexcept
+      -> const_reverse_iterator;
+
+    CANARD_NET_OFP_DECL auto rend() noexcept
+      -> reverse_iterator;
+
+    CANARD_NET_OFP_DECL auto rend() const noexcept
+      -> const_reverse_iterator;
+
+    CANARD_NET_OFP_DECL auto crbegin() const noexcept
+      -> const_reverse_iterator;
+
+    CANARD_NET_OFP_DECL auto crend() const noexcept
+      -> const_reverse_iterator;
+
+    // capacity:
+    CANARD_NET_OFP_DECL auto size() const noexcept
+      -> size_type;
+
+    CANARD_NET_OFP_DECL auto max_size() const noexcept
+      -> size_type;
+
+    CANARD_NET_OFP_DECL auto empty() const noexcept
+      -> bool;
+
+    CANARD_NET_OFP_DECL void reserve(size_type);
+
+    CANARD_NET_OFP_DECL void shrink_to_fit();
+
+    // element access:
+    CANARD_NET_OFP_DECL auto operator[](size_type)
+      -> reference;
+
+    CANARD_NET_OFP_DECL auto operator[](size_type) const
+      -> const_reference;
+
+    CANARD_NET_OFP_DECL auto at(size_type)
+      -> reference;
+
+    CANARD_NET_OFP_DECL auto at(size_type) const
+      -> const_reference;
+
+    CANARD_NET_OFP_DECL auto front()
+      -> reference;
+
+    CANARD_NET_OFP_DECL auto front() const
+      -> const_reference;
+
+    CANARD_NET_OFP_DECL auto back()
+      -> reference;
+
+    CANARD_NET_OFP_DECL auto back() const
+      -> const_reference;
+
+    // modifiers:
+    template <class... Args>
+    void emplace_back(Args&&... args)
+    {
+      values_.emplace_back(std::forward<Args>(args)...);
+    }
+
+    CANARD_NET_OFP_DECL void push_back(value_type const&);
+
+    CANARD_NET_OFP_DECL void push_back(value_type&&);
+
+    CANARD_NET_OFP_DECL void pop_back();
+
+    template <class... Args>
+    auto emplace(const_iterator pos, Args&&... args)
+      -> iterator
+    {
+      return values_.emplace(pos, std::forward<Args>(args)...);
+    }
+
+    template <
+        class... Args
+      , class = detail::enable_if_is_all_constructible_t<value_type, Args...>
+    >
+    auto insert(const_iterator pos, Args&&... args)
+      -> iterator
+    {
+      return insert_impl(pos, { value_type(std::forward<Args>(args))... });
+    }
+
+    CANARD_NET_OFP_DECL auto insert(const_iterator, size_type, const_reference)
+      -> iterator;
+
+    template <class InputIterator>
+    auto insert(const_iterator pos, InputIterator first, InputIterator last)
+      -> detail::enable_if_is_input_iterator_t<InputIterator, iterator>
+    {
+      return values_.insert(pos, first, last);
+    }
+
+    CANARD_NET_OFP_DECL auto erase(const_iterator)
+      -> iterator;
+
+    CANARD_NET_OFP_DECL auto erase(const_iterator first, const_iterator last)
+      -> iterator;
+
+    CANARD_NET_OFP_DECL void swap(list&) noexcept;
+
+    CANARD_NET_OFP_DECL void clear() noexcept;
+
+    // OFP operations:
+    CANARD_NET_OFP_DECL auto calc_ofp_length(
+            std::uint16_t const base_length) const
+      -> std::uint16_t;
+
+    CANARD_NET_OFP_DECL auto length() const noexcept
+      -> std::size_t;
+
+    CANARD_NET_OFP_DECL auto byte_length() const noexcept
+      -> std::size_t;
+
+    template <class Validator>
+    void validate(Validator validator_for_children) const
+    {
+      boost::for_each(values_, validator_for_children);
+    }
+
+    template <class Container>
+    auto encode(Container& container) const
+      -> Container&
+    {
+      boost::for_each(values_, [&](const_reference v) { v.encode(container); });
+      return container;
+    }
+
+    template <class Iterator>
+    static auto decode(Iterator& first, Iterator last)
+      -> list
+    {
+      auto values = container_type{};
+      values.reserve(
+          std::distance(first, last) / value_type::min_byte_length());
+      while (std::distance(first, last)
+          >= list_detail::header_size<value_type>()) {
+        values.push_back(value_type::decode(first, last));
+      }
+      if (first != last) {
+        throw std::runtime_error{"list byte length is invalid"};
+      }
+      return list{std::move(values)};
+    }
+
+    friend auto operator==(list const& lhs, list const& rhs) noexcept
+      -> bool
+    {
+      return lhs.equal_impl(rhs);
+    }
+
+    friend auto equivalent(list const& lhs, list const& rhs) noexcept
+      -> bool
+    {
+      return lhs.equivalent_impl(rhs);
+    }
+
+  private:
+    CANARD_NET_OFP_DECL explicit list(container_type&&);
+
+    CANARD_NET_OFP_DECL void assign_impl(std::initializer_list<value_type>&&);
+
+    CANARD_NET_OFP_DECL auto insert_impl(
+        const_iterator, std::initializer_list<value_type>&&)
+      -> iterator;
+
+    CANARD_NET_OFP_DECL auto length_impl() const noexcept
+      -> std::size_t;
+
+    CANARD_NET_OFP_DECL auto equal_impl(list const&) const noexcept
+      -> bool;
+
+    CANARD_NET_OFP_DECL auto equivalent_impl(list const&) const noexcept
+      -> bool;
+
+  private:
+    container_type values_;
+  };
+
+  template <class ProtocolType>
+  void swap(list<ProtocolType>& lhs, list<ProtocolType>& rhs) noexcept
+  {
+    lhs.swap(rhs);
+  }
+
+} // namespace ofp
+} // namespace net
+} // namespace canard
+
+#include <canard/network/openflow/detail/impl/list.hpp>
+
+#endif // CANARD_NET_OFP_LIST_HPP

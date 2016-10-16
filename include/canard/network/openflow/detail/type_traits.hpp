@@ -32,6 +32,10 @@ namespace detail {
     : decltype(type_traits_detail::is_input_iterator_impl(std::declval<T>()))
   {};
 
+  template <class Iterator, class T = void>
+  using enable_if_is_input_iterator_t
+    = typename std::enable_if<is_input_iterator<Iterator>::value, T>::type;
+
   template <class...>
   struct conjuction : std::true_type {};
 
@@ -42,6 +46,11 @@ namespace detail {
 
   template <class T, class... Args>
   using is_all_constructible_t = typename std::enable_if<
+    conjuction<std::is_constructible<T, Args>...>::value
+  >::type;
+
+  template <class T, class... Args>
+  using enable_if_is_all_constructible_t = typename std::enable_if<
     conjuction<std::is_constructible<T, Args>...>::value
   >::type;
 
