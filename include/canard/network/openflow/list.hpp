@@ -20,6 +20,13 @@ namespace ofp {
 
   namespace list_detail {
 
+    struct dummy_type {};
+
+    template <class T, class U>
+    using enable_if_is_initializer_list_t = typename std::enable_if<
+      std::is_same<T, std::initializer_list<U>>::value
+    >::type;
+
     template <class T>
     auto has_header_impl(T const&)
       -> decltype(typename T::header_type{}, std::true_type{});
@@ -76,6 +83,8 @@ namespace ofp {
         = typename container_type::const_reverse_iterator;
 
     // construct:
+    list() = default;
+
     CANARD_NET_OFP_DECL list(size_type, const_reference);
 
     template <
@@ -92,20 +101,25 @@ namespace ofp {
       , class = detail::enable_if_is_all_constructible_t<value_type, Args...>
     >
     list(Args&&... args)
-      : values_{ value_type(std::forward<Args>(args))... }
+      : values_{}
     {
+      values_.reserve(sizeof...(args));
+      list_detail::dummy_type unused[]
+        = { init_impl(value_type(std::forward<Args>(args)))... };
+      static_cast<void>(unused);
     }
 
     template <
-        class... Args
-      , class = detail::enable_if_is_all_constructible_t<value_type, Args...>
+        class List
+      , class = list_detail::enable_if_is_initializer_list_t<List, value_type>
     >
-    auto operator=(Args&&... args)
-      -> list&
+    list(List const init_list)
+      : values_(init_list)
     {
-      assign_impl({ value_type(std::forward<Args>(args))... });
-      return *this;
     }
+
+    CANARD_NET_OFP_DECL auto operator=(std::initializer_list<value_type>)
+      -> list&;
 
     template <
         class InputIterator
@@ -118,13 +132,16 @@ namespace ofp {
 
     CANARD_NET_OFP_DECL void assign(size_type, const_reference);
 
+    CANARD_NET_OFP_DECL void assign(std::initializer_list<value_type>);
+
     template <
         class... Args
       , class = detail::enable_if_is_all_constructible_t<value_type, Args...>
     >
     void assign(Args&&... args)
     {
-      assign_impl({ value_type(std::forward<Args>(args))... });
+      value_type init_list[] = { value_type(std::forward<Args>(args))... };
+      return assign_impl(std::begin(init_list), std::end(init_list));
     }
 
     // iterators:
@@ -217,7 +234,7 @@ namespace ofp {
     CANARD_NET_OFP_DECL void pop_back();
 
     template <class... Args>
-    auto emplace(const_iterator pos, Args&&... args)
+    auto emplace(const_iterator const pos, Args&&... args)
       -> iterator
     {
       return values_.emplace(pos, std::forward<Args>(args)...);
@@ -227,26 +244,32 @@ namespace ofp {
         class... Args
       , class = detail::enable_if_is_all_constructible_t<value_type, Args...>
     >
-    auto insert(const_iterator pos, Args&&... args)
+    auto insert(const_iterator const pos, Args&&... args)
       -> iterator
     {
-      return insert_impl(pos, { value_type(std::forward<Args>(args))... });
+      value_type init_list[] = { value_type(std::forward<Args>(args))... };
+      return insert_impl(pos, std::begin(init_list), std::end(init_list));
     }
 
     CANARD_NET_OFP_DECL auto insert(const_iterator, size_type, const_reference)
       -> iterator;
 
     template <class InputIterator>
-    auto insert(const_iterator pos, InputIterator first, InputIterator last)
+    auto insert(
+          const_iterator const pos, InputIterator first, InputIterator last)
       -> detail::enable_if_is_input_iterator_t<InputIterator, iterator>
     {
       return values_.insert(pos, first, last);
     }
 
+    CANARD_NET_OFP_DECL auto insert(
+        const_iterator, std::initializer_list<value_type>)
+      -> iterator;
+
     CANARD_NET_OFP_DECL auto erase(const_iterator)
       -> iterator;
 
-    CANARD_NET_OFP_DECL auto erase(const_iterator first, const_iterator last)
+    CANARD_NET_OFP_DECL auto erase(const_iterator, const_iterator)
       -> iterator;
 
     CANARD_NET_OFP_DECL void swap(list&) noexcept;
@@ -254,8 +277,7 @@ namespace ofp {
     CANARD_NET_OFP_DECL void clear() noexcept;
 
     // OFP operations:
-    CANARD_NET_OFP_DECL auto calc_ofp_length(
-            std::uint16_t const base_length) const
+    CANARD_NET_OFP_DECL auto calc_ofp_length(std::uint16_t const) const
       -> std::uint16_t;
 
     CANARD_NET_OFP_DECL auto length() const noexcept
@@ -310,10 +332,13 @@ namespace ofp {
   private:
     CANARD_NET_OFP_DECL explicit list(container_type&&);
 
-    CANARD_NET_OFP_DECL void assign_impl(std::initializer_list<value_type>&&);
+    CANARD_NET_OFP_DECL auto init_impl(value_type&&)
+      -> list_detail::dummy_type;
+
+    CANARD_NET_OFP_DECL void assign_impl(value_type*, value_type*);
 
     CANARD_NET_OFP_DECL auto insert_impl(
-        const_iterator, std::initializer_list<value_type>&&)
+        const_iterator, value_type*, value_type*)
       -> iterator;
 
     CANARD_NET_OFP_DECL auto length_impl() const noexcept

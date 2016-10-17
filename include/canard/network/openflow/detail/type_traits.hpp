@@ -51,7 +51,7 @@ namespace detail {
 
   template <class T, class... Args>
   using enable_if_is_all_constructible_t = typename std::enable_if<
-    conjuction<std::is_constructible<T, Args>...>::value
+    sizeof...(Args) && conjuction<std::is_constructible<T, Args>...>::value
   >::type;
 
 } // namespace detail

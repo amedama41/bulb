@@ -25,9 +25,25 @@ namespace ofp {
   }
 
   template <class ProtocolType>
+  auto list<ProtocolType>::operator=(
+      std::initializer_list<value_type> const init_list)
+    -> list&
+  {
+    values_ = init_list;
+    return *this;
+  }
+
+  template <class ProtocolType>
   void list<ProtocolType>::assign(size_type const n, const_reference value)
   {
     values_.assign(n, value);
+  }
+
+  template <class ProtocolType>
+  void list<ProtocolType>::assign(
+      std::initializer_list<value_type> const init_list)
+  {
+    values_.assign(init_list);
   }
 
   // iterators:
@@ -234,6 +250,15 @@ namespace ofp {
   }
 
   template <class ProtocolType>
+  auto list<ProtocolType>::insert(
+        const_iterator const pos
+      , std::initializer_list<value_type> const init_list)
+    -> iterator
+  {
+    return values_.insert(pos, init_list);
+  }
+
+  template <class ProtocolType>
   auto list<ProtocolType>::erase(const_iterator const pos)
     -> iterator
   {
@@ -300,18 +325,28 @@ namespace ofp {
   }
 
   template <class ProtocolType>
-  void list<ProtocolType>::assign_impl(
-      std::initializer_list<value_type>&& il)
+  auto list<ProtocolType>::init_impl(value_type&& value)
+    -> list_detail::dummy_type
   {
-    values_.assign(std::move(il));
+    values_.push_back(std::move(value));
+    return list_detail::dummy_type{};
+  }
+
+  template <class ProtocolType>
+  void list<ProtocolType>::assign_impl(
+      value_type* const first, value_type* const last)
+  {
+    values_.assign(
+        std::make_move_iterator(first), std::make_move_iterator(last));
   }
 
   template <class ProtocolType>
   auto list<ProtocolType>::insert_impl(
-      const_iterator const pos, std::initializer_list<value_type>&& il)
+      const_iterator const pos, value_type* const first, value_type* const last)
     -> iterator
   {
-    return values_.insert(pos, std::move(il));
+    return values_.insert(
+        pos, std::make_move_iterator(first), std::make_move_iterator(last));
   }
 
   template <class ProtocolType>
