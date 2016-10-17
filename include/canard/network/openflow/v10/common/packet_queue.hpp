@@ -1,20 +1,15 @@
 #ifndef CANARD_NET_OFP_V10_PACKET_QUEUE_HPP
 #define CANARD_NET_OFP_V10_PACKET_QUEUE_HPP
 
-#include <cstddef>
 #include <cstdint>
 #include <iterator>
-#include <limits>
 #include <stdexcept>
 #include <utility>
-#include <vector>
 #include <boost/range/algorithm/equal.hpp>
-#include <boost/range/algorithm/for_each.hpp>
-#include <boost/range/numeric.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
-#include <canard/network/openflow/detail/min_base_size_element.hpp>
+#include <canard/network/openflow/list.hpp>
 #include <canard/network/openflow/queue_id.hpp>
 #include <canard/network/openflow/v10/any_queue_property.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
@@ -30,7 +25,7 @@ namespace v10 {
     {
     public:
         using raw_ofp_type = v10_detail::ofp_packet_queue;
-        using properties_type = std::vector<any_queue_property>;
+        using properties_type = list<any_queue_property>;
         using iterator = properties_type::const_iterator;
         using const_iterator = properties_type::const_iterator;
 
@@ -38,9 +33,7 @@ namespace v10 {
                    , properties_type properties)
             : packet_queue_{
                   queue_id
-                , std::uint16_t(
-                          sizeof(raw_ofp_type)
-                        + calc_propertis_length(properties))
+                , properties.calc_ofp_length(sizeof(raw_ofp_type))
                 , { 0, 0 }
               }
             , properties_(std::move(properties))
@@ -120,9 +113,7 @@ namespace v10 {
         void encode_impl(Container& container) const
         {
             detail::encode(container, packet_queue_);
-            boost::for_each(properties_, [&](any_queue_property const& e) {
-                e.encode(container);
-            });
+            properties_.encode(container);
         }
 
         template <class Iterator>
@@ -133,25 +124,13 @@ namespace v10 {
             if (pkt_queue.len < sizeof(raw_ofp_type)) {
                 throw std::runtime_error{"packet_queue length is too small"};
             }
-            if (std::distance(first, last)
-                    < pkt_queue.len - sizeof(raw_ofp_type)) {
+            auto const properties_length = pkt_queue.len - sizeof(raw_ofp_type);
+            if (std::distance(first, last) < properties_length) {
                 throw std::runtime_error{"packet_queue length is too big"};
             }
-            auto const properties_length = pkt_queue.len - sizeof(raw_ofp_type);
             last = std::next(first, properties_length);
 
-            auto properties = properties_type{};
-            constexpr auto min_base_size = detail::min_base_size_element<
-                any_queue_property::type_list
-            >::value;
-            properties.reserve(properties_length / min_base_size);
-            while (std::distance(first, last)
-                    >= sizeof(v10_detail::ofp_queue_prop_header)) {
-                properties.push_back(any_queue_property::decode(first, last));
-            }
-            if (first != last) {
-                throw std::runtime_error{"invalid packet_queue length"};
-            }
+            auto properties = properties_type::decode(first, last);
 
             return packet_queue{pkt_queue, std::move(properties)};
         }
@@ -172,21 +151,6 @@ namespace v10 {
                           properties(), rhs.properties()
                         , [](cref lhs_prop, cref rhs_prop)
                           { return equivalent(lhs_prop, rhs_prop); });
-        }
-
-        static auto calc_propertis_length(properties_type const& properties)
-            -> std::size_t
-        {
-            auto const properties_length = boost::accumulate(
-                      properties, std::size_t{0}
-                    , [](std::size_t const sum, any_queue_property const& e) {
-                            return sum + e.length();
-                      });
-            if (properties_length + sizeof(raw_ofp_type)
-                    > std::numeric_limits<std::uint16_t>::max()) {
-                throw std::runtime_error{"properties length is too big"};
-            }
-            return properties_length;
         }
 
     private:
