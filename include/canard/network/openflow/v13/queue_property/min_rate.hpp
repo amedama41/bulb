@@ -1,7 +1,6 @@
 #ifndef CANARD_NET_OFP_V13_QUEUE_PROPERTIES_MIN_RATE_HPP
 #define CANARD_NET_OFP_V13_QUEUE_PROPERTIES_MIN_RATE_HPP
 
-#include <cstddef>
 #include <cstdint>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/detail/basic_queue_property.hpp>
@@ -21,8 +20,6 @@ namespace queue_properties {
     public:
         static constexpr protocol::ofp_queue_properties queue_property
             = protocol::OFPQT_MIN_RATE;
-
-        static constexpr std::size_t base_size = sizeof(raw_ofp_type);
 
         explicit min_rate(std::uint16_t const rate) noexcept
             : min_rate_{
