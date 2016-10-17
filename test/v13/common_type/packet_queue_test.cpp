@@ -21,7 +21,7 @@ auto operator ""_bin(char const* const str, std::size_t const size)
 
 struct properties_fixture
 {
-    std::vector<v13::any_queue_property> properties = {
+    v13::packet_queue::properties_type properties = {
           v13::any_queue_property{queue_props::min_rate{0x1234}}
         , v13::any_queue_property{queue_props::max_rate{0x5678}}
     }; // 16 + 16 = 32
