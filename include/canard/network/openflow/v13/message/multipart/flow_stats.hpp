@@ -1,7 +1,6 @@
 #ifndef CANARD_NET_OFP_V13_MESSAGES_MULTIPART_FLOW_STATS_HPP
 #define CANARD_NET_OFP_V13_MESSAGES_MULTIPART_FLOW_STATS_HPP
 
-#include <cstddef>
 #include <cstdint>
 #include <iterator>
 #include <limits>
@@ -35,10 +34,6 @@ namespace multipart {
     {
     public:
         using raw_ofp_type = v13_detail::ofp_flow_stats;
-
-        static constexpr std::size_t base_size
-            = sizeof(raw_ofp_type)
-            + v13_detail::exact_length(oxm_match_set::min_length());
 
         flow_stats(v13::flow_entry entry
                  , std::uint8_t const table_id
@@ -161,10 +156,14 @@ namespace multipart {
 
         friend basic_protocol_type;
 
+        static constexpr std::uint16_t base_size
+            = sizeof(raw_ofp_type)
+            + v13_detail::exact_length(oxm_match_set::min_length());
+
         friend constexpr auto get_min_length(flow_stats*) noexcept
             -> std::uint16_t
         {
-            return base_size;
+            return flow_stats::base_size;
         }
 
         template <class Container>

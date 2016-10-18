@@ -1,7 +1,6 @@
 #ifndef CANARD_NET_OFP_V13_MESSAGES_MULTIPART_PORT_STATS_HPP
 #define CANARD_NET_OFP_V13_MESSAGES_MULTIPART_PORT_STATS_HPP
 
-#include <cstddef>
 #include <cstdint>
 #include <utility>
 #include <canard/network/openflow/detail/basic_protocol_type.hpp>
@@ -25,8 +24,6 @@ namespace multipart {
     {
     public:
         using raw_ofp_type = v13_detail::ofp_port_stats;
-
-        static std::uint16_t const base_size = sizeof(raw_ofp_type);
 
         port_stats(std::uint32_t const port_no
                  , std::uint64_t const rx_packets

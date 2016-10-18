@@ -1,7 +1,6 @@
 #ifndef CANARD_NET_OFP_V13_MESSAGES_MULTIPART_QUEUE_STATS_HPP
 #define CANARD_NET_OFP_V13_MESSAGES_MULTIPART_QUEUE_STATS_HPP
 
-#include <cstddef>
 #include <cstdint>
 #include <utility>
 #include <canard/network/openflow/detail/basic_protocol_type.hpp>
@@ -26,8 +25,6 @@ namespace multipart {
     public:
         using raw_ofp_type = v13_detail::ofp_queue_stats;
 
-        static constexpr std::size_t base_size = sizeof(raw_ofp_type);
-
         queue_stats(std::uint32_t const queue_id
                   , std::uint32_t const port_no
                   , std::uint64_t const tx_packets
@@ -49,7 +46,7 @@ namespace multipart {
         static constexpr auto length() noexcept
             -> std::uint16_t
         {
-            return base_size;
+            return sizeof(raw_ofp_type);
         }
 
         auto queue_id() const noexcept

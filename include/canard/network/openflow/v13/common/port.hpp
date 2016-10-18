@@ -1,7 +1,6 @@
 #ifndef CANARD_NET_OFP_V13_PORT_HPP
 #define CANARD_NET_OFP_V13_PORT_HPP
 
-#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <algorithm>
@@ -26,8 +25,6 @@ namespace v13 {
     {
     public:
         using raw_ofp_type = v13_detail::ofp_port;
-
-        static constexpr std::size_t base_size = sizeof(raw_ofp_type);
 
         port(std::uint32_t const port_no
            , canard::mac_address const addr

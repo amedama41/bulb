@@ -1,9 +1,7 @@
 #ifndef CANARD_NET_OFP_V13_MESSAGES_MULTIPART_TABLE_FEATURES_HPP
 #define CANARD_NET_OFP_V13_MESSAGES_MULTIPART_TABLE_FEATURES_HPP
 
-#include <cstddef>
 #include <cstdint>
-#include <cstring>
 #include <algorithm>
 #include <iterator>
 #include <stdexcept>
@@ -32,8 +30,6 @@ namespace multipart {
     {
     public:
         using raw_ofp_type = v13_detail::ofp_table_features;
-
-        static constexpr std::size_t base_size = sizeof(raw_ofp_type);
 
         table_features(
                   std::uint8_t const table_id

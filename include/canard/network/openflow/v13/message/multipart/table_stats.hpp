@@ -1,7 +1,6 @@
 #ifndef CANARD_NET_OFP_V13_MESSAGES_MULTIPART_TABLE_STATS_HPP
 #define CANARD_NET_OFP_V13_MESSAGES_MULTIPART_TABLE_STATS_HPP
 
-#include <cstddef>
 #include <cstdint>
 #include <utility>
 #include <canard/network/openflow/get_xid.hpp>
@@ -24,8 +23,6 @@ namespace multipart {
     {
     public:
         using raw_ofp_type = v13_detail::ofp_table_stats;
-
-        static constexpr std::size_t base_size = sizeof(raw_ofp_type);
 
         table_stats(std::uint8_t const table_id
                   , std::uint32_t const active_count
