@@ -1,19 +1,15 @@
 #ifndef CANARD_NET_OFP_V10_BAISC_STATS_HPP
 #define CANARD_NET_OFP_V10_BAISC_STATS_HPP
 
-#include <cstddef>
 #include <cstdint>
 #include <iterator>
-#include <limits>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
-#include <vector>
-#include <boost/range/algorithm/for_each.hpp>
-#include <boost/range/numeric.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
+#include <canard/network/openflow/list.hpp>
 #include <canard/network/openflow/v10/detail/basic_openflow_message.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
@@ -263,7 +259,7 @@ namespace stats_detail {
 
     public:
         using raw_ofp_type = typename base_t::raw_ofp_type;
-        using body_type = std::vector<elem_type>;
+        using body_type = ofp::list<elem_type>;
 
         auto body() const noexcept
             -> body_type const&
@@ -299,8 +295,7 @@ namespace stats_detail {
                   v10_detail::ofp_header{
                       protocol::OFP_VERSION
                     , T::message_type
-                    , std::uint16_t(
-                            sizeof(raw_ofp_type) + calc_body_length(body))
+                    , body.calc_ofp_length(sizeof(raw_ofp_type))
                     , xid
                   }
                 , T::stats_type_value
@@ -347,8 +342,7 @@ namespace stats_detail {
         void encode_impl(Container& container) const
         {
             detail::encode(container, stats_);
-            boost::for_each(
-                    body_, [&](elem_type const& e) { e.encode(container); });
+            body_.encode(container);
         }
 
         template <class Iterator>
@@ -359,15 +353,8 @@ namespace stats_detail {
             auto const body_length = stats.header.length - sizeof(raw_ofp_type);
             last = std::next(first, body_length);
 
-            auto body = body_type{};
-            body.reserve(body_length / elem_type::min_length());
-            while (std::distance(first, last) >= elem_type::min_length()) {
-                body.push_back(elem_type::decode(first, last));
-            }
+            auto body = body_type::decode(first, last);
 
-            if (first != last) {
-                throw std::runtime_error{"invalid stats length"};
-            }
             return T{stats, std::move(body)};
         }
 
@@ -384,21 +371,6 @@ namespace stats_detail {
             -> raw_ofp_type const&
         {
             return stats_;
-        }
-
-        static auto calc_body_length(body_type const& body)
-            -> std::uint16_t
-        {
-            auto const body_length = boost::accumulate(
-                      body, std::size_t{0}
-                    , [](std::size_t const sum, elem_type const& e) {
-                            return sum + e.length();
-                      });
-            if (body_length + sizeof(raw_ofp_type)
-                    > std::numeric_limits<std::uint16_t>::max()) {
-                throw std::runtime_error{"body size is too big"};
-            }
-            return std::uint16_t(body_length);
         }
 
     private:
