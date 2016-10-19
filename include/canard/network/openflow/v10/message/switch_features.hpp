@@ -4,12 +4,11 @@
 #include <cstdint>
 #include <stdexcept> // TODO
 #include <utility>
-#include <vector>
-#include <boost/range/algorithm/for_each.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/get_xid.hpp>
+#include <canard/network/openflow/list.hpp>
 #include <canard/network/openflow/v10/common/port.hpp>
 #include <canard/network/openflow/v10/detail/basic_openflow_message.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
@@ -96,7 +95,7 @@ namespace messages {
     {
     public:
         using raw_ofp_type = v10_detail::ofp_switch_features;
-        using port_list = std::vector<port>;
+        using ports_type = ofp::list<port>;
 
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_FEATURES_REPLY;
@@ -106,15 +105,13 @@ namespace messages {
                      , std::uint8_t const n_tables
                      , std::uint32_t const capabilities
                      , std::uint32_t const actions
-                     , port_list ports
+                     , ports_type ports
                      , std::uint32_t const xid = get_xid())
             : switch_features_{
                   v10_detail::ofp_header{
                       protocol::OFP_VERSION
                     , message_type
-                    , std::uint16_t(
-                            sizeof(raw_ofp_type)
-                          + ports.size() * sizeof(port::raw_ofp_type))
+                    , ports.calc_ofp_length(sizeof(raw_ofp_type))
                     , xid
                   }
                 , dpid
@@ -134,7 +131,7 @@ namespace messages {
                      , std::uint8_t const n_tables
                      , std::uint32_t const capabilities
                      , std::uint32_t const actions
-                     , port_list ports)
+                     , ports_type ports)
             : features_reply{
                   dpid, n_buffers, n_tables, capabilities, actions
                 , std::move(ports), request.xid()
@@ -202,15 +199,15 @@ namespace messages {
         }
 
         auto ports() const noexcept
-            -> port_list const&
+            -> ports_type const&
         {
             return ports_;
         }
 
         auto extract_ports()
-            -> port_list
+            -> ports_type
         {
-            auto tmp = port_list{};
+            auto tmp = ports_type{};
             tmp.swap(ports_);
             switch_features_.header.length = sizeof(raw_ofp_type);
             return tmp;
@@ -236,7 +233,7 @@ namespace messages {
     private:
         friend basic_openflow_message::basic_protocol_type;
 
-        features_reply(raw_ofp_type const& features, port_list&& ports)
+        features_reply(raw_ofp_type const& features, ports_type&& ports)
             : switch_features_(features)
             , ports_(std::move(ports))
         {
@@ -246,8 +243,7 @@ namespace messages {
         void encode_impl(Container& container) const
         {
             detail::encode(container, switch_features_);
-            boost::for_each(
-                    ports_, [&](port const& p) { p.encode(container); });
+            ports_.encode(container);
         }
 
         template <class Iterator>
@@ -256,14 +252,12 @@ namespace messages {
         {
             auto const features = detail::decode<raw_ofp_type>(first, last);
 
-            auto const ports_length = features.header.length - sizeof(features);
+            auto const ports_length
+                = features.header.length - sizeof(raw_ofp_type);
             last = std::next(first, ports_length);
 
-            auto ports = port_list{};
-            ports.reserve(ports_length / sizeof(port::raw_ofp_type));
-            while (first != last) {
-                ports.emplace_back(port::decode(first, last));
-            }
+            auto ports = ports_type::decode(first, last);
+
             return features_reply{features, std::move(ports)};
         }
 
@@ -276,7 +270,7 @@ namespace messages {
 
     private:
         raw_ofp_type switch_features_;
-        port_list ports_;
+        ports_type ports_;
     };
 
 } // namespace messages
