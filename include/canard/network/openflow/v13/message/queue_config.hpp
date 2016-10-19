@@ -1,18 +1,13 @@
 #ifndef CANARD_NET_OFP_V13_MESSAGES_QUEUE_CONFIG_HPP
 #define CANARD_NET_OFP_V13_MESSAGES_QUEUE_CONFIG_HPP
 
-#include <cstddef>
 #include <cstdint>
 #include <iterator>
-#include <limits>
-#include <stdexcept>
 #include <utility>
-#include <vector>
-#include <boost/range/algorithm/for_each.hpp>
-#include <boost/range/numeric.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/get_xid.hpp>
+#include <canard/network/openflow/list.hpp>
 #include <canard/network/openflow/v13/common/packet_queue.hpp>
 #include <canard/network/openflow/v13/detail/basic_openflow_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
@@ -98,7 +93,7 @@ namespace messages {
             = protocol::OFPT_QUEUE_GET_CONFIG_REPLY;
 
         using raw_ofp_type = v13_detail::ofp_queue_get_config_reply;
-        using queues_type = std::vector<packet_queue>;
+        using queues_type = ofp::list<packet_queue>;
         using iterator = queues_type::const_iterator;
         using const_iterator = queues_type::const_iterator;
 
@@ -110,8 +105,7 @@ namespace messages {
                   v13_detail::ofp_header{
                       version()
                     , type()
-                    , std::uint16_t(
-                            sizeof(raw_ofp_type) + calc_queues_length(queues))
+                    , queues.calc_ofp_length(sizeof(raw_ofp_type))
                     , xid
                   }
                 , port_no
@@ -192,30 +186,13 @@ namespace messages {
         {
         }
 
-        static auto calc_queues_length(queues_type const& queues)
-            -> std::size_t
-        {
-            auto const queues_length = boost::accumulate(
-                      queues, std::size_t{0}
-                    , [](std::size_t const sum, queues_type::const_reference q)
-                      { return sum + q.length(); });
-            if (queues_length + sizeof(raw_ofp_type)
-                    > std::numeric_limits<std::uint16_t>::max()) {
-                throw std::runtime_error{"queues length is too big"};
-            }
-            return queues_length;
-        }
-
         friend basic_protocol_type;
 
         template <class Container>
         void encode_impl(Container& container) const
         {
             detail::encode(container, queue_get_config_reply_);
-            boost::for_each(
-                      queues_
-                    , [&](queues_type::const_reference q)
-                      { q.encode(container); });
+            queues_.encode(container);
         }
 
         template <class Iterator>
@@ -229,18 +206,8 @@ namespace messages {
                 = queue_get_config.header.length - sizeof(raw_ofp_type);
             last = std::next(first, queues_length);
 
-            auto queues = queues_type{};
-            queues.reserve(
-                    queues_length / sizeof(v13_detail::ofp_packet_queue));
-            while (std::distance(first, last)
-                    >= sizeof(v13_detail::ofp_packet_queue)) {
-                queues.push_back(queues_type::value_type::decode(first, last));
-            }
-            if (first != last) {
-                throw std::runtime_error{
-                    "invalid queue_get_config_reply length"
-                };
-            }
+            auto queues = queues_type::decode(first, last);
+
             return queue_get_config_reply{queue_get_config, std::move(queues)};
         }
 
