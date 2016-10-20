@@ -3,15 +3,11 @@
 
 #include <cstdint>
 #include <iterator>
-#include <stdexcept>
 #include <utility>
-#include <vector>
-#include <boost/range/adaptor/transformed.hpp>
-#include <boost/range/algorithm/for_each.hpp>
-#include <boost/range/numeric.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/get_xid.hpp>
+#include <canard/network/openflow/list.hpp>
 #include <canard/network/openflow/v13/bucket.hpp>
 #include <canard/network/openflow/v13/detail/basic_openflow_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
@@ -36,7 +32,7 @@ namespace messages {
                 = protocol::OFPT_GROUP_MOD;
 
             using raw_ofp_type = v13_detail::ofp_group_mod;
-            using buckets_type = std::vector<bucket>;
+            using buckets_type = ofp::list<bucket>;
 
             auto header() const noexcept
                 -> v13_detail::ofp_header const&
@@ -87,7 +83,7 @@ namespace messages {
                       v13_detail::ofp_header{
                           base_t::version()
                         , base_t::type()
-                        , calc_length(buckets)
+                        , buckets.calc_ofp_length(sizeof(raw_ofp_type))
                         , xid
                       }
                     , command()
@@ -148,26 +144,13 @@ namespace messages {
             }
 
         private:
-            static auto calc_length(buckets_type const& buckets)
-                -> std::uint16_t
-            {
-                using const_reference = buckets_type::const_reference;
-                return boost::accumulate(
-                          buckets, std::uint16_t(sizeof(raw_ofp_type))
-                        , [](std::uint16_t const len, const_reference b)
-                          { return len + b.length(); });
-            }
-
             friend typename base_t::basic_protocol_type;
 
             template <class Container>
             void encode_impl(Container& container) const
             {
                 detail::encode(container, group_mod_);
-                using const_reference = buckets_type::const_reference;
-                boost::for_each(buckets_, [&](const_reference bkt) {
-                    bkt.encode(container);
-                });
+                buckets_.encode(container);
             }
 
             template <class Iterator>
@@ -178,21 +161,10 @@ namespace messages {
                     = detail::decode<raw_ofp_type>(first, last);
                 auto const buckets_length
                     = group_mod.header.length - sizeof(raw_ofp_type);
-                if (std::distance(first, last) < buckets_length) {
-                    throw std::runtime_error{"too large group_mod length"};
-                }
                 last = std::next(first, buckets_length);
 
-                using value_type = buckets_type::value_type;
-                constexpr auto min_bucket_size = value_type::min_length();
-                auto buckets = buckets_type();
-                buckets.reserve(std::distance(first, last) / min_bucket_size);
-                while (std::distance(first, last) >= min_bucket_size) {
-                    buckets.push_back(value_type::decode(first, last));
-                }
-                if (first != last) {
-                    throw std::runtime_error{"invalid group_mod length"};
-                }
+                auto buckets = buckets_type::decode(first, last);
+
                 return GroupMod{group_mod, std::move(buckets)};
             }
 
