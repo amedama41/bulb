@@ -83,7 +83,7 @@ namespace ofp {
         = typename container_type::const_reverse_iterator;
 
     // construct:
-    list() = default;
+    list();
 
     CANARD_NET_OFP_DECL list(size_type, const_reference);
 

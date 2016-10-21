@@ -19,6 +19,9 @@ namespace ofp {
 
   // construct:
   template <class ProtocolType>
+  list<ProtocolType>::list() = default;
+
+  template <class ProtocolType>
   list<ProtocolType>::list(size_type const n, const_reference value)
     : values_(n, value)
   {
