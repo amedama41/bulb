@@ -2,21 +2,17 @@
 #define CANARD_NET_OFP_V13_HELLO_HPP
 
 #include <cstdint>
-#include <algorithm>
 #include <iterator>
 #include <stdexcept>
 #include <utility>
-#include <vector>
 #include <boost/optional/optional.hpp>
 #include <boost/range/algorithm/find_if.hpp>
-#include <boost/range/algorithm/for_each.hpp>
-#include <boost/range/numeric.hpp>
 #include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/get_xid.hpp>
+#include <canard/network/openflow/list.hpp>
 #include <canard/network/openflow/v13/any_hello_element.hpp>
-#include <canard/network/openflow/v13/detail/length_utility.hpp>
 #include <canard/network/openflow/v13/hello_element/versionbitmap.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -29,7 +25,7 @@ namespace messages {
     namespace hello_detail {
 
         template <class HelloElement>
-        auto find(std::vector<any_hello_element> const& elements)
+        auto find(ofp::list<any_hello_element> const& elements)
             -> boost::optional<HelloElement const&>
         {
             auto const it = boost::find_if(
@@ -42,7 +38,7 @@ namespace messages {
             return any_cast<HelloElement>(*it);
         }
 
-        auto get_version(std::vector<any_hello_element> const& elements)
+        auto get_version(ofp::list<any_hello_element> const& elements)
             -> std::uint8_t
         {
             if (auto const versionbitmap
@@ -62,7 +58,7 @@ namespace messages {
         static constexpr protocol::ofp_type message_type = protocol::OFPT_HELLO;
 
         using raw_ofp_type = v13_detail::ofp_hello;
-        using hello_elements_type = std::vector<any_hello_element>;
+        using hello_elements_type = ofp::list<any_hello_element>;
 
         explicit hello(
                   std::uint8_t const version = protocol::OFP_VERSION
@@ -86,7 +82,7 @@ namespace messages {
                 v13_detail::ofp_header{
                       version
                     , message_type
-                    , calc_length(elements)
+                    , elements.calc_ofp_length(sizeof(raw_ofp_type))
                     , xid
                 }
               }
@@ -220,26 +216,13 @@ namespace messages {
         {
         }
 
-        static auto calc_length(hello_elements_type const& elements)
-            -> std::uint16_t
-        {
-            using const_reference = hello_elements_type::const_reference;
-            return boost::accumulate(
-                      elements
-                    , std::uint16_t{sizeof(raw_ofp_type)}
-                    , [](std::uint16_t const len, const_reference e)
-                      { return len + v13_detail::exact_length(e.length()); });
-        }
-
         friend basic_protocol_type;
 
         template <class Container>
         void encode_impl(Container& container) const
         {
-            using const_reference = hello_elements_type::const_reference;
             detail::encode(container, hello_);
-            boost::for_each(
-                    elements_, [&](const_reference e) { e.encode(container); });
+            elements_.encode(container);
         }
 
         template <class Iterator>
@@ -249,20 +232,10 @@ namespace messages {
             auto const h = detail::decode<raw_ofp_type>(first, last);
             auto const hello_elements_length
                 = h.header.length - sizeof(raw_ofp_type);
-            if (std::distance(first, last) < hello_elements_length) {
-                throw std::runtime_error{"too large hello length"};
-            }
             last = std::next(first, hello_elements_length);
 
-            auto elements = hello_elements_type{};
-            using value_type = hello_elements_type::value_type;
-            while (std::distance(first, last)
-                    >= sizeof(value_type::header_type)) {
-                elements.push_back(value_type::decode(first, last));
-            }
-            if (first != last) {
-                throw std::runtime_error{"invalid hello length"};
-            }
+            auto elements = hello_elements_type::decode(first, last);
+
             return hello{h, std::move(elements)};
         }
 
