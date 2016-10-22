@@ -87,7 +87,7 @@ namespace flow_mod_detail {
                   v10_detail::ofp_header{
                       protocol::OFP_VERSION
                     , message_type
-                    , std::uint16_t(sizeof(raw_ofp_type) + actions.length())
+                    , actions.calc_ofp_length(sizeof(raw_ofp_type))
                     , xid
                   }
                 , match.ofp_match()

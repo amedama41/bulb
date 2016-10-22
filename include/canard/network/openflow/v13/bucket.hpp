@@ -68,7 +68,7 @@ namespace v13 {
              , std::uint32_t const watch_group
              , action_list actions)
             : bucket_{
-                  std::uint16_t(sizeof(bucket_) + actions.length())
+                  actions.calc_ofp_length(sizeof(bucket_))
                 , weight
                 , watch_port
                 , watch_group

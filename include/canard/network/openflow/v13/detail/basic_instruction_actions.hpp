@@ -68,7 +68,7 @@ namespace v13 {
         explicit basic_instruction_actions(ofp::v13::action_list&& actions)
             : instruction_actions_{
                   T::instruction_type
-                , std::uint16_t(sizeof(raw_ofp_type) + actions.length())
+                , actions.calc_ofp_length(sizeof(raw_ofp_type))
                 , { 0, 0, 0, 0 }
               }
             , actions_(std::move(actions))

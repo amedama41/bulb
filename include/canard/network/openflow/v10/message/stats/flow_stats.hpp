@@ -37,7 +37,7 @@ namespace statistics {
                  , v10::elapsed_time const& elapsed_time
                  , v10::counters const& counters)
             : flow_stats_{
-                  std::uint16_t(sizeof(raw_ofp_type) + entry.actions().length())
+                  entry.actions().calc_ofp_length(sizeof(raw_ofp_type))
                 , table_id
                 , 0
                 , entry.match().ofp_match()
