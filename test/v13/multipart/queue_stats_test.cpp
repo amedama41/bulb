@@ -15,6 +15,8 @@ using proto = v13::protocol;
 
 namespace {
 
+using body_type = multipart::queue_stats_reply::body_type;
+
 struct queue_stats_fixture
 {
     multipart::queue_stats sut{
@@ -230,8 +232,7 @@ BOOST_AUTO_TEST_SUITE(queue_stats_reply_test)
     BOOST_FIXTURE_TEST_CASE(construct_test, queue_stats_fixture)
     {
         auto const size = 2;
-        auto const queue_stats = std::vector<multipart::queue_stats>(
-                size, queue_stats_fixture::sut);
+        auto const queue_stats = ::body_type(size, queue_stats_fixture::sut);
 
         auto const sut = multipart::queue_stats_reply{queue_stats};
 

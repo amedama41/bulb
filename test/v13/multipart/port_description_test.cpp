@@ -16,6 +16,8 @@ using proto = v13::protocol;
 
 namespace {
 
+using body_type = multipart::port_description_reply::body_type;
+
 struct port_description_request_fixture
 {
     multipart::port_description_request sut{0x12345678};
@@ -136,7 +138,7 @@ BOOST_AUTO_TEST_SUITE(port_description_reply_test)
 
     BOOST_FIXTURE_TEST_CASE(construct_test, port_fixture)
     {
-        auto const ports = std::vector<v13::port>{port1, port2};
+        auto const ports = ::body_type{port1, port2};
 
         auto const sut = multipart::port_description_reply{ports};
 

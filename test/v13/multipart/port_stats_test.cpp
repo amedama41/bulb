@@ -15,6 +15,8 @@ using proto = v13::protocol;
 
 namespace {
 
+using body_type = multipart::port_stats_reply::body_type;
+
 struct port_stats_fixutre
 {
     multipart::port_stats sut{
@@ -58,7 +60,7 @@ struct port_stats_request_fixture
 struct port_stats_reply_fixture : port_stats_fixutre
 {
     multipart::port_stats_reply sut{
-          std::vector<multipart::port_stats>(3, port_stats_fixutre::sut)
+          ::body_type(3, port_stats_fixutre::sut)
         , 0
         , 0x12345678
     };
@@ -315,8 +317,7 @@ BOOST_AUTO_TEST_SUITE(port_stats_reply_test)
     BOOST_FIXTURE_TEST_CASE(construct_test, port_stats_fixutre)
     {
         auto const size = std::size_t{2};
-        auto const port_stats = std::vector<multipart::port_stats>(
-                size, port_stats_fixutre::sut);
+        auto const port_stats = ::body_type(size, port_stats_fixutre::sut);
 
         auto const sut = multipart::port_stats_reply{port_stats};
 
@@ -332,8 +333,7 @@ BOOST_AUTO_TEST_SUITE(port_stats_reply_test)
     BOOST_FIXTURE_TEST_CASE(construct_with_flag_test, port_stats_fixutre)
     {
         auto const size = std::size_t{0};
-        auto const port_stats = std::vector<multipart::port_stats>(
-                size, port_stats_fixutre::sut);
+        auto const port_stats = ::body_type(size, port_stats_fixutre::sut);
         auto const flags = std::uint16_t{proto::OFPMPF_REPLY_MORE};
 
         auto const sut = multipart::port_stats_reply{port_stats, flags};

@@ -15,11 +15,12 @@ namespace detail = v13::v13_detail;
 using proto = v13::protocol;
 
 namespace {
+using helems_type = msg::hello::hello_elements_type;
 struct parameters {
   helems::versionbitmap versionbitmap{{0x00000012}};
   helems::unknown_element unknown_element{2};
   std::uint8_t version = versionbitmap.max_support_version();
-  std::vector<v13::any_hello_element> elements{versionbitmap, unknown_element};
+  helems_type elements{versionbitmap, unknown_element};
   std::uint32_t xid = 0x12345678;
 };
 struct hello_fixture : parameters {
@@ -108,7 +109,7 @@ BOOST_AUTO_TEST_SUITE(hello)
     BOOST_AUTO_TEST_CASE(is_constructible_from_empty_hello_elements)
     {
       auto const version = std::uint8_t{1};
-      auto const elements = std::vector<v13::any_hello_element>{};
+      auto const elements = helems_type{};
       auto const xid = 0x11223344;
 
       msg::hello sut{version, elements, xid};

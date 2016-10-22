@@ -77,7 +77,7 @@ struct features_reply_param_fixture {
     | (1 << proto::OFPAT_SET_TP_SRC)
     | (1 << proto::OFPAT_SET_TP_DST)
     | (1 << proto::OFPAT_ENQUEUE);
-  msg::features_reply::port_list ports{ port1, port2, port3 };
+  msg::features_reply::ports_type ports{ port1, port2, port3 };
   std::uint32_t xid = 0x12345678;
 };
 
@@ -284,7 +284,7 @@ BOOST_AUTO_TEST_SUITE(features_reply)
       BOOST_TEST(sut.length() == sizeof(detail::ofp_switch_features));
       BOOST_TEST(sut.ports().empty());
       BOOST_TEST(
-          (ports == msg::features_reply::port_list{ port1, port2, port3 }));
+          (ports == msg::features_reply::ports_type{ port1, port2, port3 }));
     }
     BOOST_AUTO_TEST_CASE(returns_empty_port_list)
     {

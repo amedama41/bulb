@@ -15,6 +15,8 @@ using proto = v13::protocol;
 
 namespace {
 
+using body_type = multipart::table_stats_reply::body_type;
+
 struct table_stats_fixture
 {
     multipart::table_stats sut{
@@ -37,7 +39,7 @@ struct table_stats_request_fixture
 struct table_stats_reply_fixture : table_stats_fixture
 {
     multipart::table_stats_reply sut{
-          std::vector<multipart::table_stats>(3, table_stats_fixture::sut)
+          ::body_type(3, table_stats_fixture::sut)
         , proto::OFPMPF_REPLY_MORE
         , 0x12345678
     };
@@ -204,8 +206,7 @@ BOOST_AUTO_TEST_SUITE(table_stats_reply_test)
     BOOST_FIXTURE_TEST_CASE(construct_test, table_stats_fixture)
     {
         auto const size = 5;
-        auto const table_stats = std::vector<multipart::table_stats>(
-                size, table_stats_fixture::sut);
+        auto const table_stats = ::body_type(size, table_stats_fixture::sut);
 
         auto const sut = multipart::table_stats_reply{table_stats};
 
@@ -221,8 +222,7 @@ BOOST_AUTO_TEST_SUITE(table_stats_reply_test)
     BOOST_FIXTURE_TEST_CASE(construct_with_flag_test, table_stats_fixture)
     {
         auto const size = 0;
-        auto const table_stats = std::vector<multipart::table_stats>(
-                size, table_stats_fixture::sut);
+        auto const table_stats = ::body_type(size, table_stats_fixture::sut);
         auto const flags = std::uint16_t(proto::OFPMPF_REPLY_MORE);
 
         auto const sut = multipart::table_stats_reply{table_stats, flags};

@@ -18,6 +18,8 @@ using proto = v13::protocol;
 
 namespace {
 
+using body_type = multipart::flow_stats_reply::body_type;
+
 struct flow_entry_fixture {
     canard::mac_address eth_dst = "\x01\x02\x03\x04\x05\x06"_mac;
     canard::mac_address eth_src = "\x11\x12\x13\x14\x15\x16"_mac;
@@ -89,7 +91,7 @@ struct flow_stats_request_fixture : flow_entry_fixture
 struct flow_stats_reply_fixture : flow_stats_fixture
 {
     multipart::flow_stats_reply sut = multipart::flow_stats_reply{
-          std::vector<multipart::flow_stats>(6, flow_stats_fixture::sut)
+          ::body_type(6, flow_stats_fixture::sut)
         , proto::OFPMPF_REPLY_MORE
         , 0x12345678
     };
@@ -500,7 +502,7 @@ BOOST_AUTO_TEST_SUITE(flow_stats_reply_test)
     BOOST_FIXTURE_TEST_CASE(constructor_test, flow_stats_fixture)
     {
         auto const size = std::size_t{32};
-        auto stats = std::vector<multipart::flow_stats>(size, sut);
+        auto stats = ::body_type(size, sut);
         auto const flags = std::uint16_t{proto::OFPMPF_REPLY_MORE};
 
         auto const sut = multipart::flow_stats_reply{stats, flags};
@@ -544,9 +546,7 @@ BOOST_AUTO_TEST_SUITE(flow_stats_reply_test)
 
     BOOST_FIXTURE_TEST_CASE(copy_assignment_test, flow_stats_reply_fixture)
     {
-        auto copy = multipart::flow_stats_reply{
-            std::vector<multipart::flow_stats>{}
-        };
+        auto copy = multipart::flow_stats_reply{::body_type{}};
 
         copy = sut;
 
@@ -560,9 +560,7 @@ BOOST_AUTO_TEST_SUITE(flow_stats_reply_test)
 
     BOOST_FIXTURE_TEST_CASE(move_assignment_test, flow_stats_reply_fixture)
     {
-        auto copy = multipart::flow_stats_reply{
-            std::vector<multipart::flow_stats>{}
-        };
+        auto copy = multipart::flow_stats_reply{::body_type{}};
         auto src = sut;
 
         copy = std::move(src);
