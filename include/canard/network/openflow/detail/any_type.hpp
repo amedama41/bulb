@@ -37,6 +37,7 @@ namespace detail {
     using header_type = typename Decoder::header_type;
     using type_id = typename Decoder::type_id;
     using type_list = typename Decoder::decode_type_list;
+    static constexpr std::uint16_t header_size = Decoder::header_size;
 
   private:
     using inner_type_list = detail::to_type_list_t<type_list>;

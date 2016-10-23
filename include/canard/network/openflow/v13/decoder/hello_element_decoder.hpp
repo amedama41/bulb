@@ -46,6 +46,7 @@ namespace v13 {
     using decode_type_list = hello_element_decoder_detail::tuple_append_t<
       hello_element_list, unknwon_type
     >;
+    static constexpr std::uint16_t header_size = sizeof(header_type);
 
     template <class ReturnType, class Iterator, class Function>
     static auto decode(Iterator& first, Iterator last, Function function)

@@ -21,6 +21,7 @@ struct instruction_decoder
     using header_type = v13_detail::ofp_instruction;
     using type_id = std::uint16_t;
     using decode_type_list = default_instruction_list;
+    static constexpr std::uint16_t header_size = sizeof(header_type);
 
     static_assert(
               std::tuple_size<decode_type_list>::value == 6

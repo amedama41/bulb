@@ -21,6 +21,7 @@ struct queue_property_decoder
     using header_type = v13_detail::ofp_queue_prop_header;
     using type_id = std::uint16_t;
     using decode_type_list = default_queue_property_list;
+    static constexpr std::uint16_t header_size = sizeof(header_type);
 
     static_assert(
               std::tuple_size<decode_type_list>::value == 2

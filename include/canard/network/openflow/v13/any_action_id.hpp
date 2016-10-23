@@ -23,14 +23,14 @@ namespace v13 {
     using header_type = v13_detail::ofp_action_header;
     using type_id = std::uint16_t;
     using decode_type_list = std::tuple<action_id, action_experimenter_id>;
+    static constexpr std::uint16_t header_size = offsetof(header_type, pad);
 
     template <class ReturnType, class Iterator, class Function>
     static auto decode(Iterator& first, Iterator last, Function function)
       -> ReturnType
     {
       auto it = first;
-      auto const header
-        = detail::decode<header_type>(it, last, offsetof(header_type, pad));
+      auto const header = detail::decode<header_type>(it, last, header_size);
 
       if (header.len > std::distance(first, last)) {
         throw std::runtime_error{"too large action_id length"};

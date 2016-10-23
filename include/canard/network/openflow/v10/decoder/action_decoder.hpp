@@ -21,6 +21,7 @@ struct action_decoder
     using header_type = v10_detail::ofp_action_header;
     using type_id = std::uint16_t;
     using decode_type_list = default_action_list;
+    static constexpr std::uint16_t header_size = sizeof(header_type);
     static_assert(
               std::tuple_size<decode_type_list>::value == 12
             , "not match to the number of action types");

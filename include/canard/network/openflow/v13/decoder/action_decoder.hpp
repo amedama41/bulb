@@ -23,6 +23,7 @@ struct action_decoder
     using type_id = std::uint16_t;
     using decode_type_list = default_all_action_list;
     using non_set_field_action_type_list = default_action_list;
+    static constexpr std::uint16_t header_size = sizeof(header_type);
 
     static_assert(
               std::tuple_size<non_set_field_action_type_list>::value == 15

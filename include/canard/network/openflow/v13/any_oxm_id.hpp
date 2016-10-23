@@ -22,6 +22,7 @@ namespace v13 {
     using header_type = std::uint32_t;
     using type_id = std::uint32_t;
     using decode_type_list = std::tuple<oxm_id, oxm_experimenter_id>;
+    static constexpr std::uint16_t header_size = sizeof(header_type);
 
     template <class ReturnType, class Iterator, class Function>
     static auto decode(Iterator& first, Iterator last, Function function)

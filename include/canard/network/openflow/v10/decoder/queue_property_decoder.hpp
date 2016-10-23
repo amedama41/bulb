@@ -21,6 +21,7 @@ struct queue_property_decoder
     using header_type = v10_detail::ofp_queue_prop_header;
     using type_id = std::uint16_t;
     using decode_type_list = default_queue_property_list;
+    static constexpr std::uint16_t header_size = sizeof(header_type);
 
     template <class ReturnType, class Iterator, class Function>
     static auto decode(Iterator& first, Iterator last, Function function)
