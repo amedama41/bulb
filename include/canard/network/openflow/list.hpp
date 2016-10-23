@@ -12,7 +12,8 @@
 #include <vector>
 #include <boost/operators.hpp>
 #include <boost/range/algorithm/for_each.hpp>
-#include <canard/network/openflow/detail/type_traits.hpp>
+#include <canard/network/openflow/type_traits/is_all_constructible.hpp>
+#include <canard/network/openflow/type_traits/is_iterator.hpp>
 
 namespace canard {
 namespace net {
@@ -30,6 +31,11 @@ namespace ofp {
     template <class T, class... Us>
     using enable_if_is_all_constructible_t = typename std::enable_if<
       sizeof...(Us) && type_traits::is_all_constructible<T, Us...>::value
+    >::type;
+
+    template <class Iterator, class T = void>
+    using enable_if_is_input_iterator_t = typename std::enable_if<
+      type_traits::is_input_iterator<Iterator>::value, T
     >::type;
 
     template <class T>
@@ -94,7 +100,7 @@ namespace ofp {
 
     template <
         class InputIterator
-      , class = detail::enable_if_is_input_iterator_t<InputIterator>
+      , class = list_detail::enable_if_is_input_iterator_t<InputIterator>
     >
     list(InputIterator first, InputIterator last)
       : values_(first, last)
@@ -128,7 +134,7 @@ namespace ofp {
 
     template <
         class InputIterator
-      , class = detail::enable_if_is_input_iterator_t<InputIterator>
+      , class = list_detail::enable_if_is_input_iterator_t<InputIterator>
     >
     void assign(InputIterator first, InputIterator last)
     {
@@ -262,7 +268,7 @@ namespace ofp {
     template <class InputIterator>
     auto insert(
           const_iterator const pos, InputIterator first, InputIterator last)
-      -> detail::enable_if_is_input_iterator_t<InputIterator, iterator>
+      -> list_detail::enable_if_is_input_iterator_t<InputIterator, iterator>
     {
       return values_.insert(pos, first, last);
     }
