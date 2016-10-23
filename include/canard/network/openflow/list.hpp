@@ -39,14 +39,16 @@ namespace ofp {
     >::type;
 
     template <class T>
-    auto has_header_impl(T const&)
-      -> decltype(typename T::header_type{}, std::true_type{});
+    auto has_header_size_impl(T const&)
+      -> decltype(T::header_size, std::true_type{});
 
-    auto has_header_impl(...)
+    auto has_header_size_impl(...)
       -> std::false_type;
 
     template <class T>
-    struct has_header : decltype(has_header_impl(std::declval<T>())) {};
+    struct has_header_size
+        : decltype(has_header_size_impl(std::declval<T>()))
+    {};
 
     template <class ProtocolType, class = void>
     struct header_size_impl
@@ -57,11 +59,10 @@ namespace ofp {
     template <class ProtocolType>
     struct header_size_impl<
         ProtocolType
-      , typename std::enable_if<has_header<ProtocolType>::value>::type
+      , typename std::enable_if<has_header_size<ProtocolType>::value>::type
     >
     {
-      static constexpr std::uint16_t value
-        = sizeof(typename ProtocolType::header_type);
+      static constexpr std::uint16_t value = ProtocolType::header_size;
     };
 
     template <class ProtocolType>
