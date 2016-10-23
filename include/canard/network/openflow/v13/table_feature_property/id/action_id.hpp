@@ -55,7 +55,7 @@ namespace v13 {
     private:
         friend basic_protocol_type;
 
-        friend auto get_min_length(action_id*) noexcept
+        friend constexpr auto get_min_length(action_id*) noexcept
             -> std::uint16_t
         {
             return action_id::length();
