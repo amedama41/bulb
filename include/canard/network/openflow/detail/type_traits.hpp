@@ -5,6 +5,7 @@
 #include <type_traits>
 #include <utility>
 #include <canard/network/openflow/type_traits/conjuction.hpp>
+#include <canard/network/openflow/type_traits/is_all_constructible.hpp>
 
 namespace canard {
 namespace net {
@@ -36,17 +37,6 @@ namespace detail {
   template <class Iterator, class T = void>
   using enable_if_is_input_iterator_t
     = typename std::enable_if<is_input_iterator<Iterator>::value, T>::type;
-
-  template <class T, class... Args>
-  using is_all_constructible_t = typename std::enable_if<
-    type_traits::conjuction<std::is_constructible<T, Args>...>::value
-  >::type;
-
-  template <class T, class... Args>
-  using enable_if_is_all_constructible_t = typename std::enable_if<
-       sizeof...(Args)
-    && type_traits::conjuction<std::is_constructible<T, Args>...>::value
-  >::type;
 
 } // namespace detail
 } // namespace ofp

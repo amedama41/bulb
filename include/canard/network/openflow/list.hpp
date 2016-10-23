@@ -27,6 +27,11 @@ namespace ofp {
       std::is_same<T, std::initializer_list<U>>::value
     >::type;
 
+    template <class T, class... Us>
+    using enable_if_is_all_constructible_t = typename std::enable_if<
+      sizeof...(Us) && type_traits::is_all_constructible<T, Us...>::value
+    >::type;
+
     template <class T>
     auto has_header_impl(T const&)
       -> decltype(typename T::header_type{}, std::true_type{});
@@ -97,15 +102,15 @@ namespace ofp {
     }
 
     template <
-        class... Args
-      , class = detail::enable_if_is_all_constructible_t<value_type, Args...>
+        class... Ts
+      , class = list_detail::enable_if_is_all_constructible_t<value_type, Ts...>
     >
-    list(Args&&... args)
+    list(Ts&&... ts)
       : values_{}
     {
-      values_.reserve(sizeof...(args));
+      values_.reserve(sizeof...(ts));
       list_detail::dummy_type unused[]
-        = { init_impl(value_type(std::forward<Args>(args)))... };
+        = { init_impl(value_type(std::forward<Ts>(ts)))... };
       static_cast<void>(unused);
     }
 
@@ -135,12 +140,12 @@ namespace ofp {
     CANARD_NET_OFP_DECL void assign(std::initializer_list<value_type>);
 
     template <
-        class... Args
-      , class = detail::enable_if_is_all_constructible_t<value_type, Args...>
+        class... Ts
+      , class = list_detail::enable_if_is_all_constructible_t<value_type, Ts...>
     >
-    void assign(Args&&... args)
+    void assign(Ts&&... ts)
     {
-      value_type init_list[] = { value_type(std::forward<Args>(args))... };
+      value_type init_list[] = { value_type(std::forward<Ts>(ts))... };
       return assign_impl(std::begin(init_list), std::end(init_list));
     }
 
@@ -241,13 +246,13 @@ namespace ofp {
     }
 
     template <
-        class... Args
-      , class = detail::enable_if_is_all_constructible_t<value_type, Args...>
+        class... Ts
+      , class = list_detail::enable_if_is_all_constructible_t<value_type, Ts...>
     >
-    auto insert(const_iterator const pos, Args&&... args)
+    auto insert(const_iterator const pos, Ts&&... ts)
       -> iterator
     {
-      value_type init_list[] = { value_type(std::forward<Args>(args))... };
+      value_type init_list[] = { value_type(std::forward<Ts>(ts))... };
       return insert_impl(pos, std::begin(init_list), std::end(init_list));
     }
 
