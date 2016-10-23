@@ -4,6 +4,7 @@
 #include <iterator>
 #include <type_traits>
 #include <utility>
+#include <canard/network/openflow/type_traits/conjuction.hpp>
 
 namespace canard {
 namespace net {
@@ -36,22 +37,15 @@ namespace detail {
   using enable_if_is_input_iterator_t
     = typename std::enable_if<is_input_iterator<Iterator>::value, T>::type;
 
-  template <class...>
-  struct conjuction : std::true_type {};
-
-  template <class B1, class... Bn>
-  struct conjuction<B1, Bn...>
-    : std::conditional<B1::value, conjuction<Bn...>, B1>::type
-  {};
-
   template <class T, class... Args>
   using is_all_constructible_t = typename std::enable_if<
-    conjuction<std::is_constructible<T, Args>...>::value
+    type_traits::conjuction<std::is_constructible<T, Args>...>::value
   >::type;
 
   template <class T, class... Args>
   using enable_if_is_all_constructible_t = typename std::enable_if<
-    sizeof...(Args) && conjuction<std::is_constructible<T, Args>...>::value
+       sizeof...(Args)
+    && type_traits::conjuction<std::is_constructible<T, Args>...>::value
   >::type;
 
 } // namespace detail
