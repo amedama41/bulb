@@ -1,20 +1,17 @@
 #ifndef CANARD_NET_OFP_V13_TABLE_FEATURE_PROPERTIES_INSTRUCTIONS_HPP
 #define CANARD_NET_OFP_V13_TABLE_FEATURE_PROPERTIES_INSTRUCTIONS_HPP
 
-#include <cstddef>
 #include <cstdint>
 #include <iterator>
-#include <stdexcept>
 #include <type_traits>
 #include <utility>
-#include <vector>
-#include <boost/range/numeric.hpp>
 #include <boost/range/algorithm/find_if.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
-#include <canard/network/openflow/detail/is_related.hpp>
+#include <canard/network/openflow/list.hpp>
+#include <canard/network/openflow/type_traits/is_all_constructible.hpp>
 #include <canard/network/openflow/v13/any_instruction_id.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
@@ -31,18 +28,27 @@ namespace table_feature_properties {
     {
     public:
         using raw_ofp_type = v13_detail::ofp_table_feature_prop_instructions;
-        using instruction_id_container = std::vector<any_instruction_id>;
-        using iterator = instruction_id_container::iterator;
-        using const_iterator = instruction_id_container::const_iterator;
+        using instruction_ids_type = ofp::list<any_instruction_id>;
+        using iterator = instruction_ids_type::iterator;
+        using const_iterator = instruction_ids_type::const_iterator;
 
+    private:
+        template <class... InstructionIDs>
+        using enable_if_is_all_constructible_t = typename std::enable_if<
+            type_traits::is_all_constructible<
+                instruction_ids_type::value_type, InstructionIDs...
+            >::value
+        >::type;
+
+    public:
         static constexpr protocol::ofp_table_feature_prop_type prop_type
             = T::prop_type;
 
         explicit basic_prop_instructions(
-                instruction_id_container&& instruction_ids)
+                instruction_ids_type&& instruction_ids)
             : table_feature_prop_instructions_{
                   prop_type
-                , std::uint16_t(calc_length(instruction_ids))
+                , instruction_ids.calc_ofp_length(sizeof(raw_ofp_type))
               }
             , instruction_ids_(std::move(instruction_ids))
         {
@@ -50,14 +56,11 @@ namespace table_feature_properties {
 
         template <
               class... InstructionIDs
-            , class = typename std::enable_if<
-                !detail::is_related<
-                    InstructionIDs..., basic_prop_instructions>::value
-              >::type
+            , class = enable_if_is_all_constructible_t<InstructionIDs...>
         >
         explicit basic_prop_instructions(InstructionIDs&&... instruction_ids)
             : basic_prop_instructions{
-                instruction_id_container{
+                instruction_ids_type{
                     std::forward<InstructionIDs>(instruction_ids)...
                 }
               }
@@ -102,15 +105,15 @@ namespace table_feature_properties {
         }
 
         auto instruction_ids() const noexcept
-            -> instruction_id_container const&
+            -> instruction_ids_type const&
         {
             return instruction_ids_;
         }
 
         auto extract_instruction_ids()
-            -> instruction_id_container
+            -> instruction_ids_type
         {
-            auto instruction_ids = instruction_id_container{};
+            auto instruction_ids = instruction_ids_type{};
             instruction_ids.swap(instruction_ids_);
             table_feature_prop_instructions_.length = sizeof(raw_ofp_type);
             return instruction_ids;
@@ -143,20 +146,10 @@ namespace table_feature_properties {
     private:
         basic_prop_instructions(
                   raw_ofp_type const& table_feature_prop_instructions
-                , instruction_id_container&& instruction_ids)
+                , instruction_ids_type&& instruction_ids)
             : table_feature_prop_instructions_(table_feature_prop_instructions)
             , instruction_ids_(std::move(instruction_ids))
         {
-        }
-
-        static auto calc_length(
-                instruction_id_container const& instruction_ids) noexcept
-            -> std::size_t
-        {
-            return boost::accumulate(
-                      instruction_ids, sizeof(raw_ofp_type)
-                    , [](std::size_t const length, any_instruction_id const& id)
-                      { return length + id.length(); });
         }
 
         friend detail::basic_protocol_type<basic_prop_instructions>;
@@ -183,19 +176,8 @@ namespace table_feature_properties {
         {
             auto const property = detail::decode<raw_ofp_type>(first, last);
 
-            auto const ids_last
-                = std::next(first, property.length - sizeof(raw_ofp_type));
-            constexpr auto base_id_size = sizeof(v13_detail::ofp_instruction);
-            auto ids = instruction_id_container{};
-            ids.reserve(std::distance(first, ids_last) / base_id_size);
-            while (std::distance(first, ids_last) >= base_id_size) {
-                ids.push_back(any_instruction_id::decode(first, ids_last));
-            }
-            if (first != ids_last) {
-                throw std::runtime_error{
-                    "invalid table_feature_prop_instructions length"
-                };
-            }
+            last = std::next(first, property.length - sizeof(raw_ofp_type));
+            auto ids = instruction_ids_type::decode(first, last);
 
             return basic_prop_instructions{property, std::move(ids)};
         }
@@ -214,8 +196,7 @@ namespace table_feature_properties {
             }
             auto const rhs_ids_end = rhs.instruction_ids_.end();
             for (auto const& lhs_id : instruction_ids_) {
-                using const_reference
-                    = instruction_id_container::const_reference;
+                using const_reference = instruction_ids_type::const_reference;
                 if (boost::find_if(
                               rhs.instruction_ids_
                             , [&lhs_id](const_reference rhs_id)
@@ -229,7 +210,7 @@ namespace table_feature_properties {
 
     private:
         raw_ofp_type table_feature_prop_instructions_;
-        instruction_id_container instruction_ids_;
+        instruction_ids_type instruction_ids_;
     };
 
     namespace instructions_detail {

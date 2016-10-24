@@ -1,20 +1,17 @@
 #ifndef CANARD_NET_OFP_V13_TABLE_FEATURE_PROPERTIES_ACTIONS_HPP
 #define CANARD_NET_OFP_V13_TABLE_FEATURE_PROPERTIES_ACTIONS_HPP
 
-#include <cstddef>
 #include <cstdint>
 #include <iterator>
-#include <stdexcept>
 #include <type_traits>
 #include <utility>
-#include <vector>
-#include <boost/range/numeric.hpp>
 #include <boost/range/algorithm/find_if.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
-#include <canard/network/openflow/detail/is_related.hpp>
+#include <canard/network/openflow/list.hpp>
+#include <canard/network/openflow/type_traits/is_all_constructible.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/any_action_id.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
@@ -34,27 +31,35 @@ namespace table_feature_properties {
             = T::prop_type;
 
         using raw_ofp_type = v13_detail::ofp_table_feature_prop_actions;
-        using action_id_container = std::vector<any_action_id>;
-        using iterator = action_id_container::iterator;
-        using const_iterator = action_id_container::const_iterator;
+        using action_ids_type = ofp::list<any_action_id>;
+        using iterator = action_ids_type::iterator;
+        using const_iterator = action_ids_type::const_iterator;
 
-        explicit basic_prop_actions(action_id_container action_ids)
+    private:
+        template <class... ActionIDs>
+        using enable_if_is_all_constructible_t = typename std::enable_if<
+            type_traits::is_all_constructible<
+                action_ids_type::value_type, ActionIDs...
+            >::value
+        >::type;
+
+    public:
+        explicit basic_prop_actions(action_ids_type action_ids)
             : table_feature_prop_actions_{
                   prop_type
-                , std::uint16_t(calc_length(action_ids))
+                , action_ids.calc_ofp_length(sizeof(raw_ofp_type))
               }
             , action_ids_(std::move(action_ids))
         {
         }
 
-        template <class... ActionIDs
-            , class = typename std::enable_if<
-                !detail::is_related<ActionIDs..., basic_prop_actions>::value
-              >::type
+        template <
+              class... ActionIDs
+            , class = enable_if_is_all_constructible_t<ActionIDs...>
         >
         explicit basic_prop_actions(ActionIDs&&... action_ids)
             : basic_prop_actions{
-                action_id_container{std::forward<ActionIDs>(action_ids)...}
+                action_ids_type{std::forward<ActionIDs>(action_ids)...}
               }
         {
         }
@@ -96,15 +101,15 @@ namespace table_feature_properties {
         }
 
         auto action_ids() const noexcept
-            -> action_id_container const&
+            -> action_ids_type const&
         {
             return action_ids_;
         }
 
         auto extract_action_ids()
-            -> action_id_container
+            -> action_ids_type
         {
-            auto action_ids = action_id_container{};
+            auto action_ids = action_ids_type{};
             action_ids.swap(action_ids_);
             table_feature_prop_actions_.length = sizeof(raw_ofp_type);
             return action_ids;
@@ -137,19 +142,10 @@ namespace table_feature_properties {
     private:
         basic_prop_actions(
                   raw_ofp_type const& table_feature_prop_actions
-                , action_id_container&& action_ids)
+                , action_ids_type&& action_ids)
             : table_feature_prop_actions_(table_feature_prop_actions)
             , action_ids_(std::move(action_ids))
         {
-        }
-
-        static auto calc_length(action_id_container const& action_ids)
-            -> std::size_t
-        {
-            return boost::accumulate(
-                      action_ids, sizeof(raw_ofp_type)
-                    , [](std::size_t const length, any_action_id const& id)
-                      { return length + id.length(); });
         }
 
         friend detail::basic_protocol_type<basic_prop_actions>;
@@ -175,20 +171,8 @@ namespace table_feature_properties {
         {
             auto const property = detail::decode<raw_ofp_type>(first, last);
 
-            auto const id_last
-                = std::next(first, property.length - sizeof(raw_ofp_type));
-            constexpr auto base_id_size
-                = offsetof(v13_detail::ofp_action_header, pad);
-            auto action_ids = action_id_container{};
-            action_ids.reserve(std::distance(first, id_last) / base_id_size);
-            while (std::distance(first, id_last) >= base_id_size) {
-                action_ids.push_back(any_action_id::decode(first, id_last));
-            }
-            if (first != id_last) {
-                throw std::runtime_error{
-                    "invalid table_feature_prop_actions length"
-                };
-            }
+            last = std::next(first, property.length - sizeof(raw_ofp_type));
+            auto action_ids = action_ids_type::decode(first, last);
 
             return basic_prop_actions{property, std::move(action_ids)};
         }
@@ -207,7 +191,7 @@ namespace table_feature_properties {
             }
             auto const rhs_ids_end = rhs.action_ids_.end();
             for (auto const& lhs_id : action_ids_) {
-                using const_reference = action_id_container::const_reference;
+                using const_reference = action_ids_type::const_reference;
                 if (boost::find_if(
                               rhs.action_ids_
                             , [&lhs_id](const_reference rhs_id)
@@ -221,7 +205,7 @@ namespace table_feature_properties {
 
     private:
         raw_ofp_type table_feature_prop_actions_;
-        action_id_container action_ids_;
+        action_ids_type action_ids_;
     };
 
     namespace actions_detail {

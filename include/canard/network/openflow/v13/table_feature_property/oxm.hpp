@@ -1,19 +1,17 @@
 #ifndef CANARD_NET_OFP_V13_TABLE_FEATURE_PROPERTIES_OXM_HPP
 #define CANARD_NET_OFP_V13_TABLE_FEATURE_PROPERTIES_OXM_HPP
 
-#include <cstddef>
 #include <cstdint>
 #include <iterator>
-#include <stdexcept>
+#include <type_traits>
 #include <utility>
-#include <vector>
 #include <boost/range/algorithm/find_if.hpp>
 #include <boost/range/algorithm/for_each.hpp>
-#include <boost/range/numeric.hpp>
 #include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
-#include <canard/network/openflow/detail/is_related.hpp>
+#include <canard/network/openflow/list.hpp>
+#include <canard/network/openflow/type_traits/is_all_constructible.hpp>
 #include <canard/network/openflow/v13/any_oxm_id.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
@@ -33,27 +31,33 @@ namespace table_feature_properties {
             = T::prop_type;
 
         using raw_ofp_type = v13_detail::ofp_table_feature_prop_oxm;
-        using oxm_id_container = std::vector<any_oxm_id>;
-        using iterator = oxm_id_container::iterator;
-        using const_iterator = oxm_id_container::const_iterator;
+        using oxm_ids_type = ofp::list<any_oxm_id>;
+        using iterator = oxm_ids_type::iterator;
+        using const_iterator = oxm_ids_type::const_iterator;
 
-        explicit basic_prop_oxm(oxm_id_container oxm_ids)
+    private:
+        template <class... OXMIDs>
+        using enable_if_is_all_constructible_t = typename std::enable_if<
+            type_traits::is_all_constructible<
+                oxm_ids_type::value_type, OXMIDs...
+            >::value
+        >::type;
+
+    public:
+        explicit basic_prop_oxm(oxm_ids_type oxm_ids)
             : table_feature_prop_oxm_{
                   prop_type
-                , std::uint16_t(calc_length(oxm_ids))
+                , oxm_ids.calc_ofp_length(sizeof(raw_ofp_type))
               }
             , oxm_ids_(std::move(oxm_ids))
         {
         }
 
         template <
-              class... OXMIDs
-            , class = typename std::enable_if<
-                !detail::is_related<OXMIDs..., basic_prop_oxm>::value
-              >::type
+            class... OXMIDs, class = enable_if_is_all_constructible_t<OXMIDs...>
         >
         explicit basic_prop_oxm(OXMIDs&&... oxm_ids)
-            : basic_prop_oxm{oxm_id_container{std::forward<OXMIDs>(oxm_ids)...}}
+            : basic_prop_oxm{oxm_ids_type{std::forward<OXMIDs>(oxm_ids)...}}
         {
         }
 
@@ -93,15 +97,15 @@ namespace table_feature_properties {
         }
 
         auto oxm_ids() const noexcept
-            -> oxm_id_container const&
+            -> oxm_ids_type const&
         {
             return oxm_ids_;
         }
 
         auto extract_oxm_ids()
-            -> oxm_id_container
+            -> oxm_ids_type
         {
-            auto oxm_ids = oxm_id_container{};
+            auto oxm_ids = oxm_ids_type{};
             oxm_ids.swap(oxm_ids_);
             table_feature_prop_oxm_.length = sizeof(raw_ofp_type);
             return oxm_ids;
@@ -134,19 +138,10 @@ namespace table_feature_properties {
     private:
         basic_prop_oxm(
                   raw_ofp_type const& table_feature_prop_oxm
-                , oxm_id_container&& oxm_ids)
+                , oxm_ids_type&& oxm_ids)
             : table_feature_prop_oxm_(table_feature_prop_oxm)
             , oxm_ids_(std::move(oxm_ids))
         {
-        }
-
-        static auto calc_length(oxm_id_container const& oxm_ids) noexcept
-            -> std::size_t
-        {
-            return boost::accumulate(
-                      oxm_ids, sizeof(raw_ofp_type)
-                    , [](std::size_t const length, any_oxm_id const& id)
-                      { return length + id.length(); });
         }
 
         friend detail::basic_protocol_type<basic_prop_oxm>;
@@ -172,19 +167,8 @@ namespace table_feature_properties {
         {
             auto const property = detail::decode<raw_ofp_type>(first, last);
 
-            auto const id_last
-                = std::next(first, property.length - sizeof(raw_ofp_type));
-            constexpr auto base_id_size = sizeof(std::uint32_t);
-            auto oxm_ids = oxm_id_container{};
-            oxm_ids.reserve(std::distance(first, id_last) / base_id_size);
-            while (std::distance(first, id_last) >= base_id_size) {
-                oxm_ids.push_back(any_oxm_id::decode(first, id_last));
-            }
-            if (first != id_last) {
-                throw std::runtime_error{
-                    "invalid table_feature_prop_oxm length"
-                };
-            }
+            last = std::next(first, property.length - sizeof(raw_ofp_type));
+            auto oxm_ids = oxm_ids_type::decode(first, last);
 
             return basic_prop_oxm{property, std::move(oxm_ids)};
         }
@@ -203,7 +187,7 @@ namespace table_feature_properties {
             }
             auto const rhs_ids_end = rhs.oxm_ids_.end();
             for (auto const& lhs_id : oxm_ids_) {
-                using const_reference = oxm_id_container::const_reference;
+                using const_reference = oxm_ids_type::const_reference;
                 if (boost::find_if(
                               rhs.oxm_ids_
                             , [&lhs_id](const_reference rhs_id)
@@ -217,7 +201,7 @@ namespace table_feature_properties {
 
     private:
         raw_ofp_type table_feature_prop_oxm_;
-        oxm_id_container oxm_ids_;
+        oxm_ids_type oxm_ids_;
     };
 
     namespace oxm_detail {
