@@ -7,6 +7,7 @@
 #include <initializer_list>
 #include <iterator>
 #include <limits>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 #include <boost/algorithm/cxx11/all_of.hpp>
@@ -32,14 +33,14 @@ namespace table_feature_properties {
             = T::prop_type;
 
         using raw_ofp_type = v13_detail::ofp_table_feature_prop_next_tables;
-        using next_table_id_container = std::vector<std::uint8_t>;
-        using iterator = next_table_id_container::iterator;
-        using const_iterator = next_table_id_container::const_iterator;
+        using next_table_ids_type = std::vector<std::uint8_t>;
+        using iterator = next_table_ids_type::iterator;
+        using const_iterator = next_table_ids_type::const_iterator;
 
-        explicit basic_prop_next_tables(next_table_id_container table_ids)
+        explicit basic_prop_next_tables(next_table_ids_type table_ids)
             : table_feature_prop_next_tables_{
                   prop_type
-                , std::uint16_t(calc_length(table_ids))
+                , calc_length(table_ids)
               }
             , next_table_ids_(std::move(table_ids))
         {
@@ -47,7 +48,7 @@ namespace table_feature_properties {
 
         explicit basic_prop_next_tables(
                 std::initializer_list<std::uint8_t> table_ids)
-            : basic_prop_next_tables{next_table_id_container(table_ids)}
+            : basic_prop_next_tables{next_table_ids_type(table_ids)}
         {
         }
 
@@ -89,15 +90,15 @@ namespace table_feature_properties {
         }
 
         auto next_table_ids() const noexcept
-            -> next_table_id_container const&
+            -> next_table_ids_type const&
         {
             return next_table_ids_;
         }
 
         auto extract_next_table_ids()
-            -> next_table_id_container
+            -> next_table_ids_type
         {
-            auto next_table_ids = next_table_id_container{};
+            auto next_table_ids = next_table_ids_type{};
             next_table_ids.swap(next_table_ids_);
             table_feature_prop_next_tables_.length = sizeof(raw_ofp_type);
             return next_table_ids;
@@ -130,17 +131,23 @@ namespace table_feature_properties {
     private:
         basic_prop_next_tables(
                   raw_ofp_type const& table_feature_prop_next_tables
-                , next_table_id_container&& next_table_ids)
+                , next_table_ids_type&& next_table_ids)
             : table_feature_prop_next_tables_(table_feature_prop_next_tables)
             , next_table_ids_(std::move(next_table_ids))
         {
         }
 
-        static auto calc_length(next_table_id_container const& table_ids)
-            -> std::size_t
+        static auto calc_length(next_table_ids_type const& table_ids)
+            -> std::uint16_t
         {
-            return sizeof(raw_ofp_type)
-                + table_ids.size() * sizeof(next_table_id_container::value_type);
+            constexpr auto max_length
+                = std::numeric_limits<std::uint16_t>::max();
+            auto const table_ids_length
+                = table_ids.size() * sizeof(next_table_ids_type::value_type);
+            if (table_ids_length > max_length - sizeof(raw_ofp_type)) {
+                throw std::runtime_error{"too many table_ids"};
+            }
+            return sizeof(raw_ofp_type) + table_ids_length;
         }
 
         friend detail::basic_protocol_type<basic_prop_next_tables>;
@@ -165,10 +172,9 @@ namespace table_feature_properties {
         {
             auto const property = detail::decode<raw_ofp_type>(first, last);
 
-            auto const id_last
-                = std::next(first, property.length - sizeof(raw_ofp_type));
-            auto next_table_ids = next_table_id_container(first, id_last);
-            first = id_last;
+            last = std::next(first, property.length - sizeof(raw_ofp_type));
+            auto next_table_ids = next_table_ids_type(first, last);
+            first = last;
 
             return basic_prop_next_tables{property, std::move(next_table_ids)};
         }
@@ -185,7 +191,7 @@ namespace table_feature_properties {
             if (next_table_ids_.size() != rhs.next_table_ids_.size()) {
                 return false;
             }
-            using value_type = next_table_id_container::value_type;
+            using value_type = next_table_ids_type::value_type;
             constexpr auto array_size
                 = std::size_t{std::numeric_limits<value_type>::max() + 1};
             auto bitmap = std::array<bool, array_size>{};
@@ -199,7 +205,7 @@ namespace table_feature_properties {
 
     private:
         raw_ofp_type table_feature_prop_next_tables_;
-        next_table_id_container next_table_ids_;
+        next_table_ids_type next_table_ids_;
     };
 
     namespace next_tables_detail {
