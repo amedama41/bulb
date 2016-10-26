@@ -2,9 +2,7 @@
 #define CANARD_NET_OFP_V13_INSTRUCTIONS_WRITE_ACTIONS_HPP
 
 #include <stdexcept>
-#include <type_traits>
 #include <utility>
-#include <canard/network/openflow/detail/is_related.hpp>
 #include <canard/network/openflow/v13/action_list.hpp>
 #include <canard/network/openflow/v13/action_set.hpp>
 #include <canard/network/openflow/v13/detail/basic_instruction_actions.hpp>
@@ -35,9 +33,7 @@ namespace instructions {
 
         template <
               class... Actions
-            , typename std::enable_if<
-                !detail::is_related<write_actions, Actions...>::value
-              >::type* = nullptr
+            , class = enable_if_is_all_constructible_t<Actions...>
         >
         explicit write_actions(Actions&&... actions)
             : write_actions{action_set{std::forward<Actions>(actions)...}}

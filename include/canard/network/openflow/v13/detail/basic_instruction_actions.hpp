@@ -4,11 +4,13 @@
 #include <cstdint>
 #include <iterator>
 #include <stdexcept>
+#include <type_traits>
 #include <utility>
 #include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
+#include <canard/network/openflow/type_traits/is_all_constructible.hpp>
 #include <canard/network/openflow/v13/action_list.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
@@ -65,6 +67,13 @@ namespace v13 {
         }
 
     protected:
+        template <class... Actions>
+        using enable_if_is_all_constructible_t = typename std::enable_if<
+            type_traits::is_all_constructible<
+                ofp::v13::action_list::value_type, Actions...
+            >::value
+        >::type;
+
         explicit basic_instruction_actions(ofp::v13::action_list&& actions)
             : instruction_actions_{
                   T::instruction_type
