@@ -3,6 +3,8 @@
 
 #include <cstdint>
 #include <iterator>
+#include <limits>
+#include <stdexcept>
 #include <utility>
 #include <boost/range/iterator_range.hpp>
 #include <canard/network/openflow/binary_data.hpp>
@@ -62,7 +64,7 @@ namespace messages {
                 : header_{
                       base_t::version()
                     , base_t::type()
-                    , std::uint16_t(sizeof(raw_ofp_type) + data.size())
+                    , calc_ofp_length(data)
                     , xid
                   }
                 , data_(std::move(data).data())
@@ -124,6 +126,17 @@ namespace messages {
                 first = last;
 
                 return T{header, std::move(data)};
+            }
+
+            static auto calc_ofp_length(binary_data const& data)
+                -> std::uint16_t
+            {
+                constexpr auto max_length
+                    = std::numeric_limits<std::uint16_t>::max();
+                if (data.size() > max_length - sizeof(raw_ofp_type)) {
+                    throw std::runtime_error{"too large echo data length"};
+                }
+                return sizeof(raw_ofp_type) + data.size();
             }
 
         private:
