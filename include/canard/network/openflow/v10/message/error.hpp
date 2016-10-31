@@ -3,7 +3,7 @@
 
 #include <cstdint>
 #include <iterator>
-#include <numeric>
+#include <limits>
 #include <stdexcept>
 #include <utility>
 #include <vector>
@@ -40,7 +40,7 @@ namespace messages {
                   v10_detail::ofp_header{
                         protocol::OFP_VERSION
                       , message_type
-                      , std::uint16_t(sizeof(raw_ofp_type) + data.size())
+                      , calc_ofp_length(data)
                       , xid
                   }
                 , std::uint16_t(type)
@@ -206,6 +206,17 @@ namespace messages {
             }
 
             return binary_data{buffer};
+        }
+
+        static auto calc_ofp_length(binary_data const& data)
+            -> std::uint16_t
+        {
+            constexpr auto max_length
+                = std::numeric_limits<std::uint16_t>::max();
+            if (data.size() > max_length - sizeof(raw_ofp_type)) {
+                throw std::runtime_error{"too large error data length"};
+            }
+            return sizeof(raw_ofp_type) + data.size();
         }
 
     private:
