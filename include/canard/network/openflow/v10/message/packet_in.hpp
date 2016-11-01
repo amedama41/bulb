@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <cstring>
 #include <iterator>
+#include <limits>
 #include <stdexcept>
 #include <utility>
 #include <boost/range/iterator_range.hpp>
@@ -52,7 +53,7 @@ namespace messages {
                   v10_detail::ofp_header{
                       protocol::OFP_VERSION
                     , message_type
-                    , std::uint16_t(min_pkt_in_len + data.size())
+                    , calc_ofp_length(data)
                     , xid
                   }
                 , buffer_id
@@ -192,6 +193,17 @@ namespace messages {
             return std::memcmp(
                     &packet_in_, &rhs.packet_in_, min_pkt_in_len) == 0
                 && frame() == rhs.frame();
+        }
+
+        static auto calc_ofp_length(binary_data const& data)
+            -> std::uint16_t
+        {
+            constexpr auto max_length
+                = std::numeric_limits<std::uint16_t>::max();
+            if (data.size() > max_length - min_pkt_in_len) {
+                throw std::runtime_error{"too large packet_in data length"};
+            }
+            return min_pkt_in_len + data.size();
         }
 
     public:
