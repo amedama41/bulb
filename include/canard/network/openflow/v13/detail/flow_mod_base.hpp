@@ -8,11 +8,12 @@
 #include <utility>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/list.hpp>
+#include <canard/network/openflow/v13/any_instruction.hpp>
 #include <canard/network/openflow/v13/common/oxm_match_set.hpp>
 #include <canard/network/openflow/v13/detail/basic_openflow_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/detail/length_utility.hpp>
-#include <canard/network/openflow/v13/instruction_set.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -33,6 +34,7 @@ namespace flow_mod_detail {
             = protocol::OFPT_FLOW_MOD;
 
         using raw_ofp_type = v13_detail::ofp_flow_mod;
+        using instructions_type = ofp::list<any_instruction>;
 
         auto header() const noexcept
             -> v13_detail::ofp_header const&
@@ -56,15 +58,15 @@ namespace flow_mod_detail {
         }
 
         auto instructions() const noexcept
-            -> instruction_set const&
+            -> instructions_type const&
         {
             return instructions_;
         }
 
         auto extract_instructions()
-            -> instruction_set
+            -> instructions_type
         {
-            auto instructions = instruction_set{};
+            auto instructions = instructions_type{};
             instructions.swap(instructions_);
             flow_mod_.header.length
                 = sizeof(raw_ofp_type)
@@ -78,7 +80,7 @@ namespace flow_mod_detail {
                 , std::uint16_t const priority
                 , std::uint64_t const cookie
                 , std::uint64_t const cookie_mask
-                , instruction_set&& instructions
+                , instructions_type&& instructions
                 , std::uint8_t const table_id
                 , std::uint16_t const idle_timeout
                 , std::uint16_t const hard_timeout
@@ -89,10 +91,9 @@ namespace flow_mod_detail {
                   v13_detail::ofp_header{
                       base_t::version()
                     , base_t::type()
-                    , std::uint16_t(
+                    , instructions.calc_ofp_length(
                               sizeof(raw_ofp_type)
-                            + v13_detail::exact_length(match.length())
-                            + instructions.length())
+                            + v13_detail::exact_length(match.length()))
                     , xid
                   }
                 , cookie
@@ -152,7 +153,7 @@ namespace flow_mod_detail {
         flow_mod_base(
                  raw_ofp_type const& flow_mod
                , oxm_match_set&& match
-               , instruction_set&& instructions)
+               , instructions_type&& instructions)
             : flow_mod_(flow_mod)
             , match_(std::move(match))
             , instructions_(std::move(instructions))
@@ -226,7 +227,7 @@ namespace flow_mod_detail {
             }
             auto match = oxm_match_set::decode(first, last);
 
-            auto instructions = instruction_set::decode(first, last);
+            auto instructions = instructions_type::decode(first, last);
 
             return FlowMod{
                 flow_mod, std::move(match), std::move(instructions)
@@ -236,7 +237,7 @@ namespace flow_mod_detail {
     private:
         raw_ofp_type flow_mod_;
         oxm_match_set match_;
-        instruction_set instructions_;
+        instructions_type instructions_;
     };
 
 } // namespace flow_mod_detail

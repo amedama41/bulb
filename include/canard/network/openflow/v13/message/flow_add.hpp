@@ -8,7 +8,6 @@
 #include <canard/network/openflow/v13/detail/flow_entry_adaptor.hpp>
 #include <canard/network/openflow/v13/detail/flow_mod_base.hpp>
 #include <canard/network/openflow/v13/flow_entry.hpp>
-#include <canard/network/openflow/v13/instruction_set.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -94,7 +93,7 @@ namespace messages {
 
         flow_add(v13_detail::ofp_flow_mod const& flow_mod
                , oxm_match_set&& match
-               , instruction_set&& instructions)
+               , instructions_type&& instructions)
             : flow_mod_base{
                 flow_mod, std::move(match), std::move(instructions)
               }

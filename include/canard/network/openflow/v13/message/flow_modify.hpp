@@ -26,7 +26,7 @@ namespace messages {
 
         flow_modify(oxm_match_set match
                   , std::uint8_t const table_id
-                  , instruction_set instructions
+                  , instructions_type instructions
                   , v13::cookie_mask const& cookie_mask
                   , bool const reset_counter = false
                   , std::uint32_t const buffer_id = protocol::OFP_NO_BUFFER
@@ -42,6 +42,43 @@ namespace messages {
                 , 0
                 , std::uint16_t(
                         reset_counter ? protocol::OFPFF_RESET_COUNTS : 0)
+                , buffer_id
+                , xid
+              }
+        {
+        }
+
+        flow_modify(oxm_match_set match
+                  , std::uint8_t const table_id
+                  , instruction_set instructions
+                  , v13::cookie_mask const& cookie_mask
+                  , bool const reset_counter = false
+                  , std::uint32_t const buffer_id = protocol::OFP_NO_BUFFER
+                  , std::uint32_t const xid = get_xid())
+            : flow_modify{
+                  std::move(match)
+                , table_id
+                , std::move(instructions).to_list()
+                , cookie_mask
+                , reset_counter
+                , buffer_id
+                , xid
+              }
+        {
+        }
+
+        flow_modify(oxm_match_set match
+                  , std::uint8_t const table_id
+                  , instructions_type instructions
+                  , bool const reset_counter = false
+                  , std::uint32_t const buffer_id = protocol::OFP_NO_BUFFER
+                  , std::uint32_t const xid = get_xid())
+            : flow_modify{
+                  std::move(match)
+                , table_id
+                , std::move(instructions)
+                , v13::cookie_mask{0, 0}
+                , reset_counter
                 , buffer_id
                 , xid
               }
@@ -101,7 +138,7 @@ namespace messages {
 
         flow_modify(v13_detail::ofp_flow_mod const& flow_mod
                   , oxm_match_set&& match
-                  , instruction_set&& instructions)
+                  , instructions_type&& instructions)
             : flow_mod_base{
                 flow_mod, std::move(match), std::move(instructions)
               }
@@ -120,7 +157,7 @@ namespace messages {
         flow_modify_strict(
                   flow_entry entry
                 , std::uint8_t const table_id
-                , instruction_set instructions
+                , instructions_type instructions
                 , bool const reset_counter = false
                 , std::uint32_t const buffer_id = protocol::OFP_NO_BUFFER
                 , std::uint32_t const xid = get_xid())
@@ -142,10 +179,28 @@ namespace messages {
         }
 
         flow_modify_strict(
+                  flow_entry entry
+                , std::uint8_t const table_id
+                , instruction_set instructions
+                , bool const reset_counter = false
+                , std::uint32_t const buffer_id = protocol::OFP_NO_BUFFER
+                , std::uint32_t const xid = get_xid())
+            : flow_modify_strict{
+                  std::move(entry)
+                , table_id
+                , std::move(instructions).to_list()
+                , reset_counter
+                , buffer_id
+                , xid
+              }
+        {
+        }
+
+        flow_modify_strict(
                   oxm_match_set match
                 , std::uint16_t const priority
                 , std::uint8_t const table_id
-                , instruction_set instructions
+                , instructions_type instructions
                 , v13::cookie_mask cookie_mask
                 , bool const reset_counter = false
                 , std::uint32_t const buffer_id = protocol::OFP_NO_BUFFER
@@ -161,6 +216,49 @@ namespace messages {
                 , 0
                 , std::uint16_t(
                         reset_counter ? protocol::OFPFF_RESET_COUNTS : 0)
+                , buffer_id
+                , xid
+              }
+        {
+        }
+
+        flow_modify_strict(
+                  oxm_match_set match
+                , std::uint16_t const priority
+                , std::uint8_t const table_id
+                , instruction_set instructions
+                , v13::cookie_mask cookie_mask
+                , bool const reset_counter = false
+                , std::uint32_t const buffer_id = protocol::OFP_NO_BUFFER
+                , std::uint32_t const xid = get_xid())
+            : flow_modify_strict{
+                  std::move(match)
+                , priority
+                , table_id
+                , std::move(instructions).to_list()
+                , cookie_mask
+                , reset_counter
+                , buffer_id
+                , xid
+              }
+        {
+        }
+
+        flow_modify_strict(
+                  oxm_match_set match
+                , std::uint16_t const priority
+                , std::uint8_t const table_id
+                , instructions_type instructions
+                , bool const reset_counter = false
+                , std::uint32_t const buffer_id = protocol::OFP_NO_BUFFER
+                , std::uint32_t const xid = get_xid())
+            : flow_modify_strict{
+                  std::move(match)
+                , priority
+                , table_id
+                , std::move(instructions)
+                , v13::cookie_mask{0, 0}
+                , reset_counter
                 , buffer_id
                 , xid
               }
@@ -236,7 +334,7 @@ namespace messages {
         flow_modify_strict(
                   v13_detail::ofp_flow_mod const& flow_mod
                 , oxm_match_set&& match
-                , instruction_set&& instructions)
+                , instructions_type&& instructions)
             : flow_mod_base{
                 flow_mod, std::move(match), std::move(instructions)
               }

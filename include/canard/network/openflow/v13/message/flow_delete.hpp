@@ -93,7 +93,7 @@ namespace messages {
 
         flow_delete(v13_detail::ofp_flow_mod const& flow_mod
                   , oxm_match_set&& match
-                  , instruction_set&& instructions)
+                  , instructions_type&& instructions)
             : flow_mod_base{flow_mod, std::move(match), std::move(instructions)}
         {
         }
@@ -214,7 +214,7 @@ namespace messages {
         flow_delete_strict(
                   v13_detail::ofp_flow_mod const& flow_mod
                 , oxm_match_set&& match
-                , instruction_set&& instructions)
+                , instructions_type&& instructions)
             : flow_mod_base{flow_mod, std::move(match), std::move(instructions)}
         {
         }
