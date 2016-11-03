@@ -16,6 +16,7 @@
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/iterator.hpp>
 #include <canard/network/openflow/detail/is_related.hpp>
+#include <canard/network/openflow/list.hpp>
 #include <canard/network/openflow/v13/decoder/instruction_decoder.hpp>
 #include <canard/network/openflow/v13/any_instruction.hpp>
 #include <canard/network/openflow/v13/instruction_order.hpp>
@@ -32,6 +33,7 @@ namespace v13 {
         using container_type = std::map<std::uint64_t, any_instruction>;
 
     public:
+        using list_type = ofp::list<any_instruction>;
         using key_type = std::uint64_t;
         using value_type = container_type::mapped_type;
         using reference = value_type const&;
@@ -166,6 +168,12 @@ namespace v13 {
                 return boost::none;
             }
             return v13::any_cast<Instruction>(it->second);
+        }
+
+        CANARD_NET_OFP_DECL auto to_list() const
+            -> list_type
+        {
+            return list_type(begin(), end());
         }
 
         CANARD_NET_OFP_DECL auto length() const noexcept
