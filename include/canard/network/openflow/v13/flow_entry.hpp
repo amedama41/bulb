@@ -3,6 +3,8 @@
 
 #include <cstdint>
 #include <utility>
+#include <canard/network/openflow/list.hpp>
+#include <canard/network/openflow/v13/any_instruction.hpp>
 #include <canard/network/openflow/v13/common/oxm_match_set.hpp>
 #include <canard/network/openflow/v13/instruction_set.hpp>
 
@@ -53,10 +55,31 @@ namespace v13 {
     class flow_entry
     {
     public:
+        using instructions_type = ofp::list<any_instruction>;
+
+        flow_entry(flow_entry_id identifer
+                 , std::uint64_t const cookie
+                 , instructions_type instructions)
+            : identifier_(std::move(identifer))
+            , cookie_(cookie)
+            , instructions_(std::move(instructions))
+        {
+        }
+
         flow_entry(flow_entry_id identifer
                  , std::uint64_t const cookie
                  , instruction_set instructions)
             : identifier_(std::move(identifer))
+            , cookie_(cookie)
+            , instructions_(std::move(instructions).to_list())
+        {
+        }
+
+        flow_entry(oxm_match_set match
+                 , std::uint16_t const priority
+                 , std::uint64_t const cookie
+                 , instructions_type instructions)
+            : identifier_{std::move(match), priority}
             , cookie_(cookie)
             , instructions_(std::move(instructions))
         {
@@ -68,7 +91,7 @@ namespace v13 {
                  , instruction_set instructions)
             : identifier_{std::move(match), priority}
             , cookie_(cookie)
-            , instructions_(std::move(instructions))
+            , instructions_(std::move(instructions).to_list())
         {
         }
 
@@ -109,26 +132,26 @@ namespace v13 {
         }
 
         auto instructions() const& noexcept
-            -> instruction_set const&
+            -> instructions_type const&
         {
             return instructions_;
         }
 
         auto instructions() && noexcept
-            -> instruction_set&&
+            -> instructions_type&&
         {
             return std::move(instructions_);
         }
 
         void instructions(instruction_set instructions)
         {
-            instructions_ = std::move(instructions);
+            instructions_ = std::move(instructions).to_list();
         }
 
     private:
         flow_entry_id identifier_;
         std::uint64_t cookie_;
-        instruction_set instructions_;
+        instructions_type instructions_;
     };
 
 
