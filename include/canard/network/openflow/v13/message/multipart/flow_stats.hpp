@@ -10,13 +10,14 @@
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/get_xid.hpp>
+#include <canard/network/openflow/list.hpp>
+#include <canard/network/openflow/v13/any_instruction.hpp>
 #include <canard/network/openflow/v13/common/oxm_match_set.hpp>
 #include <canard/network/openflow/v13/detail/basic_multipart.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/detail/flow_entry_adaptor.hpp>
 #include <canard/network/openflow/v13/detail/length_utility.hpp>
 #include <canard/network/openflow/v13/flow_entry.hpp>
-#include <canard/network/openflow/v13/instruction_set.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -34,6 +35,7 @@ namespace multipart {
     {
     public:
         using raw_ofp_type = v13_detail::ofp_flow_stats;
+        using instructions_type = ofp::list<any_instruction>;
 
         flow_stats(v13::flow_entry entry
                  , std::uint8_t const table_id
@@ -42,10 +44,9 @@ namespace multipart {
                  , v13::elapsed_time const& elapsed_time
                  , v13::counters const& counters)
             : flow_stats_{
-                  std::uint16_t(
+                  entry.instructions().calc_ofp_length(
                           sizeof(raw_ofp_type)
-                        + v13_detail::exact_length(entry.match().length())
-                        + entry.instructions().length())
+                        + v13_detail::exact_length(entry.match().length()))
                 , table_id
                 , 0
                 , elapsed_time.duration_sec()
@@ -115,15 +116,16 @@ namespace multipart {
         }
 
         auto instructions() const noexcept
-            -> instruction_set const&
+            -> instructions_type const&
         {
             return instructions_;
         }
 
         auto extract_instructions()
-            -> instruction_set
+            -> instructions_type
         {
-            auto instructions = std::move(instructions_);
+            auto instructions = instructions_type{};
+            instructions.swap(instructions_);
             flow_stats_.length
                 = sizeof(raw_ofp_type)
                 + v13_detail::exact_length(match_.length());
@@ -139,7 +141,7 @@ namespace multipart {
     private:
         flow_stats(raw_ofp_type const& stats
                  , oxm_match_set&& match
-                 , instruction_set&& instructions)
+                 , instructions_type&& instructions)
             : flow_stats_(stats)
             , match_(std::move(match))
             , instructions_(std::move(instructions))
@@ -198,7 +200,7 @@ namespace multipart {
             }
             auto match = oxm_match_set::decode(first, last);
 
-            auto instructions = instruction_set::decode(first, last);
+            auto instructions = instructions_type::decode(first, last);
 
             return flow_stats{stats, std::move(match), std::move(instructions)};
         }
@@ -206,7 +208,7 @@ namespace multipart {
     private:
         raw_ofp_type flow_stats_;
         oxm_match_set match_;
-        instruction_set instructions_;
+        instructions_type instructions_;
     };
 
 
