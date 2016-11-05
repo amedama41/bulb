@@ -4,18 +4,10 @@
 #include <canard/network/openflow/detail/config.hpp>
 
 #include <cstdint>
-#include <memory>
-#include <stdexcept>
 #include <type_traits>
 #include <utility>
-#include <boost/container/flat_set.hpp>
 #include <boost/operators.hpp>
 #include <boost/optional/optional.hpp>
-#include <boost/range/algorithm/adjacent_find.hpp>
-#include <boost/range/algorithm/equal.hpp>
-#include <boost/range/algorithm/find_if.hpp>
-#include <boost/range/algorithm/lower_bound.hpp>
-#include <boost/range/adaptor/transformed.hpp>
 #include <canard/network/openflow/list.hpp>
 #include <canard/network/openflow/type_traits/is_all_constructible.hpp>
 
@@ -49,7 +41,7 @@ namespace ofp {
     >::type;
 
   public:
-    set() = default;
+    CANARD_NET_OFP_DECL set();
 
     template <
         class... Types
@@ -63,68 +55,54 @@ namespace ofp {
     }
 
     CANARD_NET_OFP_DECL auto begin() const noexcept
-      -> const_iterator
-    { return list_.begin(); }
+      -> const_iterator;
 
     CANARD_NET_OFP_DECL auto end() const noexcept
-      -> const_iterator
-    { return list_.end(); }
+      -> const_iterator;
 
     CANARD_NET_OFP_DECL auto cbegin() const noexcept
-      -> const_iterator
-    { return list_.cbegin(); }
+      -> const_iterator;
 
     CANARD_NET_OFP_DECL auto cend() const noexcept
-      -> const_iterator
-    { return list_.cend(); }
+      -> const_iterator;
 
     CANARD_NET_OFP_DECL auto rbegin() const noexcept
-      -> const_reverse_iterator
-    { return list_.rbegin(); }
+      -> const_reverse_iterator;
 
     CANARD_NET_OFP_DECL auto rend() const noexcept
-      -> const_reverse_iterator
-    { return list_.rend(); }
+      -> const_reverse_iterator;
 
     CANARD_NET_OFP_DECL auto crbegin() const noexcept
-      -> const_reverse_iterator
-    { return list_.crbegin(); }
+      -> const_reverse_iterator;
 
     CANARD_NET_OFP_DECL auto crend() const noexcept
-      -> const_reverse_iterator
-    { return list_.crend(); }
+      -> const_reverse_iterator;
 
     CANARD_NET_OFP_DECL auto empty() const noexcept
-      -> bool
-    { return list_.empty(); }
+      -> bool;
 
     CANARD_NET_OFP_DECL auto size() const noexcept
-      -> size_type
-    { return list_.size(); }
+      -> size_type;
 
     CANARD_NET_OFP_DECL auto max_size() const noexcept
-      -> size_type
-    { return list_.max_size(); }
+      -> size_type;
 
-    CANARD_NET_OFP_DECL auto at(key_type const key) const
-      -> const_reference
-    {
-      auto const it = find(key);
-      if (it == list_.end()) {
-        throw std::out_of_range{"not found specified value"};
-      }
-      return *it;
-    }
+    CANARD_NET_OFP_DECL auto at(key_type) const
+      -> const_reference;
 
     template <class T>
     auto at() const
       -> T const&
-    { return any_cast<T>(at(KeyTraits::template key<T>::value)); }
+    {
+      return any_cast<T>(at(KeyTraits::template key<T>::value));
+    }
 
     template <class T>
     auto get() const
       -> T const&
-    { return any_cast<T>(*find(KeyTraits::template key<T>::value)); }
+    {
+      return any_cast<T>(*find(KeyTraits::template key<T>::value));
+    }
 
     template <class T>
     auto insert(T&& t)
@@ -172,9 +150,8 @@ namespace ofp {
       }
     }
 
-    CANARD_NET_OFP_DECL auto erase(const_iterator pos)
-      -> const_iterator
-    { return list_.erase(pos); }
+    CANARD_NET_OFP_DECL auto erase(const_iterator)
+      -> const_iterator;
 
     template <class T>
     auto erase()
@@ -188,19 +165,12 @@ namespace ofp {
       return 1;
     }
 
-    CANARD_NET_OFP_DECL void swap(set& other) noexcept
-    { list_.swap(other.list_); }
+    CANARD_NET_OFP_DECL void swap(set&) noexcept;
 
-    CANARD_NET_OFP_DECL void clear() noexcept
-    { list_.clear(); }
+    CANARD_NET_OFP_DECL void clear() noexcept;
 
-    CANARD_NET_OFP_DECL auto find(key_type const key) const noexcept
-      -> const_iterator
-    {
-      return boost::find_if(
-            list_
-          , [=](const_reference e) { return KeyTraits::get_key(e) == key; });
-    }
+    CANARD_NET_OFP_DECL auto find(key_type) const noexcept
+      -> const_iterator;
 
     template <class T>
     auto find() const
@@ -214,142 +184,59 @@ namespace ofp {
     }
 
     CANARD_NET_OFP_DECL auto length() const
-      -> std::uint16_t
-    { return list_.length(); }
+      -> std::uint16_t;
 
     CANARD_NET_OFP_DECL auto to_list() const& noexcept
-      -> list_type const&
-    { return list_; }
+      -> list_type const&;
 
     CANARD_NET_OFP_DECL auto to_list() && noexcept
-      -> list_type&&
-    { return std::move(list_); }
+      -> list_type&&;
 
     friend auto operator==(set const& lhs, set const& rhs)
       -> bool
-    { return lhs.equal_impl(rhs); }
+    {
+      return lhs.equal_impl(rhs);
+    }
 
     friend auto equivalent(set const& lhs, set const& rhs) noexcept
       -> bool
-    { return lhs.equivalent_impl(rhs); }
-
-    CANARD_NET_OFP_DECL static auto is_valid_set(list_type const& values)
-      -> bool
     {
-      auto key_set = boost::container::flat_set<key_type>{};
-      key_set.reserve(values.size());
-      for (auto const& v : values) {
-        auto const result = key_set.insert(KeyTraits::get_key(v));
-        if (!result.second) {
-          return false;
-        }
-      }
-      return true;
+      return lhs.equivalent_impl(rhs);
     }
+
+    CANARD_NET_OFP_DECL static auto is_valid_set(list_type const&)
+      -> bool;
 
     CANARD_NET_OFP_DECL static auto equivalent_as_set(
-        list_type const& lhs, list_type const& rhs)
-      -> bool
-    {
-      if (auto const lhs_info = set_info{lhs}) {
-        if (auto const rhs_info = set_info{rhs}) {
-          return lhs_info == rhs_info;
-        }
-      }
-      return false;
-    }
+        list_type const&, list_type const&)
+      -> bool;
 
   private:
+    class set_info;
+
     template <class T>
-    CANARD_NET_OFP_DECL auto init_impl(T&& t)
+    auto init_impl(T&& t)
       -> dummy_type
     {
       insert(std::forward<T>(t));
       return {};
     }
 
-    CANARD_NET_OFP_DECL auto non_const_lower_bound(key_type const key)
-      -> typename list_type::iterator
-    {
-      return boost::lower_bound(
-            list_
-          , key
-          , [](const_reference e, key_type const key)
-            { return KeyTraits::get_key(e) < key; });
-    }
+    CANARD_NET_OFP_DECL auto non_const_lower_bound(key_type)
+      -> typename list_type::iterator;
 
-    CANARD_NET_OFP_DECL auto equal_impl(set const& rhs) const noexcept
-      -> bool
-    { return list_ == rhs.list_; }
+    CANARD_NET_OFP_DECL auto equal_impl(set const&) const noexcept
+      -> bool;
 
-    CANARD_NET_OFP_DECL auto equivalent_impl(set const& rhs) const noexcept
-      -> bool
-    {
-      return boost::equal(
-            list_, rhs.list_
-          , [](const_reference lhs_value, const_reference rhs_value)
-            { return equivalent(lhs_value, rhs_value); });
-    }
+    CANARD_NET_OFP_DECL auto equivalent_impl(set const&) const noexcept
+      -> bool;
 
     template <class T>
-    CANARD_NET_OFP_DECL static auto any_cast(const_reference value)
+    static auto any_cast(const_reference value)
       -> T const&
-    { return KeyTraits::template any_cast<T>(value); }
-
-    class set_info
     {
-      struct compare
-      {
-        auto operator()(
-            value_type const* lhs, value_type const* rhs) const noexcept
-          -> bool
-        { return KeyTraits::get_key(*lhs) < KeyTraits::get_key(*rhs); }
-      };
-
-      using set_type
-        = boost::container::flat_multiset<value_type const*, compare>;
-
-    public:
-      explicit set_info(list_type const& list)
-        : value_set_(create_value_set(list))
-      {
-      }
-
-      explicit operator bool() const noexcept
-      {
-        auto const it = boost::adjacent_find(
-              value_set_
-            , [](value_type const* lhs, value_type const* rhs)
-              { return KeyTraits::get_key(*lhs) == KeyTraits::get_key(*rhs); });
-        return it == value_set_.end();
-      }
-
-      friend auto operator==(set_info const& lhs, set_info const& rhs) noexcept
-        -> bool
-      {
-        return boost::equal(
-              lhs.value_set_, rhs.value_set_
-            , [](value_type const* lhs_it, value_type const* rhs_it)
-              { return equivalent(*lhs_it, *rhs_it); });
-      }
-
-    private:
-      struct to_pointer
-      {
-        auto operator()(value_type const& v) const noexcept
-          -> value_type const*
-        { return std::addressof(v); }
-      };
-
-      static auto create_value_set(list_type const& list)
-        -> set_type
-      {
-        auto const rng = list | boost::adaptors::transformed(to_pointer{});
-        return set_type(rng.begin(), rng.end());
-      }
-
-      set_type value_set_;
-    };
+      return KeyTraits::template any_cast<T>(value);
+    }
 
   private:
     list_type list_;
@@ -358,5 +245,9 @@ namespace ofp {
 } // namespace ofp
 } // namespace net
 } // namespace canard
+
+#if defined(CANARD_NET_OFP_HEADER_ONLY) || !defined(CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
+# include <canard/network/openflow/detail/impl/set.hpp>
+#endif
 
 #endif // CANARD_NET_OFP_SET_HPP
