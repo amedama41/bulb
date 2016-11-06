@@ -7,12 +7,11 @@
 #include <memory>
 #include <stdexcept>
 #include <utility>
-#include <boost/container/flat_set.hpp>
-#include <boost/range/algorithm/adjacent_find.hpp>
+#include <boost/container/flat_map.hpp>
 #include <boost/range/algorithm/equal.hpp>
 #include <boost/range/algorithm/find_if.hpp>
 #include <boost/range/algorithm/lower_bound.hpp>
-#include <boost/range/adaptor/transformed.hpp>
+#include <boost/range/adaptor/map.hpp>
 
 namespace canard {
 namespace net {
@@ -162,15 +161,7 @@ namespace ofp {
   auto set<KeyTraits>::is_valid_set(list_type const& values)
     -> bool
   {
-    auto key_set = boost::container::flat_set<key_type>{};
-    key_set.reserve(values.size());
-    for (auto const& v : values) {
-      auto const result = key_set.insert(KeyTraits::get_key(v));
-      if (!result.second) {
-        return false;
-      }
-    }
-    return true;
+    return set_info{values}.is_valid_set();
   }
 
   template <class KeyTraits>
@@ -189,59 +180,48 @@ namespace ofp {
   template <class KeyTraits>
   class set<KeyTraits>::set_info
   {
-    struct compare
-    {
-      auto operator()(
-          value_type const* lhs, value_type const* rhs) const noexcept
-        -> bool
-      { return KeyTraits::get_key(*lhs) < KeyTraits::get_key(*rhs); }
-    };
-
-    using set_type
-      = boost::container::flat_multiset<value_type const*, compare>;
+    using set_type = boost::container::flat_map<key_type, const_iterator>;
 
   public:
     explicit set_info(list_type const& list)
-      : value_set_(create_value_set(list))
+      : value_set_{}
+      , is_valid_set_{}
     {
+      value_set_.reserve(list.size());
+      auto const it_end = list.cend();
+      for (auto it = list.cbegin(); it != it_end; ++it) {
+        if (!value_set_.emplace(KeyTraits::get_key(*it), it).second) {
+          is_valid_set_ = false;
+          return;
+        }
+      }
+      is_valid_set_ = true;
     }
 
     explicit operator bool() const noexcept
     {
-      auto const it = boost::adjacent_find(
-            value_set_
-          , [](value_type const* lhs, value_type const* rhs)
-            { return KeyTraits::get_key(*lhs) == KeyTraits::get_key(*rhs); });
-      return it == value_set_.end();
+      return is_valid_set_;
+    }
+
+    auto is_valid_set() const noexcept
+      -> bool
+    {
+      return is_valid_set_;
     }
 
     friend auto operator==(set_info const& lhs, set_info const& rhs) noexcept
       -> bool
     {
       return boost::equal(
-            lhs.value_set_, rhs.value_set_
-          , [](value_type const* lhs_it, value_type const* rhs_it)
+            lhs.value_set_ | boost::adaptors::map_values
+          , rhs.value_set_ | boost::adaptors::map_values
+          , [](const_iterator lhs_it, const_iterator rhs_it)
             { return equivalent(*lhs_it, *rhs_it); });
     }
 
   private:
-    struct to_pointer
-    {
-      auto operator()(value_type const& v) const noexcept
-        -> value_type const*
-      {
-        return std::addressof(v);
-      }
-    };
-
-    static auto create_value_set(list_type const& list)
-      -> set_type
-    {
-      auto const rng = list | boost::adaptors::transformed(to_pointer{});
-      return set_type(rng.begin(), rng.end());
-    }
-
     set_type value_set_;
+    bool is_valid_set_;
   };
 
   template <class KeyTraits>
