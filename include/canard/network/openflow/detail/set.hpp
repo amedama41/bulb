@@ -14,16 +14,15 @@
 namespace canard {
 namespace net {
 namespace ofp {
+namespace detail {
 
-  template <class KeyTraits>
-  class set
-    : private boost::equality_comparable<set<KeyTraits>>
+  template <class Derived, class Key, class T>
+  class set_base
+    : private boost::equality_comparable<Derived>
   {
-    struct dummy_type {};
-
   public:
-    using list_type = ofp::list<typename KeyTraits::value_type>;
-    using key_type = typename KeyTraits::key_type;
+    using list_type = ofp::list<T>;
+    using key_type = Key;
     using value_type = typename list_type::value_type;
     using reference = typename list_type::const_reference;
     using const_reference = typename list_type::const_reference;
@@ -41,16 +40,19 @@ namespace ofp {
     >::type;
 
   public:
-    CANARD_NET_OFP_DECL set();
+    CANARD_NET_OFP_DECL set_base();
 
     template <
         class... Types
       , class = enable_if_is_all_constructible_t<value_type, Types...>
     >
-    set(Types&&... ts)
+    set_base(Types&&... ts)
       : list_{}
     {
-      dummy_type const unused[] = { init_impl(std::forward<Types>(ts))... };
+      struct dummy_type {};
+      dummy_type const unused[] = {
+        (insert(std::forward<Types>(ts)), dummy_type{})...
+      };
       static_cast<void>(unused);
     }
 
@@ -90,43 +92,43 @@ namespace ofp {
     CANARD_NET_OFP_DECL auto at(key_type) const
       -> const_reference;
 
-    template <class T>
+    template <class U>
     auto at() const
-      -> T const&
+      -> U const&
     {
-      return any_cast<T>(at(KeyTraits::template key<T>::value));
+      return cast<U>(at(key<U>()));
     }
 
-    template <class T>
+    template <class U>
     auto get() const
-      -> T const&
+      -> U const&
     {
-      return any_cast<T>(*find(KeyTraits::template key<T>::value));
+      return cast<U>(*find(key<U>()));
     }
 
-    template <class T>
-    auto insert(T&& t)
+    template <class U>
+    auto insert(U&& u)
       -> std::pair<const_iterator, bool>
     {
-      auto const key = KeyTraits::get_key(t);
+      auto const key = get_key(u);
       auto const pos = non_const_lower_bound(key);
-      if (pos != list_.end() && KeyTraits::get_key(*pos) == key) {
+      if (pos != list_.end() && get_key(*pos) == key) {
         return std::make_pair(const_iterator{pos}, false);
       }
       else {
-        auto const it = list_.insert(pos, value_type{std::forward<T>(t)});
+        auto const it = list_.insert(pos, value_type{std::forward<U>(u)});
         return std::make_pair(const_iterator{it}, true);
       }
     }
 
-    template <class T>
-    auto assign(T&& t)
+    template <class U>
+    auto assign(U&& u)
       -> std::pair<const_iterator, bool>
     {
-      auto const key = KeyTraits::get_key(t);
+      auto const key = get_key(u);
       auto const pos = non_const_lower_bound(key);
-      if (pos != list_.end() && KeyTraits::get_key(*pos) == key) {
-        *pos = std::forward<T>(t);
+      if (pos != list_.end() && get_key(*pos) == key) {
+        *pos = std::forward<U>(u);
         return std::make_pair(const_iterator{pos}, true);
       }
       else {
@@ -134,18 +136,18 @@ namespace ofp {
       }
     }
 
-    template <class T>
-    auto insert_or_assign(T&& t)
+    template <class U>
+    auto insert_or_assign(U&& u)
       -> std::pair<const_iterator, bool>
     {
-      auto const key = KeyTraits::get_key(t);
+      auto const key = get_key(u);
       auto const pos = non_const_lower_bound(key);
-      if (pos != list_.end() && KeyTraits::get_key(*pos) == key) {
-        *pos = std::forward<T>(t);
+      if (pos != list_.end() && get_key(*pos) == key) {
+        *pos = std::forward<U>(u);
         return std::make_pair(const_iterator{pos}, false);
       }
       else {
-        auto const it = list_.insert(pos, value_type{std::forward<T>(t)});
+        auto const it = list_.insert(pos, value_type{std::forward<U>(u)});
         return std::make_pair(const_iterator{it}, true);
       }
     }
@@ -153,11 +155,11 @@ namespace ofp {
     CANARD_NET_OFP_DECL auto erase(const_iterator)
       -> const_iterator;
 
-    template <class T>
+    template <class U>
     auto erase()
       -> size_type
     {
-      auto const it = find(KeyTraits::template key<T>::value);
+      auto const it = find(key<U>());
       if (it == list_.end()) {
         return 0;
       }
@@ -165,25 +167,25 @@ namespace ofp {
       return 1;
     }
 
-    CANARD_NET_OFP_DECL void swap(set&) noexcept;
+    CANARD_NET_OFP_DECL void swap(set_base&) noexcept;
 
     CANARD_NET_OFP_DECL void clear() noexcept;
 
     CANARD_NET_OFP_DECL auto find(key_type) const noexcept
       -> const_iterator;
 
-    template <class T>
+    template <class U>
     auto find() const
-      -> boost::optional<T const&>
+      -> boost::optional<U const&>
     {
-      auto const it = find(KeyTraits::template key<T>::value);
+      auto const it = find(key<U>());
       if (it == list_.end()) {
         return boost::none;
       }
-      return any_cast<T>(*it);
+      return cast<U>(*it);
     }
 
-    CANARD_NET_OFP_DECL auto length() const
+    CANARD_NET_OFP_DECL auto length() const noexcept
       -> std::uint16_t;
 
     CANARD_NET_OFP_DECL auto to_list() const& noexcept
@@ -192,13 +194,13 @@ namespace ofp {
     CANARD_NET_OFP_DECL auto to_list() && noexcept
       -> list_type&&;
 
-    friend auto operator==(set const& lhs, set const& rhs)
+    friend auto operator==(Derived const& lhs, Derived const& rhs)
       -> bool
     {
       return lhs.equal_impl(rhs);
     }
 
-    friend auto equivalent(set const& lhs, set const& rhs) noexcept
+    friend auto equivalent(Derived const& lhs, Derived const& rhs) noexcept
       -> bool
     {
       return lhs.equivalent_impl(rhs);
@@ -211,37 +213,45 @@ namespace ofp {
         list_type const&, list_type const&)
       -> bool;
 
+  protected:
+    class default_set_info;
+
   private:
-    class set_info;
-
-    template <class T>
-    auto init_impl(T&& t)
-      -> dummy_type
-    {
-      insert(std::forward<T>(t));
-      return {};
-    }
-
     CANARD_NET_OFP_DECL auto non_const_lower_bound(key_type)
       -> typename list_type::iterator;
 
-    CANARD_NET_OFP_DECL auto equal_impl(set const&) const noexcept
+    CANARD_NET_OFP_DECL auto equal_impl(set_base const&) const noexcept
       -> bool;
 
-    CANARD_NET_OFP_DECL auto equivalent_impl(set const&) const noexcept
+    CANARD_NET_OFP_DECL auto equivalent_impl(set_base const&) const noexcept
       -> bool;
 
-    template <class T>
-    static auto any_cast(const_reference value)
-      -> T const&
+    template <class U>
+    static constexpr auto key() noexcept
+      -> key_type
     {
-      return KeyTraits::template any_cast<T>(value);
+      return Derived::template key_impl<U>();
+    }
+
+    template <class U>
+    static auto get_key(U const& u) noexcept
+      -> key_type
+    {
+      return Derived::get_key_impl(u);
+    }
+
+    template <class U>
+    static auto cast(const_reference value)
+      -> U const&
+    {
+      return Derived::template cast_impl<U>(value);
     }
 
   private:
     list_type list_;
   };
 
+} // namespace detail
 } // namespace ofp
 } // namespace net
 } // namespace canard

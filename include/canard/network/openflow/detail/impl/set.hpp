@@ -16,89 +16,90 @@
 namespace canard {
 namespace net {
 namespace ofp {
+namespace detail {
 
-  template <class KeyTraits>
-  set<KeyTraits>::set() = default;
+  template <class Derived, class Key, class T>
+  set_base<Derived, Key, T>::set_base() = default;
 
-  template <class KeyTraits>
-  auto set<KeyTraits>::begin() const noexcept
+  template <class Derived, class Key, class T>
+  auto set_base<Derived, Key, T>::begin() const noexcept
     -> const_iterator
   {
     return list_.begin();
   }
 
-  template <class KeyTraits>
-  auto set<KeyTraits>::end() const noexcept
+  template <class Derived, class Key, class T>
+  auto set_base<Derived, Key, T>::end() const noexcept
     -> const_iterator
   {
     return list_.end();
   }
 
-  template <class KeyTraits>
-  auto set<KeyTraits>::cbegin() const noexcept
+  template <class Derived, class Key, class T>
+  auto set_base<Derived, Key, T>::cbegin() const noexcept
     -> const_iterator
   {
     return list_.cbegin();
   }
 
-  template <class KeyTraits>
-  auto set<KeyTraits>::cend() const noexcept
+  template <class Derived, class Key, class T>
+  auto set_base<Derived, Key, T>::cend() const noexcept
     -> const_iterator
   {
     return list_.cend();
   }
 
-  template <class KeyTraits>
-  auto set<KeyTraits>::rbegin() const noexcept
+  template <class Derived, class Key, class T>
+  auto set_base<Derived, Key, T>::rbegin() const noexcept
     -> const_reverse_iterator
   {
     return list_.rbegin();
   }
 
-  template <class KeyTraits>
-  auto set<KeyTraits>::rend() const noexcept
+  template <class Derived, class Key, class T>
+  auto set_base<Derived, Key, T>::rend() const noexcept
     -> const_reverse_iterator
   {
     return list_.rend();
   }
 
-  template <class KeyTraits>
-  auto set<KeyTraits>::crbegin() const noexcept
+  template <class Derived, class Key, class T>
+  auto set_base<Derived, Key, T>::crbegin() const noexcept
     -> const_reverse_iterator
   {
     return list_.crbegin();
   }
 
-  template <class KeyTraits>
-  auto set<KeyTraits>::crend() const noexcept
+  template <class Derived, class Key, class T>
+  auto set_base<Derived, Key, T>::crend() const noexcept
     -> const_reverse_iterator
   {
     return list_.crend();
   }
 
-  template <class KeyTraits>
-  auto set<KeyTraits>::empty() const noexcept
+  template <class Derived, class Key, class T>
+  auto set_base<Derived, Key, T>::empty() const noexcept
     -> bool
   {
     return list_.empty();
   }
 
-  template <class KeyTraits>
-  auto set<KeyTraits>::size() const noexcept
+  template <class Derived, class Key, class T>
+  auto set_base<Derived, Key, T>::size() const noexcept
     -> size_type
   {
     return list_.size();
   }
 
-  template <class KeyTraits>
-  auto set<KeyTraits>::max_size() const noexcept
+  template <class Derived, class Key, class T>
+  auto set_base<Derived, Key, T>::max_size() const noexcept
     -> size_type
   {
     return list_.max_size();
   }
 
-  template <class KeyTraits>
-  auto set<KeyTraits>::at(key_type const key) const
+  template <class Derived, class Key, class T>
+  auto set_base<Derived, Key, T>::at(key_type const key) const
     -> const_reference
   {
     auto const it = find(key);
@@ -108,89 +109,89 @@ namespace ofp {
     return *it;
   }
 
-  template <class KeyTraits>
-  auto set<KeyTraits>::erase(const_iterator const pos)
+  template <class Derived, class Key, class T>
+  auto set_base<Derived, Key, T>::erase(const_iterator const pos)
     -> const_iterator
   {
     return list_.erase(pos);
   }
 
-  template <class KeyTraits>
-  void set<KeyTraits>::swap(set& other) noexcept
+  template <class Derived, class Key, class T>
+  void set_base<Derived, Key, T>::swap(set_base& other) noexcept
   {
     list_.swap(other.list_);
   }
 
-  template <class KeyTraits>
-  void set<KeyTraits>::clear() noexcept
+  template <class Derived, class Key, class T>
+  void set_base<Derived, Key, T>::clear() noexcept
   {
     list_.clear();
   }
 
-  template <class KeyTraits>
-  auto set<KeyTraits>::find(key_type const key) const noexcept
+  template <class Derived, class Key, class T>
+  auto set_base<Derived, Key, T>::find(key_type const key) const noexcept
     -> const_iterator
   {
     return boost::find_if(
           list_
-        , [=](const_reference e) { return KeyTraits::get_key(e) == key; });
+        , [=](const_reference e) { return get_key(e) == key; });
   }
 
-  template <class KeyTraits>
-  auto set<KeyTraits>::length() const
+  template <class Derived, class Key, class T>
+  auto set_base<Derived, Key, T>::length() const noexcept
     -> std::uint16_t
   {
     return list_.length();
   }
 
-  template <class KeyTraits>
-  auto set<KeyTraits>::to_list() const& noexcept
+  template <class Derived, class Key, class T>
+  auto set_base<Derived, Key, T>::to_list() const& noexcept
     -> list_type const&
   {
     return list_;
   }
 
-  template <class KeyTraits>
-  auto set<KeyTraits>::to_list() && noexcept
+  template <class Derived, class Key, class T>
+  auto set_base<Derived, Key, T>::to_list() && noexcept
     -> list_type&&
   {
     return std::move(list_);
   }
 
-  template <class KeyTraits>
-  auto set<KeyTraits>::is_valid_set(list_type const& values)
+  template <class Derived, class Key, class T>
+  auto set_base<Derived, Key, T>::is_valid_set(list_type const& values)
     -> bool
   {
-    return set_info{values}.is_valid_set();
+    return bool(typename Derived::set_info{values});
   }
 
-  template <class KeyTraits>
-  auto set<KeyTraits>::equivalent_as_set(
+  template <class Derived, class Key, class T>
+  auto set_base<Derived, Key, T>::equivalent_as_set(
       list_type const& lhs, list_type const& rhs)
     -> bool
   {
-    if (auto const lhs_info = set_info{lhs}) {
-      if (auto const rhs_info = set_info{rhs}) {
+    if (auto const lhs_info = typename Derived::set_info{lhs}) {
+      if (auto const rhs_info = typename Derived::set_info{rhs}) {
         return lhs_info == rhs_info;
       }
     }
     return false;
   }
 
-  template <class KeyTraits>
-  class set<KeyTraits>::set_info
+  template <class Derived, class Key, class T>
+  class set_base<Derived, Key, T>::default_set_info
   {
     using set_type = boost::container::flat_map<key_type, const_iterator>;
 
   public:
-    explicit set_info(list_type const& list)
+    explicit default_set_info(list_type const& list)
       : value_set_{}
       , is_valid_set_{}
     {
       value_set_.reserve(list.size());
       auto const it_end = list.cend();
       for (auto it = list.cbegin(); it != it_end; ++it) {
-        if (!value_set_.emplace(KeyTraits::get_key(*it), it).second) {
+        if (!value_set_.emplace(get_key(*it), it).second) {
           is_valid_set_ = false;
           return;
         }
@@ -203,13 +204,8 @@ namespace ofp {
       return is_valid_set_;
     }
 
-    auto is_valid_set() const noexcept
-      -> bool
-    {
-      return is_valid_set_;
-    }
-
-    friend auto operator==(set_info const& lhs, set_info const& rhs) noexcept
+    friend auto operator==(
+        default_set_info const& lhs, default_set_info const& rhs) noexcept
       -> bool
     {
       return boost::equal(
@@ -224,26 +220,27 @@ namespace ofp {
     bool is_valid_set_;
   };
 
-  template <class KeyTraits>
-  auto set<KeyTraits>::non_const_lower_bound(key_type const key)
+  template <class Derived, class Key, class T>
+  auto set_base<Derived, Key, T>::non_const_lower_bound(key_type const key)
     -> typename list_type::iterator
   {
     return boost::lower_bound(
           list_
         , key
         , [](const_reference e, key_type const key)
-          { return KeyTraits::get_key(e) < key; });
+          { return Derived::get_key(e) < key; });
   }
 
-  template <class KeyTraits>
-  auto set<KeyTraits>::equal_impl(set const& rhs) const noexcept
+  template <class Derived, class Key, class T>
+  auto set_base<Derived, Key, T>::equal_impl(set_base const& rhs) const noexcept
     -> bool
   {
     return list_ == rhs.list_;
   }
 
-  template <class KeyTraits>
-  auto set<KeyTraits>::equivalent_impl(set const& rhs) const noexcept
+  template <class Derived, class Key, class T>
+  auto set_base<Derived, Key, T>::equivalent_impl(
+      set_base const& rhs) const noexcept
     -> bool
   {
     return boost::equal(
@@ -252,6 +249,7 @@ namespace ofp {
           { return equivalent(lhs_value, rhs_value); });
   }
 
+} // namespace detail
 } // namespace ofp
 } // namespace net
 } // namespace canard
