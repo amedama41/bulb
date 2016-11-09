@@ -52,7 +52,7 @@ namespace instructions {
         template <class Validator>
         void validate_instruction(Validator validator) const
         {
-            if (!action_set::is_action_set(actions())) {
+            if (!action_set::is_valid_set(actions())) {
                 throw std::runtime_error{"duplicated action type"};
             }
             validator(actions());
@@ -61,8 +61,7 @@ namespace instructions {
         auto is_equivalent_instruction(write_actions const& rhs) const noexcept
             -> bool
         {
-            return action_set::equivalent_as_action_set(
-                    actions(), rhs.actions());
+            return action_set::equivalent_as_set(actions(), rhs.actions());
         }
     };
 

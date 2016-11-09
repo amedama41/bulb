@@ -179,7 +179,7 @@ namespace v13 {
         template <class Validator>
         void validate_impl(Validator validator) const
         {
-            if (!action_set::is_action_set(actions_)) {
+            if (!action_set::is_valid_set(actions_)) {
                 throw std::runtime_error{"duplicated action type"};
             }
             validator(actions_);
@@ -227,7 +227,7 @@ namespace v13 {
                 && weight() == rhs.weight()
                 && watch_port() == rhs.watch_port()
                 && watch_group() == rhs.watch_group()
-                && action_set::equivalent_as_action_set(actions_, rhs.actions_);
+                && action_set::equivalent_as_set(actions_, rhs.actions_);
         }
 
     private:
