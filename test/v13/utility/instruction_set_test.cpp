@@ -607,49 +607,5 @@ BOOST_AUTO_TEST_SUITE(instruction_set_test)
 
     BOOST_AUTO_TEST_SUITE_END() // modification_test
 
-    BOOST_FIXTURE_TEST_CASE(encode_test, instruction_set_fixture)
-    {
-        auto buffer = std::vector<unsigned char>{};
-
-        sut.encode(buffer);
-
-        BOOST_TEST(buffer.size() == sut.length());
-        BOOST_TEST(buffer == binary, boost::test_tools::per_element{});
-    }
-
-    BOOST_FIXTURE_TEST_CASE(decode_test, instruction_set_fixture)
-    {
-        auto it = binary.begin();
-        auto const it_end = binary.end();
-
-        auto const instruction_set = v13::instruction_set::decode(it, it_end);
-
-        BOOST_TEST((it == it_end));
-        BOOST_TEST((instruction_set == sut));
-    }
-
-    BOOST_FIXTURE_TEST_CASE(
-            decode_different_order_instruction_test, instruction_set_fixture)
-    {
-        auto it = diff_order_binary.begin();
-        auto const it_end = diff_order_binary.end();
-
-        auto const instruction_set = v13::instruction_set::decode(it, it_end);
-
-        BOOST_TEST((it == it_end));
-        BOOST_TEST((instruction_set == sut));
-    }
-
-    BOOST_FIXTURE_TEST_CASE(
-            decode_duplicated_instruction_test, instruction_set_fixture)
-    {
-        auto it = duplicated_binary.begin();
-        auto const it_end = duplicated_binary.end();
-
-        BOOST_CHECK_THROW(
-                  v13::instruction_set::decode(it, it_end)
-                , std::runtime_error);
-    }
-
 BOOST_AUTO_TEST_SUITE_END() // instruction_set_test
 BOOST_AUTO_TEST_SUITE_END() // common_type_test
