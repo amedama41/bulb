@@ -4,7 +4,7 @@
 #include <canard/network/openflow/detail/config.hpp>
 
 #include <cstdint>
-#include <canard/network/openflow/detail/set.hpp>
+#include <canard/network/openflow/detail/set_base.hpp>
 #include <canard/network/openflow/v13/action_order.hpp>
 #include <canard/network/openflow/v13/any_action.hpp>
 

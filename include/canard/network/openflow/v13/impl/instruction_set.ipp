@@ -4,7 +4,7 @@
 #include <canard/network/openflow/detail/config.hpp>
 #include <canard/network/openflow/v13/instruction_set.hpp>
 
-#include <canard/network/openflow/detail/impl/set.hpp>
+#include <canard/network/openflow/detail/impl/set_base.hpp>
 
 #if !defined(CANARD_NET_OFP_HEADER_ONLY) && defined(CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
 namespace canard {

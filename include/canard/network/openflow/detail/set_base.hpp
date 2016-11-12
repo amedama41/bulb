@@ -1,5 +1,5 @@
-#ifndef CANARD_NET_OFP_SET_HPP
-#define CANARD_NET_OFP_SET_HPP
+#ifndef CANARD_NET_OFP_SET_BASE_HPP
+#define CANARD_NET_OFP_SET_BASE_HPP
 
 #include <canard/network/openflow/detail/config.hpp>
 
@@ -257,7 +257,7 @@ namespace detail {
 } // namespace canard
 
 #if defined(CANARD_NET_OFP_HEADER_ONLY) || !defined(CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
-# include <canard/network/openflow/detail/impl/set.hpp>
+# include <canard/network/openflow/detail/impl/set_base.hpp>
 #endif
 
-#endif // CANARD_NET_OFP_SET_HPP
+#endif // CANARD_NET_OFP_SET_BASE_HPP
