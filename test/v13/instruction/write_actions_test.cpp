@@ -334,16 +334,16 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
                   v13::action_list{ actions::pop_pbb{}, actions::pop_pbb{} } }
               , instructions::write_actions{ actions::pop_pbb{} }));
       }
-      BOOST_AUTO_TEST_CASE(true_if_both_contain_duplicated_action)
+      BOOST_AUTO_TEST_CASE(false_if_both_contain_duplicated_action)
       {
         BOOST_TEST(
-            equivalent(
+            !equivalent(
                 instructions::write_actions{
                   v13::action_list{
-                    actions::pop_pbb{}, actions::pop_pbb{}, actions::pop_vlan{} } }
+                    actions::pop_pbb{}, actions::pop_pbb{} } }
               , instructions::write_actions{
                   v13::action_list{
-                    actions::pop_pbb{}, actions::pop_vlan{}, actions::pop_pbb{} } }));
+                    actions::pop_pbb{}, actions::pop_pbb{} } }));
       }
       BOOST_AUTO_TEST_CASE(true_if_pad_is_not_equal)
       {
