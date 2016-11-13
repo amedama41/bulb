@@ -6,7 +6,7 @@
 
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
-namespace match = v13::oxm_match;
+namespace match = v13::oxm_match_fields;
 using proto = v13::protocol;
 
 BOOST_AUTO_TEST_SUITE(message_test)

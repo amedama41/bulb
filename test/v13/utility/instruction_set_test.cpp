@@ -16,7 +16,6 @@
 
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
-namespace oxm_match = v13::oxm_match;
 namespace actions = v13::actions;
 namespace instructions = v13::instructions;
 namespace detail = v13::v13_detail;
