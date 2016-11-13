@@ -139,7 +139,7 @@ namespace messages {
         auto in_port() const
             -> std::uint32_t
         {
-            return match().get<oxm_match::in_port>().oxm_value();
+            return match().get<oxm_match_fields::in_port>().oxm_value();
         }
 
         auto reason() const noexcept

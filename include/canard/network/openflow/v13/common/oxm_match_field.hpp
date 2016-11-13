@@ -19,7 +19,7 @@ namespace canard {
 namespace net {
 namespace ofp {
 namespace v13 {
-namespace oxm_match {
+namespace oxm_match_fields {
 
     namespace oxm_match_detail {
 
@@ -547,49 +547,49 @@ namespace oxm_match {
     using tunnel_id      = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_TUNNEL_ID>;
     using ipv6_exthdr    = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IPV6_EXTHDR>;
 
-} // namespace oxm_match
+} // namespace oxm_match_fields
 
 using default_oxm_match_field_list = std::tuple<
-      oxm_match::in_port
-    , oxm_match::in_phy_port
-    , oxm_match::metadata
-    , oxm_match::eth_dst
-    , oxm_match::eth_src
-    , oxm_match::eth_type
-    , oxm_match::vlan_vid
-    , oxm_match::vlan_pcp
-    , oxm_match::ip_dscp
-    , oxm_match::ip_ecn
-    , oxm_match::ip_proto
-    , oxm_match::ipv4_src
-    , oxm_match::ipv4_dst
-    , oxm_match::tcp_src
-    , oxm_match::tcp_dst
-    , oxm_match::udp_src
-    , oxm_match::udp_dst
-    , oxm_match::sctp_src
-    , oxm_match::sctp_dst
-    , oxm_match::icmpv4_type
-    , oxm_match::icmpv4_code
-    , oxm_match::arp_op
-    , oxm_match::arp_spa
-    , oxm_match::arp_tpa
-    , oxm_match::arp_sha
-    , oxm_match::arp_tha
-    , oxm_match::ipv6_src
-    , oxm_match::ipv6_dst
-    , oxm_match::ipv6_flabel
-    , oxm_match::icmpv6_type
-    , oxm_match::icmpv6_code
-    , oxm_match::ipv6_nd_target
-    , oxm_match::ipv6_nd_sll
-    , oxm_match::ipv6_nd_tll
-    , oxm_match::mpls_label
-    , oxm_match::mpls_tc
-    , oxm_match::mpls_bos
-    , oxm_match::pbb_isid
-    , oxm_match::tunnel_id
-    , oxm_match::ipv6_exthdr
+      oxm_match_fields::in_port
+    , oxm_match_fields::in_phy_port
+    , oxm_match_fields::metadata
+    , oxm_match_fields::eth_dst
+    , oxm_match_fields::eth_src
+    , oxm_match_fields::eth_type
+    , oxm_match_fields::vlan_vid
+    , oxm_match_fields::vlan_pcp
+    , oxm_match_fields::ip_dscp
+    , oxm_match_fields::ip_ecn
+    , oxm_match_fields::ip_proto
+    , oxm_match_fields::ipv4_src
+    , oxm_match_fields::ipv4_dst
+    , oxm_match_fields::tcp_src
+    , oxm_match_fields::tcp_dst
+    , oxm_match_fields::udp_src
+    , oxm_match_fields::udp_dst
+    , oxm_match_fields::sctp_src
+    , oxm_match_fields::sctp_dst
+    , oxm_match_fields::icmpv4_type
+    , oxm_match_fields::icmpv4_code
+    , oxm_match_fields::arp_op
+    , oxm_match_fields::arp_spa
+    , oxm_match_fields::arp_tpa
+    , oxm_match_fields::arp_sha
+    , oxm_match_fields::arp_tha
+    , oxm_match_fields::ipv6_src
+    , oxm_match_fields::ipv6_dst
+    , oxm_match_fields::ipv6_flabel
+    , oxm_match_fields::icmpv6_type
+    , oxm_match_fields::icmpv6_code
+    , oxm_match_fields::ipv6_nd_target
+    , oxm_match_fields::ipv6_nd_sll
+    , oxm_match_fields::ipv6_nd_tll
+    , oxm_match_fields::mpls_label
+    , oxm_match_fields::mpls_tc
+    , oxm_match_fields::mpls_bos
+    , oxm_match_fields::pbb_isid
+    , oxm_match_fields::tunnel_id
+    , oxm_match_fields::ipv6_exthdr
 >;
 
 } // namespace v13
