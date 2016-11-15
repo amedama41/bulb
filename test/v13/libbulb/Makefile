@@ -8,6 +8,7 @@ SRCS = any_action.ipp \
 	   action_list.ipp \
 	   action_set.ipp \
 	   instruction_set.ipp \
+	   oxm_match_field_set.ipp \
 	   oxm_match_set.ipp
 
 -include ../../libbulb.mk
