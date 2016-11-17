@@ -6,12 +6,14 @@
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
+#include <type_traits>
 #include <utility>
 #include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/list.hpp>
+#include <canard/network/openflow/type_traits/is_all_constructible.hpp>
 #include <canard/network/openflow/v13/any_oxm_match_field.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
@@ -31,6 +33,14 @@ namespace v13 {
     using raw_ofp_type = v13_detail::ofp_match;
     using oxm_fields_type = ofp::list<any_oxm_match_field>;
 
+  private:
+    template <class... Ts>
+    using enable_if_is_all_constructible_t = typename std::enable_if<
+         sizeof...(Ts)
+      && type_traits::is_all_constructible<any_oxm_match_field, Ts...>::value
+    >::type;
+
+  public:
     oxm_match()
       : oxm_match{oxm_fields_type{}}
     {
@@ -48,6 +58,15 @@ namespace v13 {
           , { 0, 0, 0, 0 }
         }
       , oxm_fields_(std::move(oxm_fields))
+    {
+    }
+
+    template <
+        class... OXMMatchFields
+      , class = enable_if_is_all_constructible_t<OXMMatchFields...>
+    >
+    explicit oxm_match(OXMMatchFields&&... fields)
+      : oxm_match{oxm_fields_type{std::forward<OXMMatchFields>(fields)...}}
     {
     }
 
