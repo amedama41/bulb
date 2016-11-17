@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
+#include <stdexcept>
 #include <type_traits>
 #include <utility>
 #include <canard/network/openflow/detail/basic_protocol_type.hpp>
@@ -123,6 +124,16 @@ namespace v13 {
       oxm_fields.swap(oxm_fields_);
       match_.length = base_size;
       return oxm_fields;
+    }
+
+    static void validate_header(v13_detail::ofp_match const& match)
+    {
+      if (match.type != match_type) {
+        throw std::runtime_error{"match type is not OFPMT_OXM"};
+      }
+      if (match.length < base_size) {
+        throw std::runtime_error{"too small match length"};
+      }
     }
 
   private:
