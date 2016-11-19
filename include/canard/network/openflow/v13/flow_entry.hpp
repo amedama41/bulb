@@ -5,7 +5,7 @@
 #include <utility>
 #include <canard/network/openflow/list.hpp>
 #include <canard/network/openflow/v13/any_instruction.hpp>
-#include <canard/network/openflow/v13/common/oxm_match_set.hpp>
+#include <canard/network/openflow/v13/common/oxm_match.hpp>
 #include <canard/network/openflow/v13/instruction_set.hpp>
 
 namespace canard {
@@ -16,20 +16,20 @@ namespace v13 {
     class flow_entry_id
     {
     public:
-        flow_entry_id(oxm_match_set match, std::uint16_t const priority)
+        flow_entry_id(oxm_match match, std::uint16_t const priority)
             : match_(std::move(match))
             , priority_(priority)
         {
         }
 
         auto match() const& noexcept
-            -> oxm_match_set const&
+            -> oxm_match const&
         {
             return match_;
         }
 
         auto match() && noexcept
-            -> oxm_match_set&&
+            -> oxm_match&&
         {
             return std::move(match_);
         }
@@ -43,11 +43,11 @@ namespace v13 {
         static auto table_miss()
             -> flow_entry_id
         {
-            return flow_entry_id{oxm_match_set{}, 0};
+            return flow_entry_id{oxm_match{}, 0};
         }
 
     private:
-        oxm_match_set match_;
+        oxm_match match_;
         std::uint16_t priority_;
     };
 
@@ -75,7 +75,7 @@ namespace v13 {
         {
         }
 
-        flow_entry(oxm_match_set match
+        flow_entry(oxm_match match
                  , std::uint16_t const priority
                  , std::uint64_t const cookie
                  , instructions_type instructions)
@@ -85,7 +85,7 @@ namespace v13 {
         {
         }
 
-        flow_entry(oxm_match_set match
+        flow_entry(oxm_match match
                  , std::uint16_t const priority
                  , std::uint64_t const cookie
                  , instruction_set instructions)
@@ -108,13 +108,13 @@ namespace v13 {
         }
 
         auto match() const& noexcept
-            -> oxm_match_set const&
+            -> oxm_match const&
         {
             return identifier_.match();
         }
 
         auto match() && noexcept
-            -> oxm_match_set&&
+            -> oxm_match&&
         {
             return std::move(identifier_).match();
         }

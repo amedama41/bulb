@@ -12,7 +12,7 @@
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/list.hpp>
 #include <canard/network/openflow/v13/any_instruction.hpp>
-#include <canard/network/openflow/v13/common/oxm_match_set.hpp>
+#include <canard/network/openflow/v13/common/oxm_match.hpp>
 #include <canard/network/openflow/v13/detail/basic_multipart.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/detail/flow_entry_adaptor.hpp>
@@ -45,8 +45,7 @@ namespace multipart {
                  , v13::counters const& counters)
             : flow_stats_{
                   entry.instructions().calc_ofp_length(
-                          sizeof(raw_ofp_type)
-                        + v13_detail::exact_length(entry.match().length()))
+                          sizeof(raw_ofp_type) + entry.match().byte_length())
                 , table_id
                 , 0
                 , elapsed_time.duration_sec()
@@ -102,13 +101,13 @@ namespace multipart {
         }
 
         auto match() const noexcept
-            -> oxm_match_set const&
+            -> oxm_match const&
         {
             return match_;
         }
 
         auto extract_match()
-            -> oxm_match_set
+            -> oxm_match
         {
             auto match = std::move(match_);
             flow_stats_.length = base_size + instructions_.length();
@@ -126,9 +125,7 @@ namespace multipart {
         {
             auto instructions = instructions_type{};
             instructions.swap(instructions_);
-            flow_stats_.length
-                = sizeof(raw_ofp_type)
-                + v13_detail::exact_length(match_.length());
+            flow_stats_.length = sizeof(raw_ofp_type) + match_.byte_length();
             return instructions;
         }
 
@@ -140,7 +137,7 @@ namespace multipart {
 
     private:
         flow_stats(raw_ofp_type const& stats
-                 , oxm_match_set&& match
+                 , oxm_match&& match
                  , instructions_type&& instructions)
             : flow_stats_(stats)
             , match_(std::move(match))
@@ -159,8 +156,7 @@ namespace multipart {
         friend basic_protocol_type;
 
         static constexpr std::uint16_t base_size
-            = sizeof(raw_ofp_type)
-            + v13_detail::exact_length(oxm_match_set::min_length());
+            = sizeof(raw_ofp_type) + oxm_match::min_byte_length();
 
         friend constexpr auto get_min_length(flow_stats*) noexcept
             -> std::uint16_t
@@ -193,12 +189,12 @@ namespace multipart {
             auto copy_first = first;
             auto const ofp_match
                 = detail::decode<v13_detail::ofp_match>(copy_first, last);
-            oxm_match_set::validate_ofp_match(ofp_match);
+            oxm_match::validate_header(ofp_match);
             if (std::distance(first, last)
                     < v13_detail::exact_length(ofp_match.length)) {
                 throw std::runtime_error{"invalid oxm_match length"};
             }
-            auto match = oxm_match_set::decode(first, last);
+            auto match = oxm_match::decode(first, last);
 
             auto instructions = instructions_type::decode(first, last);
 
@@ -207,7 +203,7 @@ namespace multipart {
 
     private:
         raw_ofp_type flow_stats_;
-        oxm_match_set match_;
+        oxm_match match_;
         instructions_type instructions_;
     };
 
@@ -245,7 +241,7 @@ namespace multipart {
         }
 
         flow_stats_request(
-                  oxm_match_set match
+                  oxm_match match
                 , std::uint8_t const table_id
                 , v13::cookie_mask const& cookie_mask
                 , std::uint32_t const out_port = protocol::OFPP_ANY
@@ -269,7 +265,7 @@ namespace multipart {
         }
 
         flow_stats_request(
-                  oxm_match_set match
+                  oxm_match match
                 , std::uint8_t const table_id
                 , std::uint32_t const out_port = protocol::OFPP_ANY
                 , std::uint32_t const out_group = protocol::OFPG_ANY
@@ -321,7 +317,7 @@ namespace multipart {
         flow_stats_request(
                   v13_detail::ofp_multipart_request const& request
                 , v13_detail::ofp_flow_stats_request const& stats_request
-                , oxm_match_set&& match)
+                , oxm_match&& match)
             : basic_multipart_request{request, stats_request, std::move(match)}
         {
         }

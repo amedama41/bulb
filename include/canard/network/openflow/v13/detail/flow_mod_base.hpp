@@ -10,7 +10,7 @@
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/list.hpp>
 #include <canard/network/openflow/v13/any_instruction.hpp>
-#include <canard/network/openflow/v13/common/oxm_match_set.hpp>
+#include <canard/network/openflow/v13/common/oxm_match.hpp>
 #include <canard/network/openflow/v13/detail/basic_openflow_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/detail/length_utility.hpp>
@@ -43,17 +43,17 @@ namespace flow_mod_detail {
         }
 
         auto match() const noexcept
-            -> oxm_match_set const&
+            -> oxm_match const&
         {
             return match_;
         }
 
         auto extract_match()
-            -> oxm_match_set
+            -> oxm_match
         {
             auto match = std::move(match_);
             flow_mod_.header.length
-                = base_t::min_length() + instructions_.length();
+                -= (match.byte_length() - oxm_match::min_byte_length());
             return match;
         }
 
@@ -69,14 +69,13 @@ namespace flow_mod_detail {
             auto instructions = instructions_type{};
             instructions.swap(instructions_);
             flow_mod_.header.length
-                = sizeof(raw_ofp_type)
-                + v13_detail::exact_length(match_.length());
+                = sizeof(raw_ofp_type) + match_.byte_length();
             return instructions;
         }
 
     protected:
         flow_mod_base(
-                  oxm_match_set&& match
+                  oxm_match&& match
                 , std::uint16_t const priority
                 , std::uint64_t const cookie
                 , std::uint64_t const cookie_mask
@@ -92,8 +91,7 @@ namespace flow_mod_detail {
                       base_t::version()
                     , base_t::type()
                     , instructions.calc_ofp_length(
-                              sizeof(raw_ofp_type)
-                            + v13_detail::exact_length(match.length()))
+                              sizeof(raw_ofp_type) + match.byte_length())
                     , xid
                   }
                 , cookie
@@ -115,7 +113,7 @@ namespace flow_mod_detail {
         }
 
         flow_mod_base(
-                  oxm_match_set&& match
+                  oxm_match&& match
                 , std::uint16_t const priority
                 , std::uint64_t const cookie
                 , std::uint64_t const cookie_mask
@@ -127,9 +125,7 @@ namespace flow_mod_detail {
                   v13_detail::ofp_header{
                       base_t::version()
                     , base_t::type()
-                    , std::uint16_t(
-                              sizeof(raw_ofp_type)
-                            + v13_detail::exact_length(match.length()))
+                    , std::uint16_t(sizeof(raw_ofp_type) + match.byte_length())
                     , xid
                   }
                 , cookie
@@ -152,7 +148,7 @@ namespace flow_mod_detail {
 
         flow_mod_base(
                  raw_ofp_type const& flow_mod
-               , oxm_match_set&& match
+               , oxm_match&& match
                , instructions_type&& instructions)
             : flow_mod_(flow_mod)
             , match_(std::move(match))
@@ -198,7 +194,7 @@ namespace flow_mod_detail {
             -> std::uint16_t
         {
             return sizeof(v13_detail::ofp_flow_mod)
-                 + v13_detail::exact_length(oxm_match_set::min_length());
+                 + oxm_match::min_byte_length();
         }
 
         template <class Container>
@@ -220,12 +216,12 @@ namespace flow_mod_detail {
             auto copy_first = first;
             auto const ofp_match
                 = detail::decode<v13_detail::ofp_match>(copy_first, last);
-            oxm_match_set::validate_ofp_match(ofp_match);
+            oxm_match::validate_header(ofp_match);
             if (std::distance(first, last)
                     < v13_detail::exact_length(ofp_match.length)) {
                 throw std::runtime_error{"oxm_match length is too big"};
             }
-            auto match = oxm_match_set::decode(first, last);
+            auto match = oxm_match::decode(first, last);
 
             auto instructions = instructions_type::decode(first, last);
 
@@ -236,7 +232,7 @@ namespace flow_mod_detail {
 
     private:
         raw_ofp_type flow_mod_;
-        oxm_match_set match_;
+        oxm_match match_;
         instructions_type instructions_;
     };
 

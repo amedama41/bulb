@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <utility>
 #include <canard/network/openflow/get_xid.hpp>
-#include <canard/network/openflow/v13/common/oxm_match_set.hpp>
+#include <canard/network/openflow/v13/common/oxm_match.hpp>
 #include <canard/network/openflow/v13/detail/flow_entry_adaptor.hpp>
 #include <canard/network/openflow/v13/detail/flow_mod_base.hpp>
 #include <canard/network/openflow/v13/flow_entry.hpp>
@@ -92,7 +92,7 @@ namespace messages {
         friend flow_mod_base;
 
         flow_add(v13_detail::ofp_flow_mod const& flow_mod
-               , oxm_match_set&& match
+               , oxm_match&& match
                , instructions_type&& instructions)
             : flow_mod_base{
                 flow_mod, std::move(match), std::move(instructions)

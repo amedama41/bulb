@@ -5,7 +5,7 @@
 #include <limits>
 #include <utility>
 #include <canard/network/openflow/get_xid.hpp>
-#include <canard/network/openflow/v13/common/oxm_match_set.hpp>
+#include <canard/network/openflow/v13/common/oxm_match.hpp>
 #include <canard/network/openflow/v13/detail/flow_mod_base.hpp>
 #include <canard/network/openflow/v13/flow_entry.hpp>
 #include <canard/network/openflow/v13/instruction_set.hpp>
@@ -24,7 +24,7 @@ namespace messages {
         static constexpr protocol::ofp_flow_mod_command command_type
             = protocol::OFPFC_MODIFY;
 
-        flow_modify(oxm_match_set match
+        flow_modify(oxm_match match
                   , std::uint8_t const table_id
                   , instructions_type instructions
                   , v13::cookie_mask const& cookie_mask
@@ -48,7 +48,7 @@ namespace messages {
         {
         }
 
-        flow_modify(oxm_match_set match
+        flow_modify(oxm_match match
                   , std::uint8_t const table_id
                   , instruction_set instructions
                   , v13::cookie_mask const& cookie_mask
@@ -67,7 +67,7 @@ namespace messages {
         {
         }
 
-        flow_modify(oxm_match_set match
+        flow_modify(oxm_match match
                   , std::uint8_t const table_id
                   , instructions_type instructions
                   , bool const reset_counter = false
@@ -85,7 +85,7 @@ namespace messages {
         {
         }
 
-        flow_modify(oxm_match_set match
+        flow_modify(oxm_match match
                   , std::uint8_t const table_id
                   , instruction_set instructions
                   , bool const reset_counter = false
@@ -137,7 +137,7 @@ namespace messages {
         friend flow_mod_base;
 
         flow_modify(v13_detail::ofp_flow_mod const& flow_mod
-                  , oxm_match_set&& match
+                  , oxm_match&& match
                   , instructions_type&& instructions)
             : flow_mod_base{
                 flow_mod, std::move(match), std::move(instructions)
@@ -197,7 +197,7 @@ namespace messages {
         }
 
         flow_modify_strict(
-                  oxm_match_set match
+                  oxm_match match
                 , std::uint16_t const priority
                 , std::uint8_t const table_id
                 , instructions_type instructions
@@ -223,7 +223,7 @@ namespace messages {
         }
 
         flow_modify_strict(
-                  oxm_match_set match
+                  oxm_match match
                 , std::uint16_t const priority
                 , std::uint8_t const table_id
                 , instruction_set instructions
@@ -245,7 +245,7 @@ namespace messages {
         }
 
         flow_modify_strict(
-                  oxm_match_set match
+                  oxm_match match
                 , std::uint16_t const priority
                 , std::uint8_t const table_id
                 , instructions_type instructions
@@ -266,7 +266,7 @@ namespace messages {
         }
 
         flow_modify_strict(
-                  oxm_match_set match
+                  oxm_match match
                 , std::uint16_t const priority
                 , std::uint8_t const table_id
                 , instruction_set instructions
@@ -333,7 +333,7 @@ namespace messages {
 
         flow_modify_strict(
                   v13_detail::ofp_flow_mod const& flow_mod
-                , oxm_match_set&& match
+                , oxm_match&& match
                 , instructions_type&& instructions)
             : flow_mod_base{
                 flow_mod, std::move(match), std::move(instructions)

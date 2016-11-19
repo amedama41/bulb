@@ -9,7 +9,7 @@
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/get_xid.hpp>
-#include <canard/network/openflow/v13/common/oxm_match_set.hpp>
+#include <canard/network/openflow/v13/common/oxm_match.hpp>
 #include <canard/network/openflow/v13/detail/basic_openflow_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/detail/flow_entry_adaptor.hpp>
@@ -31,7 +31,7 @@ namespace messages {
     {
         static constexpr std::size_t base_flow_removed_size
             = sizeof(v13_detail::ofp_flow_removed)
-            + v13_detail::exact_length(oxm_match_set::min_length());
+            + oxm_match::min_byte_length();
 
     public:
         static constexpr protocol::ofp_type message_type
@@ -40,7 +40,7 @@ namespace messages {
         using raw_ofp_type = v13_detail::ofp_flow_removed;
 
         flow_removed(
-                  oxm_match_set match
+                  oxm_match match
                 , std::uint16_t const priority
                 , std::uint64_t const cookie
                 , protocol::ofp_flow_removed_reason const reason
@@ -53,9 +53,7 @@ namespace messages {
                   v13_detail::ofp_header{
                       version()
                     , type()
-                    , std::uint16_t(
-                            sizeof(raw_ofp_type)
-                          + v13_detail::exact_length(match.length()))
+                    , std::uint16_t(sizeof(raw_ofp_type) + match.byte_length())
                     , xid
                   }
                 , cookie
@@ -82,7 +80,8 @@ namespace messages {
                 , v13::counters const& counters
                 , std::uint32_t const xid = get_xid())
             : flow_removed{
-                  std::move(entry).match(), entry.priority(), entry.cookie()
+                  std::move(entry).match()
+                , entry.priority(), entry.cookie()
                 , reason
                 , table_id
                 , elapsed_time
@@ -129,22 +128,22 @@ namespace messages {
         }
 
         auto match() const noexcept
-            -> oxm_match_set const&
+            -> oxm_match const&
         {
             return match_;
         }
 
         auto extract_match()
-            -> oxm_match_set
+            -> oxm_match
         {
-            auto match = oxm_match_set{};
+            auto match = oxm_match{};
             match.swap(match_);
             flow_removed_.header.length = base_flow_removed_size;
             return match;
         }
 
     private:
-        flow_removed(raw_ofp_type const& fremoved, oxm_match_set&& match)
+        flow_removed(raw_ofp_type const& fremoved, oxm_match&& match)
             : flow_removed_(fremoved)
             , match_(std::move(match))
         {
@@ -178,11 +177,11 @@ namespace messages {
             auto copy_first = first;
             auto const ofp_match
                 = detail::decode<v13_detail::ofp_match>(copy_first, last);
-            oxm_match_set::validate_ofp_match(ofp_match);
+            oxm_match::validate_header(ofp_match);
             if (v13_detail::exact_length(ofp_match.length) != match_length) {
                 throw std::runtime_error{"invalid oxm_match length"};
             }
-            auto match = oxm_match_set::decode(first, last);
+            auto match = oxm_match::decode(first, last);
 
             return flow_removed{fremoved, std::move(match)};
         }
@@ -197,7 +196,7 @@ namespace messages {
 
     private:
         raw_ofp_type flow_removed_;
-        oxm_match_set match_;
+        oxm_match match_;
     };
 
 } // namespace messages

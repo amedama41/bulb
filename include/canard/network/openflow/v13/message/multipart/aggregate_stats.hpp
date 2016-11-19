@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <utility>
 #include <canard/network/openflow/get_xid.hpp>
-#include <canard/network/openflow/v13/common/oxm_match_set.hpp>
+#include <canard/network/openflow/v13/common/oxm_match.hpp>
 #include <canard/network/openflow/v13/flow_entry.hpp>
 #include <canard/network/openflow/v13/detail/basic_multipart.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
@@ -27,7 +27,7 @@ namespace multipart {
             = protocol::OFPMP_AGGREGATE;
 
         aggregate_stats_request(
-                  oxm_match_set match
+                  oxm_match match
                 , std::uint8_t const table_id
                 , v13::cookie_mask const& cookie_mask
                 , std::uint32_t const out_port = protocol::OFPP_ANY
@@ -51,7 +51,7 @@ namespace multipart {
         }
 
         aggregate_stats_request(
-                  oxm_match_set match
+                  oxm_match match
                 , std::uint8_t const table_id
                 , std::uint32_t const out_port = protocol::OFPP_ANY
                 , std::uint32_t const out_group = protocol::OFPG_ANY
@@ -103,7 +103,7 @@ namespace multipart {
         aggregate_stats_request(
                   v13_detail::ofp_multipart_request const& multipart_request
                 , v13_detail::ofp_aggregate_stats_request const& aggregate_stats_request
-                , oxm_match_set&& match)
+                , oxm_match&& match)
             : basic_multipart_request{
                   multipart_request, aggregate_stats_request, std::move(match)
               }

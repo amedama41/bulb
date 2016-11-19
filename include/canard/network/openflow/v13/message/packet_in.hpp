@@ -5,13 +5,14 @@
 #include <iterator>
 #include <stdexcept>
 #include <utility>
+#include <boost/range/algorithm/find_if.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <canard/network/openflow/binary_data.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/padding.hpp>
 #include <canard/network/openflow/get_xid.hpp>
-#include <canard/network/openflow/v13/common/oxm_match_set.hpp>
+#include <canard/network/openflow/v13/common/oxm_match.hpp>
 #include <canard/network/openflow/v13/detail/basic_openflow_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/detail/length_utility.hpp>
@@ -29,7 +30,7 @@ namespace messages {
         static constexpr std::uint16_t data_alignment_padding_size = 2;
         static constexpr std::uint16_t base_pkt_in_size
             = sizeof(v13_detail::ofp_packet_in)
-            + v13_detail::exact_length(oxm_match_set::min_length())
+            + oxm_match::min_byte_length()
             + data_alignment_padding_size;
 
     public:
@@ -44,7 +45,7 @@ namespace messages {
                 , protocol::ofp_packet_in_reason const reason
                 , std::uint8_t const table_id
                 , std::uint64_t const cookie
-                , oxm_match_set match
+                , oxm_match match
                 , binary_data data
                 , std::uint32_t const xid = get_xid())
             : packet_in_{
@@ -53,7 +54,7 @@ namespace messages {
                     , type()
                     , std::uint16_t(
                               sizeof(raw_ofp_type)
-                            + v13_detail::exact_length(match.length())
+                            + match.byte_length()
                             + data_alignment_padding_size
                             + data.size())
                     , xid
@@ -75,7 +76,7 @@ namespace messages {
                 , protocol::ofp_packet_in_reason const reason
                 , std::uint8_t const table_id
                 , std::uint64_t const cookie
-                , oxm_match_set match
+                , oxm_match match
                 , Range const& data
                 , std::uint32_t const xid = get_xid())
             : packet_in{
@@ -139,7 +140,12 @@ namespace messages {
         auto in_port() const
             -> std::uint32_t
         {
-            return match().get<oxm_match_fields::in_port>().oxm_value();
+            using in_port = oxm_match_fields::in_port;
+            auto const it = boost::find_if(
+                      match_.oxm_fields()
+                    , [](oxm_match::oxm_fields_type::const_reference v)
+                      { return v.type() == in_port::oxm_type(); });
+            return v13::any_cast<in_port>(*it).oxm_value();
         }
 
         auto reason() const noexcept
@@ -161,16 +167,16 @@ namespace messages {
         }
 
         auto match() const noexcept
-            -> oxm_match_set const&
+            -> oxm_match const&
         {
             return match_;
         }
 
         auto extract_match()
-            -> oxm_match_set
+            -> oxm_match
         {
             auto const frame_len = frame_length();
-            auto match = oxm_match_set{};
+            auto match = oxm_match{};
             match.swap(match_);
             packet_in_.header.length = base_pkt_in_size + frame_len;
             return match;
@@ -187,7 +193,7 @@ namespace messages {
         {
             return length()
                  - sizeof(raw_ofp_type)
-                 - v13_detail::exact_length(match().length())
+                 - match().byte_length()
                  - data_alignment_padding_size;
         }
 
@@ -201,7 +207,7 @@ namespace messages {
 
     private:
         packet_in(raw_ofp_type const& pkt_in
-                , oxm_match_set&& match
+                , oxm_match&& match
                 , data_type&& data)
             : packet_in_(pkt_in)
             , match_(std::move(match))
@@ -238,7 +244,7 @@ namespace messages {
             auto copy_first = first;
             auto const ofp_match
                 = detail::decode<v13_detail::ofp_match>(copy_first, last);
-            oxm_match_set::validate_ofp_match(ofp_match);
+            oxm_match::validate_header(ofp_match);
             auto const match_length
                 = v13_detail::exact_length(ofp_match.length);
             if (std::distance(first, last) - data_alignment_padding_size
@@ -246,7 +252,7 @@ namespace messages {
                 throw std::runtime_error{"oxm_match length is too big"};
             }
 
-            auto match = oxm_match_set::decode(first, last);
+            auto match = oxm_match::decode(first, last);
 
             std::advance(first, data_alignment_padding_size);
 
@@ -258,7 +264,7 @@ namespace messages {
 
     private:
         raw_ofp_type packet_in_;
-        oxm_match_set match_;
+        oxm_match match_;
         data_type data_;
     };
 

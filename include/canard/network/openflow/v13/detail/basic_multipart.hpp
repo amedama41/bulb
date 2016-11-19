@@ -10,7 +10,7 @@
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/list.hpp>
-#include <canard/network/openflow/v13/common/oxm_match_set.hpp>
+#include <canard/network/openflow/v13/common/oxm_match.hpp>
 #include <canard/network/openflow/v13/detail/basic_openflow_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/detail/length_utility.hpp>
@@ -225,13 +225,13 @@ namespace multipart_detail {
         using body_type = BodyType;
 
         auto match() const noexcept
-            -> oxm_match_set const&
+            -> oxm_match const&
         {
             return match_;
         }
 
         auto extract_match()
-            -> oxm_match_set
+            -> oxm_match
         {
             auto match = std::move(match_);
             multipart_.header.length = base_t::min_length();
@@ -242,7 +242,7 @@ namespace multipart_detail {
         single_element_with_match_multipart(
                   std::uint16_t const flags
                 , body_type const& body
-                , oxm_match_set&& match
+                , oxm_match&& match
                 , std::uint32_t const xid) noexcept
             : multipart_{
                   v13_detail::ofp_header{
@@ -251,7 +251,7 @@ namespace multipart_detail {
                     , std::uint16_t(
                               sizeof(raw_ofp_type)
                             + sizeof(body_type)
-                            + v13_detail::exact_length(match.length()))
+                            + match.byte_length())
                     , xid
                   }
                 , T::multipart_type_value
@@ -266,7 +266,7 @@ namespace multipart_detail {
         single_element_with_match_multipart(
                   raw_ofp_type const& multipart
                 , body_type const& body
-                , oxm_match_set&& match) noexcept
+                , oxm_match&& match) noexcept
             : multipart_(multipart)
             , body_(body)
             , match_(std::move(match))
@@ -321,8 +321,7 @@ namespace multipart_detail {
             -> std::uint16_t
         {
             return sizeof(raw_ofp_type)
-                 + sizeof(body_type)
-                 + v13_detail::exact_length(oxm_match_set::min_length());
+                 + sizeof(body_type) + oxm_match::min_byte_length();
         }
 
         template <class Container>
@@ -346,12 +345,12 @@ namespace multipart_detail {
             auto it = first;
             auto const ofp_match
                 = detail::decode<v13_detail::ofp_match>(it, last);
-            oxm_match_set::validate_ofp_match(ofp_match);
+            oxm_match::validate_header(ofp_match);
             if (std::distance(first, last)
                     != v13_detail::exact_length(ofp_match.length)) {
                 throw std::runtime_error{"invalid oxm_match length"};
             }
-            auto match = oxm_match_set::decode(first, last);
+            auto match = oxm_match::decode(first, last);
 
             return T{multipart, body, std::move(match)};
         }
@@ -359,7 +358,7 @@ namespace multipart_detail {
     private:
         raw_ofp_type multipart_;
         body_type body_;
-        oxm_match_set match_;
+        oxm_match match_;
     };
 
 
