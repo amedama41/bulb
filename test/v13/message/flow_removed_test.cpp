@@ -10,18 +10,18 @@
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace v13_detail = v13::v13_detail;
-namespace match = v13::oxm_match_fields;
+namespace fields = v13::oxm_match_fields;
 using proto = v13::protocol;
 
 namespace {
 
 struct oxm_match_fixture
 {
-    v13::oxm_match_set const match{
-          match::in_port{1}
-        , match::eth_dst{"\x01\x02\x03\x04\x05\x06"_mac}
-        , match::eth_src{"\x11\x12\x13\x14\x15\x16"_mac}
-        , match::eth_type{0x0800, 0x0800}
+    v13::oxm_match const match{
+          fields::in_port{1}
+        , fields::eth_dst{"\x01\x02\x03\x04\x05\x06"_mac}
+        , fields::eth_src{"\x11\x12\x13\x14\x15\x16"_mac}
+        , fields::eth_type{0x0800, 0x0800}
     };
 };
 
@@ -55,7 +55,8 @@ BOOST_AUTO_TEST_SUITE(flow_removed_test)
     BOOST_FIXTURE_TEST_CASE(construct_from_flow_entry_test, oxm_match_fixture)
     {
         auto const entry = v13::flow_entry{
-              match, proto::OFP_DEFAULT_PRIORITY
+              match
+            , proto::OFP_DEFAULT_PRIORITY
             , 0xff00ff0012345678
             , v13::instruction_set{}
         };
@@ -135,7 +136,7 @@ BOOST_AUTO_TEST_SUITE(flow_removed_test)
     BOOST_FIXTURE_TEST_CASE(copy_assignment_test, flow_removed_fixutre)
     {
         auto copy = v13::messages::flow_removed{
-              v13::oxm_match_set{}, 0, 0, proto::OFPRR_IDLE_TIMEOUT, 0
+              v13::oxm_match{}, 0, 0, proto::OFPRR_IDLE_TIMEOUT, 0
             , v13::elapsed_time{0, 0}, v13::timeouts{0, 0}, v13::counters{0, 0}
         };
 
@@ -161,7 +162,7 @@ BOOST_AUTO_TEST_SUITE(flow_removed_test)
     {
         auto src = sut;
         auto copy = v13::messages::flow_removed{
-              v13::oxm_match_set{}, 0, 0, proto::OFPRR_IDLE_TIMEOUT, 0
+              v13::oxm_match{}, 0, 0, proto::OFPRR_IDLE_TIMEOUT, 0
             , v13::elapsed_time{0, 0}, v13::timeouts{0, 0}, v13::counters{0, 0}
         };
 

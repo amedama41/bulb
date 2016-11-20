@@ -4,7 +4,7 @@
 
 #include <cstdint>
 #include <vector>
-#include <canard/network/openflow/v13/common/oxm_match_set.hpp>
+#include <canard/network/openflow/v13/common/oxm_match.hpp>
 
 #include "../../test_utility.hpp"
 
@@ -20,7 +20,7 @@ namespace {
 struct aggregate_stats_request_fixture
 {
     multipart::aggregate_stats_request sut{
-          v13::oxm_match_set{
+          v13::oxm_match{
               match::in_port{4}
             , match::eth_dst{"\x01\x02\x03\x04\x05\x06"_mac}
           } // 4 + 8 + 10 = 22
@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_SUITE(aggregate_stats_request_test)
 
     BOOST_AUTO_TEST_CASE(construct_from_match_test)
     {
-        auto const match = v13::oxm_match_set{
+        auto const match = v13::oxm_match{
               match::in_port{4}
             , match::eth_dst{"\x01\x02\x03\x04\x05\x06"_mac}
             , match::eth_src{"\x11\x12\x13\x14\x15\x16"_mac}
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_SUITE(aggregate_stats_request_test)
 
     BOOST_AUTO_TEST_CASE(construct_from_cookie_mask_test)
     {
-        auto const match = v13::oxm_match_set{
+        auto const match = v13::oxm_match{
             match::in_port{4}
         }; // 4 + 8 = 12
         auto const table_id = std::uint8_t{proto::OFPTT_ALL};
@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_SUITE(aggregate_stats_request_test)
 
     BOOST_AUTO_TEST_CASE(construct_from_out_port_test)
     {
-        auto const match = v13::oxm_match_set{
+        auto const match = v13::oxm_match{
         }; // 4
         auto const table_id = std::uint8_t{254};
         auto const out_port = std::uint32_t{proto::OFPP_CONTROLLER};

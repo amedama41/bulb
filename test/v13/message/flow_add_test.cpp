@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <vector>
 #include <canard/network/openflow/v13/instructions.hpp>
-#include <canard/network/openflow/v13/common/oxm_match_set.hpp>
+#include <canard/network/openflow/v13/common/oxm_match.hpp>
 
 #include "../../test_utility.hpp"
 
@@ -21,7 +21,7 @@ struct flow_entry_fixture {
     canard::mac_address eth_dst = "\x01\x02\x03\x04\x05\x06"_mac;
     canard::mac_address eth_src = "\x11\x12\x13\x14\x15\x16"_mac;
     v13::flow_entry entry = {
-          v13::oxm_match_set{
+          v13::oxm_match{
               match::in_port{4}
             , match::eth_dst{eth_dst}
             , match::eth_src{eth_src}
@@ -248,7 +248,7 @@ BOOST_AUTO_TEST_SUITE(flow_add_test)
     BOOST_FIXTURE_TEST_CASE(copy_assignment_test, flow_add_fixture)
     {
         auto const empty_entry
-            = v13::flow_entry{v13::oxm_match_set{}, 0, 0, v13::instruction_set{}};
+            = v13::flow_entry{v13::oxm_match{}, 0, 0, v13::instruction_set{}};
         auto copy = v13::messages::flow_add{empty_entry, 0, 0};
 
         copy = sut;
@@ -271,7 +271,7 @@ BOOST_AUTO_TEST_SUITE(flow_add_test)
     BOOST_FIXTURE_TEST_CASE(move_assignment_test, flow_add_fixture)
     {
         auto const empty_entry
-            = v13::flow_entry{v13::oxm_match_set{}, 0, 0, v13::instruction_set{}};
+            = v13::flow_entry{v13::oxm_match{}, 0, 0, v13::instruction_set{}};
         auto copy = v13::messages::flow_add{empty_entry, 0, 0};
         auto src = sut;
 

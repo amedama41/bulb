@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <vector>
 #include <canard/network/openflow/v13/instructions.hpp>
-#include <canard/network/openflow/v13/common/oxm_match_set.hpp>
+#include <canard/network/openflow/v13/common/oxm_match.hpp>
 
 #include "../../test_utility.hpp"
 
@@ -21,7 +21,7 @@ struct flow_entry_fixture {
     canard::mac_address eth_dst = "\x01\x02\x03\x04\x05\x06"_mac;
     canard::mac_address eth_src = "\x11\x12\x13\x14\x15\x16"_mac;
     v13::flow_entry entry = {
-          v13::oxm_match_set{
+          v13::oxm_match{
               match::in_port{4}
             , match::eth_dst{eth_dst}
             , match::eth_src{eth_src}
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_SUITE(flow_delete_test)
         auto const out_group = std::uint32_t{0};
 
         auto const sut = v13::messages::flow_delete{
-            v13::oxm_match_set{}, table_id, out_port, out_group
+            v13::oxm_match{}, table_id, out_port, out_group
         };
 
         BOOST_TEST(sut.version() == proto::OFP_VERSION);
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_SUITE(flow_delete_test)
         auto const cookie_mask = v13::cookie_mask{0xff, 0xffff};
 
         auto const sut = v13::messages::flow_delete{
-            v13::oxm_match_set{}, table_id, cookie_mask
+            v13::oxm_match{}, table_id, cookie_mask
         };
 
         BOOST_TEST(sut.version() == proto::OFP_VERSION);
@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_SUITE(flow_delete_test)
         auto const out_group = std::uint32_t{proto::OFPG_MAX};
 
         auto const sut = v13::messages::flow_delete{
-            v13::oxm_match_set{}, table_id, cookie_mask, out_port, out_group
+            v13::oxm_match{}, table_id, cookie_mask, out_port, out_group
         };
 
         BOOST_TEST(sut.version() == proto::OFP_VERSION);
@@ -198,7 +198,7 @@ BOOST_AUTO_TEST_SUITE(flow_delete_test)
 
     BOOST_FIXTURE_TEST_CASE(copy_assignment_test, flow_delete_fixture)
     {
-        auto copy = v13::messages::flow_delete{v13::oxm_match_set{}, 0};
+        auto copy = v13::messages::flow_delete{v13::oxm_match{}, 0};
 
         copy = sut;
 
@@ -216,7 +216,7 @@ BOOST_AUTO_TEST_SUITE(flow_delete_test)
 
     BOOST_FIXTURE_TEST_CASE(move_assignment_test, flow_delete_fixture)
     {
-        auto copy = v13::messages::flow_delete{v13::oxm_match_set{}, 0};
+        auto copy = v13::messages::flow_delete{v13::oxm_match{}, 0};
         auto src = sut;
 
         copy = std::move(src);
@@ -341,7 +341,7 @@ BOOST_AUTO_TEST_SUITE(flow_delete_strict_test)
             = v13::cookie_mask{0x0f0f0f0f0f0f0f0f, 0xffffffff0000000f};
 
         auto const sut = v13::messages::flow_delete_strict{
-            v13::oxm_match_set{}, priority, table_id, cookie_mask
+            v13::oxm_match{}, priority, table_id, cookie_mask
         };
 
         BOOST_TEST(sut.version() == proto::OFP_VERSION);
@@ -364,7 +364,7 @@ BOOST_AUTO_TEST_SUITE(flow_delete_strict_test)
         auto const out_group = 254;
 
         auto const sut = v13::messages::flow_delete_strict{
-            v13::oxm_match_set{}, priority, table_id, out_port, out_group
+            v13::oxm_match{}, priority, table_id, out_port, out_group
         };
 
         BOOST_TEST(sut.version() == proto::OFP_VERSION);
@@ -419,7 +419,7 @@ BOOST_AUTO_TEST_SUITE(flow_delete_strict_test)
 
     BOOST_FIXTURE_TEST_CASE(copy_assignment_test, flow_delete_strict_fixture)
     {
-        auto copy = v13::messages::flow_delete_strict{v13::oxm_match_set{}, 0, 0};
+        auto copy = v13::messages::flow_delete_strict{v13::oxm_match{}, 0, 0};
 
         copy = sut;
 
@@ -439,7 +439,7 @@ BOOST_AUTO_TEST_SUITE(flow_delete_strict_test)
     BOOST_FIXTURE_TEST_CASE(move_assignment_test, flow_delete_strict_fixture)
     {
         auto src = sut;
-        auto copy = v13::messages::flow_delete_strict{v13::oxm_match_set{}, 0, 0};
+        auto copy = v13::messages::flow_delete_strict{v13::oxm_match{}, 0, 0};
 
         copy = std::move(src);
 

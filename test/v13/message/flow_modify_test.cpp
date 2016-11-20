@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <vector>
 #include <canard/network/openflow/v13/instructions.hpp>
-#include <canard/network/openflow/v13/common/oxm_match_set.hpp>
+#include <canard/network/openflow/v13/common/oxm_match.hpp>
 
 #include "../../test_utility.hpp"
 
@@ -21,7 +21,7 @@ struct flow_entry_fixture {
     canard::mac_address eth_dst = "\x01\x02\x03\x04\x05\x06"_mac;
     canard::mac_address eth_src = "\x11\x12\x13\x14\x15\x16"_mac;
     v13::flow_entry entry = {
-          v13::oxm_match_set{
+          v13::oxm_match{
               match::in_port{4}
             , match::eth_dst{eth_dst}
             , match::eth_src{eth_src}
@@ -285,7 +285,7 @@ BOOST_AUTO_TEST_SUITE(flow_modify_strict_test)
 
     BOOST_AUTO_TEST_CASE(construct_from_match_test)
     {
-        auto const match = v13::oxm_match_set{
+        auto const match = v13::oxm_match{
             match::eth_type{0x0800}, match::ip_proto{17}, match::udp_src{52}
         }; // 4 + 6 + 5 + 6 = 21
         auto const priority = std::uint16_t{32};
@@ -313,7 +313,7 @@ BOOST_AUTO_TEST_SUITE(flow_modify_strict_test)
 
     BOOST_AUTO_TEST_CASE(construct_from_cookie_mask_test)
     {
-        auto const match = v13::oxm_match_set{};
+        auto const match = v13::oxm_match{};
         auto const priority = std::uint16_t{0};
         auto const table_id = std::uint8_t{254};
         auto const instructions = v13::instruction_set{};

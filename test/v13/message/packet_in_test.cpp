@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_SUITE(packet_in_test)
         auto const reason = proto::OFPR_NO_MATCH;
         auto const table_id = std::uint8_t{0};
         auto const cookie = std::uint64_t{0xffffffffffffffff};
-        auto const match = v13::oxm_match_set{
+        auto const match = v13::oxm_match{
               match::in_port{1}
             , match::eth_dst{"\x01\x02\x03\x04\x05\x06"_mac}
             , match::eth_src{"\x11\x12\x13\x14\x15\x16"_mac}
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_SUITE(packet_in_test)
         auto const reason = proto::OFPR_ACTION;
         auto const table_id = std::uint8_t{0xff};
         auto const cookie = std::uint64_t{0};
-        auto const match = v13::oxm_match_set{};
+        auto const match = v13::oxm_match{};
         char const bin[] = "\x09\x08\x07\x06\x05\x04";
 
         auto const sut = v13::messages::packet_in{
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_SUITE(packet_in_test)
         auto const reason = proto::OFPR_INVALID_TTL;
         auto const table_id = std::uint8_t{0xff};
         auto const cookie = std::uint64_t{0};
-        auto const match = v13::oxm_match_set{
+        auto const match = v13::oxm_match{
             match::eth_src{"\x11\x12\x13\x14\x15\x16"_mac}
         };
         auto const bin = std::vector<unsigned char>{};
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_SUITE(packet_in_test)
     {
         v13::messages::packet_in pkt_in = v13::messages::packet_in{
               0x01234567, 512, proto::OFPR_NO_MATCH, 2, 0x0001020304050607
-            , v13::oxm_match_set{
+            , v13::oxm_match{
                   match::in_port{1}
                 , match::eth_dst{"\x01\x02\x03\x04\x05\x06"_mac}
                 , match::eth_src{"\x11\x12\x13\x14\x15\x16"_mac}
