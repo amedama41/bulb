@@ -126,6 +126,16 @@ namespace v13 {
       return oxm_fields;
     }
 
+    auto calc_ofp_length(std::uint16_t const base_length) const
+      -> std::uint16_t
+    {
+      auto const length = byte_length();
+      if (length > std::numeric_limits<std::uint16_t>::max() - base_length) {
+        throw std::runtime_error{"too large oxm_match length"};
+      }
+      return base_length + length;
+    }
+
     static void validate_header(v13_detail::ofp_match const& match)
     {
       if (match.type != match_type) {
