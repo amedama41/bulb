@@ -235,6 +235,23 @@ BOOST_AUTO_TEST_SUITE(oxm_match)
     }
   BOOST_AUTO_TEST_SUITE_END() // extract_oxm_fields
 
+  BOOST_FIXTURE_TEST_SUITE(calc_ofp_length, oxm_match_fixture)
+    BOOST_AUTO_TEST_CASE(return_length)
+    {
+      auto const max_length = std::numeric_limits<std::uint16_t>::max();
+      auto const base_length = max_length - 64;
+
+      BOOST_TEST(sut.calc_ofp_length(base_length) == max_length);
+    }
+    BOOST_AUTO_TEST_CASE(throw_exception_if_base_length_is_too_large)
+    {
+      auto const max_length = std::numeric_limits<std::uint16_t>::max();
+      auto const base_length = max_length - 63;
+
+      BOOST_CHECK_THROW(sut.calc_ofp_length(base_length), std::runtime_error);
+    }
+  BOOST_AUTO_TEST_SUITE_END() // calc_ofp_length
+
   BOOST_AUTO_TEST_SUITE(validate_header)
     BOOST_AUTO_TEST_CASE(
         throw_no_exception_if_type_is_oxm_and_length_is_equal_to_4)
