@@ -248,10 +248,8 @@ namespace multipart_detail {
                   v13_detail::ofp_header{
                       base_t::version()
                     , base_t::type()
-                    , std::uint16_t(
-                              sizeof(raw_ofp_type)
-                            + sizeof(body_type)
-                            + match.byte_length())
+                    , match.calc_ofp_length(
+                            sizeof(raw_ofp_type) + sizeof(body_type))
                     , xid
                   }
                 , T::multipart_type_value

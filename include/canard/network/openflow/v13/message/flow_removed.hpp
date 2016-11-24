@@ -53,7 +53,7 @@ namespace messages {
                   v13_detail::ofp_header{
                       version()
                     , type()
-                    , std::uint16_t(sizeof(raw_ofp_type) + match.byte_length())
+                    , match.calc_ofp_length(sizeof(raw_ofp_type))
                     , xid
                   }
                 , cookie

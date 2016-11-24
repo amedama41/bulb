@@ -53,8 +53,7 @@ namespace messages {
                       version()
                     , type()
                     , std::uint16_t(
-                              sizeof(raw_ofp_type)
-                            + match.byte_length()
+                              match.calc_ofp_length(sizeof(raw_ofp_type))
                             + data_alignment_padding_size
                             + data.size())
                     , xid

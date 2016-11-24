@@ -45,7 +45,7 @@ namespace multipart {
                  , v13::counters const& counters)
             : flow_stats_{
                   entry.instructions().calc_ofp_length(
-                          sizeof(raw_ofp_type) + entry.match().byte_length())
+                          entry.match().calc_ofp_length(sizeof(raw_ofp_type)))
                 , table_id
                 , 0
                 , elapsed_time.duration_sec()
