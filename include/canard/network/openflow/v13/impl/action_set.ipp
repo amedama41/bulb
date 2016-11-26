@@ -2,7 +2,7 @@
 #define CANARD_NET_OFP_V13_IMPL_ACTION_SET_IPP
 
 #include <canard/network/openflow/detail/config.hpp>
-#include <canard/network/openflow/v13/action_set.hpp>
+#include <canard/network/openflow/v13/utility/action_set.hpp>
 
 #include <canard/network/openflow/detail/impl/set_base.hpp>
 

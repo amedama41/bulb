@@ -4,9 +4,9 @@
 #include <stdexcept>
 #include <utility>
 #include <canard/network/openflow/v13/action_list.hpp>
-#include <canard/network/openflow/v13/action_set.hpp>
 #include <canard/network/openflow/v13/detail/basic_instruction_actions.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/network/openflow/v13/utility/action_set.hpp>
 
 namespace canard {
 namespace net {
