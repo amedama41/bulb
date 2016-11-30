@@ -29,7 +29,7 @@ namespace v13 {
       -> key_type
     {
       return action_order<Action>::value;
-    };
+    }
 
     template <class Action>
     static auto get_key_impl(Action const& action) noexcept
