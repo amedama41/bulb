@@ -1,17 +1,10 @@
 #ifndef CANARD_NET_OFP_V13_TABLE_FEATURE_PROPERTY_SET_HPP
 #define CANARD_NET_OFP_V13_TABLE_FEATURE_PROPERTY_SET_HPP
 
-#include <cstddef>
+#include <canard/network/openflow/detail/config.hpp>
+
 #include <cstdint>
-#include <iterator>
-#include <map>
-#include <stdexcept>
-#include <utility>
-#include <boost/range/adaptor/map.hpp>
-#include <boost/range/adaptor/transformed.hpp>
-#include <boost/range/algorithm/for_each.hpp>
-#include <boost/range/numeric.hpp>
-#include <canard/network/openflow/detail/add_helper.hpp>
+#include <canard/network/openflow/detail/set_base.hpp>
 #include <canard/network/openflow/v13/any_table_feature_property.hpp>
 
 namespace canard {
@@ -19,120 +12,62 @@ namespace net {
 namespace ofp {
 namespace v13 {
 
-    class table_feature_property_set
+  class table_feature_property_set
+    : public detail::set_base<
+        table_feature_property_set, std::uint16_t, any_table_feature_property
+      >
+  {
+  public:
+    using set_base::set_base;
+
+  private:
+    friend set_base;
+
+    using set_info = set_base::default_set_info;
+
+    template <class Property>
+    static constexpr auto key_impl() noexcept
+      -> key_type
     {
-        using property_map
-            = std::map<std::uint16_t, any_table_feature_property>;
+      return Property::type();
+    }
 
-    public:
-        using value_type = property_map::mapped_type;
-        using reference = value_type const&;
-        using const_reference = value_type const&;
-        using iterator = boost::range_iterator<
-            boost::select_second_const_range<property_map> const
-        >::type;
-        using const_iterator = boost::range_iterator<
-            boost::select_second_const_range<property_map> const
-        >::type;
+    template <class Property>
+    static auto get_key_impl(Property const& property) noexcept
+      -> key_type
+    {
+      return property.type();
+    }
 
-        template <class... Properties>
-        table_feature_property_set(Properties&&... properties)
-            : properties_{}
-        {
-            add_impl(std::forward<Properties>(properties)...);
-        }
-
-        void swap(table_feature_property_set& other)
-        {
-            properties_.swap(other.properties_);
-        }
-
-        template <class Property>
-        void add(Property&& property)
-        {
-            auto const type = property.type();
-            auto const it = properties_.lower_bound(type);
-            if (it != properties_.end() && !properties_.key_comp()(type, it->first)) {
-                it->second = std::forward<Property>(property);
-            }
-            else {
-                properties_.emplace_hint(it, type, std::forward<Property>(property));
-            }
-        }
-
-        auto length() const
-            -> std::uint16_t
-        {
-            using boost::adaptors::transformed;
-            return boost::accumulate(
-                      *this | transformed(
-                          [](const_reference p) { return p.byte_length(); })
-                    , std::uint16_t{0});
-        }
-
-        auto size() const noexcept
-            -> std::size_t
-        {
-            return properties_.size();
-        }
-
-        auto begin() const noexcept
-            -> const_iterator
-        {
-            return boost::begin(properties_ | boost::adaptors::map_values);
-        }
-
-        auto end() const noexcept
-            -> const_iterator
-        {
-            return boost::end(properties_ | boost::adaptors::map_values);
-        }
-
-        template <class Container>
-        auto encode(Container& container) const
-            -> Container&
-        {
-            boost::for_each(
-                    *this, [&](const_reference p) { p.encode(container); });
-            return container;
-        }
-
-        template <class Iterator>
-        static auto decode(Iterator& first, Iterator last)
-            -> table_feature_property_set
-        {
-            auto properties = table_feature_property_set{};
-            while (std::distance(first, last)
-                    >= sizeof(v13_detail::ofp_table_feature_prop_header)) {
-                table_feature_property_decoder::decode<void>(
-                          first, last
-                        , detail::add_helper<table_feature_property_set>{properties});
-            }
-            if (first != last) {
-                throw std::runtime_error{"invalid properties length"};
-            }
-            return properties;
-        }
-
-    private:
-        void add_impl()
-        {
-        }
-
-        template <class Property, class... Properties>
-        void add_impl(Property&& prop, Properties&&... properties)
-        {
-            add(std::forward<Property>(prop));
-            add_impl(std::forward<Properties>(properties)...);
-        }
-
-    private:
-        property_map properties_;
-    };
+    template <class T>
+    static auto cast_impl(const_reference property)
+      -> T const&
+    {
+      return v13::any_cast<T>(property);
+    }
+  };
 
 } // namespace v13
 } // namespace ofp
 } // namespace net
 } // namespace canard
+
+#if !defined(CANARD_NET_OFP_HEADER_ONLY) && defined(CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
+namespace canard {
+namespace net {
+namespace ofp {
+
+  extern template class detail::set_base<
+      v13::table_feature_property_set
+    , std::uint16_t
+    , v13::any_table_feature_property
+  >;
+
+} // namespace ofp
+} // namespace net
+} // namespace canard
+#else
+# include <canard/network/openflow/v13/impl/table_feature_property_set.ipp>
+#endif
 
 #endif // CANARD_NET_OFP_V13_TABLE_FEATURE_PROPERTY_SET_HPP
