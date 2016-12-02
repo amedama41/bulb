@@ -13,6 +13,7 @@
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/get_xid.hpp>
+#include <canard/network/openflow/list.hpp>
 #include <canard/network/openflow/v13/detail/basic_multipart.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
@@ -30,6 +31,7 @@ namespace multipart {
     {
     public:
         using raw_ofp_type = v13_detail::ofp_table_features;
+        using properties_type = ofp::list<any_table_feature_property>;
 
         table_features(
                   std::uint8_t const table_id
@@ -38,9 +40,9 @@ namespace multipart {
                 , std::uint64_t const metadata_write
                 , std::uint32_t const config
                 , std::uint32_t const max_entries
-                , table_feature_property_set properties)
+                , properties_type properties)
             : table_features_{
-                  std::uint16_t(sizeof(raw_ofp_type) + properties.length())
+                  properties.calc_ofp_length(sizeof(raw_ofp_type))
                 , table_id
                 , { 0, 0, 0, 0, 0 }
                 , ""
@@ -55,6 +57,22 @@ namespace multipart {
                 = std::min(name.size(), sizeof(table_features_.name) - 1);
             using boost::adaptors::sliced;
             boost::copy(name | sliced(0, name_size), table_features_.name);
+        }
+
+        table_features(
+                  std::uint8_t const table_id
+                , boost::string_ref const name
+                , std::uint64_t const metadata_match
+                , std::uint64_t const metadata_write
+                , std::uint32_t const config
+                , std::uint32_t const max_entries
+                , table_feature_property_set properties)
+            : table_features{
+                  table_id, name
+                , metadata_match, metadata_write, config, max_entries
+                , std::move(properties).to_list()
+              }
+        {
         }
 
         table_features(table_features const&) = default;
@@ -123,15 +141,15 @@ namespace multipart {
         }
 
         auto properties() const noexcept
-            -> table_feature_property_set const&
+            -> properties_type const&
         {
             return properties_;
         }
 
         auto extract_properties()
-            -> table_feature_property_set
+            -> properties_type
         {
-            auto properties = table_feature_property_set{};
+            auto properties = properties_type{};
             properties.swap(properties_);
             table_features_.length = min_length();
             return properties;
@@ -140,7 +158,7 @@ namespace multipart {
     private:
         table_features(
                   raw_ofp_type const& features
-                , table_feature_property_set&& properties)
+                , properties_type&& properties)
             : table_features_(features)
             , properties_(std::move(properties))
         {
@@ -169,13 +187,13 @@ namespace multipart {
             }
 
             last = std::next(first, prop_length);
-            auto properties = table_feature_property_set::decode(first, last);
+            auto properties = properties_type::decode(first, last);
             return table_features{features, std::move(properties)};
         }
 
     private:
         raw_ofp_type table_features_;
-        table_feature_property_set properties_;
+        properties_type properties_;
     };
 
 
