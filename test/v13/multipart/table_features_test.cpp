@@ -15,7 +15,7 @@ struct table_features_fixture {
     {
         auto const table_name = "table" + std::to_string(table_id);
         return messages::multipart::table_features{table_id, table_name.c_str(), 0xffffffffffffffff, 0xffffffffffffffff, 0, 0xffffffff
-            , {
+            , table_feature_property_set{
                   table_feature_properties::instructions{
                       instruction_id{protocol::OFPIT_GOTO_TABLE}, instruction_id{protocol::OFPIT_WRITE_METADATA}
                     , instruction_id{protocol::OFPIT_WRITE_ACTIONS}, instruction_id{protocol::OFPIT_APPLY_ACTIONS}
