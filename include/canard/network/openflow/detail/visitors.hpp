@@ -88,18 +88,6 @@ namespace ofp {
             }
         };
 
-        class property_visitor
-            : public boost::static_visitor<std::uint16_t>
-        {
-        public:
-            template <class T>
-            auto operator()(T const& t) const
-                -> std::uint16_t
-            {
-                return t.property();
-            }
-        };
-
         class equivalent_visitor
             : public boost::static_visitor<bool>
         {
