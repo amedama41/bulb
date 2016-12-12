@@ -11,6 +11,7 @@ LIBBULB_RPATH = -rpath @executable_path/./$(LIBBULB_DIR)
 
 TEST_DIRS = action \
 			common_type \
+			decoder \
 			hello_element \
 			instruction \
 			message \
