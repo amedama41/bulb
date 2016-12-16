@@ -12,6 +12,8 @@ SRCS = hello_test.cpp \
 	   flow_modify_test.cpp \
 	   flow_delete_test.cpp \
 	   group_mod_test.cpp \
+	   meter_add_test.cpp \
+	   meter_delete_test.cpp \
 	   port_mod.cpp \
 	   barrier_test.cpp \
 	   queue_config_test.cpp
