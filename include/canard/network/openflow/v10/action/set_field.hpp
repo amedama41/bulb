@@ -29,15 +29,15 @@ namespace actions {
         };
 
         using set_field_info_table = boost::fusion::map<
-              boost::fusion::pair<match::eth_src  , ofp_action_info<protocol::OFPAT_SET_DL_SRC   , v10_detail::ofp_action_dl_addr  > >
-            , boost::fusion::pair<match::eth_dst  , ofp_action_info<protocol::OFPAT_SET_DL_DST   , v10_detail::ofp_action_dl_addr  > >
-            , boost::fusion::pair<match::vlan_vid , ofp_action_info<protocol::OFPAT_SET_VLAN_VID , v10_detail::ofp_action_vlan_vid > >
-            , boost::fusion::pair<match::vlan_pcp , ofp_action_info<protocol::OFPAT_SET_VLAN_PCP , v10_detail::ofp_action_vlan_pcp > >
-            , boost::fusion::pair<match::ip_dscp  , ofp_action_info<protocol::OFPAT_SET_NW_TOS   , v10_detail::ofp_action_nw_tos   > >
-            , boost::fusion::pair<match::ipv4_src , ofp_action_info<protocol::OFPAT_SET_NW_SRC   , v10_detail::ofp_action_nw_addr  > >
-            , boost::fusion::pair<match::ipv4_dst , ofp_action_info<protocol::OFPAT_SET_NW_DST   , v10_detail::ofp_action_nw_addr  > >
-            , boost::fusion::pair<match::tcp_src  , ofp_action_info<protocol::OFPAT_SET_TP_SRC   , v10_detail::ofp_action_tp_port  > >
-            , boost::fusion::pair<match::tcp_dst  , ofp_action_info<protocol::OFPAT_SET_TP_DST   , v10_detail::ofp_action_tp_port  > >
+              boost::fusion::pair<match_fields::eth_src  , ofp_action_info<protocol::OFPAT_SET_DL_SRC   , v10_detail::ofp_action_dl_addr  > >
+            , boost::fusion::pair<match_fields::eth_dst  , ofp_action_info<protocol::OFPAT_SET_DL_DST   , v10_detail::ofp_action_dl_addr  > >
+            , boost::fusion::pair<match_fields::vlan_vid , ofp_action_info<protocol::OFPAT_SET_VLAN_VID , v10_detail::ofp_action_vlan_vid > >
+            , boost::fusion::pair<match_fields::vlan_pcp , ofp_action_info<protocol::OFPAT_SET_VLAN_PCP , v10_detail::ofp_action_vlan_pcp > >
+            , boost::fusion::pair<match_fields::ip_dscp  , ofp_action_info<protocol::OFPAT_SET_NW_TOS   , v10_detail::ofp_action_nw_tos   > >
+            , boost::fusion::pair<match_fields::ipv4_src , ofp_action_info<protocol::OFPAT_SET_NW_SRC   , v10_detail::ofp_action_nw_addr  > >
+            , boost::fusion::pair<match_fields::ipv4_dst , ofp_action_info<protocol::OFPAT_SET_NW_DST   , v10_detail::ofp_action_nw_addr  > >
+            , boost::fusion::pair<match_fields::tcp_src  , ofp_action_info<protocol::OFPAT_SET_TP_SRC   , v10_detail::ofp_action_tp_port  > >
+            , boost::fusion::pair<match_fields::tcp_dst  , ofp_action_info<protocol::OFPAT_SET_TP_DST   , v10_detail::ofp_action_tp_port  > >
         >;
 
         template <class MatchField>
@@ -65,10 +65,10 @@ namespace actions {
         }
 
         inline auto to_ofp_action(
-                std::uint8_t const value, set_field_info<match::ip_dscp>) noexcept
-            -> set_field_info<match::ip_dscp>::raw_ofp_type
+                std::uint8_t const value, set_field_info<match_fields::ip_dscp>) noexcept
+            -> set_field_info<match_fields::ip_dscp>::raw_ofp_type
         {
-            using info = set_field_info<match::ip_dscp>;
+            using info = set_field_info<match_fields::ip_dscp>;
             return info::raw_ofp_type{
                   info::action_type
                 , sizeof(info::raw_ofp_type)
@@ -211,17 +211,17 @@ namespace actions {
         raw_ofp_type set_field_;
     };
 
-    using set_eth_src = set_field<match::eth_src>;
-    using set_eth_dst = set_field<match::eth_dst>;
-    using set_vlan_vid = set_field<match::vlan_vid>;
-    using set_vlan_pcp = set_field<match::vlan_pcp>;
-    using set_ip_dscp = set_field<match::ip_dscp>;
-    using set_ipv4_src = set_field<match::ipv4_src>;
-    using set_ipv4_dst = set_field<match::ipv4_dst>;
-    using set_tcp_dst = set_field<match::tcp_dst>;
-    using set_tcp_src = set_field<match::tcp_src>;
-    using set_udp_dst = set_field<match::udp_dst>;
-    using set_udp_src = set_field<match::udp_src>;
+    using set_eth_src = set_field<match_fields::eth_src>;
+    using set_eth_dst = set_field<match_fields::eth_dst>;
+    using set_vlan_vid = set_field<match_fields::vlan_vid>;
+    using set_vlan_pcp = set_field<match_fields::vlan_pcp>;
+    using set_ip_dscp = set_field<match_fields::ip_dscp>;
+    using set_ipv4_src = set_field<match_fields::ipv4_src>;
+    using set_ipv4_dst = set_field<match_fields::ipv4_dst>;
+    using set_tcp_dst = set_field<match_fields::tcp_dst>;
+    using set_tcp_src = set_field<match_fields::tcp_src>;
+    using set_udp_dst = set_field<match_fields::udp_dst>;
+    using set_udp_src = set_field<match_fields::udp_src>;
 
 } // namespace actions
 } // namespace v10

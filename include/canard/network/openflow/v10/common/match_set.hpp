@@ -168,13 +168,13 @@ namespace v10 {
                 }
 
                 using match_field_pointer_list = std::tuple<
-                      match::in_port*
-                    , match::eth_src*, match::eth_dst*
-                    , match::vlan_vid*, match::vlan_pcp*
-                    , match::eth_type*
-                    , match::ip_dscp*, match::ip_proto*
-                    , match::ipv4_src*, match::ipv4_dst*
-                    , match::tcp_src*, match::tcp_dst*
+                      match_fields::in_port*
+                    , match_fields::eth_src*, match_fields::eth_dst*
+                    , match_fields::vlan_vid*, match_fields::vlan_pcp*
+                    , match_fields::eth_type*
+                    , match_fields::ip_dscp*, match_fields::ip_proto*
+                    , match_fields::ipv4_src*, match_fields::ipv4_dst*
+                    , match_fields::tcp_src*, match_fields::tcp_dst*
                 >;
                 return boost::fusion::all(match_field_pointer_list{}, *this);
             }

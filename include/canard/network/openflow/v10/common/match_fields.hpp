@@ -139,7 +139,7 @@ namespace v10 {
     class match_set;
 
 
-    namespace match {
+    namespace match_fields {
 
         template <class FieldType>
         class match_field
@@ -504,7 +504,7 @@ namespace v10 {
         using icmpv4_type = match_field<match_detail::field_type<protocol::OFPFW_TP_SRC>>;
         using icmpv4_code = match_field<match_detail::field_type<protocol::OFPFW_TP_DST>>;
 
-    } // namespace match
+    } // namespace match_fields
 
 } // namespace v10
 } // namespace ofp
