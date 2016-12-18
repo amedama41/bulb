@@ -1,6 +1,7 @@
 #ifndef CANARD_NET_OFP_V10_MATCH_SET_HPP
 #define CANARD_NET_OFP_V10_MATCH_SET_HPP
 
+#include <cstdint>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -10,8 +11,8 @@
 #include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
-#include <canard/network/openflow/detail/is_related.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
+#include <canard/network/openflow/type_traits/conjuction.hpp>
 #include <canard/network/openflow/v10/common/match_fields.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
 
@@ -20,23 +21,62 @@ namespace net {
 namespace ofp {
 namespace v10 {
 
+    namespace match_set_detail {
+
+        template <class FieldType>
+        auto is_match_field_impl(
+                match_fields::match_field<FieldType> const&) noexcept
+            -> std::true_type;
+
+        template <class FieldType>
+        auto is_match_field_impl(
+                match_fields::dl_addr_match_field<FieldType> const&) noexcept
+            -> std::true_type;
+
+        template <class FieldType>
+        auto is_match_field_impl(
+                match_fields::nw_addr_match_field<FieldType> const&) noexcept
+            -> std::true_type;
+
+        auto is_match_field_impl(...) noexcept -> std::false_type;
+
+        template <class T>
+        struct is_match_field : decltype(is_match_field_impl(std::declval<T>()))
+        {};
+
+    } // namespace match_set_detail
+
     class match_set
         : public detail::basic_protocol_type<match_set>
     {
+        template <class... Ts>
+        using enable_if_is_all_match_field = typename std::enable_if<
+               sizeof...(Ts)
+            && ofp::type_traits::conjuction<
+                    match_set_detail::is_match_field<Ts>...
+               >::value
+        >::type;
+
     public:
         using raw_ofp_type = v10_detail::ofp_match;
 
+        match_set() noexcept
+            : match_{protocol::OFPFW_ALL, 0}
+        {
+        }
+
         template <
               class... MatchFields
-            , typename std::enable_if<
-                       !detail::is_related<match_set, MatchFields...>::value
-                    && !detail::is_related<raw_ofp_type, MatchFields...>::value
-              >::type* = nullptr
+            , class = enable_if_is_all_match_field<MatchFields...>
         >
         explicit match_set(MatchFields&&... fields) noexcept
             : match_{protocol::OFPFW_ALL, 0}
         {
-            set_impl(std::forward<MatchFields>(fields)...);
+            struct dummy_type {};
+            dummy_type const unused[] = {
+                (set(std::forward<MatchFields>(fields)), dummy_type{})...
+            };
+            static_cast<void>(unused);
         }
 
         explicit match_set(raw_ofp_type const& match) noexcept
@@ -80,12 +120,6 @@ namespace v10 {
         }
 
         template <class MatchField>
-        void add(MatchField&& field) noexcept
-        {
-            set(std::forward<MatchField>(field));
-        }
-
-        template <class MatchField>
         void set(MatchField&& field) noexcept
         {
             std::forward<MatchField>(field).set_value(match_);
@@ -104,17 +138,6 @@ namespace v10 {
         }
 
     private:
-        void set_impl() noexcept
-        {
-        }
-
-        template <class MatchField, class... MatchFields>
-        void set_impl(MatchField&& field, MatchFields&&... fields) noexcept
-        {
-            set(std::forward<MatchField>(field));
-            set_impl(std::forward<MatchFields>(fields)...);
-        }
-
         friend basic_protocol_type;
 
         template <class Validator>
