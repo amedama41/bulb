@@ -136,7 +136,7 @@ namespace v10 {
     } // namespace match_detail
 
 
-    class match_set;
+    class match;
 
 
     namespace match_fields {
@@ -196,7 +196,7 @@ namespace v10 {
                 return value_ == rhs.value_;
             }
 
-            friend match_set;
+            friend match;
 
             void set_value(v10_detail::ofp_match& match) const noexcept
             {
@@ -294,7 +294,7 @@ namespace v10 {
             }
 
         private:
-            friend match_set;
+            friend match;
 
             void set_value(v10_detail::ofp_match& match) const noexcept
             {
@@ -430,7 +430,7 @@ namespace v10 {
             {
             }
 
-            friend match_set;
+            friend match;
 
             void set_value(v10_detail::ofp_match& match) const noexcept
             {

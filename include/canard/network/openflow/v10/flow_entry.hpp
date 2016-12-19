@@ -16,7 +16,7 @@ namespace v10 {
         : private boost::equality_comparable<flow_entry_id>
     {
     public:
-        flow_entry_id(match_set const& match
+        flow_entry_id(v10::match const& match
                     , std::uint16_t const priority) noexcept
             : match_(match)
             , priority_(priority)
@@ -24,7 +24,7 @@ namespace v10 {
         }
 
         auto match() const noexcept
-            -> match_set const&
+            -> v10::match const&
         {
             return match_;
         }
@@ -38,11 +38,11 @@ namespace v10 {
         static auto table_miss() noexcept
             -> flow_entry_id
         {
-            return flow_entry_id{match_set{}, 0};
+            return flow_entry_id{v10::match{}, 0};
         }
 
     private:
-        match_set match_;
+        v10::match match_;
         std::uint16_t priority_;
     };
 
@@ -68,7 +68,7 @@ namespace v10 {
         {
         }
 
-        flow_entry(match_set const& match
+        flow_entry(v10::match const& match
                  , std::uint16_t const priority
                  , std::uint64_t const cookie
                  , action_list actions)
@@ -85,7 +85,7 @@ namespace v10 {
         }
 
         auto match() const noexcept
-            -> match_set const&
+            -> v10::match const&
         {
             return id().match();
         }

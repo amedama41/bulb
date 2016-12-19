@@ -23,7 +23,7 @@ namespace messages {
         static constexpr protocol::ofp_flow_mod_command command_type
             = protocol::OFPFC_ADD;
 
-        flow_add(match_set const& match
+        flow_add(v10::match const& match
                , std::uint16_t const priority
                , std::uint64_t const cookie
                , action_list actions
@@ -73,9 +73,9 @@ namespace messages {
         }
 
         auto match() const noexcept
-            -> match_set
+            -> v10::match
         {
-            return match_set{ofp_flow_mod().match};
+            return v10::match{ofp_flow_mod().match};
         }
 
         auto priority() const noexcept

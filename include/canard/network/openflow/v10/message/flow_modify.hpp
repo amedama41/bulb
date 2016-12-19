@@ -24,9 +24,9 @@ namespace messages {
         {
         public:
             auto match() const noexcept
-                -> match_set
+                -> v10::match
             {
-                return match_set{ofp_flow_mod().match};
+                return v10::match{ofp_flow_mod().match};
             }
 
             auto priority() const noexcept
@@ -103,7 +103,7 @@ namespace messages {
             = protocol::OFPFC_MODIFY;
 
         flow_modify(
-                  match_set const& match
+                  v10::match const& match
                 , std::uint16_t const priority
                 , std::uint64_t const cookie
                 , action_list actions
@@ -126,7 +126,7 @@ namespace messages {
         }
 
         flow_modify(
-                  match_set const& match
+                  v10::match const& match
                 , std::uint64_t const cookie
                 , action_list actions
                 , std::uint32_t const buffer_id = protocol::OFP_NO_BUFFER
@@ -169,7 +169,7 @@ namespace messages {
             = protocol::OFPFC_MODIFY_STRICT;
 
         flow_modify_strict(
-                  match_set const& match
+                  v10::match const& match
                 , std::uint16_t const priority
                 , std::uint64_t const cookie
                 , action_list actions
@@ -192,7 +192,7 @@ namespace messages {
         }
 
         flow_modify_strict(
-                  match_set const& match
+                  v10::match const& match
                 , std::uint16_t const priority
                 , std::uint64_t const cookie
                 , action_list actions

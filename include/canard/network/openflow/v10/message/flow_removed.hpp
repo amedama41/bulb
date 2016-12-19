@@ -29,7 +29,7 @@ namespace messages {
             = protocol::OFPT_FLOW_REMOVED;
 
         flow_removed(
-                  match_set const& match
+                  v10::match const& match
                 , std::uint16_t const priority
                 , std::uint64_t const cookie
                 , protocol::ofp_flow_removed_reason const reason
@@ -80,9 +80,9 @@ namespace messages {
         }
 
         auto match() const noexcept
-            -> match_set
+            -> v10::match
         {
-            return match_set{flow_removed_.match};
+            return v10::match{flow_removed_.match};
         }
 
         auto priority() const noexcept

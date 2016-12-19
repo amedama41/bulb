@@ -90,9 +90,9 @@ namespace statistics {
         }
 
         auto match() const noexcept
-            -> v10::match_set
+            -> v10::match
         {
-            return v10::match_set{flow_stats_.match};
+            return v10::match{flow_stats_.match};
         }
 
         auto priority() const noexcept
@@ -252,7 +252,7 @@ namespace statistics {
             = protocol::OFPST_FLOW;
 
         flow_stats_request(
-                  match_set const& match
+                  v10::match const& match
                 , std::uint8_t const table_id
                 , std::uint16_t const out_port = protocol::OFPP_NONE
                 , std::uint32_t const xid = get_xid()) noexcept
@@ -270,9 +270,9 @@ namespace statistics {
         }
 
         auto match() const noexcept
-            -> match_set
+            -> v10::match
         {
-            return match_set{body().match};
+            return v10::match{body().match};
         }
 
         auto table_id() const noexcept

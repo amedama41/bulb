@@ -24,7 +24,7 @@ namespace messages {
             = protocol::OFPFC_DELETE;
 
         explicit flow_delete(
-                  match_set const& match
+                  v10::match const& match
                 , std::uint16_t const out_port = protocol::OFPP_NONE
                 , std::uint32_t const xid = get_xid())
             : flow_mod_base{match, 0, out_port, xid}
@@ -32,9 +32,9 @@ namespace messages {
         }
 
         auto match() const noexcept
-            -> match_set
+            -> v10::match
         {
-            return match_set{ofp_flow_mod().match};
+            return v10::match{ofp_flow_mod().match};
         }
 
         auto out_port() const noexcept
@@ -61,7 +61,7 @@ namespace messages {
             = protocol::OFPFC_DELETE_STRICT;
 
         flow_delete_strict(
-                  match_set const& match
+                  v10::match const& match
                 , std::uint16_t const priority
                 , std::uint16_t const out_port = protocol::OFPP_NONE
                 , std::uint32_t const xid = get_xid())
@@ -78,9 +78,9 @@ namespace messages {
         }
 
         auto match() const noexcept
-            -> match_set
+            -> v10::match
         {
-            return match_set{ofp_flow_mod().match};
+            return v10::match{ofp_flow_mod().match};
         }
 
         auto priority() const noexcept

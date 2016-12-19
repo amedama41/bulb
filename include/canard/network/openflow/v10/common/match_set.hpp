@@ -46,8 +46,8 @@ namespace v10 {
 
     } // namespace match_set_detail
 
-    class match_set
-        : public detail::basic_protocol_type<match_set>
+    class match
+        : public detail::basic_protocol_type<match>
     {
         template <class... Ts>
         using enable_if_is_all_match_field = typename std::enable_if<
@@ -60,7 +60,7 @@ namespace v10 {
     public:
         using raw_ofp_type = v10_detail::ofp_match;
 
-        match_set() noexcept
+        match() noexcept
             : match_{protocol::OFPFW_ALL, 0}
         {
         }
@@ -69,7 +69,7 @@ namespace v10 {
               class... MatchFields
             , class = enable_if_is_all_match_field<MatchFields...>
         >
-        explicit match_set(MatchFields&&... fields) noexcept
+        explicit match(MatchFields&&... fields) noexcept
             : match_{protocol::OFPFW_ALL, 0}
         {
             struct dummy_type {};
@@ -79,7 +79,7 @@ namespace v10 {
             static_cast<void>(unused);
         }
 
-        explicit match_set(raw_ofp_type const& match) noexcept
+        explicit match(raw_ofp_type const& match) noexcept
             : match_(match)
         {
         }
@@ -154,18 +154,18 @@ namespace v10 {
 
         template <class Iterator>
         static auto decode_impl(Iterator& first, Iterator last)
-            -> match_set
+            -> match
         {
-            return match_set{detail::decode<raw_ofp_type>(first, last)};
+            return match{detail::decode<raw_ofp_type>(first, last)};
         }
 
-        auto equal_impl(match_set const& rhs) const noexcept
+        auto equal_impl(match const& rhs) const noexcept
             -> bool
         {
             return detail::memcmp(match_, rhs.match_);
         }
 
-        auto equivalent_impl(match_set const& rhs) const noexcept
+        auto equivalent_impl(match const& rhs) const noexcept
             -> bool
         {
             return equivalent_for_each_field{this, &rhs};
@@ -202,8 +202,8 @@ namespace v10 {
                 return boost::fusion::all(match_field_pointer_list{}, *this);
             }
 
-            match_set const* lhs;
-            match_set const* rhs;
+            match const* lhs;
+            match const* rhs;
         };
 
     private:

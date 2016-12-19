@@ -74,7 +74,7 @@ namespace flow_mod_detail {
 
     protected:
         flow_mod_base(
-                  match_set const& match
+                  match const& match
                 , std::uint16_t const priority
                 , std::uint64_t const cookie
                 , action_list&& actions
@@ -105,7 +105,7 @@ namespace flow_mod_detail {
         }
 
         flow_mod_base(
-                  match_set const& match
+                  match const& match
                 , std::uint16_t const priority
                 , std::uint16_t const out_port
                 , std::uint32_t const xid)
