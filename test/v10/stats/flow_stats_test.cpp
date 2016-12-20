@@ -15,7 +15,7 @@ using proto = v10::protocol;
 
 namespace {
 struct flow_stats_parameters : match_fixture, action_fixture {
-  v10::match_set match{ in_port, eth_src, eth_type, ip_proto, ipv4_dst };
+  v10::match match{ in_port, eth_src, eth_type, ip_proto, ipv4_dst };
   std::uint16_t priority = 0x4000;
   std::uint64_t cookie = 0x0102030405060708;
   v10::action_list actions{ set_vlan_vid, output };
@@ -57,7 +57,7 @@ struct flow_stats_fixure : flow_stats_parameters {
       ""_bin;
 };
 struct flow_stats_request_parameters : match_fixture {
-  v10::match_set match { in_port, eth_src, eth_type, ip_proto, ipv4_dst};
+  v10::match match { in_port, eth_src, eth_type, ip_proto, ipv4_dst};
   std::uint8_t table_id = 0x34;
   std::uint16_t out_port = 0xffdd;
   std::uint32_t xid = 0x01020304;
@@ -75,7 +75,7 @@ using body_type = stats::flow_stats_reply::body_type;
 struct flow_stats_reply_parameters : match_fixture, action_fixture {
   stats::flow_stats stats1{
       v10::flow_entry{
-          {v10::match_set{ eth_src, eth_type, ip_proto, ipv4_dst }, 0x4000}
+          {v10::match{ eth_src, eth_type, ip_proto, ipv4_dst }, 0x4000}
         , 0x0102030405060708
         , v10::action_list{ set_vlan_vid, output }
       }
@@ -86,7 +86,7 @@ struct flow_stats_reply_parameters : match_fixture, action_fixture {
   };
   stats::flow_stats stats2{
       v10::flow_entry{
-          {v10::match_set{ in_port }, 0x4001}
+          {v10::match{ in_port }, 0x4001}
         , 0xf1f2f3f4f5f6f7f8
         , v10::action_list{}
       }
@@ -97,7 +97,7 @@ struct flow_stats_reply_parameters : match_fixture, action_fixture {
   };
   stats::flow_stats stats3{
       v10::flow_entry{
-          {v10::match_set{}, 0x4002}
+          {v10::match{}, 0x4002}
         , 0x01f203f405f607f8
         , v10::action_list{ output }
       }
@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_SUITE(flow_stats)
         is_constructible_from_parameters, flow_stats_parameters)
     {
       auto const entry = v10::flow_entry{
-          {v10::match_set{ in_port }, 1}
+          {v10::match{ in_port }, 1}
         , 2
         , v10::action_list{ set_vlan_vid, output }
       };
@@ -229,11 +229,11 @@ BOOST_AUTO_TEST_SUITE(flow_stats)
       BOOST_TEST(
           (stats::flow_stats{
               v10::flow_entry{
-                {v10::match_set{ in_port }, priority}, cookie, actions
+                {v10::match{ in_port }, priority}, cookie, actions
               }, table_id, timeouts, elapsed_time, counters}
         != stats::flow_stats{
               v10::flow_entry{
-                {v10::match_set{ eth_src }, priority}, cookie, actions
+                {v10::match{ eth_src }, priority}, cookie, actions
               }, table_id, timeouts, elapsed_time, counters}));
     }
     BOOST_AUTO_TEST_CASE(is_false_if_priority_is_not_equal)
@@ -391,7 +391,7 @@ BOOST_AUTO_TEST_SUITE(flow_stats_request)
   BOOST_FIXTURE_TEST_SUITE(constructor, match_fixture)
     BOOST_AUTO_TEST_CASE(is_constructible_from_parameters)
     {
-      auto const match = v10::match_set{ in_port, eth_dst, eth_src };
+      auto const match = v10::match{ in_port, eth_dst, eth_src };
       auto const table_id = 0x01;
       auto const out_port = 0x02;
       auto const xid = 0x12345678;
@@ -409,7 +409,7 @@ BOOST_AUTO_TEST_SUITE(flow_stats_request)
     }
     BOOST_AUTO_TEST_CASE(is_constructible_from_parameters_without_xid)
     {
-      auto const match = v10::match_set{ eth_type, ip_proto, tcp_src };
+      auto const match = v10::match{ eth_type, ip_proto, tcp_src };
       auto const table_id = 0x01;
       auto const out_port = 0x02;
 
@@ -426,7 +426,7 @@ BOOST_AUTO_TEST_SUITE(flow_stats_request)
     BOOST_AUTO_TEST_CASE(
         is_constructible_from_parameters_without_out_port_and_xid)
     {
-      auto const match = v10::match_set{ eth_type, eth_src, eth_dst };
+      auto const match = v10::match{ eth_type, eth_src, eth_dst };
       auto const table_id = 0x01;
 
       stats::flow_stats_request sut{match, table_id};
@@ -459,9 +459,9 @@ BOOST_AUTO_TEST_SUITE(flow_stats_request)
     {
       BOOST_TEST(
           (stats::flow_stats_request{
-            v10::match_set{ ip_proto }, table_id, out_port, xid}
+            v10::match{ ip_proto }, table_id, out_port, xid}
         != stats::flow_stats_request{
-            v10::match_set{ eth_type }, table_id, out_port, xid}));
+            v10::match{ eth_type }, table_id, out_port, xid}));
     }
     BOOST_AUTO_TEST_CASE(is_false_if_table_id_is_not_equal)
     {

@@ -15,7 +15,7 @@ using proto = v10::protocol;
 
 namespace {
 struct aggregate_stats_request_parameter : match_fixture {
-  v10::match_set match{ in_port, eth_src, eth_type, ipv4_dst };
+  v10::match match{ in_port, eth_src, eth_type, ipv4_dst };
   std::uint8_t table_id = 0x56;
   std::uint16_t out_port = 0x0123;
   std::uint32_t xid = 0x11223344;
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_SUITE(aggregate_stats_request)
   BOOST_AUTO_TEST_SUITE(constructor)
     BOOST_FIXTURE_TEST_CASE(is_constructible_from_parameters, match_fixture)
     {
-      auto const match = v10::match_set{ in_port, eth_src, eth_dst };
+      auto const match = v10::match{ in_port, eth_src, eth_dst };
       auto const table_id = 0x12;
       auto const out_port = 0x5678;
       auto const xid = 0x11223344;
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_SUITE(aggregate_stats_request)
     BOOST_FIXTURE_TEST_CASE(
         is_constructible_from_parameters_without_xid, match_fixture)
     {
-      auto const match = v10::match_set{ in_port, eth_src, eth_dst };
+      auto const match = v10::match{ in_port, eth_src, eth_dst };
       auto const table_id = 0x12;
       auto const out_port = 0x5678;
 
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_SUITE(aggregate_stats_request)
           is_constructible_from_parameters_without_out_port_and_xid
         , match_fixture)
     {
-      auto const match = v10::match_set{ in_port, eth_src, eth_dst };
+      auto const match = v10::match{ in_port, eth_src, eth_dst };
       auto const table_id = 0x12;
 
       stats::aggregate_stats_request sut{match, table_id};
@@ -132,9 +132,9 @@ BOOST_AUTO_TEST_SUITE(aggregate_stats_request)
     {
       BOOST_TEST(
           (stats::aggregate_stats_request{
-            v10::match_set{ ipv4_dst }, table_id, out_port, xid}
+            v10::match{ ipv4_dst }, table_id, out_port, xid}
         != stats::aggregate_stats_request{
-            v10::match_set{ ipv4_src }, table_id, out_port, xid}));
+            v10::match{ ipv4_src }, table_id, out_port, xid}));
     }
     BOOST_AUTO_TEST_CASE(is_false_if_table_id_is_not_equal)
     {

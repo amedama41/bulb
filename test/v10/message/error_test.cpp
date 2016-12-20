@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_SUITE(error)
       auto const type = proto::OFPET_FLOW_MOD_FAILED;
       auto const code = proto::OFPFMFC_OVERLAP;
       auto const req = msg::flow_add{
-        v10::flow_entry{{v10::match_set{}, 1}, 1, {}}
+        v10::flow_entry{{v10::match{}, 1}, 1, {}}
       };
 
       msg::error sut{type, code, req};

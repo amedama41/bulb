@@ -15,7 +15,7 @@ using proto = v10::protocol;
 
 namespace {
 struct parameters : match_fixture, action_fixture {
-  v10::match_set match{
+  v10::match match{
     in_port, eth_src, vlan_vid, eth_type, ip_proto, ipv4_dst, tcp_src
   };
   std::uint16_t priority = 0x4321;

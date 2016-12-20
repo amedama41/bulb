@@ -13,18 +13,18 @@ namespace act = v10::actions;
 namespace {
 
 struct flow_entry_id_fixture {
-  v10::match::in_port in_port{1};
-  v10::match::eth_src eth_src{"\x01\x02\x03\x04\x05\x06"_mac};
-  v10::match::eth_dst eth_dst{"\xf1\xf2\xf3\xf4\xf5\xf6"_mac};
-  v10::match::vlan_vid vlan_vid{0x0123};
-  v10::match::vlan_pcp vlan_pcp{2};
-  v10::match::eth_type eth_type{0x0800};
-  v10::match::ip_dscp ip_dscp{0x23};
-  v10::match::ip_proto ip_proto{7};
-  v10::match::ipv4_src ipv4_src{"192.168.1.2"_ipv4, 32};
-  v10::match::ipv4_dst ipv4_dst{"192.168.1.0"_ipv4, 28};
-  v10::match::tcp_src tcp_src{6653};
-  v10::match::tcp_src tcp_dst{8080};
+  v10::match_fields::in_port in_port{1};
+  v10::match_fields::eth_src eth_src{"\x01\x02\x03\x04\x05\x06"_mac};
+  v10::match_fields::eth_dst eth_dst{"\xf1\xf2\xf3\xf4\xf5\xf6"_mac};
+  v10::match_fields::vlan_vid vlan_vid{0x0123};
+  v10::match_fields::vlan_pcp vlan_pcp{2};
+  v10::match_fields::eth_type eth_type{0x0800};
+  v10::match_fields::ip_dscp ip_dscp{0x23};
+  v10::match_fields::ip_proto ip_proto{7};
+  v10::match_fields::ipv4_src ipv4_src{"192.168.1.2"_ipv4, 32};
+  v10::match_fields::ipv4_dst ipv4_dst{"192.168.1.0"_ipv4, 28};
+  v10::match_fields::tcp_src tcp_src{6653};
+  v10::match_fields::tcp_src tcp_dst{8080};
 };
 
 struct flow_entry_fixture : flow_entry_id_fixture {
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_SUITE(flow_entry_id)
     BOOST_FIXTURE_TEST_CASE(
         is_constructible_from_match_and_priority, flow_entry_id_fixture)
     {
-      auto const match = v10::match_set{ in_port, eth_src, vlan_vid, ipv4_dst };
+      auto const match = v10::match{ in_port, eth_src, vlan_vid, ipv4_dst };
       auto const priority = std::uint16_t{30000};
 
       auto const sut = v10::flow_entry_id{match, priority};
@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_SUITE(flow_entry_id)
     }
     BOOST_AUTO_TEST_CASE(is_constructible_from_empty_match_and_priority)
     {
-      auto const match = v10::match_set{};
+      auto const match = v10::match{};
       auto const priority = std::uint16_t{0};
 
       auto const sut = v10::flow_entry_id{match, priority};
@@ -76,14 +76,14 @@ BOOST_AUTO_TEST_SUITE(flow_entry_id)
     BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
     {
       auto const sut = v10::flow_entry_id{
-        v10::match_set{ in_port, eth_type, ip_proto}, 1234
+        v10::match{ in_port, eth_type, ip_proto}, 1234
       };
 
       BOOST_TEST((sut == sut));
     }
     BOOST_AUTO_TEST_CASE(is_true_if_match_and_priority_are_equal)
     {
-      auto const match = v10::match_set{ ipv4_dst, tcp_src };
+      auto const match = v10::match{ ipv4_dst, tcp_src };
       auto const priority = std::uint16_t{v10::protocol::OFP_DEFAULT_PRIORITY};
 
       BOOST_TEST(
@@ -95,23 +95,23 @@ BOOST_AUTO_TEST_SUITE(flow_entry_id)
       auto const priority = std::uint16_t{v10::protocol::OFP_DEFAULT_PRIORITY};
 
       BOOST_TEST(
-          (v10::flow_entry_id{v10::match_set{ in_port, ipv4_dst }, priority}
-        != v10::flow_entry_id{v10::match_set{ in_port, ipv4_src }, priority}));
+          (v10::flow_entry_id{v10::match{ in_port, ipv4_dst }, priority}
+        != v10::flow_entry_id{v10::match{ in_port, ipv4_src }, priority}));
     }
     BOOST_AUTO_TEST_CASE(is_true_if_match_is_not_equal_but_equivalent)
     {
       auto const priority = std::uint16_t{v10::protocol::OFP_DEFAULT_PRIORITY};
-      using v10::match::ipv4_src;
+      using v10::match_fields::ipv4_src;
 
       BOOST_TEST(
-          (v10::flow_entry_id{v10::match_set{
+          (v10::flow_entry_id{v10::match{
               ipv4_src{"0.0.0.0"_ipv4, 8} }, priority}
-        == v10::flow_entry_id{v10::match_set{
+        == v10::flow_entry_id{v10::match{
               ipv4_src{"0.0.0.1"_ipv4, 8} }, priority}));
     }
     BOOST_AUTO_TEST_CASE(is_false_if_priority_is_not_equal)
     {
-      auto const match = v10::match_set{};
+      auto const match = v10::match{};
 
       BOOST_TEST(
           (v10::flow_entry_id{match, 1} != v10::flow_entry_id{match, 2}));
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_SUITE(flow_entry_id)
     {
       auto const sut = v10::flow_entry_id::table_miss();
 
-      BOOST_TEST((sut.match() == v10::match_set{}));
+      BOOST_TEST((sut.match() == v10::match{}));
       BOOST_TEST(sut.priority() == 0);
     }
   BOOST_AUTO_TEST_SUITE_END() // table_miss
@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_SUITE(flow_entry)
         , flow_entry_fixture)
     {
       auto const id = v10::flow_entry_id{
-        v10::match_set{ in_port, eth_type, ip_proto }, 0x1234
+        v10::match{ in_port, eth_type, ip_proto }, 0x1234
       };
       auto const cookie = 0x0102030405060708;
       auto const actions
@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_SUITE(flow_entry)
         is_constructible_from_empty_action_list, flow_entry_fixture)
     {
       auto const id = v10::flow_entry_id{
-        v10::match_set{ in_port, eth_type, ip_proto }, 0x1234
+        v10::match{ in_port, eth_type, ip_proto }, 0x1234
       };
       auto const cookie = 0x0102030405060708;
       auto const empty_actions = v10::action_list{};
@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_SUITE(flow_entry)
     BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
     {
       auto const sut = v10::flow_entry{
-          v10::flow_entry_id{v10::match_set{ in_port }, 0x1234}
+          v10::flow_entry_id{v10::match{ in_port }, 0x1234}
         , 0x0102030405060708
         , v10::action_list{ strip_vlan, enqueue }
       };
@@ -180,7 +180,7 @@ BOOST_AUTO_TEST_SUITE(flow_entry)
     }
     BOOST_AUTO_TEST_CASE(is_true_if_id_and_cookie_and_actions_are_equal)
     {
-      auto const id = v10::flow_entry_id{v10::match_set{ eth_type }, 0x1000 };
+      auto const id = v10::flow_entry_id{v10::match{ eth_type }, 0x1000 };
       auto const cookie = std::uint64_t{1234};
       auto const actions
         = v10::action_list{ set_vlan_vid, set_ip_dscp, output };
@@ -197,13 +197,13 @@ BOOST_AUTO_TEST_SUITE(flow_entry)
 
       BOOST_TEST(
           (v10::flow_entry{
-              v10::flow_entry_id{v10::match_set{ eth_src }, 1}, cookie, actions}
+              v10::flow_entry_id{v10::match{ eth_src }, 1}, cookie, actions}
         != v10::flow_entry{
-              v10::flow_entry_id{v10::match_set{ eth_dst }, 2}, cookie, actions}));
+              v10::flow_entry_id{v10::match{ eth_dst }, 2}, cookie, actions}));
     }
     BOOST_AUTO_TEST_CASE(is_false_if_cookie_is_not_equal)
     {
-      auto const id = v10::flow_entry_id{v10::match_set{ eth_type }, 0x1000 };
+      auto const id = v10::flow_entry_id{v10::match{ eth_type }, 0x1000 };
       auto const actions
         = v10::action_list{ set_vlan_vid, set_ip_dscp, output };
 
@@ -212,7 +212,7 @@ BOOST_AUTO_TEST_SUITE(flow_entry)
     }
     BOOST_AUTO_TEST_CASE(is_false_if_actions_is_not_equal)
     {
-      auto const id = v10::flow_entry_id{v10::match_set{ eth_type }, 0x1000 };
+      auto const id = v10::flow_entry_id{v10::match{ eth_type }, 0x1000 };
       auto const cookie = std::uint64_t{1234};
 
       BOOST_TEST(

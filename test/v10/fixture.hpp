@@ -8,18 +8,18 @@
 namespace {
 
 struct match_fixture {
-  canard::net::ofp::v10::match::in_port in_port{1};
-  canard::net::ofp::v10::match::eth_src eth_src{"\x01\x02\x03\x04\x05\x06"_mac};
-  canard::net::ofp::v10::match::eth_dst eth_dst{"\xf1\xf2\xf3\xf4\xf5\xf6"_mac};
-  canard::net::ofp::v10::match::vlan_vid vlan_vid{0x0123};
-  canard::net::ofp::v10::match::vlan_pcp vlan_pcp{2};
-  canard::net::ofp::v10::match::eth_type eth_type{0x0800};
-  canard::net::ofp::v10::match::ip_dscp ip_dscp{0x23};
-  canard::net::ofp::v10::match::ip_proto ip_proto{7};
-  canard::net::ofp::v10::match::ipv4_src ipv4_src{"192.168.1.2"_ipv4, 32};
-  canard::net::ofp::v10::match::ipv4_dst ipv4_dst{"192.168.1.0"_ipv4, 28};
-  canard::net::ofp::v10::match::tcp_src tcp_src{0x1823};
-  canard::net::ofp::v10::match::tcp_src tcp_dst{8080};
+  canard::net::ofp::v10::match_fields::in_port in_port{1};
+  canard::net::ofp::v10::match_fields::eth_src eth_src{"\x01\x02\x03\x04\x05\x06"_mac};
+  canard::net::ofp::v10::match_fields::eth_dst eth_dst{"\xf1\xf2\xf3\xf4\xf5\xf6"_mac};
+  canard::net::ofp::v10::match_fields::vlan_vid vlan_vid{0x0123};
+  canard::net::ofp::v10::match_fields::vlan_pcp vlan_pcp{2};
+  canard::net::ofp::v10::match_fields::eth_type eth_type{0x0800};
+  canard::net::ofp::v10::match_fields::ip_dscp ip_dscp{0x23};
+  canard::net::ofp::v10::match_fields::ip_proto ip_proto{7};
+  canard::net::ofp::v10::match_fields::ipv4_src ipv4_src{"192.168.1.2"_ipv4, 32};
+  canard::net::ofp::v10::match_fields::ipv4_dst ipv4_dst{"192.168.1.0"_ipv4, 28};
+  canard::net::ofp::v10::match_fields::tcp_src tcp_src{0x1823};
+  canard::net::ofp::v10::match_fields::tcp_src tcp_dst{8080};
 };
 
 struct action_fixture {

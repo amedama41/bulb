@@ -14,7 +14,7 @@ using proto = v10::protocol;
 
 namespace {
 struct parameters : match_fixture {
-  v10::match_set match{
+  v10::match match{
     in_port, eth_src, vlan_vid, eth_type, ip_proto, ipv4_dst, tcp_src
   };
   std::uint16_t priority = 0x1024;
@@ -158,11 +158,11 @@ BOOST_AUTO_TEST_SUITE(flow_removed)
     {
       BOOST_TEST(
           (msg::flow_removed{
-               v10::match_set{ipv4_dst}, priority, cookie, reason
+               v10::match{ipv4_dst}, priority, cookie, reason
              , elapsed_time, idle_timeout, counters, xid
            }
         != msg::flow_removed{
-               v10::match_set{ipv4_src}, priority, cookie, reason
+               v10::match{ipv4_src}, priority, cookie, reason
              , elapsed_time, idle_timeout, counters, xid
            }));
     }

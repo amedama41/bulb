@@ -15,7 +15,7 @@ using proto = v10::protocol;
 
 namespace {
 struct parameters : match_fixture, action_fixture {
-  v10::match_set match{
+  v10::match match{
     in_port, eth_src, vlan_vid, eth_type, ip_proto, ipv4_dst, tcp_src
   };
   std::uint16_t priority = 0x4321;
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_SUITE(flow_add)
           is_constructible_from_match_and_priority_and_cookie_and_actions
         , parameters)
     {
-      auto const match = v10::match_set{ in_port, eth_type, eth_src, eth_dst };
+      auto const match = v10::match{ in_port, eth_type, eth_src, eth_dst };
       constexpr auto priority = std::uint16_t{0xff12};
       constexpr auto cookie = std::uint64_t{0x0102030405060708};
       auto const actions = v10::action_list{ set_ipv4_src, output };
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_SUITE(flow_add)
     }
     BOOST_FIXTURE_TEST_CASE(is_constructible_from_xid, parameters)
     {
-      auto const match = v10::match_set{ in_port, eth_type, eth_src, eth_dst };
+      auto const match = v10::match{ in_port, eth_type, eth_src, eth_dst };
       constexpr auto priority = std::uint16_t{0xff12};
       constexpr auto cookie = std::uint64_t{0x0102030405060708};
       auto const actions = v10::action_list{ set_ipv4_src, output };
