@@ -12,7 +12,7 @@
 #include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/v10/action_list.hpp>
-#include <canard/network/openflow/v10/common/match_set.hpp>
+#include <canard/network/openflow/v10/common/match.hpp>
 #include <canard/network/openflow/v10/detail/basic_stats.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
 #include <canard/network/openflow/v10/flow_entry.hpp>
