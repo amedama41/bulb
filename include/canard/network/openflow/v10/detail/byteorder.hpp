@@ -21,6 +21,19 @@ namespace v10 {
                 using boost::endian::endian_reverse_inplace;
                 endian_reverse_inplace(field);
             }
+
+            template <class T, std::size_t N>
+            void operator()(T (&field)[N]) const
+            {
+                using boost::endian::endian_reverse_inplace;
+                for (T& e : field) { endian_reverse_inplace(e); }
+            }
+
+            template <std::size_t N>
+            void operator()(char (&)[N]) const {}
+
+            template <std::size_t N>
+            void operator()(std::uint8_t (&)[N]) const {}
         };
 
         inline void endian_reverse_inplace(ofp_header& data) noexcept

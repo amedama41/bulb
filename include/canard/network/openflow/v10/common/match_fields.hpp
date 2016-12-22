@@ -34,16 +34,16 @@ namespace v10 {
           //+-------------------------------------------------------------+------------------------+
               boost::fusion::pair<field_type<protocol::OFPFW_IN_PORT>     , boost::mpl::int_<1>>
             , boost::fusion::pair<field_type<protocol::OFPFW_DL_SRC>      , boost::mpl::int_<2>>
-            , boost::fusion::pair<field_type<protocol::OFPFW_DL_DST>      , boost::mpl::int_<8>>
-            , boost::fusion::pair<field_type<protocol::OFPFW_DL_VLAN>     , boost::mpl::int_<14>>
-            , boost::fusion::pair<field_type<protocol::OFPFW_DL_VLAN_PCP> , boost::mpl::int_<15>>
-            , boost::fusion::pair<field_type<protocol::OFPFW_DL_TYPE>     , boost::mpl::int_<17>>
-            , boost::fusion::pair<field_type<protocol::OFPFW_NW_TOS>      , boost::mpl::int_<18>>
-            , boost::fusion::pair<field_type<protocol::OFPFW_NW_PROTO>    , boost::mpl::int_<19>>
-            , boost::fusion::pair<field_type<protocol::OFPFW_NW_SRC_ALL>  , boost::mpl::int_<22>>
-            , boost::fusion::pair<field_type<protocol::OFPFW_NW_DST_ALL>  , boost::mpl::int_<23>>
-            , boost::fusion::pair<field_type<protocol::OFPFW_TP_SRC>      , boost::mpl::int_<24>>
-            , boost::fusion::pair<field_type<protocol::OFPFW_TP_DST>      , boost::mpl::int_<25>>
+            , boost::fusion::pair<field_type<protocol::OFPFW_DL_DST>      , boost::mpl::int_<3>>
+            , boost::fusion::pair<field_type<protocol::OFPFW_DL_VLAN>     , boost::mpl::int_<4>>
+            , boost::fusion::pair<field_type<protocol::OFPFW_DL_VLAN_PCP> , boost::mpl::int_<5>>
+            , boost::fusion::pair<field_type<protocol::OFPFW_DL_TYPE>     , boost::mpl::int_<7>>
+            , boost::fusion::pair<field_type<protocol::OFPFW_NW_TOS>      , boost::mpl::int_<8>>
+            , boost::fusion::pair<field_type<protocol::OFPFW_NW_PROTO>    , boost::mpl::int_<9>>
+            , boost::fusion::pair<field_type<protocol::OFPFW_NW_SRC_ALL>  , boost::mpl::int_<11>>
+            , boost::fusion::pair<field_type<protocol::OFPFW_NW_DST_ALL>  , boost::mpl::int_<12>>
+            , boost::fusion::pair<field_type<protocol::OFPFW_TP_SRC>      , boost::mpl::int_<13>>
+            , boost::fusion::pair<field_type<protocol::OFPFW_TP_DST>      , boost::mpl::int_<14>>
           //+-------------------------------------------------------------+------------------------+
         >;
 
