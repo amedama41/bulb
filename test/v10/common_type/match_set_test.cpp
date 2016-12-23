@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v10/common/match_set.hpp>
+#include <canard/network/openflow/v10/common/match.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <limits>
