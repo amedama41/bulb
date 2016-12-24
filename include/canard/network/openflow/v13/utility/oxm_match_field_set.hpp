@@ -118,7 +118,7 @@ namespace ofp {
 } // namespace net
 } // namespace canard
 #else
-# include <canard/network/openflow/v13/impl/oxm_match_field_set.hpp>
+# include <canard/network/openflow/v13/impl/oxm_match_field_set.ipp>
 #endif
 
 #endif // CANARD_NET_OFP_V13_OXM_MATCH_FIELD_SET_HPP
