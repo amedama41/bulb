@@ -15,7 +15,7 @@ namespace fields = v13::oxm_match_fields;
 
 namespace {
 
-  using proto = v13::protocol;
+  namespace proto = v13::protocol;
   using oxm_fields_type = v13::oxm_match::oxm_fields_type;
 
   struct parameter

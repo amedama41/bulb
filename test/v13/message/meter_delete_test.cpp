@@ -11,7 +11,7 @@ namespace v13 = ofp::v13;
 namespace msg = v13::messages;
 
 namespace {
-  using v13::protocol;
+  namespace protocol = v13::protocol;
 
   struct meter_delete_fixture
   {

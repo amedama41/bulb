@@ -11,7 +11,7 @@
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace v13_detail = v13::v13_detail;
-using proto = v13::protocol;
+namespace proto = v13::protocol;
 
 constexpr auto error_size = sizeof(v13_detail::ofp_error_msg);
 

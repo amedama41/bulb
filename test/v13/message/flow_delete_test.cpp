@@ -13,7 +13,7 @@ namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace match = v13::oxm_match_fields;
 namespace v13_detail = v13::v13_detail;
-using proto = v13::protocol;
+namespace proto = v13::protocol;
 
 namespace  {
 

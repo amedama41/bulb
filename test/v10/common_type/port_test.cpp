@@ -7,7 +7,7 @@
 namespace ofp = canard::net::ofp;
 namespace v10_detail = ofp::v10::v10_detail;
 
-using protocol = ofp::v10::protocol;
+namespace protocol = ofp::v10::protocol;
 
 namespace {
 

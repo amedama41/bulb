@@ -14,7 +14,7 @@ namespace v13 = of::v13;
 namespace v13_detail = v13::v13_detail;
 namespace match = v13::oxm_match_fields;
 namespace multipart = v13::messages::multipart;
-using proto = v13::protocol;
+namespace proto = v13::protocol;
 
 namespace {
 

@@ -11,7 +11,7 @@ namespace msg = v10::messages;
 namespace stats = msg::statistics;
 namespace detail = v10::v10_detail;
 
-using proto = v10::protocol;
+namespace proto = v10::protocol;
 
 namespace {
 struct aggregate_stats_request_parameter : match_fixture {

@@ -13,7 +13,7 @@ namespace v13 = of::v13;
 namespace table_feature_properties = v13::table_feature_properties;
 namespace detail = v13::v13_detail;
 
-using v13::protocol;
+namespace protocol = v13::protocol;
 
 namespace {
 struct match_fixture

@@ -7,7 +7,7 @@
 namespace ofp = canard::net::ofp;
 namespace v13 = ofp::v13;
 
-using protocol = v13::protocol;
+namespace protocol = v13::protocol;
 
 namespace {
 

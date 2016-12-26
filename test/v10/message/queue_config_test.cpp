@@ -10,7 +10,7 @@ namespace msg = v10::messages;
 namespace props = v10::queue_properties;
 namespace detail = v10::v10_detail;
 
-using proto = v10::protocol;
+namespace proto = v10::protocol;
 
 namespace {
 struct queue_get_config_request_fixture {

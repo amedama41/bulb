@@ -9,7 +9,7 @@ namespace v13 = ofp::v13;
 namespace match = v13::oxm_match_fields;
 
 namespace {
-  using proto = v13::protocol;
+  namespace proto = v13::protocol;
   using list_type = v13::oxm_match_field_set::list_type;
 
   struct parameters

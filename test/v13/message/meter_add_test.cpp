@@ -11,7 +11,7 @@ namespace meter_bands = v13::meter_bands;
 
 namespace {
   using bands_type = msg::meter_add::bands_type;
-  using v13::protocol;
+  namespace protocol = v13::protocol;
 
   struct meter_bands_fixture
   {
@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_SUITE(meter_add)
     }
     BOOST_AUTO_TEST_CASE(is_false_if_kbps_bit_is_not_equal_with_pktps_bit)
     {
-      using p = protocol;
+      namespace p = protocol;
 
       BOOST_TEST(
           (msg::meter_add{meter_id, p::OFPMF_KBPS | p::OFPMF_PKTPS, bands, xid}
@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_SUITE(meter_add)
     }
     BOOST_AUTO_TEST_CASE(is_false_if_kbps_bit_is_not_equal_without_pktps_bit)
     {
-      using p = protocol;
+      namespace p = protocol;
 
       BOOST_TEST(
           (msg::meter_add{meter_id, p::OFPMF_KBPS | p::OFPMF_BURST, bands, xid}
@@ -201,7 +201,7 @@ BOOST_AUTO_TEST_SUITE(meter_add)
     }
     BOOST_AUTO_TEST_CASE(is_true_if_kbps_bit_is_not_equal_with_pktps_bit)
     {
-      using p = protocol;
+      namespace p = protocol;
 
       BOOST_TEST(
           equivalent(
@@ -212,7 +212,7 @@ BOOST_AUTO_TEST_SUITE(meter_add)
     }
     BOOST_AUTO_TEST_CASE(is_true_if_kbps_bit_is_not_equal_without_pktps_bit)
     {
-      using p = protocol;
+      namespace p = protocol;
 
       BOOST_TEST(
           equivalent(

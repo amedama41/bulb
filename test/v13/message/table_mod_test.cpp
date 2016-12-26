@@ -8,7 +8,7 @@
 
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
-using proto = v13::protocol;
+namespace proto = v13::protocol;
 
 template <std::size_t N>
 static auto to_buffer(char const (&expected)[N])

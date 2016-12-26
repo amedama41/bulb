@@ -14,7 +14,7 @@ namespace v13 = of::v13;
 namespace actions = v13::actions;
 namespace detail = v13::v13_detail;
 
-using v13::protocol;
+namespace protocol = v13::protocol;
 
 namespace {
 

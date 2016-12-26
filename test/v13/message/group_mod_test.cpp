@@ -13,7 +13,7 @@ namespace v13 = ofp::v13;
 namespace msg = v13::messages;
 namespace actions = v13::actions;
 namespace v13_detail = v13::v13_detail;
-using v13::protocol;
+namespace protocol = v13::protocol;
 
 namespace {
 struct group_add_parameters {

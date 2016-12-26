@@ -11,7 +11,7 @@ namespace msg = v10::messages;
 namespace act = v10::actions;
 namespace detail = v10::v10_detail;
 
-using proto = v10::protocol;
+namespace proto = v10::protocol;
 
 namespace {
 

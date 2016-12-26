@@ -12,7 +12,7 @@ namespace v10 = of::v10;
 namespace detail = v10::v10_detail;
 namespace fields = v10::match_fields;
 
-using proto = v10::protocol;
+namespace proto = v10::protocol;
 
 namespace {
 

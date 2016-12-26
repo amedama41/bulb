@@ -20,7 +20,7 @@ namespace actions = v13::actions;
 namespace instructions = v13::instructions;
 namespace detail = v13::v13_detail;
 
-using v13::protocol;
+namespace protocol = v13::protocol;
 
 namespace {
 

@@ -17,7 +17,7 @@ namespace match = v13::oxm_match_fields;
 namespace actions = v13::actions;
 namespace v13_detail = v13::v13_detail;
 
-using protocol = v13::protocol;
+namespace protocol = v13::protocol;
 
 namespace bdata = boost::unit_test::data;
 

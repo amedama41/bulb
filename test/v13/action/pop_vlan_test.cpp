@@ -14,7 +14,7 @@ namespace v13 = of::v13;
 namespace actions = v13::actions;
 namespace v13_detail = v13::v13_detail;
 
-using protocol = v13::protocol;
+namespace protocol = v13::protocol;
 
 namespace bdata = boost::unit_test::data;
 

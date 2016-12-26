@@ -14,7 +14,7 @@ namespace v13 = ofp::v13;
 namespace helems = v13::hello_elements;
 namespace detail = v13::v13_detail;
 
-using proto = v13::protocol;
+namespace proto = v13::protocol;
 
 namespace bdata = boost::unit_test::data;
 

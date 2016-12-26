@@ -12,7 +12,7 @@ namespace msg = v13::messages;
 namespace helems = v13::hello_elements;
 namespace detail = v13::v13_detail;
 
-using proto = v13::protocol;
+namespace proto = v13::protocol;
 
 namespace {
 using helems_type = msg::hello::hello_elements_type;
