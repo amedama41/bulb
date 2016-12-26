@@ -1519,9 +1519,8 @@ namespace v13 {
 
   } // namespace v13_detail
 
-  class protocol
-  {
-  public:
+  namespace protocol {
+
     enum uint8_t_constants : std::uint8_t
     {
       OFP_VERSION = 0x04,
@@ -2193,7 +2192,7 @@ namespace v13 {
     using queue_prop_type = scoped_enum<v13_detail::queue_prop_type_def>;
     using controller_role = scoped_enum<v13_detail::controller_role_def>;
 
-  };
+  } // namespace protocol
 
 } // namespace v13
 } // namespace ofp

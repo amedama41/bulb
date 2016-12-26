@@ -765,9 +765,8 @@ namespace v10 {
 
   } // namespace v10_detail
 
-  class protocol
-  {
-  public:
+  namespace protocol {
+
     enum uint8_t_constants : std::uint8_t
     {
       OFP_VERSION = 0x01,
@@ -1131,7 +1130,7 @@ namespace v10 {
     using stats_reply_flags = scoped_enum<v10_detail::stats_reply_flags_def>;
     using queue_prop_type = scoped_enum<v10_detail::queue_prop_type_def>;
 
-  };
+  } // namespace protocol
 
 } // namespace v10
 } // namespace ofp
