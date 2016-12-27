@@ -779,744 +779,6 @@ namespace v13 {
     };
     static_assert(sizeof(ofp_async_config) == 32, "");
 
-    struct port_no_def
-    {
-      enum type : std::uint32_t
-      {
-        max = 4294967040,
-        in_port = 4294967288,
-        table = 4294967289,
-        normal = 4294967290,
-        flood = 4294967291,
-        all = 4294967292,
-        controller = 4294967293,
-        local = 4294967294,
-        any = 4294967295,
-      };
-    };
-
-    struct msg_type_def
-    {
-      enum type : std::uint8_t
-      {
-        hello = 0,
-        error = 1,
-        echo_request = 2,
-        echo_reply = 3,
-        experimenter = 4,
-        features_request = 5,
-        features_reply = 6,
-        get_config_request = 7,
-        get_config_reply = 8,
-        set_config = 9,
-        packet_in = 10,
-        flow_removed = 11,
-        port_status = 12,
-        packet_out = 13,
-        flow_mod = 14,
-        group_mod = 15,
-        port_mod = 16,
-        table_mod = 17,
-        multipart_request = 18,
-        multipart_reply = 19,
-        barrier_request = 20,
-        barrier_reply = 21,
-        queue_get_config_request = 22,
-        queue_get_config_reply = 23,
-        role_request = 24,
-        role_reply = 25,
-        get_async_request = 26,
-        get_async_reply = 27,
-        set_async = 28,
-        meter_mod = 29,
-      };
-    };
-
-    struct hello_elem_type_def
-    {
-      enum type : std::uint16_t
-      {
-        versionbitmap = 1,
-      };
-    };
-
-    struct config_flags_def
-    {
-      enum type : std::uint16_t
-      {
-        normal = 0,
-        drop = 1,
-        reasm = 2,
-        mask = 3,
-      };
-    };
-
-    struct table_config_def
-    {
-      enum type : std::uint32_t
-      {
-        deprecated_mask = 3,
-      };
-    };
-
-    struct table_def
-    {
-      enum type : std::uint8_t
-      {
-        max = 254,
-        all = 255,
-      };
-    };
-
-    struct capabilities_def
-    {
-      enum type : std::uint32_t
-      {
-        flow_stats = 1,
-        table_stats = 2,
-        port_stats = 4,
-        group_stats = 8,
-        ip_reasm = 32,
-        queue_stats = 64,
-        port_blocked = 256,
-      };
-    };
-
-    struct port_config_def
-    {
-      enum type : std::uint32_t
-      {
-        port_down = 1,
-        no_recv = 4,
-        no_fwd = 32,
-        no_packet_in = 64,
-      };
-    };
-
-    struct port_state_def
-    {
-      enum type : std::uint32_t
-      {
-        link_down = 1,
-        blocked = 2,
-        live = 4,
-      };
-    };
-
-    struct port_features_def
-    {
-      enum type : std::uint32_t
-      {
-        mode_10mb_hd = 1,
-        mode_10mb_fd = 2,
-        mode_100mb_hd = 4,
-        mode_100mb_fd = 8,
-        mode_1gb_hd = 16,
-        mode_1gb_fd = 32,
-        mode_10gb_fd = 64,
-        mode_40gb_fd = 128,
-        mode_100gb_fd = 256,
-        mode_1tb_fd = 512,
-        mode_other = 1024,
-        copper = 2048,
-        fiber = 4096,
-        autoneg = 8192,
-        pause = 16384,
-        pause_asym = 32768,
-      };
-    };
-
-    struct port_reason_def
-    {
-      enum type : std::uint8_t
-      {
-        by_add = 0,
-        by_delete = 1,
-        by_modify = 2,
-      };
-    };
-
-    struct match_type_def
-    {
-      enum type : std::uint16_t
-      {
-        standard = 0,
-        oxm = 1,
-      };
-    };
-
-    struct oxm_class_def
-    {
-      enum type : std::uint16_t
-      {
-        nxm_0 = 0,
-        nxm_1 = 1,
-        openflow_basic = 32768,
-        experimenter = 65535,
-      };
-    };
-
-    struct ofb_match_fields_def
-    {
-      enum type : std::uint8_t
-      {
-        in_port = 0,
-        in_phy_port = 1,
-        metadata = 2,
-        eth_dst = 3,
-        eth_src = 4,
-        eth_type = 5,
-        vlan_vid = 6,
-        vlan_pcp = 7,
-        ip_dscp = 8,
-        ip_ecn = 9,
-        ip_proto = 10,
-        ipv4_src = 11,
-        ipv4_dst = 12,
-        tcp_src = 13,
-        tcp_dst = 14,
-        udp_src = 15,
-        udp_dst = 16,
-        sctp_src = 17,
-        sctp_dst = 18,
-        icmpv4_type = 19,
-        icmpv4_code = 20,
-        arp_op = 21,
-        arp_spa = 22,
-        arp_tpa = 23,
-        arp_sha = 24,
-        arp_tha = 25,
-        ipv6_src = 26,
-        ipv6_dst = 27,
-        ipv6_flabel = 28,
-        icmpv6_type = 29,
-        icmpv6_code = 30,
-        ipv6_nd_target = 31,
-        ipv6_nd_sll = 32,
-        ipv6_nd_tll = 33,
-        mpls_label = 34,
-        mpls_tc = 35,
-        mpls_bos = 36,
-        pbb_isid = 37,
-        tunnel_id = 38,
-        ipv6_exthdr = 39,
-      };
-    };
-
-    struct vlan_id_def
-    {
-      enum type : std::uint16_t
-      {
-        present = 4096,
-        none = 0,
-      };
-    };
-
-    struct ipv6exthdr_flags_def
-    {
-      enum type : std::uint16_t
-      {
-        nonext = 1,
-        esp = 2,
-        auth = 4,
-        dest = 8,
-        frag = 16,
-        router = 32,
-        hop = 64,
-        unrep = 128,
-        unseq = 256,
-      };
-    };
-
-    struct action_type_def
-    {
-      enum type : std::uint16_t
-      {
-        output = 0,
-        copy_ttl_out = 11,
-        copy_ttl_in = 12,
-        set_mpls_ttl = 15,
-        dec_mpls_ttl = 16,
-        push_vlan = 17,
-        pop_vlan = 18,
-        push_mpls = 19,
-        pop_mpls = 20,
-        set_queue = 21,
-        group = 22,
-        set_nw_ttl = 23,
-        dec_nw_ttl = 24,
-        set_field = 25,
-        push_pbb = 26,
-        pop_pbb = 27,
-        experimenter = 65535,
-      };
-    };
-
-    struct controller_max_len_def
-    {
-      enum type : std::uint16_t
-      {
-        max = 65509,
-        no_buffer = 65535,
-      };
-    };
-
-    struct instruction_type_def
-    {
-      enum type : std::uint16_t
-      {
-        goto_table = 1,
-        write_metadata = 2,
-        write_actions = 3,
-        apply_actions = 4,
-        clear_actions = 5,
-        meter = 6,
-        experimenter = 65535,
-      };
-    };
-
-    struct flow_mod_command_def
-    {
-      enum type : std::uint16_t
-      {
-        add_cmd = 0,
-        modify_cmd = 1,
-        modify_strict_cmd = 2,
-        delete_cmd = 3,
-        delete_strict_cmd = 4,
-      };
-    };
-
-    struct flow_mod_flags_def
-    {
-      enum type : std::uint16_t
-      {
-        send_flow_rem = 1,
-        check_overlap = 2,
-        reset_counts = 4,
-        no_pkt_counts = 8,
-        no_byt_counts = 16,
-      };
-    };
-
-    struct group_def
-    {
-      enum type : std::uint32_t
-      {
-        max = 4294967040,
-        all = 4294967292,
-        any = 4294967295,
-      };
-    };
-
-    struct group_mod_command_def
-    {
-      enum type : std::uint8_t
-      {
-        add_cmd = 0,
-        modify_cmd = 1,
-        delete_cmd = 2,
-      };
-    };
-
-    struct group_type_def
-    {
-      enum type : std::uint8_t
-      {
-        all = 0,
-        select = 1,
-        indirect = 2,
-        ff = 3,
-      };
-    };
-
-    struct packet_in_reason_def
-    {
-      enum type : std::uint8_t
-      {
-        no_match = 0,
-        action = 1,
-        invalid_ttl = 2,
-      };
-    };
-
-    struct flow_removed_reason_def
-    {
-      enum type : std::uint8_t
-      {
-        by_idle_timeout = 0,
-        by_hard_timeout = 1,
-        by_delete = 2,
-        by_group_delete = 3,
-      };
-    };
-
-    struct meter_def
-    {
-      enum type : std::uint32_t
-      {
-        max = 4294901760,
-        slowpath = 4294967293,
-        controller = 4294967294,
-        all = 4294967295,
-      };
-    };
-
-    struct meter_band_type_def
-    {
-      enum type : std::uint16_t
-      {
-        drop = 1,
-        dscp_remark = 2,
-        experimenter = 65535,
-      };
-    };
-
-    struct meter_mod_command_def
-    {
-      enum type : std::uint16_t
-      {
-        add_cmd = 0,
-        modify_cmd = 1,
-        delete_cmd = 2,
-      };
-    };
-
-    struct meter_flags_def
-    {
-      enum type : std::uint16_t
-      {
-        kbps = 1,
-        pktps = 2,
-        burst = 4,
-        stats = 8,
-      };
-    };
-
-    struct error_type_def
-    {
-      enum type : std::uint16_t
-      {
-        hello_failed = 0,
-        bad_request = 1,
-        bad_action = 2,
-        bad_instruction = 3,
-        bad_match = 4,
-        flow_mod_failed = 5,
-        group_mod_failed = 6,
-        port_mod_failed = 7,
-        table_mod_failed = 8,
-        queue_op_failed = 9,
-        switch_config_failed = 10,
-        role_request_failed = 11,
-        meter_mod_failed = 12,
-        table_features_failed = 13,
-        experimenter = 65535,
-      };
-    };
-
-    struct hello_failed_code_def
-    {
-      enum type : std::uint16_t
-      {
-        incompatible = 0,
-        eperm = 1,
-      };
-    };
-
-    struct bad_request_code_def
-    {
-      enum type : std::uint16_t
-      {
-        bad_version = 0,
-        bad_type = 1,
-        bad_multipart = 2,
-        bad_experimenter = 3,
-        bad_exp_type = 4,
-        eperm = 5,
-        bad_len = 6,
-        buffer_empty = 7,
-        buffer_unknown = 8,
-        bad_table_id = 9,
-        is_slave = 10,
-        bad_port = 11,
-        bad_packet = 12,
-        multipart_buffer_overflow = 13,
-      };
-    };
-
-    struct bad_action_code_def
-    {
-      enum type : std::uint16_t
-      {
-        bad_type = 0,
-        bad_len = 1,
-        bad_experimenter = 2,
-        bad_exp_type = 3,
-        bad_out_port = 4,
-        bad_argument = 5,
-        eperm = 6,
-        too_many = 7,
-        bad_queue = 8,
-        bad_out_group = 9,
-        match_inconsistent = 10,
-        unsupported_order = 11,
-        bad_tag = 12,
-        bad_set_type = 13,
-        bad_set_len = 14,
-        bad_set_argument = 15,
-      };
-    };
-
-    struct bad_instruction_code_def
-    {
-      enum type : std::uint16_t
-      {
-        unknown_inst = 0,
-        unsup_inst = 1,
-        bad_table_id = 2,
-        unsup_metadata = 3,
-        unsup_metadata_mask = 4,
-        bad_experimenter = 5,
-        bad_exp_type = 6,
-        bad_len = 7,
-        eperm = 8,
-      };
-    };
-
-    struct bad_match_code_def
-    {
-      enum type : std::uint16_t
-      {
-        bad_type = 0,
-        bad_len = 1,
-        bad_tag = 2,
-        bad_dl_addr_mask = 3,
-        bad_nw_addr_mask = 4,
-        bad_wildcards = 5,
-        bad_field = 6,
-        bad_value = 7,
-        bad_mask = 8,
-        bad_prereq = 9,
-        dup_field = 10,
-        eperm = 11,
-      };
-    };
-
-    struct flow_mod_failed_code_def
-    {
-      enum type : std::uint16_t
-      {
-        unknown = 0,
-        table_full = 1,
-        bad_table_id = 2,
-        overlap = 3,
-        eperm = 4,
-        bad_timeout = 5,
-        bad_command = 6,
-        bad_flags = 7,
-      };
-    };
-
-    struct group_mod_failed_code_def
-    {
-      enum type : std::uint16_t
-      {
-        group_exists = 0,
-        invalid_group = 1,
-        weight_unsupported = 2,
-        out_of_groups = 3,
-        out_of_buckets = 4,
-        chaining_unsupported = 5,
-        watch_unsupported = 6,
-        loop = 7,
-        unknown_group = 8,
-        chained_group = 9,
-        bad_type = 10,
-        bad_command = 11,
-        bad_bucket = 12,
-        bad_watch = 13,
-        eperm = 14,
-      };
-    };
-
-    struct port_mod_failed_code_def
-    {
-      enum type : std::uint16_t
-      {
-        bad_port = 0,
-        bad_hw_addr = 1,
-        bad_config = 2,
-        bad_advertise = 3,
-        eperm = 4,
-      };
-    };
-
-    struct table_mod_failed_code_def
-    {
-      enum type : std::uint16_t
-      {
-        bad_table = 0,
-        bad_config = 1,
-        eperm = 2,
-      };
-    };
-
-    struct queue_op_failed_code_def
-    {
-      enum type : std::uint16_t
-      {
-        bad_port = 0,
-        bad_queue = 1,
-        eperm = 2,
-      };
-    };
-
-    struct switch_config_failed_code_def
-    {
-      enum type : std::uint16_t
-      {
-        bad_flags = 0,
-        bad_len = 1,
-        eperm = 2,
-      };
-    };
-
-    struct role_request_failed_code_def
-    {
-      enum type : std::uint16_t
-      {
-        stale = 0,
-        unsup = 1,
-        bad_role = 2,
-      };
-    };
-
-    struct meter_mod_failed_code_def
-    {
-      enum type : std::uint16_t
-      {
-        unknown = 0,
-        meter_exists = 1,
-        invalid_meter = 2,
-        unknown_meter = 3,
-        bad_command = 4,
-        bad_flags = 5,
-        bad_rate = 6,
-        bad_burst = 7,
-        bad_band = 8,
-        bad_band_value = 9,
-        out_of_meters = 10,
-        out_of_bands = 11,
-      };
-    };
-
-    struct table_features_failed_code_def
-    {
-      enum type : std::uint16_t
-      {
-        bad_table = 0,
-        bad_metadata = 1,
-        bad_type = 2,
-        bad_len = 3,
-        bad_argument = 4,
-        eperm = 5,
-      };
-    };
-
-    struct multipart_type_def
-    {
-      enum type : std::uint16_t
-      {
-        desc = 0,
-        flow = 1,
-        aggregate = 2,
-        table = 3,
-        port_stats = 4,
-        queue = 5,
-        group = 6,
-        group_desc = 7,
-        group_features = 8,
-        meter = 9,
-        meter_config = 10,
-        meter_features = 11,
-        table_features = 12,
-        port_desc = 13,
-        experimenter = 65535,
-      };
-    };
-
-    struct multipart_request_flags_def
-    {
-      enum type : std::uint16_t
-      {
-        req_more = 1,
-      };
-    };
-
-    struct multipart_reply_flags_def
-    {
-      enum type : std::uint16_t
-      {
-        reply_more = 1,
-      };
-    };
-
-    struct table_feature_prop_type_def
-    {
-      enum type : std::uint16_t
-      {
-        instructions = 0,
-        instructions_miss = 1,
-        next_tables = 2,
-        next_tables_miss = 3,
-        write_actions = 4,
-        write_actions_miss = 5,
-        apply_actions = 6,
-        apply_actions_miss = 7,
-        match = 8,
-        wildcards = 10,
-        write_setfield = 12,
-        write_setfield_miss = 13,
-        apply_setfield = 14,
-        apply_setfield_miss = 15,
-        experimenter = 65534,
-        experimenter_miss = 65535,
-      };
-    };
-
-    struct group_capabilities_def
-    {
-      enum type : std::uint32_t
-      {
-        select_weight = 1,
-        select_liveness = 2,
-        chaining = 4,
-        chaining_checks = 8,
-      };
-    };
-
-    struct queue_prop_type_def
-    {
-      enum type : std::uint16_t
-      {
-        min_rate = 1,
-        max_rate = 2,
-        experimenter = 65535,
-      };
-    };
-
-    struct controller_role_def
-    {
-      enum type : std::uint32_t
-      {
-        nochange = 0,
-        equal = 1,
-        master = 2,
-        slave = 3,
-      };
-    };
-
   } // namespace v13_detail
 
   namespace protocol {
@@ -2125,6 +1387,748 @@ namespace v13 {
       OFPCR_ROLE_SLAVE = 3,
     };
 
+    namespace protocol_detail {
+
+      struct port_no_def
+      {
+        enum type : std::uint32_t
+        {
+          max = protocol::OFPP_MAX,
+          in_port = protocol::OFPP_IN_PORT,
+          table = protocol::OFPP_TABLE,
+          normal = protocol::OFPP_NORMAL,
+          flood = protocol::OFPP_FLOOD,
+          all = protocol::OFPP_ALL,
+          controller = protocol::OFPP_CONTROLLER,
+          local = protocol::OFPP_LOCAL,
+          any = protocol::OFPP_ANY,
+        };
+      };
+
+      struct msg_type_def
+      {
+        enum type : std::uint8_t
+        {
+          hello = protocol::OFPT_HELLO,
+          error = protocol::OFPT_ERROR,
+          echo_request = protocol::OFPT_ECHO_REQUEST,
+          echo_reply = protocol::OFPT_ECHO_REPLY,
+          experimenter = protocol::OFPT_EXPERIMENTER,
+          features_request = protocol::OFPT_FEATURES_REQUEST,
+          features_reply = protocol::OFPT_FEATURES_REPLY,
+          get_config_request = protocol::OFPT_GET_CONFIG_REQUEST,
+          get_config_reply = protocol::OFPT_GET_CONFIG_REPLY,
+          set_config = protocol::OFPT_SET_CONFIG,
+          packet_in = protocol::OFPT_PACKET_IN,
+          flow_removed = protocol::OFPT_FLOW_REMOVED,
+          port_status = protocol::OFPT_PORT_STATUS,
+          packet_out = protocol::OFPT_PACKET_OUT,
+          flow_mod = protocol::OFPT_FLOW_MOD,
+          group_mod = protocol::OFPT_GROUP_MOD,
+          port_mod = protocol::OFPT_PORT_MOD,
+          table_mod = protocol::OFPT_TABLE_MOD,
+          multipart_request = protocol::OFPT_MULTIPART_REQUEST,
+          multipart_reply = protocol::OFPT_MULTIPART_REPLY,
+          barrier_request = protocol::OFPT_BARRIER_REQUEST,
+          barrier_reply = protocol::OFPT_BARRIER_REPLY,
+          queue_get_config_request = protocol::OFPT_QUEUE_GET_CONFIG_REQUEST,
+          queue_get_config_reply = protocol::OFPT_QUEUE_GET_CONFIG_REPLY,
+          role_request = protocol::OFPT_ROLE_REQUEST,
+          role_reply = protocol::OFPT_ROLE_REPLY,
+          get_async_request = protocol::OFPT_GET_ASYNC_REQUEST,
+          get_async_reply = protocol::OFPT_GET_ASYNC_REPLY,
+          set_async = protocol::OFPT_SET_ASYNC,
+          meter_mod = protocol::OFPT_METER_MOD,
+        };
+      };
+
+      struct hello_elem_type_def
+      {
+        enum type : std::uint16_t
+        {
+          versionbitmap = protocol::OFPHET_VERSIONBITMAP,
+        };
+      };
+
+      struct config_flags_def
+      {
+        enum type : std::uint16_t
+        {
+          normal = protocol::OFPC_FRAG_NORMAL,
+          drop = protocol::OFPC_FRAG_DROP,
+          reasm = protocol::OFPC_FRAG_REASM,
+          mask = protocol::OFPC_FRAG_MASK,
+        };
+      };
+
+      struct table_config_def
+      {
+        enum type : std::uint32_t
+        {
+          deprecated_mask = protocol::OFPTC_DEPRECATED_MASK,
+        };
+      };
+
+      struct table_def
+      {
+        enum type : std::uint8_t
+        {
+          max = protocol::OFPTT_MAX,
+          all = protocol::OFPTT_ALL,
+        };
+      };
+
+      struct capabilities_def
+      {
+        enum type : std::uint32_t
+        {
+          flow_stats = protocol::OFPC_FLOW_STATS,
+          table_stats = protocol::OFPC_TABLE_STATS,
+          port_stats = protocol::OFPC_PORT_STATS,
+          group_stats = protocol::OFPC_GROUP_STATS,
+          ip_reasm = protocol::OFPC_IP_REASM,
+          queue_stats = protocol::OFPC_QUEUE_STATS,
+          port_blocked = protocol::OFPC_PORT_BLOCKED,
+        };
+      };
+
+      struct port_config_def
+      {
+        enum type : std::uint32_t
+        {
+          port_down = protocol::OFPPC_PORT_DOWN,
+          no_recv = protocol::OFPPC_NO_RECV,
+          no_fwd = protocol::OFPPC_NO_FWD,
+          no_packet_in = protocol::OFPPC_NO_PACKET_IN,
+        };
+      };
+
+      struct port_state_def
+      {
+        enum type : std::uint32_t
+        {
+          link_down = protocol::OFPPS_LINK_DOWN,
+          blocked = protocol::OFPPS_BLOCKED,
+          live = protocol::OFPPS_LIVE,
+        };
+      };
+
+      struct port_features_def
+      {
+        enum type : std::uint32_t
+        {
+          mode_10mb_hd = protocol::OFPPF_10MB_HD,
+          mode_10mb_fd = protocol::OFPPF_10MB_FD,
+          mode_100mb_hd = protocol::OFPPF_100MB_HD,
+          mode_100mb_fd = protocol::OFPPF_100MB_FD,
+          mode_1gb_hd = protocol::OFPPF_1GB_HD,
+          mode_1gb_fd = protocol::OFPPF_1GB_FD,
+          mode_10gb_fd = protocol::OFPPF_10GB_FD,
+          mode_40gb_fd = protocol::OFPPF_40GB_FD,
+          mode_100gb_fd = protocol::OFPPF_100GB_FD,
+          mode_1tb_fd = protocol::OFPPF_1TB_FD,
+          mode_other = protocol::OFPPF_OTHER,
+          copper = protocol::OFPPF_COPPER,
+          fiber = protocol::OFPPF_FIBER,
+          autoneg = protocol::OFPPF_AUTONEG,
+          pause = protocol::OFPPF_PAUSE,
+          pause_asym = protocol::OFPPF_PAUSE_ASYM,
+        };
+      };
+
+      struct port_reason_def
+      {
+        enum type : std::uint8_t
+        {
+          by_add = protocol::OFPPR_ADD,
+          by_delete = protocol::OFPPR_DELETE,
+          by_modify = protocol::OFPPR_MODIFY,
+        };
+      };
+
+      struct match_type_def
+      {
+        enum type : std::uint16_t
+        {
+          standard = protocol::OFPMT_STANDARD,
+          oxm = protocol::OFPMT_OXM,
+        };
+      };
+
+      struct oxm_class_def
+      {
+        enum type : std::uint16_t
+        {
+          nxm_0 = protocol::OFPXMC_NXM_0,
+          nxm_1 = protocol::OFPXMC_NXM_1,
+          openflow_basic = protocol::OFPXMC_OPENFLOW_BASIC,
+          experimenter = protocol::OFPXMC_EXPERIMENTER,
+        };
+      };
+
+      struct ofb_match_fields_def
+      {
+        enum type : std::uint8_t
+        {
+          in_port = protocol::OFPXMT_OFB_IN_PORT,
+          in_phy_port = protocol::OFPXMT_OFB_IN_PHY_PORT,
+          metadata = protocol::OFPXMT_OFB_METADATA,
+          eth_dst = protocol::OFPXMT_OFB_ETH_DST,
+          eth_src = protocol::OFPXMT_OFB_ETH_SRC,
+          eth_type = protocol::OFPXMT_OFB_ETH_TYPE,
+          vlan_vid = protocol::OFPXMT_OFB_VLAN_VID,
+          vlan_pcp = protocol::OFPXMT_OFB_VLAN_PCP,
+          ip_dscp = protocol::OFPXMT_OFB_IP_DSCP,
+          ip_ecn = protocol::OFPXMT_OFB_IP_ECN,
+          ip_proto = protocol::OFPXMT_OFB_IP_PROTO,
+          ipv4_src = protocol::OFPXMT_OFB_IPV4_SRC,
+          ipv4_dst = protocol::OFPXMT_OFB_IPV4_DST,
+          tcp_src = protocol::OFPXMT_OFB_TCP_SRC,
+          tcp_dst = protocol::OFPXMT_OFB_TCP_DST,
+          udp_src = protocol::OFPXMT_OFB_UDP_SRC,
+          udp_dst = protocol::OFPXMT_OFB_UDP_DST,
+          sctp_src = protocol::OFPXMT_OFB_SCTP_SRC,
+          sctp_dst = protocol::OFPXMT_OFB_SCTP_DST,
+          icmpv4_type = protocol::OFPXMT_OFB_ICMPV4_TYPE,
+          icmpv4_code = protocol::OFPXMT_OFB_ICMPV4_CODE,
+          arp_op = protocol::OFPXMT_OFB_ARP_OP,
+          arp_spa = protocol::OFPXMT_OFB_ARP_SPA,
+          arp_tpa = protocol::OFPXMT_OFB_ARP_TPA,
+          arp_sha = protocol::OFPXMT_OFB_ARP_SHA,
+          arp_tha = protocol::OFPXMT_OFB_ARP_THA,
+          ipv6_src = protocol::OFPXMT_OFB_IPV6_SRC,
+          ipv6_dst = protocol::OFPXMT_OFB_IPV6_DST,
+          ipv6_flabel = protocol::OFPXMT_OFB_IPV6_FLABEL,
+          icmpv6_type = protocol::OFPXMT_OFB_ICMPV6_TYPE,
+          icmpv6_code = protocol::OFPXMT_OFB_ICMPV6_CODE,
+          ipv6_nd_target = protocol::OFPXMT_OFB_IPV6_ND_TARGET,
+          ipv6_nd_sll = protocol::OFPXMT_OFB_IPV6_ND_SLL,
+          ipv6_nd_tll = protocol::OFPXMT_OFB_IPV6_ND_TLL,
+          mpls_label = protocol::OFPXMT_OFB_MPLS_LABEL,
+          mpls_tc = protocol::OFPXMT_OFB_MPLS_TC,
+          mpls_bos = protocol::OFPXMT_OFB_MPLS_BOS,
+          pbb_isid = protocol::OFPXMT_OFB_PBB_ISID,
+          tunnel_id = protocol::OFPXMT_OFB_TUNNEL_ID,
+          ipv6_exthdr = protocol::OFPXMT_OFB_IPV6_EXTHDR,
+        };
+      };
+
+      struct vlan_id_def
+      {
+        enum type : std::uint16_t
+        {
+          present = protocol::OFPVID_PRESENT,
+          none = protocol::OFPVID_NONE,
+        };
+      };
+
+      struct ipv6exthdr_flags_def
+      {
+        enum type : std::uint16_t
+        {
+          nonext = protocol::OFPIEH_NONEXT,
+          esp = protocol::OFPIEH_ESP,
+          auth = protocol::OFPIEH_AUTH,
+          dest = protocol::OFPIEH_DEST,
+          frag = protocol::OFPIEH_FRAG,
+          router = protocol::OFPIEH_ROUTER,
+          hop = protocol::OFPIEH_HOP,
+          unrep = protocol::OFPIEH_UNREP,
+          unseq = protocol::OFPIEH_UNSEQ,
+        };
+      };
+
+      struct action_type_def
+      {
+        enum type : std::uint16_t
+        {
+          output = protocol::OFPAT_OUTPUT,
+          copy_ttl_out = protocol::OFPAT_COPY_TTL_OUT,
+          copy_ttl_in = protocol::OFPAT_COPY_TTL_IN,
+          set_mpls_ttl = protocol::OFPAT_SET_MPLS_TTL,
+          dec_mpls_ttl = protocol::OFPAT_DEC_MPLS_TTL,
+          push_vlan = protocol::OFPAT_PUSH_VLAN,
+          pop_vlan = protocol::OFPAT_POP_VLAN,
+          push_mpls = protocol::OFPAT_PUSH_MPLS,
+          pop_mpls = protocol::OFPAT_POP_MPLS,
+          set_queue = protocol::OFPAT_SET_QUEUE,
+          group = protocol::OFPAT_GROUP,
+          set_nw_ttl = protocol::OFPAT_SET_NW_TTL,
+          dec_nw_ttl = protocol::OFPAT_DEC_NW_TTL,
+          set_field = protocol::OFPAT_SET_FIELD,
+          push_pbb = protocol::OFPAT_PUSH_PBB,
+          pop_pbb = protocol::OFPAT_POP_PBB,
+          experimenter = protocol::OFPAT_EXPERIMENTER,
+        };
+      };
+
+      struct controller_max_len_def
+      {
+        enum type : std::uint16_t
+        {
+          max = protocol::OFPCML_MAX,
+          no_buffer = protocol::OFPCML_NO_BUFFER,
+        };
+      };
+
+      struct instruction_type_def
+      {
+        enum type : std::uint16_t
+        {
+          goto_table = protocol::OFPIT_GOTO_TABLE,
+          write_metadata = protocol::OFPIT_WRITE_METADATA,
+          write_actions = protocol::OFPIT_WRITE_ACTIONS,
+          apply_actions = protocol::OFPIT_APPLY_ACTIONS,
+          clear_actions = protocol::OFPIT_CLEAR_ACTIONS,
+          meter = protocol::OFPIT_METER,
+          experimenter = protocol::OFPIT_EXPERIMENTER,
+        };
+      };
+
+      struct flow_mod_command_def
+      {
+        enum type : std::uint16_t
+        {
+          add_cmd = protocol::OFPFC_ADD,
+          modify_cmd = protocol::OFPFC_MODIFY,
+          modify_strict_cmd = protocol::OFPFC_MODIFY_STRICT,
+          delete_cmd = protocol::OFPFC_DELETE,
+          delete_strict_cmd = protocol::OFPFC_DELETE_STRICT,
+        };
+      };
+
+      struct flow_mod_flags_def
+      {
+        enum type : std::uint16_t
+        {
+          send_flow_rem = protocol::OFPFF_SEND_FLOW_REM,
+          check_overlap = protocol::OFPFF_CHECK_OVERLAP,
+          reset_counts = protocol::OFPFF_RESET_COUNTS,
+          no_pkt_counts = protocol::OFPFF_NO_PKT_COUNTS,
+          no_byt_counts = protocol::OFPFF_NO_BYT_COUNTS,
+        };
+      };
+
+      struct group_def
+      {
+        enum type : std::uint32_t
+        {
+          max = protocol::OFPG_MAX,
+          all = protocol::OFPG_ALL,
+          any = protocol::OFPG_ANY,
+        };
+      };
+
+      struct group_mod_command_def
+      {
+        enum type : std::uint8_t
+        {
+          add_cmd = protocol::OFPGC_ADD,
+          modify_cmd = protocol::OFPGC_MODIFY,
+          delete_cmd = protocol::OFPGC_DELETE,
+        };
+      };
+
+      struct group_type_def
+      {
+        enum type : std::uint8_t
+        {
+          all = protocol::OFPGT_ALL,
+          select = protocol::OFPGT_SELECT,
+          indirect = protocol::OFPGT_INDIRECT,
+          ff = protocol::OFPGT_FF,
+        };
+      };
+
+      struct packet_in_reason_def
+      {
+        enum type : std::uint8_t
+        {
+          no_match = protocol::OFPR_NO_MATCH,
+          action = protocol::OFPR_ACTION,
+          invalid_ttl = protocol::OFPR_INVALID_TTL,
+        };
+      };
+
+      struct flow_removed_reason_def
+      {
+        enum type : std::uint8_t
+        {
+          by_idle_timeout = protocol::OFPRR_IDLE_TIMEOUT,
+          by_hard_timeout = protocol::OFPRR_HARD_TIMEOUT,
+          by_delete = protocol::OFPRR_DELETE,
+          by_group_delete = protocol::OFPRR_GROUP_DELETE,
+        };
+      };
+
+      struct meter_def
+      {
+        enum type : std::uint32_t
+        {
+          max = protocol::OFPM_MAX,
+          slowpath = protocol::OFPM_SLOWPATH,
+          controller = protocol::OFPM_CONTROLLER,
+          all = protocol::OFPM_ALL,
+        };
+      };
+
+      struct meter_band_type_def
+      {
+        enum type : std::uint16_t
+        {
+          drop = protocol::OFPMBT_DROP,
+          dscp_remark = protocol::OFPMBT_DSCP_REMARK,
+          experimenter = protocol::OFPMBT_EXPERIMENTER,
+        };
+      };
+
+      struct meter_mod_command_def
+      {
+        enum type : std::uint16_t
+        {
+          add_cmd = protocol::OFPMC_ADD,
+          modify_cmd = protocol::OFPMC_MODIFY,
+          delete_cmd = protocol::OFPMC_DELETE,
+        };
+      };
+
+      struct meter_flags_def
+      {
+        enum type : std::uint16_t
+        {
+          kbps = protocol::OFPMF_KBPS,
+          pktps = protocol::OFPMF_PKTPS,
+          burst = protocol::OFPMF_BURST,
+          stats = protocol::OFPMF_STATS,
+        };
+      };
+
+      struct error_type_def
+      {
+        enum type : std::uint16_t
+        {
+          hello_failed = protocol::OFPET_HELLO_FAILED,
+          bad_request = protocol::OFPET_BAD_REQUEST,
+          bad_action = protocol::OFPET_BAD_ACTION,
+          bad_instruction = protocol::OFPET_BAD_INSTRUCTION,
+          bad_match = protocol::OFPET_BAD_MATCH,
+          flow_mod_failed = protocol::OFPET_FLOW_MOD_FAILED,
+          group_mod_failed = protocol::OFPET_GROUP_MOD_FAILED,
+          port_mod_failed = protocol::OFPET_PORT_MOD_FAILED,
+          table_mod_failed = protocol::OFPET_TABLE_MOD_FAILED,
+          queue_op_failed = protocol::OFPET_QUEUE_OP_FAILED,
+          switch_config_failed = protocol::OFPET_SWITCH_CONFIG_FAILED,
+          role_request_failed = protocol::OFPET_ROLE_REQUEST_FAILED,
+          meter_mod_failed = protocol::OFPET_METER_MOD_FAILED,
+          table_features_failed = protocol::OFPET_TABLE_FEATURES_FAILED,
+          experimenter = protocol::OFPET_EXPERIMENTER,
+        };
+      };
+
+      struct hello_failed_code_def
+      {
+        enum type : std::uint16_t
+        {
+          incompatible = protocol::OFPHFC_INCOMPATIBLE,
+          eperm = protocol::OFPHFC_EPERM,
+        };
+      };
+
+      struct bad_request_code_def
+      {
+        enum type : std::uint16_t
+        {
+          bad_version = protocol::OFPBRC_BAD_VERSION,
+          bad_type = protocol::OFPBRC_BAD_TYPE,
+          bad_multipart = protocol::OFPBRC_BAD_MULTIPART,
+          bad_experimenter = protocol::OFPBRC_BAD_EXPERIMENTER,
+          bad_exp_type = protocol::OFPBRC_BAD_EXP_TYPE,
+          eperm = protocol::OFPBRC_EPERM,
+          bad_len = protocol::OFPBRC_BAD_LEN,
+          buffer_empty = protocol::OFPBRC_BUFFER_EMPTY,
+          buffer_unknown = protocol::OFPBRC_BUFFER_UNKNOWN,
+          bad_table_id = protocol::OFPBRC_BAD_TABLE_ID,
+          is_slave = protocol::OFPBRC_IS_SLAVE,
+          bad_port = protocol::OFPBRC_BAD_PORT,
+          bad_packet = protocol::OFPBRC_BAD_PACKET,
+          multipart_buffer_overflow = protocol::OFPBRC_MULTIPART_BUFFER_OVERFLOW,
+        };
+      };
+
+      struct bad_action_code_def
+      {
+        enum type : std::uint16_t
+        {
+          bad_type = protocol::OFPBAC_BAD_TYPE,
+          bad_len = protocol::OFPBAC_BAD_LEN,
+          bad_experimenter = protocol::OFPBAC_BAD_EXPERIMENTER,
+          bad_exp_type = protocol::OFPBAC_BAD_EXP_TYPE,
+          bad_out_port = protocol::OFPBAC_BAD_OUT_PORT,
+          bad_argument = protocol::OFPBAC_BAD_ARGUMENT,
+          eperm = protocol::OFPBAC_EPERM,
+          too_many = protocol::OFPBAC_TOO_MANY,
+          bad_queue = protocol::OFPBAC_BAD_QUEUE,
+          bad_out_group = protocol::OFPBAC_BAD_OUT_GROUP,
+          match_inconsistent = protocol::OFPBAC_MATCH_INCONSISTENT,
+          unsupported_order = protocol::OFPBAC_UNSUPPORTED_ORDER,
+          bad_tag = protocol::OFPBAC_BAD_TAG,
+          bad_set_type = protocol::OFPBAC_BAD_SET_TYPE,
+          bad_set_len = protocol::OFPBAC_BAD_SET_LEN,
+          bad_set_argument = protocol::OFPBAC_BAD_SET_ARGUMENT,
+        };
+      };
+
+      struct bad_instruction_code_def
+      {
+        enum type : std::uint16_t
+        {
+          unknown_inst = protocol::OFPBIC_UNKNOWN_INST,
+          unsup_inst = protocol::OFPBIC_UNSUP_INST,
+          bad_table_id = protocol::OFPBIC_BAD_TABLE_ID,
+          unsup_metadata = protocol::OFPBIC_UNSUP_METADATA,
+          unsup_metadata_mask = protocol::OFPBIC_UNSUP_METADATA_MASK,
+          bad_experimenter = protocol::OFPBIC_BAD_EXPERIMENTER,
+          bad_exp_type = protocol::OFPBIC_BAD_EXP_TYPE,
+          bad_len = protocol::OFPBIC_BAD_LEN,
+          eperm = protocol::OFPBIC_EPERM,
+        };
+      };
+
+      struct bad_match_code_def
+      {
+        enum type : std::uint16_t
+        {
+          bad_type = protocol::OFPBMC_BAD_TYPE,
+          bad_len = protocol::OFPBMC_BAD_LEN,
+          bad_tag = protocol::OFPBMC_BAD_TAG,
+          bad_dl_addr_mask = protocol::OFPBMC_BAD_DL_ADDR_MASK,
+          bad_nw_addr_mask = protocol::OFPBMC_BAD_NW_ADDR_MASK,
+          bad_wildcards = protocol::OFPBMC_BAD_WILDCARDS,
+          bad_field = protocol::OFPBMC_BAD_FIELD,
+          bad_value = protocol::OFPBMC_BAD_VALUE,
+          bad_mask = protocol::OFPBMC_BAD_MASK,
+          bad_prereq = protocol::OFPBMC_BAD_PREREQ,
+          dup_field = protocol::OFPBMC_DUP_FIELD,
+          eperm = protocol::OFPBMC_EPERM,
+        };
+      };
+
+      struct flow_mod_failed_code_def
+      {
+        enum type : std::uint16_t
+        {
+          unknown = protocol::OFPFMFC_UNKNOWN,
+          table_full = protocol::OFPFMFC_TABLE_FULL,
+          bad_table_id = protocol::OFPFMFC_BAD_TABLE_ID,
+          overlap = protocol::OFPFMFC_OVERLAP,
+          eperm = protocol::OFPFMFC_EPERM,
+          bad_timeout = protocol::OFPFMFC_BAD_TIMEOUT,
+          bad_command = protocol::OFPFMFC_BAD_COMMAND,
+          bad_flags = protocol::OFPFMFC_BAD_FLAGS,
+        };
+      };
+
+      struct group_mod_failed_code_def
+      {
+        enum type : std::uint16_t
+        {
+          group_exists = protocol::OFPGMFC_GROUP_EXISTS,
+          invalid_group = protocol::OFPGMFC_INVALID_GROUP,
+          weight_unsupported = protocol::OFPGMFC_WEIGHT_UNSUPPORTED,
+          out_of_groups = protocol::OFPGMFC_OUT_OF_GROUPS,
+          out_of_buckets = protocol::OFPGMFC_OUT_OF_BUCKETS,
+          chaining_unsupported = protocol::OFPGMFC_CHAINING_UNSUPPORTED,
+          watch_unsupported = protocol::OFPGMFC_WATCH_UNSUPPORTED,
+          loop = protocol::OFPGMFC_LOOP,
+          unknown_group = protocol::OFPGMFC_UNKNOWN_GROUP,
+          chained_group = protocol::OFPGMFC_CHAINED_GROUP,
+          bad_type = protocol::OFPGMFC_BAD_TYPE,
+          bad_command = protocol::OFPGMFC_BAD_COMMAND,
+          bad_bucket = protocol::OFPGMFC_BAD_BUCKET,
+          bad_watch = protocol::OFPGMFC_BAD_WATCH,
+          eperm = protocol::OFPGMFC_EPERM,
+        };
+      };
+
+      struct port_mod_failed_code_def
+      {
+        enum type : std::uint16_t
+        {
+          bad_port = protocol::OFPPMFC_BAD_PORT,
+          bad_hw_addr = protocol::OFPPMFC_BAD_HW_ADDR,
+          bad_config = protocol::OFPPMFC_BAD_CONFIG,
+          bad_advertise = protocol::OFPPMFC_BAD_ADVERTISE,
+          eperm = protocol::OFPPMFC_EPERM,
+        };
+      };
+
+      struct table_mod_failed_code_def
+      {
+        enum type : std::uint16_t
+        {
+          bad_table = protocol::OFPTMFC_BAD_TABLE,
+          bad_config = protocol::OFPTMFC_BAD_CONFIG,
+          eperm = protocol::OFPTMFC_EPERM,
+        };
+      };
+
+      struct queue_op_failed_code_def
+      {
+        enum type : std::uint16_t
+        {
+          bad_port = protocol::OFPQOFC_BAD_PORT,
+          bad_queue = protocol::OFPQOFC_BAD_QUEUE,
+          eperm = protocol::OFPQOFC_EPERM,
+        };
+      };
+
+      struct switch_config_failed_code_def
+      {
+        enum type : std::uint16_t
+        {
+          bad_flags = protocol::OFPSCFC_BAD_FLAGS,
+          bad_len = protocol::OFPSCFC_BAD_LEN,
+          eperm = protocol::OFPSCFC_EPERM,
+        };
+      };
+
+      struct role_request_failed_code_def
+      {
+        enum type : std::uint16_t
+        {
+          stale = protocol::OFPRRFC_STALE,
+          unsup = protocol::OFPRRFC_UNSUP,
+          bad_role = protocol::OFPRRFC_BAD_ROLE,
+        };
+      };
+
+      struct meter_mod_failed_code_def
+      {
+        enum type : std::uint16_t
+        {
+          unknown = protocol::OFPMMFC_UNKNOWN,
+          meter_exists = protocol::OFPMMFC_METER_EXISTS,
+          invalid_meter = protocol::OFPMMFC_INVALID_METER,
+          unknown_meter = protocol::OFPMMFC_UNKNOWN_METER,
+          bad_command = protocol::OFPMMFC_BAD_COMMAND,
+          bad_flags = protocol::OFPMMFC_BAD_FLAGS,
+          bad_rate = protocol::OFPMMFC_BAD_RATE,
+          bad_burst = protocol::OFPMMFC_BAD_BURST,
+          bad_band = protocol::OFPMMFC_BAD_BAND,
+          bad_band_value = protocol::OFPMMFC_BAD_BAND_VALUE,
+          out_of_meters = protocol::OFPMMFC_OUT_OF_METERS,
+          out_of_bands = protocol::OFPMMFC_OUT_OF_BANDS,
+        };
+      };
+
+      struct table_features_failed_code_def
+      {
+        enum type : std::uint16_t
+        {
+          bad_table = protocol::OFPTFFC_BAD_TABLE,
+          bad_metadata = protocol::OFPTFFC_BAD_METADATA,
+          bad_type = protocol::OFPTFFC_BAD_TYPE,
+          bad_len = protocol::OFPTFFC_BAD_LEN,
+          bad_argument = protocol::OFPTFFC_BAD_ARGUMENT,
+          eperm = protocol::OFPTFFC_EPERM,
+        };
+      };
+
+      struct multipart_type_def
+      {
+        enum type : std::uint16_t
+        {
+          desc = protocol::OFPMP_DESC,
+          flow = protocol::OFPMP_FLOW,
+          aggregate = protocol::OFPMP_AGGREGATE,
+          table = protocol::OFPMP_TABLE,
+          port_stats = protocol::OFPMP_PORT_STATS,
+          queue = protocol::OFPMP_QUEUE,
+          group = protocol::OFPMP_GROUP,
+          group_desc = protocol::OFPMP_GROUP_DESC,
+          group_features = protocol::OFPMP_GROUP_FEATURES,
+          meter = protocol::OFPMP_METER,
+          meter_config = protocol::OFPMP_METER_CONFIG,
+          meter_features = protocol::OFPMP_METER_FEATURES,
+          table_features = protocol::OFPMP_TABLE_FEATURES,
+          port_desc = protocol::OFPMP_PORT_DESC,
+          experimenter = protocol::OFPMP_EXPERIMENTER,
+        };
+      };
+
+      struct multipart_request_flags_def
+      {
+        enum type : std::uint16_t
+        {
+          req_more = protocol::OFPMPF_REQ_MORE,
+        };
+      };
+
+      struct multipart_reply_flags_def
+      {
+        enum type : std::uint16_t
+        {
+          reply_more = protocol::OFPMPF_REPLY_MORE,
+        };
+      };
+
+      struct table_feature_prop_type_def
+      {
+        enum type : std::uint16_t
+        {
+          instructions = protocol::OFPTFPT_INSTRUCTIONS,
+          instructions_miss = protocol::OFPTFPT_INSTRUCTIONS_MISS,
+          next_tables = protocol::OFPTFPT_NEXT_TABLES,
+          next_tables_miss = protocol::OFPTFPT_NEXT_TABLES_MISS,
+          write_actions = protocol::OFPTFPT_WRITE_ACTIONS,
+          write_actions_miss = protocol::OFPTFPT_WRITE_ACTIONS_MISS,
+          apply_actions = protocol::OFPTFPT_APPLY_ACTIONS,
+          apply_actions_miss = protocol::OFPTFPT_APPLY_ACTIONS_MISS,
+          match = protocol::OFPTFPT_MATCH,
+          wildcards = protocol::OFPTFPT_WILDCARDS,
+          write_setfield = protocol::OFPTFPT_WRITE_SETFIELD,
+          write_setfield_miss = protocol::OFPTFPT_WRITE_SETFIELD_MISS,
+          apply_setfield = protocol::OFPTFPT_APPLY_SETFIELD,
+          apply_setfield_miss = protocol::OFPTFPT_APPLY_SETFIELD_MISS,
+          experimenter = protocol::OFPTFPT_EXPERIMENTER,
+          experimenter_miss = protocol::OFPTFPT_EXPERIMENTER_MISS,
+        };
+      };
+
+      struct group_capabilities_def
+      {
+        enum type : std::uint32_t
+        {
+          select_weight = protocol::OFPGFC_SELECT_WEIGHT,
+          select_liveness = protocol::OFPGFC_SELECT_LIVENESS,
+          chaining = protocol::OFPGFC_CHAINING,
+          chaining_checks = protocol::OFPGFC_CHAINING_CHECKS,
+        };
+      };
+
+      struct queue_prop_type_def
+      {
+        enum type : std::uint16_t
+        {
+          min_rate = protocol::OFPQT_MIN_RATE,
+          max_rate = protocol::OFPQT_MAX_RATE,
+          experimenter = protocol::OFPQT_EXPERIMENTER,
+        };
+      };
+
+      struct controller_role_def
+      {
+        enum type : std::uint32_t
+        {
+          nochange = protocol::OFPCR_ROLE_NOCHANGE,
+          equal = protocol::OFPCR_ROLE_EQUAL,
+          master = protocol::OFPCR_ROLE_MASTER,
+          slave = protocol::OFPCR_ROLE_SLAVE,
+        };
+      };
+
+    } // namespace protocol_detail
+
     template <class T>
     class scoped_enum : public T
     {
@@ -2139,58 +2143,58 @@ namespace v13 {
       constexpr operator type() const noexcept { return value_; }
     };
 
-    using port_no = scoped_enum<v13_detail::port_no_def>;
-    using msg_type = scoped_enum<v13_detail::msg_type_def>;
-    using hello_elem_type = scoped_enum<v13_detail::hello_elem_type_def>;
-    using config_flags = scoped_enum<v13_detail::config_flags_def>;
-    using table_config = scoped_enum<v13_detail::table_config_def>;
-    using table = scoped_enum<v13_detail::table_def>;
-    using capabilities = scoped_enum<v13_detail::capabilities_def>;
-    using port_config = scoped_enum<v13_detail::port_config_def>;
-    using port_state = scoped_enum<v13_detail::port_state_def>;
-    using port_features = scoped_enum<v13_detail::port_features_def>;
-    using port_reason = scoped_enum<v13_detail::port_reason_def>;
-    using match_type = scoped_enum<v13_detail::match_type_def>;
-    using oxm_class = scoped_enum<v13_detail::oxm_class_def>;
-    using ofb_match_fields = scoped_enum<v13_detail::ofb_match_fields_def>;
-    using vlan_id = scoped_enum<v13_detail::vlan_id_def>;
-    using ipv6exthdr_flags = scoped_enum<v13_detail::ipv6exthdr_flags_def>;
-    using action_type = scoped_enum<v13_detail::action_type_def>;
-    using controller_max_len = scoped_enum<v13_detail::controller_max_len_def>;
-    using instruction_type = scoped_enum<v13_detail::instruction_type_def>;
-    using flow_mod_command = scoped_enum<v13_detail::flow_mod_command_def>;
-    using flow_mod_flags = scoped_enum<v13_detail::flow_mod_flags_def>;
-    using group = scoped_enum<v13_detail::group_def>;
-    using group_mod_command = scoped_enum<v13_detail::group_mod_command_def>;
-    using group_type = scoped_enum<v13_detail::group_type_def>;
-    using packet_in_reason = scoped_enum<v13_detail::packet_in_reason_def>;
-    using flow_removed_reason = scoped_enum<v13_detail::flow_removed_reason_def>;
-    using meter = scoped_enum<v13_detail::meter_def>;
-    using meter_band_type = scoped_enum<v13_detail::meter_band_type_def>;
-    using meter_mod_command = scoped_enum<v13_detail::meter_mod_command_def>;
-    using meter_flags = scoped_enum<v13_detail::meter_flags_def>;
-    using error_type = scoped_enum<v13_detail::error_type_def>;
-    using hello_failed_code = scoped_enum<v13_detail::hello_failed_code_def>;
-    using bad_request_code = scoped_enum<v13_detail::bad_request_code_def>;
-    using bad_action_code = scoped_enum<v13_detail::bad_action_code_def>;
-    using bad_instruction_code = scoped_enum<v13_detail::bad_instruction_code_def>;
-    using bad_match_code = scoped_enum<v13_detail::bad_match_code_def>;
-    using flow_mod_failed_code = scoped_enum<v13_detail::flow_mod_failed_code_def>;
-    using group_mod_failed_code = scoped_enum<v13_detail::group_mod_failed_code_def>;
-    using port_mod_failed_code = scoped_enum<v13_detail::port_mod_failed_code_def>;
-    using table_mod_failed_code = scoped_enum<v13_detail::table_mod_failed_code_def>;
-    using queue_op_failed_code = scoped_enum<v13_detail::queue_op_failed_code_def>;
-    using switch_config_failed_code = scoped_enum<v13_detail::switch_config_failed_code_def>;
-    using role_request_failed_code = scoped_enum<v13_detail::role_request_failed_code_def>;
-    using meter_mod_failed_code = scoped_enum<v13_detail::meter_mod_failed_code_def>;
-    using table_features_failed_code = scoped_enum<v13_detail::table_features_failed_code_def>;
-    using multipart_type = scoped_enum<v13_detail::multipart_type_def>;
-    using multipart_request_flags = scoped_enum<v13_detail::multipart_request_flags_def>;
-    using multipart_reply_flags = scoped_enum<v13_detail::multipart_reply_flags_def>;
-    using table_feature_prop_type = scoped_enum<v13_detail::table_feature_prop_type_def>;
-    using group_capabilities = scoped_enum<v13_detail::group_capabilities_def>;
-    using queue_prop_type = scoped_enum<v13_detail::queue_prop_type_def>;
-    using controller_role = scoped_enum<v13_detail::controller_role_def>;
+    using port_no = scoped_enum<protocol_detail::port_no_def>;
+    using msg_type = scoped_enum<protocol_detail::msg_type_def>;
+    using hello_elem_type = scoped_enum<protocol_detail::hello_elem_type_def>;
+    using config_flags = scoped_enum<protocol_detail::config_flags_def>;
+    using table_config = scoped_enum<protocol_detail::table_config_def>;
+    using table = scoped_enum<protocol_detail::table_def>;
+    using capabilities = scoped_enum<protocol_detail::capabilities_def>;
+    using port_config = scoped_enum<protocol_detail::port_config_def>;
+    using port_state = scoped_enum<protocol_detail::port_state_def>;
+    using port_features = scoped_enum<protocol_detail::port_features_def>;
+    using port_reason = scoped_enum<protocol_detail::port_reason_def>;
+    using match_type = scoped_enum<protocol_detail::match_type_def>;
+    using oxm_class = scoped_enum<protocol_detail::oxm_class_def>;
+    using ofb_match_fields = scoped_enum<protocol_detail::ofb_match_fields_def>;
+    using vlan_id = scoped_enum<protocol_detail::vlan_id_def>;
+    using ipv6exthdr_flags = scoped_enum<protocol_detail::ipv6exthdr_flags_def>;
+    using action_type = scoped_enum<protocol_detail::action_type_def>;
+    using controller_max_len = scoped_enum<protocol_detail::controller_max_len_def>;
+    using instruction_type = scoped_enum<protocol_detail::instruction_type_def>;
+    using flow_mod_command = scoped_enum<protocol_detail::flow_mod_command_def>;
+    using flow_mod_flags = scoped_enum<protocol_detail::flow_mod_flags_def>;
+    using group = scoped_enum<protocol_detail::group_def>;
+    using group_mod_command = scoped_enum<protocol_detail::group_mod_command_def>;
+    using group_type = scoped_enum<protocol_detail::group_type_def>;
+    using packet_in_reason = scoped_enum<protocol_detail::packet_in_reason_def>;
+    using flow_removed_reason = scoped_enum<protocol_detail::flow_removed_reason_def>;
+    using meter = scoped_enum<protocol_detail::meter_def>;
+    using meter_band_type = scoped_enum<protocol_detail::meter_band_type_def>;
+    using meter_mod_command = scoped_enum<protocol_detail::meter_mod_command_def>;
+    using meter_flags = scoped_enum<protocol_detail::meter_flags_def>;
+    using error_type = scoped_enum<protocol_detail::error_type_def>;
+    using hello_failed_code = scoped_enum<protocol_detail::hello_failed_code_def>;
+    using bad_request_code = scoped_enum<protocol_detail::bad_request_code_def>;
+    using bad_action_code = scoped_enum<protocol_detail::bad_action_code_def>;
+    using bad_instruction_code = scoped_enum<protocol_detail::bad_instruction_code_def>;
+    using bad_match_code = scoped_enum<protocol_detail::bad_match_code_def>;
+    using flow_mod_failed_code = scoped_enum<protocol_detail::flow_mod_failed_code_def>;
+    using group_mod_failed_code = scoped_enum<protocol_detail::group_mod_failed_code_def>;
+    using port_mod_failed_code = scoped_enum<protocol_detail::port_mod_failed_code_def>;
+    using table_mod_failed_code = scoped_enum<protocol_detail::table_mod_failed_code_def>;
+    using queue_op_failed_code = scoped_enum<protocol_detail::queue_op_failed_code_def>;
+    using switch_config_failed_code = scoped_enum<protocol_detail::switch_config_failed_code_def>;
+    using role_request_failed_code = scoped_enum<protocol_detail::role_request_failed_code_def>;
+    using meter_mod_failed_code = scoped_enum<protocol_detail::meter_mod_failed_code_def>;
+    using table_features_failed_code = scoped_enum<protocol_detail::table_features_failed_code_def>;
+    using multipart_type = scoped_enum<protocol_detail::multipart_type_def>;
+    using multipart_request_flags = scoped_enum<protocol_detail::multipart_request_flags_def>;
+    using multipart_reply_flags = scoped_enum<protocol_detail::multipart_reply_flags_def>;
+    using table_feature_prop_type = scoped_enum<protocol_detail::table_feature_prop_type_def>;
+    using group_capabilities = scoped_enum<protocol_detail::group_capabilities_def>;
+    using queue_prop_type = scoped_enum<protocol_detail::queue_prop_type_def>;
+    using controller_role = scoped_enum<protocol_detail::controller_role_def>;
 
   } // namespace protocol
 
