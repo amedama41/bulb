@@ -758,6 +758,8 @@ namespace v10 {
 
       struct port_no_def
       {
+        using ofp_type = protocol::ofp_port;
+
         enum type : std::uint16_t
         {
           max = protocol::OFPP_MAX,
@@ -775,6 +777,8 @@ namespace v10 {
 
       struct msg_type_def
       {
+        using ofp_type = protocol::ofp_type;
+
         enum type : std::uint8_t
         {
           hello = protocol::OFPT_HELLO,
@@ -804,6 +808,8 @@ namespace v10 {
 
       struct config_flags_def
       {
+        using ofp_type = protocol::ofp_config_flags;
+
         enum type : std::uint16_t
         {
           normal = protocol::OFPC_FRAG_NORMAL,
@@ -815,6 +821,8 @@ namespace v10 {
 
       struct capabilities_def
       {
+        using ofp_type = protocol::ofp_capabilities;
+
         enum type : std::uint32_t
         {
           flow_stats = protocol::OFPC_FLOW_STATS,
@@ -830,6 +838,8 @@ namespace v10 {
 
       struct port_config_def
       {
+        using ofp_type = protocol::ofp_port_config;
+
         enum type : std::uint32_t
         {
           port_down = protocol::OFPPC_PORT_DOWN,
@@ -844,6 +854,8 @@ namespace v10 {
 
       struct port_state_def
       {
+        using ofp_type = protocol::ofp_port_state;
+
         enum type : std::uint32_t
         {
           link_down = protocol::OFPPS_LINK_DOWN,
@@ -857,6 +869,8 @@ namespace v10 {
 
       struct port_features_def
       {
+        using ofp_type = protocol::ofp_port_features;
+
         enum type : std::uint32_t
         {
           mode_10mb_hd = protocol::OFPPF_10MB_HD,
@@ -876,6 +890,8 @@ namespace v10 {
 
       struct port_reason_def
       {
+        using ofp_type = protocol::ofp_port_reason;
+
         enum type : std::uint8_t
         {
           by_add = protocol::OFPPR_ADD,
@@ -886,6 +902,8 @@ namespace v10 {
 
       struct packet_in_reason_def
       {
+        using ofp_type = protocol::ofp_packet_in_reason;
+
         enum type : std::uint8_t
         {
           no_match = protocol::OFPR_NO_MATCH,
@@ -895,6 +913,8 @@ namespace v10 {
 
       struct action_type_def
       {
+        using ofp_type = protocol::ofp_action_type;
+
         enum type : std::uint16_t
         {
           output = protocol::OFPAT_OUTPUT,
@@ -918,6 +938,8 @@ namespace v10 {
 
       struct flow_mod_command_def
       {
+        using ofp_type = protocol::ofp_flow_mod_command;
+
         enum type : std::uint16_t
         {
           add_cmd = protocol::OFPFC_ADD,
@@ -930,6 +952,8 @@ namespace v10 {
 
       struct flow_wildcards_def
       {
+        using ofp_type = protocol::ofp_flow_wildcards;
+
         enum type : std::uint32_t
         {
           in_port = protocol::OFPFW_IN_PORT,
@@ -956,6 +980,8 @@ namespace v10 {
 
       struct flow_mod_flags_def
       {
+        using ofp_type = protocol::ofp_flow_mod_flags;
+
         enum type : std::uint16_t
         {
           send_flow_rem = protocol::OFPFF_SEND_FLOW_REM,
@@ -966,6 +992,8 @@ namespace v10 {
 
       struct flow_removed_reason_def
       {
+        using ofp_type = protocol::ofp_flow_removed_reason;
+
         enum type : std::uint8_t
         {
           by_idle_timeout = protocol::OFPRR_IDLE_TIMEOUT,
@@ -976,6 +1004,8 @@ namespace v10 {
 
       struct error_type_def
       {
+        using ofp_type = protocol::ofp_error_type;
+
         enum type : std::uint16_t
         {
           hello_failed = protocol::OFPET_HELLO_FAILED,
@@ -989,6 +1019,8 @@ namespace v10 {
 
       struct hello_failed_code_def
       {
+        using ofp_type = protocol::ofp_hello_failed_code;
+
         enum type : std::uint16_t
         {
           incompatible = protocol::OFPHFC_INCOMPATIBLE,
@@ -998,6 +1030,8 @@ namespace v10 {
 
       struct bad_request_code_def
       {
+        using ofp_type = protocol::ofp_bad_request_code;
+
         enum type : std::uint16_t
         {
           bad_version = protocol::OFPBRC_BAD_VERSION,
@@ -1014,6 +1048,8 @@ namespace v10 {
 
       struct bad_action_code_def
       {
+        using ofp_type = protocol::ofp_bad_action_code;
+
         enum type : std::uint16_t
         {
           bad_type = protocol::OFPBAC_BAD_TYPE,
@@ -1030,6 +1066,8 @@ namespace v10 {
 
       struct flow_mod_failed_code_def
       {
+        using ofp_type = protocol::ofp_flow_mod_failed_code;
+
         enum type : std::uint16_t
         {
           all_tables_full = protocol::OFPFMFC_ALL_TABLES_FULL,
@@ -1043,6 +1081,8 @@ namespace v10 {
 
       struct port_mod_failed_code_def
       {
+        using ofp_type = protocol::ofp_port_mod_failed_code;
+
         enum type : std::uint16_t
         {
           bad_port = protocol::OFPPMFC_BAD_PORT,
@@ -1052,6 +1092,8 @@ namespace v10 {
 
       struct queue_op_failed_code_def
       {
+        using ofp_type = protocol::ofp_queue_op_failed_code;
+
         enum type : std::uint16_t
         {
           bad_port = protocol::OFPQOFC_BAD_PORT,
@@ -1062,6 +1104,8 @@ namespace v10 {
 
       struct stats_type_def
       {
+        using ofp_type = protocol::ofp_stats_types;
+
         enum type : std::uint16_t
         {
           desc = protocol::OFPST_DESC,
@@ -1078,6 +1122,8 @@ namespace v10 {
 
       struct stats_reply_flags_def
       {
+        using ofp_type = protocol::ofp_stats_reply_flags;
+
         enum type : std::uint16_t
         {
           reply_more = protocol::OFPSF_REPLY_MORE,
@@ -1086,6 +1132,8 @@ namespace v10 {
 
       struct queue_prop_type_def
       {
+        using ofp_type = protocol::ofp_queue_properties;
+
         enum type : std::uint16_t
         {
           none = protocol::OFPQT_NONE,

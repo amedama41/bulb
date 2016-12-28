@@ -1391,6 +1391,8 @@ namespace v13 {
 
       struct port_no_def
       {
+        using ofp_type = protocol::ofp_port_no;
+
         enum type : std::uint32_t
         {
           max = protocol::OFPP_MAX,
@@ -1407,6 +1409,8 @@ namespace v13 {
 
       struct msg_type_def
       {
+        using ofp_type = protocol::ofp_type;
+
         enum type : std::uint8_t
         {
           hello = protocol::OFPT_HELLO,
@@ -1444,6 +1448,8 @@ namespace v13 {
 
       struct hello_elem_type_def
       {
+        using ofp_type = protocol::ofp_hello_elem_type;
+
         enum type : std::uint16_t
         {
           versionbitmap = protocol::OFPHET_VERSIONBITMAP,
@@ -1452,6 +1458,8 @@ namespace v13 {
 
       struct config_flags_def
       {
+        using ofp_type = protocol::ofp_config_flags;
+
         enum type : std::uint16_t
         {
           normal = protocol::OFPC_FRAG_NORMAL,
@@ -1463,6 +1471,8 @@ namespace v13 {
 
       struct table_config_def
       {
+        using ofp_type = protocol::ofp_table_config;
+
         enum type : std::uint32_t
         {
           deprecated_mask = protocol::OFPTC_DEPRECATED_MASK,
@@ -1471,6 +1481,8 @@ namespace v13 {
 
       struct table_def
       {
+        using ofp_type = protocol::ofp_table;
+
         enum type : std::uint8_t
         {
           max = protocol::OFPTT_MAX,
@@ -1480,6 +1492,8 @@ namespace v13 {
 
       struct capabilities_def
       {
+        using ofp_type = protocol::ofp_capabilities;
+
         enum type : std::uint32_t
         {
           flow_stats = protocol::OFPC_FLOW_STATS,
@@ -1494,6 +1508,8 @@ namespace v13 {
 
       struct port_config_def
       {
+        using ofp_type = protocol::ofp_port_config;
+
         enum type : std::uint32_t
         {
           port_down = protocol::OFPPC_PORT_DOWN,
@@ -1505,6 +1521,8 @@ namespace v13 {
 
       struct port_state_def
       {
+        using ofp_type = protocol::ofp_port_state;
+
         enum type : std::uint32_t
         {
           link_down = protocol::OFPPS_LINK_DOWN,
@@ -1515,6 +1533,8 @@ namespace v13 {
 
       struct port_features_def
       {
+        using ofp_type = protocol::ofp_port_features;
+
         enum type : std::uint32_t
         {
           mode_10mb_hd = protocol::OFPPF_10MB_HD,
@@ -1538,6 +1558,8 @@ namespace v13 {
 
       struct port_reason_def
       {
+        using ofp_type = protocol::ofp_port_reason;
+
         enum type : std::uint8_t
         {
           by_add = protocol::OFPPR_ADD,
@@ -1548,6 +1570,8 @@ namespace v13 {
 
       struct match_type_def
       {
+        using ofp_type = protocol::ofp_match_type;
+
         enum type : std::uint16_t
         {
           standard = protocol::OFPMT_STANDARD,
@@ -1557,6 +1581,8 @@ namespace v13 {
 
       struct oxm_class_def
       {
+        using ofp_type = protocol::ofp_oxm_class;
+
         enum type : std::uint16_t
         {
           nxm_0 = protocol::OFPXMC_NXM_0,
@@ -1568,6 +1594,8 @@ namespace v13 {
 
       struct ofb_match_fields_def
       {
+        using ofp_type = protocol::oxm_ofb_match_fields;
+
         enum type : std::uint8_t
         {
           in_port = protocol::OFPXMT_OFB_IN_PORT,
@@ -1615,6 +1643,8 @@ namespace v13 {
 
       struct vlan_id_def
       {
+        using ofp_type = protocol::ofp_vlan_id;
+
         enum type : std::uint16_t
         {
           present = protocol::OFPVID_PRESENT,
@@ -1624,6 +1654,8 @@ namespace v13 {
 
       struct ipv6exthdr_flags_def
       {
+        using ofp_type = protocol::ofp_ipv6exthdr_flags;
+
         enum type : std::uint16_t
         {
           nonext = protocol::OFPIEH_NONEXT,
@@ -1640,6 +1672,8 @@ namespace v13 {
 
       struct action_type_def
       {
+        using ofp_type = protocol::ofp_action_type;
+
         enum type : std::uint16_t
         {
           output = protocol::OFPAT_OUTPUT,
@@ -1664,6 +1698,8 @@ namespace v13 {
 
       struct controller_max_len_def
       {
+        using ofp_type = protocol::ofp_controller_max_len;
+
         enum type : std::uint16_t
         {
           max = protocol::OFPCML_MAX,
@@ -1673,6 +1709,8 @@ namespace v13 {
 
       struct instruction_type_def
       {
+        using ofp_type = protocol::ofp_instruction_type;
+
         enum type : std::uint16_t
         {
           goto_table = protocol::OFPIT_GOTO_TABLE,
@@ -1687,6 +1725,8 @@ namespace v13 {
 
       struct flow_mod_command_def
       {
+        using ofp_type = protocol::ofp_flow_mod_command;
+
         enum type : std::uint16_t
         {
           add_cmd = protocol::OFPFC_ADD,
@@ -1699,6 +1739,8 @@ namespace v13 {
 
       struct flow_mod_flags_def
       {
+        using ofp_type = protocol::ofp_flow_mod_flags;
+
         enum type : std::uint16_t
         {
           send_flow_rem = protocol::OFPFF_SEND_FLOW_REM,
@@ -1711,6 +1753,8 @@ namespace v13 {
 
       struct group_def
       {
+        using ofp_type = protocol::ofp_group;
+
         enum type : std::uint32_t
         {
           max = protocol::OFPG_MAX,
@@ -1721,6 +1765,8 @@ namespace v13 {
 
       struct group_mod_command_def
       {
+        using ofp_type = protocol::ofp_group_mod_command;
+
         enum type : std::uint8_t
         {
           add_cmd = protocol::OFPGC_ADD,
@@ -1731,6 +1777,8 @@ namespace v13 {
 
       struct group_type_def
       {
+        using ofp_type = protocol::ofp_group_type;
+
         enum type : std::uint8_t
         {
           all = protocol::OFPGT_ALL,
@@ -1742,6 +1790,8 @@ namespace v13 {
 
       struct packet_in_reason_def
       {
+        using ofp_type = protocol::ofp_packet_in_reason;
+
         enum type : std::uint8_t
         {
           no_match = protocol::OFPR_NO_MATCH,
@@ -1752,6 +1802,8 @@ namespace v13 {
 
       struct flow_removed_reason_def
       {
+        using ofp_type = protocol::ofp_flow_removed_reason;
+
         enum type : std::uint8_t
         {
           by_idle_timeout = protocol::OFPRR_IDLE_TIMEOUT,
@@ -1763,6 +1815,8 @@ namespace v13 {
 
       struct meter_def
       {
+        using ofp_type = protocol::ofp_meter;
+
         enum type : std::uint32_t
         {
           max = protocol::OFPM_MAX,
@@ -1774,6 +1828,8 @@ namespace v13 {
 
       struct meter_band_type_def
       {
+        using ofp_type = protocol::ofp_meter_band_type;
+
         enum type : std::uint16_t
         {
           drop = protocol::OFPMBT_DROP,
@@ -1784,6 +1840,8 @@ namespace v13 {
 
       struct meter_mod_command_def
       {
+        using ofp_type = protocol::ofp_meter_mod_command;
+
         enum type : std::uint16_t
         {
           add_cmd = protocol::OFPMC_ADD,
@@ -1794,6 +1852,8 @@ namespace v13 {
 
       struct meter_flags_def
       {
+        using ofp_type = protocol::ofp_meter_flags;
+
         enum type : std::uint16_t
         {
           kbps = protocol::OFPMF_KBPS,
@@ -1805,6 +1865,8 @@ namespace v13 {
 
       struct error_type_def
       {
+        using ofp_type = protocol::ofp_error_type;
+
         enum type : std::uint16_t
         {
           hello_failed = protocol::OFPET_HELLO_FAILED,
@@ -1827,6 +1889,8 @@ namespace v13 {
 
       struct hello_failed_code_def
       {
+        using ofp_type = protocol::ofp_hello_failed_code;
+
         enum type : std::uint16_t
         {
           incompatible = protocol::OFPHFC_INCOMPATIBLE,
@@ -1836,6 +1900,8 @@ namespace v13 {
 
       struct bad_request_code_def
       {
+        using ofp_type = protocol::ofp_bad_request_code;
+
         enum type : std::uint16_t
         {
           bad_version = protocol::OFPBRC_BAD_VERSION,
@@ -1857,6 +1923,8 @@ namespace v13 {
 
       struct bad_action_code_def
       {
+        using ofp_type = protocol::ofp_bad_action_code;
+
         enum type : std::uint16_t
         {
           bad_type = protocol::OFPBAC_BAD_TYPE,
@@ -1880,6 +1948,8 @@ namespace v13 {
 
       struct bad_instruction_code_def
       {
+        using ofp_type = protocol::ofp_bad_instruction_code;
+
         enum type : std::uint16_t
         {
           unknown_inst = protocol::OFPBIC_UNKNOWN_INST,
@@ -1896,6 +1966,8 @@ namespace v13 {
 
       struct bad_match_code_def
       {
+        using ofp_type = protocol::ofp_bad_match_code;
+
         enum type : std::uint16_t
         {
           bad_type = protocol::OFPBMC_BAD_TYPE,
@@ -1915,6 +1987,8 @@ namespace v13 {
 
       struct flow_mod_failed_code_def
       {
+        using ofp_type = protocol::ofp_flow_mod_failed_code;
+
         enum type : std::uint16_t
         {
           unknown = protocol::OFPFMFC_UNKNOWN,
@@ -1930,6 +2004,8 @@ namespace v13 {
 
       struct group_mod_failed_code_def
       {
+        using ofp_type = protocol::ofp_group_mod_failed_code;
+
         enum type : std::uint16_t
         {
           group_exists = protocol::OFPGMFC_GROUP_EXISTS,
@@ -1952,6 +2028,8 @@ namespace v13 {
 
       struct port_mod_failed_code_def
       {
+        using ofp_type = protocol::ofp_port_mod_failed_code;
+
         enum type : std::uint16_t
         {
           bad_port = protocol::OFPPMFC_BAD_PORT,
@@ -1964,6 +2042,8 @@ namespace v13 {
 
       struct table_mod_failed_code_def
       {
+        using ofp_type = protocol::ofp_table_mod_failed_code;
+
         enum type : std::uint16_t
         {
           bad_table = protocol::OFPTMFC_BAD_TABLE,
@@ -1974,6 +2054,8 @@ namespace v13 {
 
       struct queue_op_failed_code_def
       {
+        using ofp_type = protocol::ofp_queue_op_failed_code;
+
         enum type : std::uint16_t
         {
           bad_port = protocol::OFPQOFC_BAD_PORT,
@@ -1984,6 +2066,8 @@ namespace v13 {
 
       struct switch_config_failed_code_def
       {
+        using ofp_type = protocol::ofp_switch_config_failed_code;
+
         enum type : std::uint16_t
         {
           bad_flags = protocol::OFPSCFC_BAD_FLAGS,
@@ -1994,6 +2078,8 @@ namespace v13 {
 
       struct role_request_failed_code_def
       {
+        using ofp_type = protocol::ofp_role_request_failed_code;
+
         enum type : std::uint16_t
         {
           stale = protocol::OFPRRFC_STALE,
@@ -2004,6 +2090,8 @@ namespace v13 {
 
       struct meter_mod_failed_code_def
       {
+        using ofp_type = protocol::ofp_meter_mod_failed_code;
+
         enum type : std::uint16_t
         {
           unknown = protocol::OFPMMFC_UNKNOWN,
@@ -2023,6 +2111,8 @@ namespace v13 {
 
       struct table_features_failed_code_def
       {
+        using ofp_type = protocol::ofp_table_features_failed_code;
+
         enum type : std::uint16_t
         {
           bad_table = protocol::OFPTFFC_BAD_TABLE,
@@ -2036,6 +2126,8 @@ namespace v13 {
 
       struct multipart_type_def
       {
+        using ofp_type = protocol::ofp_multipart_type;
+
         enum type : std::uint16_t
         {
           desc = protocol::OFPMP_DESC,
@@ -2058,6 +2150,8 @@ namespace v13 {
 
       struct multipart_request_flags_def
       {
+        using ofp_type = protocol::ofp_multipart_request_flags;
+
         enum type : std::uint16_t
         {
           req_more = protocol::OFPMPF_REQ_MORE,
@@ -2066,6 +2160,8 @@ namespace v13 {
 
       struct multipart_reply_flags_def
       {
+        using ofp_type = protocol::ofp_multipart_reply_flags;
+
         enum type : std::uint16_t
         {
           reply_more = protocol::OFPMPF_REPLY_MORE,
@@ -2074,6 +2170,8 @@ namespace v13 {
 
       struct table_feature_prop_type_def
       {
+        using ofp_type = protocol::ofp_table_feature_prop_type;
+
         enum type : std::uint16_t
         {
           instructions = protocol::OFPTFPT_INSTRUCTIONS,
@@ -2097,6 +2195,8 @@ namespace v13 {
 
       struct group_capabilities_def
       {
+        using ofp_type = protocol::ofp_group_capabilities;
+
         enum type : std::uint32_t
         {
           select_weight = protocol::OFPGFC_SELECT_WEIGHT,
@@ -2108,6 +2208,8 @@ namespace v13 {
 
       struct queue_prop_type_def
       {
+        using ofp_type = protocol::ofp_queue_properties;
+
         enum type : std::uint16_t
         {
           min_rate = protocol::OFPQT_MIN_RATE,
@@ -2118,6 +2220,8 @@ namespace v13 {
 
       struct controller_role_def
       {
+        using ofp_type = protocol::ofp_controller_role;
+
         enum type : std::uint32_t
         {
           nochange = protocol::OFPCR_ROLE_NOCHANGE,
