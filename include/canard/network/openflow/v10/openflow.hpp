@@ -756,9 +756,9 @@ namespace v10 {
 
     namespace protocol_detail {
 
-      struct port_no_def
+      struct ofp_port
       {
-        using ofp_type = protocol::ofp_port;
+        using original_type = protocol::ofp_port;
 
         enum type : std::uint16_t
         {
@@ -775,9 +775,9 @@ namespace v10 {
         };
       };
 
-      struct msg_type_def
+      struct ofp_type
       {
-        using ofp_type = protocol::ofp_type;
+        using original_type = protocol::ofp_type;
 
         enum type : std::uint8_t
         {
@@ -806,9 +806,9 @@ namespace v10 {
         };
       };
 
-      struct config_flags_def
+      struct ofp_config_flags
       {
-        using ofp_type = protocol::ofp_config_flags;
+        using original_type = protocol::ofp_config_flags;
 
         enum type : std::uint16_t
         {
@@ -819,9 +819,9 @@ namespace v10 {
         };
       };
 
-      struct capabilities_def
+      struct ofp_capabilities
       {
-        using ofp_type = protocol::ofp_capabilities;
+        using original_type = protocol::ofp_capabilities;
 
         enum type : std::uint32_t
         {
@@ -836,9 +836,9 @@ namespace v10 {
         };
       };
 
-      struct port_config_def
+      struct ofp_port_config
       {
-        using ofp_type = protocol::ofp_port_config;
+        using original_type = protocol::ofp_port_config;
 
         enum type : std::uint32_t
         {
@@ -852,9 +852,9 @@ namespace v10 {
         };
       };
 
-      struct port_state_def
+      struct ofp_port_state
       {
-        using ofp_type = protocol::ofp_port_state;
+        using original_type = protocol::ofp_port_state;
 
         enum type : std::uint32_t
         {
@@ -867,9 +867,9 @@ namespace v10 {
         };
       };
 
-      struct port_features_def
+      struct ofp_port_features
       {
-        using ofp_type = protocol::ofp_port_features;
+        using original_type = protocol::ofp_port_features;
 
         enum type : std::uint32_t
         {
@@ -888,9 +888,9 @@ namespace v10 {
         };
       };
 
-      struct port_reason_def
+      struct ofp_port_reason
       {
-        using ofp_type = protocol::ofp_port_reason;
+        using original_type = protocol::ofp_port_reason;
 
         enum type : std::uint8_t
         {
@@ -900,9 +900,9 @@ namespace v10 {
         };
       };
 
-      struct packet_in_reason_def
+      struct ofp_packet_in_reason
       {
-        using ofp_type = protocol::ofp_packet_in_reason;
+        using original_type = protocol::ofp_packet_in_reason;
 
         enum type : std::uint8_t
         {
@@ -911,9 +911,9 @@ namespace v10 {
         };
       };
 
-      struct action_type_def
+      struct ofp_action_type
       {
-        using ofp_type = protocol::ofp_action_type;
+        using original_type = protocol::ofp_action_type;
 
         enum type : std::uint16_t
         {
@@ -936,9 +936,9 @@ namespace v10 {
         };
       };
 
-      struct flow_mod_command_def
+      struct ofp_flow_mod_command
       {
-        using ofp_type = protocol::ofp_flow_mod_command;
+        using original_type = protocol::ofp_flow_mod_command;
 
         enum type : std::uint16_t
         {
@@ -950,9 +950,9 @@ namespace v10 {
         };
       };
 
-      struct flow_wildcards_def
+      struct ofp_flow_wildcards
       {
-        using ofp_type = protocol::ofp_flow_wildcards;
+        using original_type = protocol::ofp_flow_wildcards;
 
         enum type : std::uint32_t
         {
@@ -978,9 +978,9 @@ namespace v10 {
         };
       };
 
-      struct flow_mod_flags_def
+      struct ofp_flow_mod_flags
       {
-        using ofp_type = protocol::ofp_flow_mod_flags;
+        using original_type = protocol::ofp_flow_mod_flags;
 
         enum type : std::uint16_t
         {
@@ -990,9 +990,9 @@ namespace v10 {
         };
       };
 
-      struct flow_removed_reason_def
+      struct ofp_flow_removed_reason
       {
-        using ofp_type = protocol::ofp_flow_removed_reason;
+        using original_type = protocol::ofp_flow_removed_reason;
 
         enum type : std::uint8_t
         {
@@ -1002,9 +1002,9 @@ namespace v10 {
         };
       };
 
-      struct error_type_def
+      struct ofp_error_type
       {
-        using ofp_type = protocol::ofp_error_type;
+        using original_type = protocol::ofp_error_type;
 
         enum type : std::uint16_t
         {
@@ -1017,9 +1017,9 @@ namespace v10 {
         };
       };
 
-      struct hello_failed_code_def
+      struct ofp_hello_failed_code
       {
-        using ofp_type = protocol::ofp_hello_failed_code;
+        using original_type = protocol::ofp_hello_failed_code;
 
         enum type : std::uint16_t
         {
@@ -1028,9 +1028,9 @@ namespace v10 {
         };
       };
 
-      struct bad_request_code_def
+      struct ofp_bad_request_code
       {
-        using ofp_type = protocol::ofp_bad_request_code;
+        using original_type = protocol::ofp_bad_request_code;
 
         enum type : std::uint16_t
         {
@@ -1046,9 +1046,9 @@ namespace v10 {
         };
       };
 
-      struct bad_action_code_def
+      struct ofp_bad_action_code
       {
-        using ofp_type = protocol::ofp_bad_action_code;
+        using original_type = protocol::ofp_bad_action_code;
 
         enum type : std::uint16_t
         {
@@ -1064,9 +1064,9 @@ namespace v10 {
         };
       };
 
-      struct flow_mod_failed_code_def
+      struct ofp_flow_mod_failed_code
       {
-        using ofp_type = protocol::ofp_flow_mod_failed_code;
+        using original_type = protocol::ofp_flow_mod_failed_code;
 
         enum type : std::uint16_t
         {
@@ -1079,9 +1079,9 @@ namespace v10 {
         };
       };
 
-      struct port_mod_failed_code_def
+      struct ofp_port_mod_failed_code
       {
-        using ofp_type = protocol::ofp_port_mod_failed_code;
+        using original_type = protocol::ofp_port_mod_failed_code;
 
         enum type : std::uint16_t
         {
@@ -1090,9 +1090,9 @@ namespace v10 {
         };
       };
 
-      struct queue_op_failed_code_def
+      struct ofp_queue_op_failed_code
       {
-        using ofp_type = protocol::ofp_queue_op_failed_code;
+        using original_type = protocol::ofp_queue_op_failed_code;
 
         enum type : std::uint16_t
         {
@@ -1102,9 +1102,9 @@ namespace v10 {
         };
       };
 
-      struct stats_type_def
+      struct ofp_stats_types
       {
-        using ofp_type = protocol::ofp_stats_types;
+        using original_type = protocol::ofp_stats_types;
 
         enum type : std::uint16_t
         {
@@ -1120,9 +1120,9 @@ namespace v10 {
         };
       };
 
-      struct stats_reply_flags_def
+      struct ofp_stats_reply_flags
       {
-        using ofp_type = protocol::ofp_stats_reply_flags;
+        using original_type = protocol::ofp_stats_reply_flags;
 
         enum type : std::uint16_t
         {
@@ -1130,9 +1130,9 @@ namespace v10 {
         };
       };
 
-      struct queue_prop_type_def
+      struct ofp_queue_properties
       {
-        using ofp_type = protocol::ofp_queue_properties;
+        using original_type = protocol::ofp_queue_properties;
 
         enum type : std::uint16_t
         {
@@ -1146,9 +1146,9 @@ namespace v10 {
     template <class T>
     class scoped_enum : public T
     {
-      using type = typename T::type;
-      type value_;
+      typename T::type value_;
     public:
+      using type = typename T::type;
       constexpr scoped_enum() noexcept : value_{} {}
       constexpr scoped_enum(type v) noexcept : value_(v) {}
       explicit constexpr scoped_enum(
@@ -1157,30 +1157,30 @@ namespace v10 {
       constexpr operator type() const noexcept { return value_; }
     };
 
-    using port_no = scoped_enum<protocol_detail::port_no_def>;
-    using msg_type = scoped_enum<protocol_detail::msg_type_def>;
-    using config_flags = scoped_enum<protocol_detail::config_flags_def>;
-    using capabilities = scoped_enum<protocol_detail::capabilities_def>;
-    using port_config = scoped_enum<protocol_detail::port_config_def>;
-    using port_state = scoped_enum<protocol_detail::port_state_def>;
-    using port_features = scoped_enum<protocol_detail::port_features_def>;
-    using port_reason = scoped_enum<protocol_detail::port_reason_def>;
-    using packet_in_reason = scoped_enum<protocol_detail::packet_in_reason_def>;
-    using action_type = scoped_enum<protocol_detail::action_type_def>;
-    using flow_mod_command = scoped_enum<protocol_detail::flow_mod_command_def>;
-    using flow_wildcards = scoped_enum<protocol_detail::flow_wildcards_def>;
-    using flow_mod_flags = scoped_enum<protocol_detail::flow_mod_flags_def>;
-    using flow_removed_reason = scoped_enum<protocol_detail::flow_removed_reason_def>;
-    using error_type = scoped_enum<protocol_detail::error_type_def>;
-    using hello_failed_code = scoped_enum<protocol_detail::hello_failed_code_def>;
-    using bad_request_code = scoped_enum<protocol_detail::bad_request_code_def>;
-    using bad_action_code = scoped_enum<protocol_detail::bad_action_code_def>;
-    using flow_mod_failed_code = scoped_enum<protocol_detail::flow_mod_failed_code_def>;
-    using port_mod_failed_code = scoped_enum<protocol_detail::port_mod_failed_code_def>;
-    using queue_op_failed_code = scoped_enum<protocol_detail::queue_op_failed_code_def>;
-    using stats_type = scoped_enum<protocol_detail::stats_type_def>;
-    using stats_reply_flags = scoped_enum<protocol_detail::stats_reply_flags_def>;
-    using queue_prop_type = scoped_enum<protocol_detail::queue_prop_type_def>;
+    using port_no = scoped_enum<protocol_detail::ofp_port>;
+    using msg_type = scoped_enum<protocol_detail::ofp_type>;
+    using config_flags = scoped_enum<protocol_detail::ofp_config_flags>;
+    using capabilities = scoped_enum<protocol_detail::ofp_capabilities>;
+    using port_config = scoped_enum<protocol_detail::ofp_port_config>;
+    using port_state = scoped_enum<protocol_detail::ofp_port_state>;
+    using port_features = scoped_enum<protocol_detail::ofp_port_features>;
+    using port_reason = scoped_enum<protocol_detail::ofp_port_reason>;
+    using packet_in_reason = scoped_enum<protocol_detail::ofp_packet_in_reason>;
+    using action_type = scoped_enum<protocol_detail::ofp_action_type>;
+    using flow_mod_command = scoped_enum<protocol_detail::ofp_flow_mod_command>;
+    using flow_wildcards = scoped_enum<protocol_detail::ofp_flow_wildcards>;
+    using flow_mod_flags = scoped_enum<protocol_detail::ofp_flow_mod_flags>;
+    using flow_removed_reason = scoped_enum<protocol_detail::ofp_flow_removed_reason>;
+    using error_type = scoped_enum<protocol_detail::ofp_error_type>;
+    using hello_failed_code = scoped_enum<protocol_detail::ofp_hello_failed_code>;
+    using bad_request_code = scoped_enum<protocol_detail::ofp_bad_request_code>;
+    using bad_action_code = scoped_enum<protocol_detail::ofp_bad_action_code>;
+    using flow_mod_failed_code = scoped_enum<protocol_detail::ofp_flow_mod_failed_code>;
+    using port_mod_failed_code = scoped_enum<protocol_detail::ofp_port_mod_failed_code>;
+    using queue_op_failed_code = scoped_enum<protocol_detail::ofp_queue_op_failed_code>;
+    using stats_type = scoped_enum<protocol_detail::ofp_stats_types>;
+    using stats_reply_flags = scoped_enum<protocol_detail::ofp_stats_reply_flags>;
+    using queue_prop_type = scoped_enum<protocol_detail::ofp_queue_properties>;
 
   } // namespace protocol
 
