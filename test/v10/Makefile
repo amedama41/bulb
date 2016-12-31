@@ -12,6 +12,7 @@ LIBBULB_RPATH = -rpath @executable_path/./$(LIBBULB_DIR)
 TEST_DIRS = action \
 			common_type \
 			message \
+			io \
 			queue_property \
 			stats \
 			utility
