@@ -2,13 +2,13 @@
 #define CANARD_NET_OFP_V10_MESSAGES_ECHO_HPP
 
 #include <cstdint>
+#include <algorithm>
 #include <iterator>
 #include <limits>
 #include <memory>
 #include <stdexcept>
 #include <utility>
-#include <boost/range/iterator_range.hpp>
-#include <canard/network/openflow/binary_data.hpp>
+#include <boost/container/vector.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
@@ -31,17 +31,17 @@ namespace messages {
         {
         public:
             using raw_ofp_type = v10_detail::ofp_header;
-            using data_type = binary_data::pointer_type;
+            using data_type = boost::container::vector<std::uint8_t>;
 
         protected:
-            echo_base(binary_data&& data, std::uint32_t const xid) noexcept
+            echo_base(data_type&& data, std::uint32_t const xid) noexcept
                 : header_{
                       protocol::OFP_VERSION
                     , T::message_type
                     , calc_ofp_length(data)
                     , xid
                   }
-                , data_(std::move(data).data())
+                , data_(std::move(data))
             {
             }
 
@@ -51,11 +51,7 @@ namespace messages {
             {
             }
 
-            echo_base(echo_base const& other)
-                : header_(other.header_)
-                , data_(binary_data::copy_data(other.data()))
-            {
-            }
+            echo_base(echo_base const&) = default;
 
             echo_base(echo_base&& other) noexcept
                 : header_(other.header_)
@@ -74,8 +70,8 @@ namespace messages {
                 -> echo_base&
             {
                 auto tmp = std::move(other);
-                header_ = tmp.header_;
-                data_ = std::move(tmp.data_);
+                std::swap(header_, tmp.header_);
+                data_.swap(tmp.data_);
                 return *this;
             }
 
@@ -87,23 +83,24 @@ namespace messages {
             }
 
             auto data() const noexcept
-                -> boost::iterator_range<unsigned char const*>
+                -> data_type const&
             {
-                return boost::make_iterator_range_n(data_.get(), data_length());
+                return data_;
             }
 
             auto data_length() const noexcept
                 -> std::uint16_t
             {
-                return this->length() - sizeof(raw_ofp_type);
+                return data_.size();
             }
 
             auto extract_data() noexcept
-                -> binary_data
+                -> data_type
             {
-                auto const data_len = data_length();
+                auto data = data_type{};
+                data.swap(data_);
                 header_.length = sizeof(raw_ofp_type);
-                return binary_data{std::move(data_), data_len};
+                return data;
             }
 
             static void validate_header(v10_detail::ofp_header const& header)
@@ -127,8 +124,7 @@ namespace messages {
             void encode_impl(Container& container) const
             {
                 detail::encode(container, header_);
-                detail::encode_byte_array(
-                        container, data_.get(), data_length());
+                detail::encode_byte_array(container, data_.data(), data_.size());
             }
 
             template <class Iterator>
@@ -136,8 +132,10 @@ namespace messages {
                 -> T
             {
                 auto const header = detail::decode<raw_ofp_type>(first, last);
-                last = std::next(first, header.length - sizeof(raw_ofp_type));
-                auto data = binary_data::copy_data(first, last);
+                auto const data_length = header.length - sizeof(raw_ofp_type);
+                last = std::next(first, data_length);
+                auto data = data_type{data_length, boost::container::default_init};
+                std::copy(first, last, data.data());
                 first = last;
 
                 return T{header, std::move(data)};
@@ -150,7 +148,7 @@ namespace messages {
                     && data() == rhs.data();
             }
 
-            static auto calc_ofp_length(binary_data const& data)
+            static auto calc_ofp_length(data_type const& data)
                 -> std::uint16_t
             {
                 constexpr auto max_length
@@ -177,13 +175,13 @@ namespace messages {
             = protocol::OFPT_ECHO_REQUEST;
 
         explicit echo_request(
-                binary_data data, std::uint32_t const xid = get_xid()) noexcept
+                data_type data, std::uint32_t const xid = get_xid()) noexcept
             : echo_base{std::move(data), xid}
         {
         }
 
         explicit echo_request(std::uint32_t const xid = get_xid()) noexcept
-            : echo_request{binary_data{}, xid}
+            : echo_request{data_type{}, xid}
         {
         }
 
@@ -206,13 +204,13 @@ namespace messages {
             = protocol::OFPT_ECHO_REPLY;
 
         explicit echo_reply(
-                binary_data data, std::uint32_t const xid = get_xid()) noexcept
+                data_type data, std::uint32_t const xid = get_xid()) noexcept
             : echo_base{std::move(data), xid}
         {
         }
 
         explicit echo_reply(std::uint32_t const xid = get_xid()) noexcept
-            : echo_reply{binary_data{}, xid}
+            : echo_reply{data_type{}, xid}
         {
         }
 

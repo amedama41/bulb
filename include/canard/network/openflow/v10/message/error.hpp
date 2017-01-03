@@ -2,13 +2,12 @@
 #define CANARD_NET_OFP_V10_MESSAGES_ERROR_HPP
 
 #include <cstdint>
+#include <algorithm>
 #include <iterator>
 #include <limits>
 #include <stdexcept>
 #include <utility>
-#include <vector>
-#include <boost/range/iterator_range.hpp>
-#include <canard/network/openflow/binary_data.hpp>
+#include <boost/container/vector.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
@@ -28,13 +27,13 @@ namespace messages {
     {
     public:
         using raw_ofp_type = v10_detail::ofp_error_msg;
-        using data_type = binary_data::pointer_type;
+        using data_type = boost::container::vector<std::uint8_t>;
 
         static constexpr protocol::ofp_type message_type = protocol::OFPT_ERROR;
 
         error(protocol::ofp_error_type const type
             , std::uint16_t const code
-            , binary_data data
+            , data_type data
             , std::uint32_t const xid = get_xid()) noexcept
             : error_msg_{
                   v10_detail::ofp_header{
@@ -46,7 +45,7 @@ namespace messages {
                 , std::uint16_t(type)
                 , code
               }
-            , data_(std::move(data).data())
+            , data_(std::move(data))
         {
         }
 
@@ -60,11 +59,7 @@ namespace messages {
         {
         }
 
-        error(error const& other)
-            : error_msg_(other.error_msg_)
-            , data_(binary_data::copy_data(other.data()))
-        {
-        }
+        error(error const&) = default;
 
         error(error&& other) noexcept
             : error_msg_(other.error_msg_)
@@ -83,7 +78,7 @@ namespace messages {
             -> error&
         {
             auto tmp = std::move(other);
-            error_msg_ = tmp.error_msg_;
+            std::swap(error_msg_, tmp.error_msg_);
             data_.swap(tmp.data_);
             return *this;
         }
@@ -107,30 +102,31 @@ namespace messages {
         }
 
         auto data() const noexcept
-            -> boost::iterator_range<unsigned char const*>
+            -> data_type const&
         {
-            return boost::make_iterator_range_n(data_.get(), data_length());
+            return data_;
         }
 
         auto data_length() const noexcept
             -> std::uint16_t
         {
-            return length() - sizeof(raw_ofp_type);
+            return data_.size();
         }
 
         auto extract_data() noexcept
-            -> binary_data
+            -> data_type
         {
-            auto const data_len = data_length();
+            auto data = data_type{};
+            data.swap(data_);
             error_msg_.header.length = sizeof(raw_ofp_type);
-            return binary_data{std::move(data_), data_len};
+            return data;
         }
 
         auto failed_request_header() const
             -> v10_detail::ofp_header
         {
-            auto it = data_.get();
-            auto const it_end = data_.get() + data_length();
+            auto it = data_.data();
+            auto const it_end = data_.data() + data_.size();
             return detail::decode<v10_detail::ofp_header>(it, it_end);
         }
 
@@ -161,7 +157,7 @@ namespace messages {
         void encode_impl(Container& container) const
         {
             detail::encode(container, error_msg_);
-            detail::encode_byte_array(container, data_.get(), data_length());
+            detail::encode_byte_array(container, data_.data(), data_.size());
         }
 
         template <class Iterator>
@@ -173,7 +169,8 @@ namespace messages {
             auto const data_length
                 = error_msg.header.length - sizeof(raw_ofp_type);
             last = std::next(first, data_length);
-            auto data = binary_data::copy_data(first, last);
+            auto data = data_type{data_length, boost::container::default_init};
+            std::copy(first, last, data.data());
             first = last;
 
             return error{error_msg, std::move(data)};
@@ -189,11 +186,11 @@ namespace messages {
         template <class Message>
         static auto create_data(
                 Message const& msg, std::uint16_t data_size)
-            -> binary_data
+            -> data_type
         {
-            auto buffer = std::vector<unsigned char>{};
-            buffer.reserve(msg.length());
-            msg.encode(buffer);
+            auto data = data_type{};
+            data.reserve(msg.length());
+            msg.encode(data);
 
             constexpr auto max_data_size
                 = std::numeric_limits<std::uint16_t>::max()
@@ -201,14 +198,14 @@ namespace messages {
             if (data_size > max_data_size) {
                 data_size = max_data_size;
             }
-            if (buffer.size() > data_size) {
-                buffer.resize(data_size);
+            if (data.size() > data_size) {
+                data.resize(data_size);
             }
 
-            return binary_data{buffer};
+            return data;
         }
 
-        static auto calc_ofp_length(binary_data const& data)
+        static auto calc_ofp_length(data_type const& data)
             -> std::uint16_t
         {
             constexpr auto max_length

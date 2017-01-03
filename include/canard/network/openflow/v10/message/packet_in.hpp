@@ -4,12 +4,12 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <algorithm>
 #include <iterator>
 #include <limits>
 #include <stdexcept>
 #include <utility>
-#include <boost/range/iterator_range.hpp>
-#include <canard/network/openflow/binary_data.hpp>
+#include <boost/container/vector.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/get_xid.hpp>
@@ -38,17 +38,17 @@ namespace messages {
 
     public:
         using raw_ofp_type = v10_detail::ofp_packet_in;
-        using data_type = binary_data::pointer_type;
+        using data_type = boost::container::vector<std::uint8_t>;
 
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_PACKET_IN;
 
-        packet_in(binary_data data
+        packet_in(data_type data
                 , std::uint16_t const total_len
                 , std::uint16_t const in_port
                 , protocol::ofp_packet_in_reason const reason
                 , std::uint32_t const buffer_id
-                , std::uint32_t const xid = get_xid())
+                , std::uint32_t const xid = get_xid()) noexcept
             : packet_in_{
                   v10_detail::ofp_header{
                       protocol::OFP_VERSION
@@ -62,15 +62,11 @@ namespace messages {
                 , std::uint8_t(reason)
                 , 0
               }
-            , data_(std::move(data).data())
+            , data_(std::move(data))
         {
         }
 
-        packet_in(packet_in const& other)
-            : packet_in_(other.packet_in_)
-            , data_(binary_data::copy_data(other.frame()))
-        {
-        }
+        packet_in(packet_in const&) = default;
 
         packet_in(packet_in&& other) noexcept
             : packet_in_(other.packet_in_)
@@ -89,7 +85,7 @@ namespace messages {
             -> packet_in&
         {
             auto pkt_in = std::move(other);
-            packet_in_ = pkt_in.packet_in_;
+            std::swap(packet_in_, pkt_in.packet_in_);
             data_.swap(pkt_in.data_);
             return *this;
         }
@@ -125,21 +121,22 @@ namespace messages {
         }
 
         auto frame() const noexcept
-            -> boost::iterator_range<unsigned char const*>
+            -> data_type const&
         {
-            return boost::make_iterator_range_n(data_.get(), frame_length());
+            return data_;
         }
 
         auto frame_length() const noexcept
             -> std::uint16_t
         {
-            return length() - min_pkt_in_len;
+            return data_.size();
         }
 
         auto extract_frame() noexcept
-            -> binary_data
+            -> data_type
         {
-            auto data = binary_data{std::move(data_), frame_length()};
+            auto data = data_type{};
+            data.swap(data_);
             packet_in_.header.length = min_pkt_in_len;
             return data;
         }
@@ -160,7 +157,7 @@ namespace messages {
     private:
         friend basic_openflow_message::basic_protocol_type;
 
-        packet_in(raw_ofp_type const& pkt_in, data_type&& data)
+        packet_in(raw_ofp_type const& pkt_in, data_type&& data) noexcept
             : packet_in_(pkt_in)
             , data_(std::move(data))
         {
@@ -170,7 +167,7 @@ namespace messages {
         void encode_impl(Container& container) const
         {
             detail::encode(container, packet_in_, min_pkt_in_len);
-            detail::encode_byte_array(container, data_.get(), frame_length());
+            detail::encode_byte_array(container, data_.data(), data_.size());
         }
 
         template <class Iterator>
@@ -179,9 +176,13 @@ namespace messages {
         {
             auto pkt_in
                 = detail::decode<raw_ofp_type>(first, last, min_pkt_in_len);
-            last = std::next(first, pkt_in.header.length - min_pkt_in_len);
 
-            auto data = binary_data::copy_data(first, last);
+            auto const data_length
+                = std::uint16_t(pkt_in.header.length - min_pkt_in_len);
+            last = std::next(first, data_length);
+
+            auto data = data_type{data_length, boost::container::default_init};
+            std::copy(first, last, data.data());
             first = last;
 
             return packet_in{pkt_in, std::move(data)};
@@ -195,7 +196,7 @@ namespace messages {
                 && frame() == rhs.frame();
         }
 
-        static auto calc_ofp_length(binary_data const& data)
+        static auto calc_ofp_length(data_type const& data)
             -> std::uint16_t
         {
             constexpr auto max_length

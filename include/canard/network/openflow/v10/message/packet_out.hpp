@@ -2,12 +2,12 @@
 #define CANARD_NET_OFP_V10_MESSAGES_PACKET_OUT_HPP
 
 #include <cstdint>
+#include <algorithm>
 #include <iterator>
 #include <limits>
 #include <stdexcept>
 #include <utility>
-#include <boost/range/iterator_range.hpp>
-#include <canard/network/openflow/binary_data.hpp>
+#include <boost/container/vector.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
@@ -28,7 +28,7 @@ namespace messages {
     {
     public:
         using raw_ofp_type = v10_detail::ofp_packet_out;
-        using data_type = binary_data::pointer_type;
+        using data_type = boost::container::vector<std::uint8_t>;
 
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_PACKET_OUT;
@@ -38,7 +38,7 @@ namespace messages {
                  , std::uint32_t const buffer_id
                  , std::uint16_t const in_port
                  , action_list&& actions
-                 , binary_data&& data
+                 , data_type&& data
                  , std::uint32_t const xid)
             : packet_out_{
                   v10_detail::ofp_header{
@@ -52,7 +52,7 @@ namespace messages {
                 , std::uint16_t(length - (sizeof(raw_ofp_type) + data.size()))
               }
             , actions_(std::move(actions))
-            , data_(std::move(data).data())
+            , data_(std::move(data))
         {
         }
 
@@ -63,7 +63,7 @@ namespace messages {
                  , std::uint32_t const xid = get_xid())
             : packet_out{
                   actions.calc_ofp_length(sizeof(raw_ofp_type))
-                , buffer_id, in_port, std::move(actions), binary_data{}, xid
+                , buffer_id, in_port, std::move(actions), data_type{}, xid
               }
         {
         }
@@ -77,7 +77,7 @@ namespace messages {
         {
         }
 
-        packet_out(binary_data data
+        packet_out(data_type data
                  , std::uint16_t const in_port
                  , action_list actions
                  , std::uint32_t const xid = get_xid())
@@ -92,7 +92,7 @@ namespace messages {
         {
         }
 
-        packet_out(binary_data data
+        packet_out(data_type data
                  , action_list actions
                  , std::uint32_t const xid = get_xid())
             : packet_out{
@@ -101,12 +101,7 @@ namespace messages {
         {
         }
 
-        packet_out(packet_out const& other)
-            : packet_out_(other.packet_out_)
-            , actions_(other.actions_)
-            , data_(binary_data::copy_data(other.frame()))
-        {
-        }
+        packet_out(packet_out const&) = default;
 
         packet_out(packet_out&& other)
             : packet_out_(other.packet_out_)
@@ -126,7 +121,7 @@ namespace messages {
             -> packet_out&
         {
             auto tmp = std::move(other);
-            packet_out_ = tmp.packet_out_;
+            std::swap(packet_out_, tmp.packet_out_);
             actions_.swap(tmp.actions_);
             data_.swap(tmp.data_);
             return *this;
@@ -173,15 +168,16 @@ namespace messages {
         }
 
         auto frame() const noexcept
-            -> boost::iterator_range<unsigned char const*>
+            -> data_type const&
         {
-            return boost::make_iterator_range_n(data_.get(), frame_length());
+            return data_;
         }
 
-        auto extract_frame()
-            -> binary_data
+        auto extract_frame() noexcept
+            -> data_type
         {
-            auto data = binary_data{std::move(data_), frame_length()};
+            auto data = data_type{};
+            data.swap(data_);
             packet_out_.header.length -= data.size();
             return data;
         }
@@ -189,7 +185,7 @@ namespace messages {
         auto frame_length() const noexcept
             -> std::uint16_t
         {
-            return length() - sizeof(raw_ofp_type) - actions_length();
+            return data_.size();
         }
 
         static void validate_header(v10_detail::ofp_header const& header)
@@ -218,7 +214,7 @@ namespace messages {
         }
 
         static auto calc_packet_out_length(
-                binary_data const& data, action_list const& actions)
+                data_type const& data, action_list const& actions)
             -> std::uint16_t
         {
             constexpr auto max_length
@@ -234,7 +230,7 @@ namespace messages {
         {
             detail::encode(container, packet_out_);
             actions_.encode(container);
-            detail::encode_byte_array(container, data_.get(), frame_length());
+            detail::encode_byte_array(container, data_.data(), data_.size());
         }
 
         template <class Iterator>
@@ -242,16 +238,18 @@ namespace messages {
             -> packet_out
         {
             auto const pkt_out = detail::decode<raw_ofp_type>(first, last);
-            last = std::next(
-                    first, pkt_out.header.length - sizeof(raw_ofp_type));
-            if (std::distance(first, last) < pkt_out.actions_len) {
+            auto const rest_size = pkt_out.header.length - sizeof(raw_ofp_type);
+            if (rest_size < pkt_out.actions_len) {
                 throw std::runtime_error{"invalid actions length"};
             }
+            last = std::next(first, rest_size);
 
             auto const actions_last = std::next(first, pkt_out.actions_len);
             auto actions = action_list::decode(first, actions_last);
 
-            auto data = binary_data::copy_data(first, last);
+            auto const data_length = rest_size - pkt_out.actions_len;
+            auto data = data_type{data_length, boost::container::default_init};
+            std::copy(first, last, data.data());
             first = last;
             return packet_out{pkt_out, std::move(actions), std::move(data)};
         }

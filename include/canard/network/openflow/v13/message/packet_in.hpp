@@ -2,12 +2,12 @@
 #define CANARD_NET_OFP_V13_MESSAGES_PACKET_IN_HPP
 
 #include <cstdint>
+#include <algorithm>
 #include <iterator>
 #include <stdexcept>
 #include <utility>
+#include <boost/container/vector.hpp>
 #include <boost/range/algorithm/find_if.hpp>
-#include <boost/range/iterator_range.hpp>
-#include <canard/network/openflow/binary_data.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/padding.hpp>
@@ -35,7 +35,7 @@ namespace messages {
 
     public:
         using raw_ofp_type = v13_detail::ofp_packet_in;
-        using data_type = binary_data::pointer_type;
+        using data_type = boost::container::vector<std::uint8_t>;
 
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_PACKET_IN;
@@ -46,7 +46,7 @@ namespace messages {
                 , std::uint8_t const table_id
                 , std::uint64_t const cookie
                 , oxm_match match
-                , binary_data data
+                , data_type data
                 , std::uint32_t const xid = get_xid())
             : packet_in_{
                   v13_detail::ofp_header{
@@ -65,7 +65,7 @@ namespace messages {
                 , cookie
               }
             , match_(std::move(match))
-            , data_(std::move(data).data())
+            , data_(std::move(data))
         {
         }
 
@@ -81,18 +81,13 @@ namespace messages {
             : packet_in{
                   buffer_id, total_len, reason, table_id, cookie
                 , std::move(match)
-                , binary_data{data}
+                , data_type{std::begin(data), std::end(data)}
                 , xid
               }
         {
         }
 
-        packet_in(packet_in const& other)
-            : packet_in_(other.packet_in_)
-            , match_(other.match_)
-            , data_(binary_data::copy_data(other.frame()))
-        {
-        }
+        packet_in(packet_in const&) = default;
 
         packet_in(packet_in&& other) noexcept
             : packet_in_(other.packet_in_)
@@ -112,7 +107,7 @@ namespace messages {
             -> packet_in&
         {
             auto pkt_in = std::move(other);
-            packet_in_ = pkt_in.packet_in_;
+            std::swap(packet_in_, pkt_in.packet_in_);
             match_.swap(pkt_in.match_);
             data_.swap(pkt_in.data_);
             return *this;
@@ -174,34 +169,31 @@ namespace messages {
         auto extract_match()
             -> oxm_match
         {
-            auto const frame_len = frame_length();
             auto match = oxm_match{};
             match.swap(match_);
-            packet_in_.header.length = base_pkt_in_size + frame_len;
+            packet_in_.header.length = base_pkt_in_size + data_.size();
             return match;
         }
 
         auto frame() const noexcept
-            -> boost::iterator_range<unsigned char const*>
+            -> data_type const&
         {
-            return boost::make_iterator_range_n(data_.get(), frame_length());
+            return data_;
         }
 
         auto frame_length() const noexcept
             -> std::uint16_t
         {
-            return length()
-                 - sizeof(raw_ofp_type)
-                 - match().byte_length()
-                 - data_alignment_padding_size;
+            return data_.size();
         }
 
         auto extract_frame() noexcept
-            -> binary_data
+            -> data_type
         {
-            auto const frame_len = frame_length();
-            packet_in_.header.length -= frame_len;
-            return binary_data{std::move(data_), frame_len};
+            auto data = data_type{};
+            data.swap(data_);
+            packet_in_.header.length -= data.size();
+            return data;
         }
 
     private:
@@ -229,7 +221,7 @@ namespace messages {
             match_.encode(container);
             detail::encode_byte_array(
                     container, detail::padding, data_alignment_padding_size);
-            detail::encode_byte_array(container, data_.get(), frame_length());
+            detail::encode_byte_array(container, data_.data(), data_.size());
         }
 
         template <class Iterator>
@@ -237,17 +229,16 @@ namespace messages {
             -> packet_in
         {
             auto const pkt_in = detail::decode<raw_ofp_type>(first, last);
-            last = std::next(
-                    first, pkt_in.header.length - sizeof(raw_ofp_type));
+            auto const rest_size = pkt_in.header.length - sizeof(raw_ofp_type);
+            last = std::next(first, rest_size);
 
-            auto copy_first = first;
+            auto it = first;
             auto const ofp_match
-                = detail::decode<v13_detail::ofp_match>(copy_first, last);
+                = detail::decode<v13_detail::ofp_match>(it, last);
             oxm_match::validate_header(ofp_match);
             auto const match_length
                 = v13_detail::exact_length(ofp_match.length);
-            if (std::distance(first, last) - data_alignment_padding_size
-                    < match_length) {
+            if (rest_size - data_alignment_padding_size < match_length) {
                 throw std::runtime_error{"oxm_match length is too big"};
             }
 
@@ -255,7 +246,10 @@ namespace messages {
 
             std::advance(first, data_alignment_padding_size);
 
-            auto data = binary_data::copy_data(first, last);
+            auto const data_length
+                = rest_size - match_length - data_alignment_padding_size;
+            auto data = data_type{data_length, boost::container::default_init};
+            std::copy(first, last, data.data());
             first = last;
 
             return packet_in{pkt_in, std::move(match), std::move(data)};
