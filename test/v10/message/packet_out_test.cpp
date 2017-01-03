@@ -18,14 +18,13 @@ struct parameters : action_fixture {
   std::uint16_t in_port = proto::OFPP_CONTROLLER;
   v10::action_list actions{ set_vlan_vid, output, strip_vlan, enqueue };
   std::uint32_t xid = 0x12345678;
-  ofp::binary_data data{
-    "\x01\x02\x03\x04\x05\x06\xa1\xa2""\xa3\xa4\xa5\xa6\x08\x00"
-    "\x45\x00\x00\x42\x12\x34\x00\x00""\x64\x07\xab\xcd\xc0\xa8\x0a\x01"
-    "\xc0\xa8\x10\x02"
-    "\xf0\x12\x80\x80\x12\x34\x56\x78""\x87\x65\x43\x21\x05\x00\x01\x80"
-    "\xab\xcd\x00\x00"
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"_bin
-  };
+  msg::packet_out::data_type data
+    = "\x01\x02\x03\x04\x05\x06\xa1\xa2""\xa3\xa4\xa5\xa6\x08\x00"
+      "\x45\x00\x00\x42\x12\x34\x00\x00""\x64\x07\xab\xcd\xc0\xa8\x0a\x01"
+      "\xc0\xa8\x10\x02"
+      "\xf0\x12\x80\x80\x12\x34\x56\x78""\x87\x65\x43\x21\x05\x00\x01\x80"
+      "\xab\xcd\x00\x00"
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ"_bbin;
 };
 struct packet_out_fixture : parameters {
   msg::packet_out sut{data, in_port, actions, xid};
@@ -255,10 +254,8 @@ BOOST_AUTO_TEST_SUITE(packet_out)
     BOOST_AUTO_TEST_CASE(is_false_if_data_is_not_equal)
     {
       BOOST_TEST(
-          (msg::packet_out{
-              ofp::binary_data{"\x01"_bin}, in_port, actions, xid}
-        != msg::packet_out{
-              ofp::binary_data{"\x02"_bin}, in_port, actions, xid}));
+          (msg::packet_out{"\x01"_bbin, in_port, actions, xid}
+        != msg::packet_out{"\x02"_bbin, in_port, actions, xid}));
     }
     BOOST_AUTO_TEST_CASE(is_false_if_buffer_id_is_not_equal)
     {
@@ -291,12 +288,12 @@ BOOST_AUTO_TEST_SUITE(packet_out)
   BOOST_FIXTURE_TEST_SUITE(extract_frame, packet_out_fixture)
     BOOST_AUTO_TEST_CASE(returns_frame_and_make_source_data_empty)
     {
-      auto const original = ofp::binary_data{sut.frame()};
+      auto const original = sut.frame();
       auto const original_length = sut.length();
 
       auto const frame = sut.extract_frame();
 
-      BOOST_TEST(boost::equal(frame, original));
+      BOOST_TEST(frame == original, boost::test_tools::per_element{});
       BOOST_TEST(sut.length() == original_length - frame.size());
       BOOST_TEST(sut.frame().empty());
     }

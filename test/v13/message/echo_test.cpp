@@ -41,39 +41,37 @@ BOOST_AUTO_TEST_SUITE(echo_request_test)
 
     BOOST_AUTO_TEST_CASE(construct_from_data_test)
     {
-        auto const bin = "\x01\x02\x03\x04"_bin;
+        auto const data = "\x01\x02\x03\x04"_bbin;
 
-        auto const sut = v13::messages::echo_request{of::binary_data{bin}};
+        auto const sut = v13::messages::echo_request{data};
 
         BOOST_TEST(sut.version() == proto::OFP_VERSION);
         BOOST_TEST(sut.type() == proto::OFPT_ECHO_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_header) + bin.size());
-        BOOST_TEST(sut.data_length() == bin.size());
-        BOOST_TEST(sut.data() == bin, boost::test_tools::per_element{});
+        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_header) + data.size());
+        BOOST_TEST(sut.data_length() == data.size());
+        BOOST_TEST(sut.data() == data, boost::test_tools::per_element{});
     }
 
     BOOST_AUTO_TEST_CASE(construct_from_data_and_xid_test)
     {
-        auto const bin = "\xff\xff\xff\xff"_bin;
+        auto const data = "\xff\xff\xff\xff"_bbin;
         auto const xid = 0xfefefefe;
 
-        auto const sut = v13::messages::echo_request{of::binary_data{bin}, xid};
+        auto const sut = v13::messages::echo_request{data, xid};
 
         BOOST_TEST(sut.version() == proto::OFP_VERSION);
         BOOST_TEST(sut.type() == proto::OFPT_ECHO_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_header) + bin.size());
+        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_header) + data.size());
         BOOST_TEST(sut.xid() == xid);
-        BOOST_TEST(sut.data_length() == bin.size());
-        BOOST_TEST(sut.data() == bin, boost::test_tools::per_element{});
+        BOOST_TEST(sut.data_length() == data.size());
+        BOOST_TEST(sut.data() == data, boost::test_tools::per_element{});
     }
 
 
     struct echo_request_fixture
     {
-        std::vector<std::uint8_t> bin = "\x00\xff\x01\xfe"_bin;
-        v13::messages::echo_request sut{
-            of::binary_data{bin}, 0x0013fffe
-        };
+        v13::messages::echo_request::data_type data = "\x00\xff\x01\xfe"_bbin;
+        v13::messages::echo_request sut{data, 0x0013fffe};
         std::vector<std::uint8_t> const echo_request_bin
             = "\x04\x02\x00\x0c\x00\x13\xff\xfe" "\x00\xff\x01\xfe"_bin;
     };
@@ -143,15 +141,13 @@ BOOST_AUTO_TEST_SUITE(echo_request_test)
 
     BOOST_FIXTURE_TEST_CASE(extract_data_test, echo_request_fixture)
     {
-        auto const data = sut.extract_data();
+        auto const extracted_data = sut.extract_data();
 
         BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_header));
         BOOST_TEST(sut.data_length() == 0);
         BOOST_TEST(sut.data().empty());
 
-        auto const data_range
-            = boost::make_iterator_range(data.begin(), data.end());
-        BOOST_TEST(data_range == bin, boost::test_tools::per_element{});
+        BOOST_TEST(extracted_data == data, boost::test_tools::per_element{});
     }
 
     BOOST_FIXTURE_TEST_CASE(encode_test, echo_request_fixture)
@@ -247,63 +243,63 @@ BOOST_AUTO_TEST_SUITE(echo_reply_test)
 
     BOOST_AUTO_TEST_CASE(construct_from_data_test)
     {
-        auto const bin = "\x01\x02\x03\x04"_bin;
+        auto const data = "\x01\x02\x03\x04"_bbin;
 
-        auto const sut = v13::messages::echo_reply{of::binary_data{bin}};
+        auto const sut = v13::messages::echo_reply{data};
 
         BOOST_TEST(sut.version() == proto::OFP_VERSION);
         BOOST_TEST(sut.type() == proto::OFPT_ECHO_REPLY);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_header) + bin.size());
-        BOOST_TEST(sut.data_length() == bin.size());
-        BOOST_TEST(sut.data() == bin, boost::test_tools::per_element{});
+        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_header) + data.size());
+        BOOST_TEST(sut.data_length() == data.size());
+        BOOST_TEST(sut.data() == data, boost::test_tools::per_element{});
     }
 
     BOOST_AUTO_TEST_CASE(construct_from_data_and_xid_test)
     {
-        auto const bin = "\xff\xff\xff\xff"_bin;
+        auto const data = "\xff\xff\xff\xff"_bbin;
         auto const xid = 0xfefefefe;
 
-        auto const sut = v13::messages::echo_reply{of::binary_data{bin}, xid};
+        auto const sut = v13::messages::echo_reply{data, xid};
 
         BOOST_TEST(sut.version() == proto::OFP_VERSION);
         BOOST_TEST(sut.type() == proto::OFPT_ECHO_REPLY);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_header) + bin.size());
+        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_header) + data.size());
         BOOST_TEST(sut.xid() == xid);
-        BOOST_TEST(sut.data_length() == bin.size());
-        BOOST_TEST(sut.data() == bin, boost::test_tools::per_element{});
+        BOOST_TEST(sut.data_length() == data.size());
+        BOOST_TEST(sut.data() == data, boost::test_tools::per_element{});
     }
 
     BOOST_AUTO_TEST_CASE(construct_from_lvalue_echo_request_test)
     {
-        auto const bin = "\xff\xff\xff\xff"_bin;
+        auto const data = "\xff\xff\xff\xff"_bbin;
         auto const xid = 0xfefefefe;
         auto const request
-            = v13::messages::echo_request{of::binary_data{bin}, xid};
+            = v13::messages::echo_request{data, xid};
 
         auto const sut = v13::messages::echo_reply{request};
 
         BOOST_TEST(sut.version() == proto::OFP_VERSION);
         BOOST_TEST(sut.type() == proto::OFPT_ECHO_REPLY);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_header) + bin.size());
+        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_header) + data.size());
         BOOST_TEST(sut.xid() == xid);
-        BOOST_TEST(sut.data_length() == bin.size());
-        BOOST_TEST(sut.data() == bin, boost::test_tools::per_element{});
+        BOOST_TEST(sut.data_length() == data.size());
+        BOOST_TEST(sut.data() == data, boost::test_tools::per_element{});
     }
 
     BOOST_AUTO_TEST_CASE(construct_from_rvalue_echo_request_test)
     {
-        auto const bin = "\xff\xff\xff\xff"_bin;
+        auto const data = "\xff\xff\xff\xff"_bbin;
         auto const xid = 0xfefefefe;
-        auto request = v13::messages::echo_request{of::binary_data{bin}, xid};
+        auto request = v13::messages::echo_request{data, xid};
 
         auto const sut = v13::messages::echo_reply{std::move(request)};
 
         BOOST_TEST(sut.version() == proto::OFP_VERSION);
         BOOST_TEST(sut.type() == proto::OFPT_ECHO_REPLY);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_header) + bin.size());
+        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_header) + data.size());
         BOOST_TEST(sut.xid() == xid);
-        BOOST_TEST(sut.data_length() == bin.size());
-        BOOST_TEST(sut.data() == bin, boost::test_tools::per_element{});
+        BOOST_TEST(sut.data_length() == data.size());
+        BOOST_TEST(sut.data() == data, boost::test_tools::per_element{});
 
         BOOST_TEST(request.length() == sizeof(v13_detail::ofp_header));
         BOOST_TEST(request.data_length() == 0);
@@ -312,10 +308,8 @@ BOOST_AUTO_TEST_SUITE(echo_reply_test)
 
     struct echo_reply_fixture
     {
-        std::vector<std::uint8_t> bin = "\x00\xff\x01\xfe"_bin;
-        v13::messages::echo_reply sut{
-            of::binary_data{bin}, 0x0013fffe
-        };
+        v13::messages::echo_reply::data_type data = "\x00\xff\x01\xfe"_bbin;
+        v13::messages::echo_reply sut{data, 0x0013fffe};
         std::vector<std::uint8_t> const echo_reply_bin
             = "\x04\x03\x00\x0c\x00\x13\xff\xfe" "\x00\xff\x01\xfe"_bin;
     };
@@ -385,15 +379,12 @@ BOOST_AUTO_TEST_SUITE(echo_reply_test)
 
     BOOST_FIXTURE_TEST_CASE(extract_data_test, echo_reply_fixture)
     {
-        auto const data = sut.extract_data();
+        auto const extracted_data = sut.extract_data();
 
         BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_header));
         BOOST_TEST(sut.data_length() == 0);
         BOOST_TEST(sut.data().empty());
-
-        auto const data_range
-            = boost::make_iterator_range(data.begin(), data.end());
-        BOOST_TEST(data_range == bin, boost::test_tools::per_element{});
+        BOOST_TEST(extracted_data == data, boost::test_tools::per_element{});
     }
 
     BOOST_FIXTURE_TEST_CASE(encode_test, echo_reply_fixture)

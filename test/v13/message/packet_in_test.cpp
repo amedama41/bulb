@@ -33,8 +33,7 @@ BOOST_AUTO_TEST_SUITE(packet_in_test)
             , match::eth_src{"\x11\x12\x13\x14\x15\x16"_mac}
             , match::eth_type{0x0800, 0x0800}
         };
-        char const bin[] = "\x00\x01\x02\x03\x04";
-        auto data = of::binary_data{bin};
+        auto const data = "\x00\x01\x02\x03\x04"_bbin;
 
         auto const sut = v13::messages::packet_in{
               buffer_id, total_len, reason, table_id, cookie
@@ -45,15 +44,15 @@ BOOST_AUTO_TEST_SUITE(packet_in_test)
         BOOST_TEST(sut.type() == proto::OFPT_PACKET_IN);
         BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_packet_in)
                                  + v13::v13_detail::exact_length(match.length())
-                                 + data_padding_size + sizeof(bin));
+                                 + data_padding_size + data.size());
         BOOST_TEST(sut.buffer_id() == buffer_id);
         BOOST_TEST(sut.total_length() == total_len);
         BOOST_TEST(sut.reason() == reason);
         BOOST_TEST(sut.table_id() == table_id);
         BOOST_TEST(sut.cookie() == cookie);
-        // BOOST_TEST(sut.match() == match);
-        BOOST_TEST(sut.frame_length() == sizeof(bin));
-        BOOST_TEST((sut.frame() == boost::make_iterator_range(bin)));
+        BOOST_TEST((sut.match() == match));
+        BOOST_TEST(sut.frame_length() == data.size());
+        BOOST_TEST(sut.frame() == data, boost::test_tools::per_element{});
     }
 
     BOOST_AUTO_TEST_CASE(constructor_from_range_test)
@@ -64,24 +63,24 @@ BOOST_AUTO_TEST_SUITE(packet_in_test)
         auto const table_id = std::uint8_t{0xff};
         auto const cookie = std::uint64_t{0};
         auto const match = v13::oxm_match{};
-        char const bin[] = "\x09\x08\x07\x06\x05\x04";
+        auto const data = "\x09\x08\x07\x06\x05\x04"_bbin;
 
         auto const sut = v13::messages::packet_in{
               buffer_id, total_len, reason, table_id, cookie
-            , match, bin
+            , match, data
         };
 
         BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_packet_in)
                                  + sizeof(v13::v13_detail::ofp_match)
-                                 + data_padding_size + sizeof(bin));
+                                 + data_padding_size + data.size());
         BOOST_TEST(sut.buffer_id() == buffer_id);
         BOOST_TEST(sut.total_length() == total_len);
         BOOST_TEST(sut.reason() == reason);
         BOOST_TEST(sut.table_id() == table_id);
         BOOST_TEST(sut.cookie() == cookie);
-        // BOOST_TEST(sut.match() == match);
-        BOOST_TEST(sut.frame_length() == sizeof(bin));
-        BOOST_TEST((sut.frame() == boost::make_iterator_range(bin)));
+        BOOST_TEST((sut.match() == match));
+        BOOST_TEST(sut.frame_length() == data.size());
+        BOOST_TEST(sut.frame() == data, boost::test_tools::per_element{});
     }
 
     BOOST_AUTO_TEST_CASE(no_data_contructor)
@@ -94,11 +93,11 @@ BOOST_AUTO_TEST_SUITE(packet_in_test)
         auto const match = v13::oxm_match{
             match::eth_src{"\x11\x12\x13\x14\x15\x16"_mac}
         };
-        auto const bin = std::vector<unsigned char>{};
+        auto const data = v13::messages::packet_in::data_type{};
 
         auto const sut = v13::messages::packet_in{
               buffer_id, total_len, reason, table_id, cookie
-            , match, bin
+            , match, data
         };
 
         BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_packet_in)
@@ -109,9 +108,9 @@ BOOST_AUTO_TEST_SUITE(packet_in_test)
         BOOST_TEST(sut.reason() == reason);
         BOOST_TEST(sut.table_id() == table_id);
         BOOST_TEST(sut.cookie() == cookie);
-        // BOOST_TEST(sut.match() == match);
-        BOOST_TEST(sut.frame_length() == bin.size());
-        BOOST_TEST((sut.frame() == boost::make_iterator_range(bin)));
+        BOOST_TEST((sut.match() == match));
+        BOOST_TEST(sut.frame_length() == data.size());
+        BOOST_TEST(sut.frame() == data, boost::test_tools::per_element{});
     }
 
     struct packet_in_fixture

@@ -17,13 +17,13 @@ struct parameters {
   std::uint16_t total_len = 1024;
   std::uint16_t in_port = 0x1234;
   proto::ofp_packet_in_reason reason = proto::OFPR_ACTION;
-  ofp::binary_data data{
+  msg::packet_in::data_type data{
     "\x01\x02\x03\x04\x05\x06\xa1\xa2""\xa3\xa4\xa5\xa6\x08\x00"
     "\x45\x00\x00\x42\x12\x34\x00\x00""\x64\x07\xab\xcd\xc0\xa8\x0a\x01"
     "\xc0\xa8\x10\x02"
     "\xf0\x12\x80\x80\x12\x34\x56\x78""\x87\x65\x43\x21\x05\x00\x01\x80"
     "\xab\xcd\x00\x00"
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"_bin
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"_bbin
   };
   std::uint32_t xid = 0x12345678;
 };
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_SUITE(packet_in)
     BOOST_AUTO_TEST_CASE(is_constructible_from_empty_data)
     {
       msg::packet_in sut{
-        ofp::binary_data{}, total_len, in_port, reason, buffer_id
+        msg::packet_in::data_type{}, total_len, in_port, reason, buffer_id
       };
 
       BOOST_TEST(sut.length() == ofp_packet_in_size);
@@ -147,10 +147,10 @@ BOOST_AUTO_TEST_SUITE(packet_in)
     {
       BOOST_TEST(
           (msg::packet_in{
-              ofp::binary_data{"\x01"_bin}, total_len, in_port, reason
+              "\x01"_bbin, total_len, in_port, reason
             , buffer_id, xid}
         != msg::packet_in{
-              ofp::binary_data{"\x02"_bin}, total_len, in_port, reason
+              "\x02"_bbin, total_len, in_port, reason
             , buffer_id, xid}));
     }
     BOOST_AUTO_TEST_CASE(is_false_if_total_len_is_not_equal)

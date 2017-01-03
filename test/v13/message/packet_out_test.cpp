@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_SUITE(packet_out_test)
 
     BOOST_AUTO_TEST_CASE(constructor_from_binary_test)
     {
-        unsigned char const bin[] = "\x00\x01\x02\x03\x04\x05";
+        auto const data = "\x00\x01\x02\x03\x04\x05"_bbin;
         auto const in_port = proto::OFPP_CONTROLLER;
         auto const actions = v13::action_list{
               v13::actions::push_vlan{0x8100}
@@ -51,35 +51,35 @@ BOOST_AUTO_TEST_SUITE(packet_out_test)
         auto const xid = std::uint32_t{0x000001};
 
         auto const sut = v13::messages::packet_out{
-            of::binary_data{bin}, in_port, actions, xid
+            data, in_port, actions, xid
         };
 
-        BOOST_TEST(sut.length() == ofp_pkt_out_size + actions.length() + sizeof(bin));
+        BOOST_TEST(sut.length() == ofp_pkt_out_size + actions.length() + data.size());
         BOOST_TEST(sut.xid() == xid);
         BOOST_TEST(sut.buffer_id() == proto::OFP_NO_BUFFER);
         BOOST_TEST(sut.in_port() == in_port);
         BOOST_TEST(sut.actions_length() == 40);
-        BOOST_TEST(sut.frame_length() == sizeof(bin));
-        BOOST_TEST((sut.frame() == boost::make_iterator_range(bin)));
+        BOOST_TEST(sut.frame_length() == data.size());
+        BOOST_TEST(sut.frame() == data, boost::test_tools::per_element{});
     }
 
     BOOST_AUTO_TEST_CASE(constructor_from_empty_actions_test)
     {
-        unsigned char const bin[] = "\x10\x11\x12\x13\x14\x15";
+        auto const data = "\x10\x11\x12\x13\x14\x15"_bbin;
         auto const in_port = 2;
         auto const xid = std::uint32_t{0x000001};
 
         auto const sut = v13::messages::packet_out{
-            of::binary_data{bin}, in_port, {}, xid
+            data, in_port, {}, xid
         };
 
-        BOOST_TEST(sut.length() == ofp_pkt_out_size + sizeof(bin));
+        BOOST_TEST(sut.length() == ofp_pkt_out_size + data.size());
         BOOST_TEST(sut.xid() == xid);
         BOOST_TEST(sut.buffer_id() == proto::OFP_NO_BUFFER);
         BOOST_TEST(sut.in_port() == in_port);
         BOOST_TEST(sut.actions_length() == 0);
-        BOOST_TEST(sut.frame_length() == sizeof(bin));
-        BOOST_TEST((sut.frame() == boost::make_iterator_range(bin)));
+        BOOST_TEST(sut.frame_length() == data.size());
+        BOOST_TEST(sut.frame() == data, boost::test_tools::per_element{});
     }
 
     BOOST_AUTO_TEST_CASE(constructor_from_empty_binary_test)
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_SUITE(packet_out_test)
         auto const in_port = 2;
 
         auto const sut = v13::messages::packet_out{
-            of::binary_data{}, in_port, {}
+            v13::messages::packet_out::data_type{}, in_port, {}
         };
 
         BOOST_TEST(sut.length() == ofp_pkt_out_size);
@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_SUITE(packet_out_test)
     struct packet_out_fixture
     {
         v13::messages::packet_out sut = v13::messages::packet_out{
-              of::binary_data{"\x10\x11\x12\x13\x14\x15"}
+              "\x10\x11\x12\x13\x14\x15"_bbin
             , proto::OFPP_CONTROLLER
             , v13::action_list{
                   v13::actions::push_vlan{0x8100}
@@ -209,27 +209,27 @@ BOOST_AUTO_TEST_SUITE(packet_out_test)
         BOOST_TEST(buffer.size() == sut.length());
 
         auto const expected
-            = "\x04\x0d\x00\x47\x00\x00\x12\x34" "\xff\xff\xff\xff\xff\xff\xff\xfd"
+            = "\x04\x0d\x00\x46\x00\x00\x12\x34" "\xff\xff\xff\xff\xff\xff\xff\xfd"
               "\x00\x28\x00\x00\x00\x00\x00\x00" "\x00\x11\x00\x08\x81\x00\x00\x00"
               "\x00\x19\x00\x10\x80\x00\x0c\x02" "\x10\x03\x00\x00\x00\x00\x00\x00"
               "\x00\x00\x00\x10\x00\x00\x00\x03" "\xff\xff\x00\x00\x00\x00\x00\x00"
-              "\x10\x11\x12\x13\x14\x15\x00"_bin
+              "\x10\x11\x12\x13\x14\x15"_bin
             ;
         BOOST_TEST(buffer == expected, boost::test_tools::per_element{});
     }
 
     BOOST_FIXTURE_TEST_CASE(decode_test, packet_out_fixture)
     {
-        char const buffer[]
-            = "\x04\x0d\x00\x47\x00\x00\x12\x34" "\xff\xff\xff\xff\xff\xff\xff\xfd"
+        auto const buffer
+            = "\x04\x0d\x00\x46\x00\x00\x12\x34" "\xff\xff\xff\xff\xff\xff\xff\xfd"
               "\x00\x28\x00\x00\x00\x00\x00\x00" "\x00\x11\x00\x08\x81\x00\x00\x00"
               "\x00\x19\x00\x10\x80\x00\x0c\x02" "\x10\x03\x00\x00\x00\x00\x00\x00"
               "\x00\x00\x00\x10\x00\x00\x00\x03" "\xff\xff\x00\x00\x00\x00\x00\x00"
-              "\x10\x11\x12\x13\x14\x15"
+              "\x10\x11\x12\x13\x14\x15"_bin
             ;
 
-        auto it = buffer;
-        auto const it_end = buffer + sizeof(buffer);
+        auto it = buffer.begin();
+        auto const it_end = buffer.end();
         auto pkt_out = v13::messages::packet_out::decode(it, it_end);
 
         BOOST_TEST(sut.version() == pkt_out.version());
@@ -240,7 +240,7 @@ BOOST_AUTO_TEST_SUITE(packet_out_test)
         BOOST_TEST(sut.in_port() == pkt_out.in_port());
         BOOST_TEST(sut.actions_length() == pkt_out.actions_length());
         BOOST_TEST(sut.frame_length() == pkt_out.frame_length());
-        BOOST_TEST((sut.frame() == pkt_out.frame()));
+        BOOST_TEST(sut.frame() == pkt_out.frame(), boost::test_tools::per_element{});
     }
 
 BOOST_AUTO_TEST_SUITE_END() // packet_out_test

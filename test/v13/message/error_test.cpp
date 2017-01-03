@@ -23,10 +23,10 @@ BOOST_AUTO_TEST_SUITE(error_test)
     {
         auto const etype = proto::OFPET_HELLO_FAILED;
         auto const ecode = proto::OFPHFC_INCOMPATIBLE;
-        auto const edata = std::string{"incompatible version"};
+        auto const edata = "incompatible version"_bbin;
 
         auto const sut
-            = v13::messages::error{etype, ecode, of::binary_data{edata}};
+            = v13::messages::error{etype, ecode, edata};
 
         BOOST_TEST(sut.version() == proto::OFP_VERSION);
         BOOST_TEST(sut.type() == proto::OFPT_ERROR);
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_SUITE(error_test)
         auto copy = v13::messages::error{
               proto::OFPET_FLOW_MOD_FAILED
             , proto::OFPFMFC_TABLE_FULL
-            , of::binary_data{""}
+            , ""_bbin
         };
 
         copy = sut;
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_SUITE(error_test)
         auto copy = v13::messages::error{
               proto::OFPET_FLOW_MOD_FAILED
             , proto::OFPFMFC_TABLE_FULL
-            , of::binary_data{""}
+            , ""_bbin
         };
         auto src = sut;
 

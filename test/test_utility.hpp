@@ -6,12 +6,19 @@
 #include <vector>
 #include <boost/asio/ip/address_v4.hpp>
 #include <boost/asio/ip/address_v6.hpp>
+#include <boost/container/vector.hpp>
 #include <canard/mac_address.hpp>
 
 inline auto operator"" _bin(char const* const str, std::size_t const size)
     -> std::vector<std::uint8_t>
 {
     return std::vector<std::uint8_t>(str, str + size);
+}
+
+inline auto operator"" _bbin(char const* const str, std::size_t const size)
+    -> boost::container::vector<std::uint8_t>
+{
+    return boost::container::vector<std::uint8_t>(str, str + size);
 }
 
 inline auto operator"" _mac(char const* const str, std::size_t const size)

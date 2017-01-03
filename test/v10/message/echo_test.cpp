@@ -13,7 +13,7 @@ namespace proto = v10::protocol;
 
 namespace {
 struct parameters {
-  ofp::binary_data data{"\xAB\xCD\xEF\x01\x02\x03\x04"_bin};
+  msg::echo_request::data_type data = "\xAB\xCD\xEF\x01\x02\x03\x04"_bbin;
   std::uint32_t xid = 0x01020304;
 };
 struct echo_request_fixture : parameters {
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_SUITE(echo_request)
   BOOST_AUTO_TEST_SUITE(constructor)
     BOOST_AUTO_TEST_CASE(is_constructible_from_data)
     {
-      auto const data = ofp::binary_data{"ABCDEFGHIJKLMNOPQRSTUVWXYZ"};
+      auto const data = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"_bbin;
       auto const xid = 0x12345678;
 
       msg::echo_request sut{data, xid};
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_SUITE(echo_request)
     }
     BOOST_AUTO_TEST_CASE(is_constructible_from_data_without_xid)
     {
-      auto const data = ofp::binary_data{"abcdefghijklmnopqrstuvwxyz"};
+      auto const data = "abcdefghijklmnopqrstuvwxyz"_bbin;
 
       msg::echo_request sut{data};
 
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_SUITE(echo_request)
     BOOST_AUTO_TEST_CASE(is_constructible_from_echo_request)
     {
       auto const request = msg::echo_request{
-        ofp::binary_data{"ABCDEFGHIJKLMNOPQRSTUVWXYZ"}, 0x12345678
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"_bbin, 0x12345678
       };
 
       msg::echo_reply sut{request};
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_SUITE(echo_request)
     BOOST_AUTO_TEST_CASE(is_constructible_from_rvalue_echo_request)
     {
       auto const request = msg::echo_request{
-        ofp::binary_data{"ABCDEFGHIJKLMNOPQRSTUVWXYZ"}, 0x12345678
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"_bbin, 0x12345678
       };
       auto rvalue_request = request;
 
@@ -148,8 +148,8 @@ BOOST_AUTO_TEST_SUITE(echo_request)
     BOOST_AUTO_TEST_CASE(is_false_if_data_is_not_equal)
     {
       BOOST_TEST(
-          (msg::echo_request{ofp::binary_data{"1"}, xid}
-        != msg::echo_request{ofp::binary_data{"2"}, xid}));
+          (msg::echo_request{"1"_bbin, xid}
+        != msg::echo_request{"2"_bbin, xid}));
     }
     BOOST_AUTO_TEST_CASE(is_false_if_xid_is_not_equal)
     {
@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_SUITE(echo_reply)
   BOOST_AUTO_TEST_SUITE(constructor)
     BOOST_AUTO_TEST_CASE(is_constructible_from_data)
     {
-      auto const data = ofp::binary_data{"ABCDEFGHIJKLMNOPQRSTUVWXYZ"};
+      auto const data = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"_bbin;
       auto const xid = 0x12345678;
 
       msg::echo_reply sut{data, xid};
@@ -221,7 +221,7 @@ BOOST_AUTO_TEST_SUITE(echo_reply)
     }
     BOOST_AUTO_TEST_CASE(is_constructible_from_data_without_xid)
     {
-      auto const data = ofp::binary_data{"abcdefghijklmnopqrstuvwxyz"};
+      auto const data = "abcdefghijklmnopqrstuvwxyz"_bbin;
 
       msg::echo_reply sut{data};
 
@@ -290,8 +290,8 @@ BOOST_AUTO_TEST_SUITE(echo_reply)
     BOOST_AUTO_TEST_CASE(is_false_if_data_is_not_equal)
     {
       BOOST_TEST(
-          (msg::echo_reply{ofp::binary_data{"1"}, xid}
-        != msg::echo_reply{ofp::binary_data{"2"}, xid}));
+          (msg::echo_reply{"1"_bbin, xid}
+        != msg::echo_reply{"2"_bbin, xid}));
     }
     BOOST_AUTO_TEST_CASE(is_false_if_xid_is_not_equal)
     {
