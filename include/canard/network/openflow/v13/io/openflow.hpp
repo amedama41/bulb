@@ -860,7 +860,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_port_no::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_port_no::original_type(value));
+      return protocol::operator<<(os, ofp_port_no::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -868,7 +868,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_type::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_type::original_type(value));
+      return protocol::operator<<(os, ofp_type::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -876,7 +876,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_hello_elem_type::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_hello_elem_type::original_type(value));
+      return protocol::operator<<(os, ofp_hello_elem_type::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -884,7 +884,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_config_flags::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_config_flags::original_type(value));
+      return protocol::operator<<(os, ofp_config_flags::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -892,7 +892,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_table_config::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_table_config::original_type(value));
+      return protocol::operator<<(os, ofp_table_config::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -900,7 +900,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_table::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_table::original_type(value));
+      return protocol::operator<<(os, ofp_table::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -908,7 +908,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_capabilities::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_capabilities::original_type(value));
+      return protocol::operator<<(os, ofp_capabilities::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -916,7 +916,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_port_config::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_port_config::original_type(value));
+      return protocol::operator<<(os, ofp_port_config::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -924,7 +924,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_port_state::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_port_state::original_type(value));
+      return protocol::operator<<(os, ofp_port_state::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -932,7 +932,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_port_features::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_port_features::original_type(value));
+      return protocol::operator<<(os, ofp_port_features::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -940,7 +940,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_port_reason::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_port_reason::original_type(value));
+      return protocol::operator<<(os, ofp_port_reason::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -948,7 +948,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_match_type::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_match_type::original_type(value));
+      return protocol::operator<<(os, ofp_match_type::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -956,7 +956,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_oxm_class::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_oxm_class::original_type(value));
+      return protocol::operator<<(os, ofp_oxm_class::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -964,7 +964,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, oxm_ofb_match_fields::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, oxm_ofb_match_fields::original_type(value));
+      return protocol::operator<<(os, oxm_ofb_match_fields::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -972,7 +972,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_vlan_id::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_vlan_id::original_type(value));
+      return protocol::operator<<(os, ofp_vlan_id::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -980,7 +980,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_ipv6exthdr_flags::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_ipv6exthdr_flags::original_type(value));
+      return protocol::operator<<(os, ofp_ipv6exthdr_flags::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -988,7 +988,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_action_type::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_action_type::original_type(value));
+      return protocol::operator<<(os, ofp_action_type::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -996,7 +996,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_controller_max_len::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_controller_max_len::original_type(value));
+      return protocol::operator<<(os, ofp_controller_max_len::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1004,7 +1004,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_instruction_type::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_instruction_type::original_type(value));
+      return protocol::operator<<(os, ofp_instruction_type::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1012,7 +1012,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_flow_mod_command::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_flow_mod_command::original_type(value));
+      return protocol::operator<<(os, ofp_flow_mod_command::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1020,7 +1020,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_flow_mod_flags::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_flow_mod_flags::original_type(value));
+      return protocol::operator<<(os, ofp_flow_mod_flags::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1028,7 +1028,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_group::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_group::original_type(value));
+      return protocol::operator<<(os, ofp_group::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1036,7 +1036,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_group_mod_command::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_group_mod_command::original_type(value));
+      return protocol::operator<<(os, ofp_group_mod_command::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1044,7 +1044,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_group_type::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_group_type::original_type(value));
+      return protocol::operator<<(os, ofp_group_type::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1052,7 +1052,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_packet_in_reason::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_packet_in_reason::original_type(value));
+      return protocol::operator<<(os, ofp_packet_in_reason::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1060,7 +1060,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_flow_removed_reason::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_flow_removed_reason::original_type(value));
+      return protocol::operator<<(os, ofp_flow_removed_reason::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1068,7 +1068,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_meter::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_meter::original_type(value));
+      return protocol::operator<<(os, ofp_meter::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1076,7 +1076,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_meter_band_type::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_meter_band_type::original_type(value));
+      return protocol::operator<<(os, ofp_meter_band_type::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1084,7 +1084,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_meter_mod_command::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_meter_mod_command::original_type(value));
+      return protocol::operator<<(os, ofp_meter_mod_command::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1092,7 +1092,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_meter_flags::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_meter_flags::original_type(value));
+      return protocol::operator<<(os, ofp_meter_flags::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1100,7 +1100,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_error_type::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_error_type::original_type(value));
+      return protocol::operator<<(os, ofp_error_type::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1108,7 +1108,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_hello_failed_code::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_hello_failed_code::original_type(value));
+      return protocol::operator<<(os, ofp_hello_failed_code::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1116,7 +1116,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_bad_request_code::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_bad_request_code::original_type(value));
+      return protocol::operator<<(os, ofp_bad_request_code::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1124,7 +1124,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_bad_action_code::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_bad_action_code::original_type(value));
+      return protocol::operator<<(os, ofp_bad_action_code::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1132,7 +1132,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_bad_instruction_code::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_bad_instruction_code::original_type(value));
+      return protocol::operator<<(os, ofp_bad_instruction_code::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1140,7 +1140,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_bad_match_code::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_bad_match_code::original_type(value));
+      return protocol::operator<<(os, ofp_bad_match_code::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1148,7 +1148,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_flow_mod_failed_code::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_flow_mod_failed_code::original_type(value));
+      return protocol::operator<<(os, ofp_flow_mod_failed_code::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1156,7 +1156,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_group_mod_failed_code::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_group_mod_failed_code::original_type(value));
+      return protocol::operator<<(os, ofp_group_mod_failed_code::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1164,7 +1164,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_port_mod_failed_code::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_port_mod_failed_code::original_type(value));
+      return protocol::operator<<(os, ofp_port_mod_failed_code::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1172,7 +1172,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_table_mod_failed_code::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_table_mod_failed_code::original_type(value));
+      return protocol::operator<<(os, ofp_table_mod_failed_code::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1180,7 +1180,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_queue_op_failed_code::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_queue_op_failed_code::original_type(value));
+      return protocol::operator<<(os, ofp_queue_op_failed_code::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1188,7 +1188,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_switch_config_failed_code::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_switch_config_failed_code::original_type(value));
+      return protocol::operator<<(os, ofp_switch_config_failed_code::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1196,7 +1196,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_role_request_failed_code::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_role_request_failed_code::original_type(value));
+      return protocol::operator<<(os, ofp_role_request_failed_code::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1204,7 +1204,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_meter_mod_failed_code::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_meter_mod_failed_code::original_type(value));
+      return protocol::operator<<(os, ofp_meter_mod_failed_code::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1212,7 +1212,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_table_features_failed_code::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_table_features_failed_code::original_type(value));
+      return protocol::operator<<(os, ofp_table_features_failed_code::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1220,7 +1220,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_multipart_type::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_multipart_type::original_type(value));
+      return protocol::operator<<(os, ofp_multipart_type::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1228,7 +1228,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_multipart_request_flags::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_multipart_request_flags::original_type(value));
+      return protocol::operator<<(os, ofp_multipart_request_flags::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1236,7 +1236,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_multipart_reply_flags::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_multipart_reply_flags::original_type(value));
+      return protocol::operator<<(os, ofp_multipart_reply_flags::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1244,7 +1244,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_table_feature_prop_type::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_table_feature_prop_type::original_type(value));
+      return protocol::operator<<(os, ofp_table_feature_prop_type::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1252,7 +1252,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_group_capabilities::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_group_capabilities::original_type(value));
+      return protocol::operator<<(os, ofp_group_capabilities::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1260,7 +1260,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_queue_properties::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_queue_properties::original_type(value));
+      return protocol::operator<<(os, ofp_queue_properties::unscoped_type(value));
     }
 
     template <class CharT, class Traits>
@@ -1268,7 +1268,7 @@ namespace protocol {
         std::basic_ostream<CharT, Traits>& os, ofp_controller_role::type const value)
       -> std::basic_ostream<CharT, Traits>&
     {
-      return protocol::operator<<(os, ofp_controller_role::original_type(value));
+      return protocol::operator<<(os, ofp_controller_role::unscoped_type(value));
     }
 
   } // namespace protocol_detail

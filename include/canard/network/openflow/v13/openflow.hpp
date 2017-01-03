@@ -1391,7 +1391,7 @@ namespace v13 {
 
       struct ofp_port_no
       {
-        using original_type = protocol::ofp_port_no;
+        using unscoped_type = protocol::ofp_port_no;
 
         enum type : std::uint32_t
         {
@@ -1409,7 +1409,7 @@ namespace v13 {
 
       struct ofp_type
       {
-        using original_type = protocol::ofp_type;
+        using unscoped_type = protocol::ofp_type;
 
         enum type : std::uint8_t
         {
@@ -1448,7 +1448,7 @@ namespace v13 {
 
       struct ofp_hello_elem_type
       {
-        using original_type = protocol::ofp_hello_elem_type;
+        using unscoped_type = protocol::ofp_hello_elem_type;
 
         enum type : std::uint16_t
         {
@@ -1458,7 +1458,7 @@ namespace v13 {
 
       struct ofp_config_flags
       {
-        using original_type = protocol::ofp_config_flags;
+        using unscoped_type = protocol::ofp_config_flags;
 
         enum type : std::uint16_t
         {
@@ -1471,7 +1471,7 @@ namespace v13 {
 
       struct ofp_table_config
       {
-        using original_type = protocol::ofp_table_config;
+        using unscoped_type = protocol::ofp_table_config;
 
         enum type : std::uint32_t
         {
@@ -1481,7 +1481,7 @@ namespace v13 {
 
       struct ofp_table
       {
-        using original_type = protocol::ofp_table;
+        using unscoped_type = protocol::ofp_table;
 
         enum type : std::uint8_t
         {
@@ -1492,7 +1492,7 @@ namespace v13 {
 
       struct ofp_capabilities
       {
-        using original_type = protocol::ofp_capabilities;
+        using unscoped_type = protocol::ofp_capabilities;
 
         enum type : std::uint32_t
         {
@@ -1508,7 +1508,7 @@ namespace v13 {
 
       struct ofp_port_config
       {
-        using original_type = protocol::ofp_port_config;
+        using unscoped_type = protocol::ofp_port_config;
 
         enum type : std::uint32_t
         {
@@ -1521,7 +1521,7 @@ namespace v13 {
 
       struct ofp_port_state
       {
-        using original_type = protocol::ofp_port_state;
+        using unscoped_type = protocol::ofp_port_state;
 
         enum type : std::uint32_t
         {
@@ -1533,7 +1533,7 @@ namespace v13 {
 
       struct ofp_port_features
       {
-        using original_type = protocol::ofp_port_features;
+        using unscoped_type = protocol::ofp_port_features;
 
         enum type : std::uint32_t
         {
@@ -1558,7 +1558,7 @@ namespace v13 {
 
       struct ofp_port_reason
       {
-        using original_type = protocol::ofp_port_reason;
+        using unscoped_type = protocol::ofp_port_reason;
 
         enum type : std::uint8_t
         {
@@ -1570,7 +1570,7 @@ namespace v13 {
 
       struct ofp_match_type
       {
-        using original_type = protocol::ofp_match_type;
+        using unscoped_type = protocol::ofp_match_type;
 
         enum type : std::uint16_t
         {
@@ -1581,7 +1581,7 @@ namespace v13 {
 
       struct ofp_oxm_class
       {
-        using original_type = protocol::ofp_oxm_class;
+        using unscoped_type = protocol::ofp_oxm_class;
 
         enum type : std::uint16_t
         {
@@ -1594,7 +1594,7 @@ namespace v13 {
 
       struct oxm_ofb_match_fields
       {
-        using original_type = protocol::oxm_ofb_match_fields;
+        using unscoped_type = protocol::oxm_ofb_match_fields;
 
         enum type : std::uint8_t
         {
@@ -1643,7 +1643,7 @@ namespace v13 {
 
       struct ofp_vlan_id
       {
-        using original_type = protocol::ofp_vlan_id;
+        using unscoped_type = protocol::ofp_vlan_id;
 
         enum type : std::uint16_t
         {
@@ -1654,7 +1654,7 @@ namespace v13 {
 
       struct ofp_ipv6exthdr_flags
       {
-        using original_type = protocol::ofp_ipv6exthdr_flags;
+        using unscoped_type = protocol::ofp_ipv6exthdr_flags;
 
         enum type : std::uint16_t
         {
@@ -1672,7 +1672,7 @@ namespace v13 {
 
       struct ofp_action_type
       {
-        using original_type = protocol::ofp_action_type;
+        using unscoped_type = protocol::ofp_action_type;
 
         enum type : std::uint16_t
         {
@@ -1698,7 +1698,7 @@ namespace v13 {
 
       struct ofp_controller_max_len
       {
-        using original_type = protocol::ofp_controller_max_len;
+        using unscoped_type = protocol::ofp_controller_max_len;
 
         enum type : std::uint16_t
         {
@@ -1709,7 +1709,7 @@ namespace v13 {
 
       struct ofp_instruction_type
       {
-        using original_type = protocol::ofp_instruction_type;
+        using unscoped_type = protocol::ofp_instruction_type;
 
         enum type : std::uint16_t
         {
@@ -1725,7 +1725,7 @@ namespace v13 {
 
       struct ofp_flow_mod_command
       {
-        using original_type = protocol::ofp_flow_mod_command;
+        using unscoped_type = protocol::ofp_flow_mod_command;
 
         enum type : std::uint16_t
         {
@@ -1739,7 +1739,7 @@ namespace v13 {
 
       struct ofp_flow_mod_flags
       {
-        using original_type = protocol::ofp_flow_mod_flags;
+        using unscoped_type = protocol::ofp_flow_mod_flags;
 
         enum type : std::uint16_t
         {
@@ -1753,7 +1753,7 @@ namespace v13 {
 
       struct ofp_group
       {
-        using original_type = protocol::ofp_group;
+        using unscoped_type = protocol::ofp_group;
 
         enum type : std::uint32_t
         {
@@ -1765,7 +1765,7 @@ namespace v13 {
 
       struct ofp_group_mod_command
       {
-        using original_type = protocol::ofp_group_mod_command;
+        using unscoped_type = protocol::ofp_group_mod_command;
 
         enum type : std::uint8_t
         {
@@ -1777,7 +1777,7 @@ namespace v13 {
 
       struct ofp_group_type
       {
-        using original_type = protocol::ofp_group_type;
+        using unscoped_type = protocol::ofp_group_type;
 
         enum type : std::uint8_t
         {
@@ -1790,7 +1790,7 @@ namespace v13 {
 
       struct ofp_packet_in_reason
       {
-        using original_type = protocol::ofp_packet_in_reason;
+        using unscoped_type = protocol::ofp_packet_in_reason;
 
         enum type : std::uint8_t
         {
@@ -1802,7 +1802,7 @@ namespace v13 {
 
       struct ofp_flow_removed_reason
       {
-        using original_type = protocol::ofp_flow_removed_reason;
+        using unscoped_type = protocol::ofp_flow_removed_reason;
 
         enum type : std::uint8_t
         {
@@ -1815,7 +1815,7 @@ namespace v13 {
 
       struct ofp_meter
       {
-        using original_type = protocol::ofp_meter;
+        using unscoped_type = protocol::ofp_meter;
 
         enum type : std::uint32_t
         {
@@ -1828,7 +1828,7 @@ namespace v13 {
 
       struct ofp_meter_band_type
       {
-        using original_type = protocol::ofp_meter_band_type;
+        using unscoped_type = protocol::ofp_meter_band_type;
 
         enum type : std::uint16_t
         {
@@ -1840,7 +1840,7 @@ namespace v13 {
 
       struct ofp_meter_mod_command
       {
-        using original_type = protocol::ofp_meter_mod_command;
+        using unscoped_type = protocol::ofp_meter_mod_command;
 
         enum type : std::uint16_t
         {
@@ -1852,7 +1852,7 @@ namespace v13 {
 
       struct ofp_meter_flags
       {
-        using original_type = protocol::ofp_meter_flags;
+        using unscoped_type = protocol::ofp_meter_flags;
 
         enum type : std::uint16_t
         {
@@ -1865,7 +1865,7 @@ namespace v13 {
 
       struct ofp_error_type
       {
-        using original_type = protocol::ofp_error_type;
+        using unscoped_type = protocol::ofp_error_type;
 
         enum type : std::uint16_t
         {
@@ -1889,7 +1889,7 @@ namespace v13 {
 
       struct ofp_hello_failed_code
       {
-        using original_type = protocol::ofp_hello_failed_code;
+        using unscoped_type = protocol::ofp_hello_failed_code;
 
         enum type : std::uint16_t
         {
@@ -1900,7 +1900,7 @@ namespace v13 {
 
       struct ofp_bad_request_code
       {
-        using original_type = protocol::ofp_bad_request_code;
+        using unscoped_type = protocol::ofp_bad_request_code;
 
         enum type : std::uint16_t
         {
@@ -1923,7 +1923,7 @@ namespace v13 {
 
       struct ofp_bad_action_code
       {
-        using original_type = protocol::ofp_bad_action_code;
+        using unscoped_type = protocol::ofp_bad_action_code;
 
         enum type : std::uint16_t
         {
@@ -1948,7 +1948,7 @@ namespace v13 {
 
       struct ofp_bad_instruction_code
       {
-        using original_type = protocol::ofp_bad_instruction_code;
+        using unscoped_type = protocol::ofp_bad_instruction_code;
 
         enum type : std::uint16_t
         {
@@ -1966,7 +1966,7 @@ namespace v13 {
 
       struct ofp_bad_match_code
       {
-        using original_type = protocol::ofp_bad_match_code;
+        using unscoped_type = protocol::ofp_bad_match_code;
 
         enum type : std::uint16_t
         {
@@ -1987,7 +1987,7 @@ namespace v13 {
 
       struct ofp_flow_mod_failed_code
       {
-        using original_type = protocol::ofp_flow_mod_failed_code;
+        using unscoped_type = protocol::ofp_flow_mod_failed_code;
 
         enum type : std::uint16_t
         {
@@ -2004,7 +2004,7 @@ namespace v13 {
 
       struct ofp_group_mod_failed_code
       {
-        using original_type = protocol::ofp_group_mod_failed_code;
+        using unscoped_type = protocol::ofp_group_mod_failed_code;
 
         enum type : std::uint16_t
         {
@@ -2028,7 +2028,7 @@ namespace v13 {
 
       struct ofp_port_mod_failed_code
       {
-        using original_type = protocol::ofp_port_mod_failed_code;
+        using unscoped_type = protocol::ofp_port_mod_failed_code;
 
         enum type : std::uint16_t
         {
@@ -2042,7 +2042,7 @@ namespace v13 {
 
       struct ofp_table_mod_failed_code
       {
-        using original_type = protocol::ofp_table_mod_failed_code;
+        using unscoped_type = protocol::ofp_table_mod_failed_code;
 
         enum type : std::uint16_t
         {
@@ -2054,7 +2054,7 @@ namespace v13 {
 
       struct ofp_queue_op_failed_code
       {
-        using original_type = protocol::ofp_queue_op_failed_code;
+        using unscoped_type = protocol::ofp_queue_op_failed_code;
 
         enum type : std::uint16_t
         {
@@ -2066,7 +2066,7 @@ namespace v13 {
 
       struct ofp_switch_config_failed_code
       {
-        using original_type = protocol::ofp_switch_config_failed_code;
+        using unscoped_type = protocol::ofp_switch_config_failed_code;
 
         enum type : std::uint16_t
         {
@@ -2078,7 +2078,7 @@ namespace v13 {
 
       struct ofp_role_request_failed_code
       {
-        using original_type = protocol::ofp_role_request_failed_code;
+        using unscoped_type = protocol::ofp_role_request_failed_code;
 
         enum type : std::uint16_t
         {
@@ -2090,7 +2090,7 @@ namespace v13 {
 
       struct ofp_meter_mod_failed_code
       {
-        using original_type = protocol::ofp_meter_mod_failed_code;
+        using unscoped_type = protocol::ofp_meter_mod_failed_code;
 
         enum type : std::uint16_t
         {
@@ -2111,7 +2111,7 @@ namespace v13 {
 
       struct ofp_table_features_failed_code
       {
-        using original_type = protocol::ofp_table_features_failed_code;
+        using unscoped_type = protocol::ofp_table_features_failed_code;
 
         enum type : std::uint16_t
         {
@@ -2126,7 +2126,7 @@ namespace v13 {
 
       struct ofp_multipart_type
       {
-        using original_type = protocol::ofp_multipart_type;
+        using unscoped_type = protocol::ofp_multipart_type;
 
         enum type : std::uint16_t
         {
@@ -2150,7 +2150,7 @@ namespace v13 {
 
       struct ofp_multipart_request_flags
       {
-        using original_type = protocol::ofp_multipart_request_flags;
+        using unscoped_type = protocol::ofp_multipart_request_flags;
 
         enum type : std::uint16_t
         {
@@ -2160,7 +2160,7 @@ namespace v13 {
 
       struct ofp_multipart_reply_flags
       {
-        using original_type = protocol::ofp_multipart_reply_flags;
+        using unscoped_type = protocol::ofp_multipart_reply_flags;
 
         enum type : std::uint16_t
         {
@@ -2170,7 +2170,7 @@ namespace v13 {
 
       struct ofp_table_feature_prop_type
       {
-        using original_type = protocol::ofp_table_feature_prop_type;
+        using unscoped_type = protocol::ofp_table_feature_prop_type;
 
         enum type : std::uint16_t
         {
@@ -2195,7 +2195,7 @@ namespace v13 {
 
       struct ofp_group_capabilities
       {
-        using original_type = protocol::ofp_group_capabilities;
+        using unscoped_type = protocol::ofp_group_capabilities;
 
         enum type : std::uint32_t
         {
@@ -2208,7 +2208,7 @@ namespace v13 {
 
       struct ofp_queue_properties
       {
-        using original_type = protocol::ofp_queue_properties;
+        using unscoped_type = protocol::ofp_queue_properties;
 
         enum type : std::uint16_t
         {
@@ -2220,7 +2220,7 @@ namespace v13 {
 
       struct ofp_controller_role
       {
-        using original_type = protocol::ofp_controller_role;
+        using unscoped_type = protocol::ofp_controller_role;
 
         enum type : std::uint32_t
         {
@@ -2241,6 +2241,7 @@ namespace v13 {
       using type = typename T::type;
       constexpr scoped_enum() noexcept : value_{} {}
       constexpr scoped_enum(type v) noexcept : value_(v) {}
+      constexpr scoped_enum(typename T::unscoped_type v) : value_(type(v)) {}
       explicit constexpr scoped_enum(
         typename std::underlying_type<type>::type v) noexcept
         : value_(type(v)) {}
