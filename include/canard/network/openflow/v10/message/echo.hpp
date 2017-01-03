@@ -2,13 +2,10 @@
 #define CANARD_NET_OFP_V10_MESSAGES_ECHO_HPP
 
 #include <cstdint>
-#include <algorithm>
 #include <iterator>
-#include <limits>
-#include <memory>
 #include <stdexcept>
 #include <utility>
-#include <boost/container/vector.hpp>
+#include <canard/network/openflow/data_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
@@ -31,14 +28,14 @@ namespace messages {
         {
         public:
             using raw_ofp_type = v10_detail::ofp_header;
-            using data_type = boost::container::vector<std::uint8_t>;
+            using data_type = ofp::data_type;
 
         protected:
             echo_base(data_type&& data, std::uint32_t const xid) noexcept
                 : header_{
                       protocol::OFP_VERSION
                     , T::message_type
-                    , calc_ofp_length(data)
+                    , ofp::calc_ofp_length(data, sizeof(raw_ofp_type))
                     , xid
                   }
                 , data_(std::move(data))
@@ -132,11 +129,9 @@ namespace messages {
                 -> T
             {
                 auto const header = detail::decode<raw_ofp_type>(first, last);
+
                 auto const data_length = header.length - sizeof(raw_ofp_type);
-                last = std::next(first, data_length);
-                auto data = data_type{data_length, boost::container::default_init};
-                std::copy(first, last, data.data());
-                first = last;
+                auto data = ofp::decode_data(first, data_length);
 
                 return T{header, std::move(data)};
             }
@@ -146,17 +141,6 @@ namespace messages {
             {
                 return detail::memcmp(header_, rhs.header_)
                     && data() == rhs.data();
-            }
-
-            static auto calc_ofp_length(data_type const& data)
-                -> std::uint16_t
-            {
-                constexpr auto max_length
-                    = std::numeric_limits<std::uint16_t>::max();
-                if (data.size() > max_length - sizeof(raw_ofp_type)) {
-                    throw std::runtime_error{"too large echo data length"};
-                }
-                return sizeof(raw_ofp_type) + data.size();
             }
 
         private:

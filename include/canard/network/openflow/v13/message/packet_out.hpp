@@ -2,12 +2,10 @@
 #define CANARD_NET_OFP_V13_MESSAGES_PACKET_OUT_HPP
 
 #include <cstdint>
-#include <algorithm>
 #include <iterator>
-#include <limits>
 #include <stdexcept>
 #include <utility>
-#include <boost/container/vector.hpp>
+#include <canard/network/openflow/data_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/get_xid.hpp>
@@ -27,7 +25,7 @@ namespace messages {
     {
     public:
         using raw_ofp_type = v13_detail::ofp_packet_out;
-        using data_type = boost::container::vector<std::uint8_t>;
+        using data_type = ofp::data_type;
 
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_PACKET_OUT;
@@ -73,7 +71,8 @@ namespace messages {
                  , action_list actions
                  , std::uint32_t const xid = get_xid())
             : packet_out{
-                  calc_packet_out_length(data, actions)
+                  actions.calc_ofp_length(
+                          ofp::calc_ofp_length(data, sizeof(raw_ofp_type)))
                 , protocol::OFP_NO_BUFFER
                 , in_port
                 , std::move(actions)
@@ -180,18 +179,6 @@ namespace messages {
         {
         }
 
-        static auto calc_packet_out_length(
-                data_type const& data, action_list const& actions)
-            -> std::uint16_t
-        {
-            constexpr auto max_length
-                = std::numeric_limits<std::uint16_t>::max();
-            if (data.size() > max_length - sizeof(raw_ofp_type)) {
-                throw std::runtime_error{"too large data length"};
-            }
-            return actions.calc_ofp_length(sizeof(raw_ofp_type) + data.size());
-        }
-
         friend basic_protocol_type;
 
         template <class Container>
@@ -208,7 +195,6 @@ namespace messages {
         {
             auto const pkt_out = detail::decode<raw_ofp_type>(first, last);
             auto const rest_size = pkt_out.header.length - sizeof(raw_ofp_type);
-            last = std::next(first, rest_size);
             if (rest_size < pkt_out.actions_len) {
                 throw std::runtime_error{"invalid actions length"};
             }
@@ -217,9 +203,8 @@ namespace messages {
             auto actions = action_list::decode(first, actions_last);
 
             auto const data_length = rest_size - pkt_out.actions_len;
-            auto data = data_type{data_length, boost::container::default_init};
-            std::copy(first, last, data.data());
-            first = last;
+            auto data = ofp::decode_data(first, data_length);
+
             return packet_out{pkt_out, std::move(actions), std::move(data)};
         }
 

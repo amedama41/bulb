@@ -4,12 +4,10 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
-#include <algorithm>
 #include <iterator>
-#include <limits>
 #include <stdexcept>
 #include <utility>
-#include <boost/container/vector.hpp>
+#include <canard/network/openflow/data_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/get_xid.hpp>
@@ -38,7 +36,7 @@ namespace messages {
 
     public:
         using raw_ofp_type = v10_detail::ofp_packet_in;
-        using data_type = boost::container::vector<std::uint8_t>;
+        using data_type = ofp::data_type;
 
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_PACKET_IN;
@@ -53,7 +51,7 @@ namespace messages {
                   v10_detail::ofp_header{
                       protocol::OFP_VERSION
                     , message_type
-                    , calc_ofp_length(data)
+                    , ofp::calc_ofp_length(data, min_pkt_in_len)
                     , xid
                   }
                 , buffer_id
@@ -179,11 +177,7 @@ namespace messages {
 
             auto const data_length
                 = std::uint16_t(pkt_in.header.length - min_pkt_in_len);
-            last = std::next(first, data_length);
-
-            auto data = data_type{data_length, boost::container::default_init};
-            std::copy(first, last, data.data());
-            first = last;
+            auto data = ofp::decode_data(first, data_length);
 
             return packet_in{pkt_in, std::move(data)};
         }
@@ -194,17 +188,6 @@ namespace messages {
             return std::memcmp(
                     &packet_in_, &rhs.packet_in_, min_pkt_in_len) == 0
                 && frame() == rhs.frame();
-        }
-
-        static auto calc_ofp_length(data_type const& data)
-            -> std::uint16_t
-        {
-            constexpr auto max_length
-                = std::numeric_limits<std::uint16_t>::max();
-            if (data.size() > max_length - min_pkt_in_len) {
-                throw std::runtime_error{"too large packet_in data length"};
-            }
-            return min_pkt_in_len + data.size();
         }
 
     public:

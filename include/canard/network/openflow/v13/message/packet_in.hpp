@@ -2,12 +2,12 @@
 #define CANARD_NET_OFP_V13_MESSAGES_PACKET_IN_HPP
 
 #include <cstdint>
-#include <algorithm>
 #include <iterator>
 #include <stdexcept>
 #include <utility>
-#include <boost/container/vector.hpp>
 #include <boost/range/algorithm/find_if.hpp>
+#include <canard/network/openflow/data_type.hpp>
+#include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/padding.hpp>
@@ -35,7 +35,7 @@ namespace messages {
 
     public:
         using raw_ofp_type = v13_detail::ofp_packet_in;
-        using data_type = boost::container::vector<std::uint8_t>;
+        using data_type = ofp::data_type;
 
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_PACKET_IN;
@@ -52,10 +52,9 @@ namespace messages {
                   v13_detail::ofp_header{
                       version()
                     , type()
-                    , std::uint16_t(
-                              match.calc_ofp_length(sizeof(raw_ofp_type))
-                            + data_alignment_padding_size
-                            + data.size())
+                    , ofp::calc_ofp_length(data, match.calc_ofp_length(
+                                  sizeof(raw_ofp_type)
+                                + data_alignment_padding_size))
                     , xid
                   }
                 , buffer_id
@@ -230,7 +229,6 @@ namespace messages {
         {
             auto const pkt_in = detail::decode<raw_ofp_type>(first, last);
             auto const rest_size = pkt_in.header.length - sizeof(raw_ofp_type);
-            last = std::next(first, rest_size);
 
             auto it = first;
             auto const ofp_match
@@ -248,9 +246,7 @@ namespace messages {
 
             auto const data_length
                 = rest_size - match_length - data_alignment_padding_size;
-            auto data = data_type{data_length, boost::container::default_init};
-            std::copy(first, last, data.data());
-            first = last;
+            auto data = ofp::decode_data(first, data_length);
 
             return packet_in{pkt_in, std::move(match), std::move(data)};
         }
