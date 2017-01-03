@@ -5,6 +5,7 @@
 #include <iterator>
 #include <limits>
 #include <utility>
+#include <boost/utility/string_ref.hpp>
 #include <canard/network/openflow/data_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
@@ -28,7 +29,7 @@ namespace messages {
 
         static constexpr protocol::ofp_type message_type = protocol::OFPT_ERROR;
 
-        error(protocol::ofp_error_type const type
+        error(protocol::error_type const type
             , std::uint16_t const code
             , data_type data
             , std::uint32_t const xid = get_xid()) noexcept
@@ -47,7 +48,7 @@ namespace messages {
         }
 
         template <class Message>
-        error(protocol::ofp_error_type const type
+        error(protocol::error_type const type
             , std::uint16_t const code
             , Message const& msg
             , std::uint16_t const data_size
@@ -125,6 +126,20 @@ namespace messages {
             auto it = data_.data();
             auto const it_end = data_.data() + data_.size();
             return detail::decode<v13_detail::ofp_header>(it, it_end);
+        }
+
+        static auto hello_failed(
+                  protocol::hello_failed_code const code
+                , boost::string_ref const data
+                , std::uint32_t const xid)
+            -> error
+        {
+            return error{
+                  protocol::OFPET_HELLO_FAILED
+                , code
+                , data_type{data.begin(), data.end()}
+                , xid
+            };
         }
 
     private:

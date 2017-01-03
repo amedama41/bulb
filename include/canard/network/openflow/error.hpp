@@ -15,6 +15,8 @@ namespace ofp {
     constexpr auto OFPHFC_INCOMPATIBLE = v13::protocol::OFPHFC_INCOMPATIBLE;
     constexpr auto OFPHFC_EPERM = v13::protocol::OFPHFC_EPERM;
 
+    using hello_failed_code = v13::protocol::hello_failed_code;
+
 } // namespace ofp
 } // namespace net
 } // namespace canard
