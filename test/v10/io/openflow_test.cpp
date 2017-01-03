@@ -15,6 +15,13 @@ namespace data = boost::unit_test::data;
 BOOST_AUTO_TEST_SUITE(io_test)
 BOOST_AUTO_TEST_SUITE(openflow)
   BOOST_AUTO_TEST_SUITE(scoped_enum)
+    BOOST_AUTO_TEST_CASE(
+        constructible_from_unscoped_type_by_copy_initialization)
+    {
+      protocol::port_no sut = protocol::OFPP_MAX;
+
+      BOOST_TEST(sut == protocol::port_no::max);
+    }
     BOOST_AUTO_TEST_CASE(equality)
     {
       auto const sut = protocol::port_no{protocol::port_no::max};
