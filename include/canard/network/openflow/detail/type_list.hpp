@@ -133,8 +133,8 @@ namespace mpl {
   {
     template <class T>
     struct apply
+      : boost::mpl::bool_<T::size == 0>
     {
-      using type = boost::mpl::bool_<T::size == 0>;
     };
   };
 
