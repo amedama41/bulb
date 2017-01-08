@@ -6,6 +6,7 @@
 #include <cstring>
 #include <iterator>
 #include <stdexcept>
+#include <type_traits>
 #include <utility>
 #include <canard/network/openflow/data_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
@@ -164,7 +165,9 @@ namespace messages {
         template <class Container>
         void encode_impl(Container& container) const
         {
-            detail::encode(container, packet_in_, min_pkt_in_len);
+            detail::encode(
+                      container, packet_in_
+                    , std::integral_constant<std::size_t, min_pkt_in_len>{});
             detail::encode_byte_array(container, data_.data(), data_.size());
         }
 
@@ -172,8 +175,9 @@ namespace messages {
         static auto decode_impl(Iterator& first, Iterator last)
             -> packet_in
         {
-            auto pkt_in
-                = detail::decode<raw_ofp_type>(first, last, min_pkt_in_len);
+            auto pkt_in = detail::decode<raw_ofp_type>(
+                      first, last
+                    , std::integral_constant<std::size_t, min_pkt_in_len>{});
 
             auto const data_length
                 = std::uint16_t(pkt_in.header.length - min_pkt_in_len);

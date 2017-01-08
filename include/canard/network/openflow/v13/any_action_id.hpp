@@ -6,6 +6,7 @@
 #include <iterator>
 #include <stdexcept>
 #include <tuple>
+#include <type_traits>
 #include <canard/network/openflow/detail/any_type.hpp>
 #include <canard/network/openflow/detail/impl/any_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
@@ -30,7 +31,8 @@ namespace v13 {
       -> ReturnType
     {
       auto it = first;
-      auto const header = detail::decode<header_type>(it, last, header_size);
+      auto const header = detail::decode<header_type>(
+              it, last, std::integral_constant<std::size_t, header_size>());
 
       if (header.len > std::distance(first, last)) {
         throw std::runtime_error{"too large action_id length"};

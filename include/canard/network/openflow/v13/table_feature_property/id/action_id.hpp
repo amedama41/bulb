@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <iterator>
 #include <stdexcept>
+#include <type_traits>
 #include <utility>
 #include <vector>
 #include <canard/network/openflow/detail/basic_protocol_type.hpp>
@@ -67,15 +68,16 @@ namespace v13 {
             detail::encode(
                       container
                     , raw_ofp_type{std::uint16_t(type()), length()}
-                    , length());
+                    , std::integral_constant<std::size_t, length()>{});
         }
 
         template <class Iterator>
         static auto decode_impl(Iterator& first, Iterator last)
             -> action_id
         {
-            auto const action_header
-                = detail::decode<raw_ofp_type>(first, last, length());
+            auto const action_header = detail::decode<raw_ofp_type>(
+                      first, last
+                    , std::integral_constant<std::size_t, length()>{});
             return action_id{action_header.type};
         }
 
