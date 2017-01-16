@@ -5,7 +5,7 @@
 #include <canard/network/openflow/v13/openflow.hpp>
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_header,
+    canard::net::ofp::v13::protocol::ofp_header,
     version,
     type,
     length,
@@ -13,31 +13,31 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_hello_elem_header,
+    canard::net::ofp::v13::protocol::ofp_hello_elem_header,
     type,
     length
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_hello_elem_versionbitmap,
+    canard::net::ofp::v13::protocol::ofp_hello_elem_versionbitmap,
     type,
     length
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_hello,
+    canard::net::ofp::v13::protocol::ofp_hello,
     header
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_switch_config,
+    canard::net::ofp::v13::protocol::ofp_switch_config,
     header,
     flags,
     miss_send_len
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_table_mod,
+    canard::net::ofp::v13::protocol::ofp_table_mod,
     header,
     table_id,
     pad,
@@ -45,7 +45,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_port,
+    canard::net::ofp::v13::protocol::ofp_port,
     port_no,
     pad,
     hw_addr,
@@ -62,7 +62,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_switch_features,
+    canard::net::ofp::v13::protocol::ofp_switch_features,
     header,
     datapath_id,
     n_buffers,
@@ -74,7 +74,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_port_status,
+    canard::net::ofp::v13::protocol::ofp_port_status,
     header,
     reason,
     pad,
@@ -82,7 +82,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_port_mod,
+    canard::net::ofp::v13::protocol::ofp_port_mod,
     header,
     port_no,
     pad,
@@ -95,27 +95,27 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_match,
+    canard::net::ofp::v13::protocol::ofp_match,
     type,
     length,
     pad
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_oxm_experimenter_header,
+    canard::net::ofp::v13::protocol::ofp_oxm_experimenter_header,
     oxm_header,
     experimenter
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_action_header,
+    canard::net::ofp::v13::protocol::ofp_action_header,
     type,
     len,
     pad
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_action_output,
+    canard::net::ofp::v13::protocol::ofp_action_output,
     type,
     len,
     port,
@@ -124,7 +124,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_action_mpls_ttl,
+    canard::net::ofp::v13::protocol::ofp_action_mpls_ttl,
     type,
     len,
     mpls_ttl,
@@ -132,7 +132,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_action_push,
+    canard::net::ofp::v13::protocol::ofp_action_push,
     type,
     len,
     ethertype,
@@ -140,7 +140,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_action_pop_mpls,
+    canard::net::ofp::v13::protocol::ofp_action_pop_mpls,
     type,
     len,
     ethertype,
@@ -148,14 +148,14 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_action_group,
+    canard::net::ofp::v13::protocol::ofp_action_group,
     type,
     len,
     group_id
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_action_nw_ttl,
+    canard::net::ofp::v13::protocol::ofp_action_nw_ttl,
     type,
     len,
     nw_ttl,
@@ -163,27 +163,27 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_action_set_field,
+    canard::net::ofp::v13::protocol::ofp_action_set_field,
     type,
     len,
     field
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_action_experimenter_header,
+    canard::net::ofp::v13::protocol::ofp_action_experimenter_header,
     type,
     len,
     experimenter
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_instruction,
+    canard::net::ofp::v13::protocol::ofp_instruction,
     type,
     len
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_instruction_goto_table,
+    canard::net::ofp::v13::protocol::ofp_instruction_goto_table,
     type,
     len,
     table_id,
@@ -191,7 +191,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_instruction_write_metadata,
+    canard::net::ofp::v13::protocol::ofp_instruction_write_metadata,
     type,
     len,
     pad,
@@ -200,28 +200,28 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_instruction_actions,
+    canard::net::ofp::v13::protocol::ofp_instruction_actions,
     type,
     len,
     pad
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_instruction_meter,
+    canard::net::ofp::v13::protocol::ofp_instruction_meter,
     type,
     len,
     meter_id
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_instruction_experimenter,
+    canard::net::ofp::v13::protocol::ofp_instruction_experimenter,
     type,
     len,
     experimenter
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_flow_mod,
+    canard::net::ofp::v13::protocol::ofp_flow_mod,
     header,
     cookie,
     cookie_mask,
@@ -238,7 +238,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_bucket,
+    canard::net::ofp::v13::protocol::ofp_bucket,
     len,
     weight,
     watch_port,
@@ -247,7 +247,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_group_mod,
+    canard::net::ofp::v13::protocol::ofp_group_mod,
     header,
     command,
     type,
@@ -256,7 +256,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_packet_out,
+    canard::net::ofp::v13::protocol::ofp_packet_out,
     header,
     buffer_id,
     in_port,
@@ -265,7 +265,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_packet_in,
+    canard::net::ofp::v13::protocol::ofp_packet_in,
     header,
     buffer_id,
     total_len,
@@ -275,7 +275,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_flow_removed,
+    canard::net::ofp::v13::protocol::ofp_flow_removed,
     header,
     cookie,
     priority,
@@ -290,7 +290,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_meter_band_header,
+    canard::net::ofp::v13::protocol::ofp_meter_band_header,
     type,
     len,
     rate,
@@ -298,7 +298,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_meter_band_drop,
+    canard::net::ofp::v13::protocol::ofp_meter_band_drop,
     type,
     len,
     rate,
@@ -307,7 +307,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_meter_band_dscp_remark,
+    canard::net::ofp::v13::protocol::ofp_meter_band_dscp_remark,
     type,
     len,
     rate,
@@ -317,7 +317,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_meter_band_experimenter,
+    canard::net::ofp::v13::protocol::ofp_meter_band_experimenter,
     type,
     len,
     rate,
@@ -326,7 +326,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_meter_mod,
+    canard::net::ofp::v13::protocol::ofp_meter_mod,
     header,
     command,
     flags,
@@ -334,14 +334,14 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_error_msg,
+    canard::net::ofp::v13::protocol::ofp_error_msg,
     header,
     type,
     code
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_error_experimenter_msg,
+    canard::net::ofp::v13::protocol::ofp_error_experimenter_msg,
     header,
     type,
     exp_type,
@@ -349,7 +349,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_multipart_request,
+    canard::net::ofp::v13::protocol::ofp_multipart_request,
     header,
     type,
     flags,
@@ -357,7 +357,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_multipart_reply,
+    canard::net::ofp::v13::protocol::ofp_multipart_reply,
     header,
     type,
     flags,
@@ -365,7 +365,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_desc,
+    canard::net::ofp::v13::protocol::ofp_desc,
     mfr_desc,
     hw_desc,
     sw_desc,
@@ -374,7 +374,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_flow_stats_request,
+    canard::net::ofp::v13::protocol::ofp_flow_stats_request,
     table_id,
     pad,
     out_port,
@@ -385,7 +385,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_flow_stats,
+    canard::net::ofp::v13::protocol::ofp_flow_stats,
     length,
     table_id,
     pad,
@@ -402,7 +402,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_aggregate_stats_request,
+    canard::net::ofp::v13::protocol::ofp_aggregate_stats_request,
     table_id,
     pad,
     out_port,
@@ -413,7 +413,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_aggregate_stats_reply,
+    canard::net::ofp::v13::protocol::ofp_aggregate_stats_reply,
     packet_count,
     byte_count,
     flow_count,
@@ -421,37 +421,37 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_table_feature_prop_header,
+    canard::net::ofp::v13::protocol::ofp_table_feature_prop_header,
     type,
     length
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_table_feature_prop_instructions,
+    canard::net::ofp::v13::protocol::ofp_table_feature_prop_instructions,
     type,
     length
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_table_feature_prop_next_tables,
+    canard::net::ofp::v13::protocol::ofp_table_feature_prop_next_tables,
     type,
     length
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_table_feature_prop_actions,
+    canard::net::ofp::v13::protocol::ofp_table_feature_prop_actions,
     type,
     length
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_table_feature_prop_oxm,
+    canard::net::ofp::v13::protocol::ofp_table_feature_prop_oxm,
     type,
     length
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_table_feature_prop_experimenter,
+    canard::net::ofp::v13::protocol::ofp_table_feature_prop_experimenter,
     type,
     length,
     experimenter,
@@ -459,7 +459,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_table_features,
+    canard::net::ofp::v13::protocol::ofp_table_features,
     length,
     table_id,
     pad,
@@ -471,7 +471,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_table_stats,
+    canard::net::ofp::v13::protocol::ofp_table_stats,
     table_id,
     pad,
     active_count,
@@ -480,13 +480,13 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_port_stats_request,
+    canard::net::ofp::v13::protocol::ofp_port_stats_request,
     port_no,
     pad
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_port_stats,
+    canard::net::ofp::v13::protocol::ofp_port_stats,
     port_no,
     pad,
     rx_packets,
@@ -506,19 +506,19 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_group_stats_request,
+    canard::net::ofp::v13::protocol::ofp_group_stats_request,
     group_id,
     pad
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_bucket_counter,
+    canard::net::ofp::v13::protocol::ofp_bucket_counter,
     packet_count,
     byte_count
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_group_stats,
+    canard::net::ofp::v13::protocol::ofp_group_stats,
     length,
     pad,
     group_id,
@@ -531,7 +531,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_group_desc,
+    canard::net::ofp::v13::protocol::ofp_group_desc,
     length,
     type,
     pad,
@@ -539,7 +539,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_group_features,
+    canard::net::ofp::v13::protocol::ofp_group_features,
     types,
     capabilities,
     max_groups,
@@ -547,19 +547,19 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_meter_multipart_request,
+    canard::net::ofp::v13::protocol::ofp_meter_multipart_request,
     meter_id,
     pad
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_meter_band_stats,
+    canard::net::ofp::v13::protocol::ofp_meter_band_stats,
     packet_band_count,
     byte_band_count
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_meter_stats,
+    canard::net::ofp::v13::protocol::ofp_meter_stats,
     meter_id,
     len,
     pad,
@@ -571,14 +571,14 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_meter_config,
+    canard::net::ofp::v13::protocol::ofp_meter_config,
     length,
     flags,
     meter_id
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_meter_features,
+    canard::net::ofp::v13::protocol::ofp_meter_features,
     max_meter,
     band_types,
     capabilities,
@@ -588,48 +588,48 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_experimenter_multipart_header,
+    canard::net::ofp::v13::protocol::ofp_experimenter_multipart_header,
     experimenter,
     exp_type
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_experimenter_header,
+    canard::net::ofp::v13::protocol::ofp_experimenter_header,
     header,
     experimenter,
     exp_type
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_queue_prop_header,
+    canard::net::ofp::v13::protocol::ofp_queue_prop_header,
     property,
     len,
     pad
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_queue_prop_min_rate,
+    canard::net::ofp::v13::protocol::ofp_queue_prop_min_rate,
     prop_header,
     rate,
     pad
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_queue_prop_max_rate,
+    canard::net::ofp::v13::protocol::ofp_queue_prop_max_rate,
     prop_header,
     rate,
     pad
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_queue_prop_experimenter,
+    canard::net::ofp::v13::protocol::ofp_queue_prop_experimenter,
     prop_header,
     experimenter,
     pad
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_packet_queue,
+    canard::net::ofp::v13::protocol::ofp_packet_queue,
     queue_id,
     port,
     len,
@@ -637,34 +637,34 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_queue_get_config_request,
+    canard::net::ofp::v13::protocol::ofp_queue_get_config_request,
     header,
     port,
     pad
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_queue_get_config_reply,
+    canard::net::ofp::v13::protocol::ofp_queue_get_config_reply,
     header,
     port,
     pad
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_action_set_queue,
+    canard::net::ofp::v13::protocol::ofp_action_set_queue,
     type,
     len,
     queue_id
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_queue_stats_request,
+    canard::net::ofp::v13::protocol::ofp_queue_stats_request,
     port_no,
     queue_id
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_queue_stats,
+    canard::net::ofp::v13::protocol::ofp_queue_stats,
     port_no,
     queue_id,
     tx_bytes,
@@ -675,7 +675,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_role_request,
+    canard::net::ofp::v13::protocol::ofp_role_request,
     header,
     role,
     pad,
@@ -683,7 +683,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    canard::net::ofp::v13::v13_detail::ofp_async_config,
+    canard::net::ofp::v13::protocol::ofp_async_config,
     header,
     packet_in_mask,
     port_status_mask,

@@ -10,7 +10,7 @@ namespace net {
 namespace ofp {
 namespace v10 {
 
-  namespace v10_detail {
+  namespace protocol {
 
     struct ofp_header
     {
@@ -425,10 +425,6 @@ namespace v10 {
       std::uint64_t tx_errors;
     };
     static_assert(sizeof(ofp_queue_stats) == 32, "");
-
-  } // namespace v10_detail
-
-  namespace protocol {
 
     enum uint8_t_constants : std::uint8_t
     {
@@ -1184,6 +1180,52 @@ namespace v10 {
     using queue_prop_type = scoped_enum<protocol_detail::ofp_queue_properties>;
 
   } // namespace protocol
+
+  namespace v10_detail {
+
+    using protocol::ofp_header;
+    using protocol::ofp_hello;
+    using protocol::ofp_switch_config;
+    using protocol::ofp_phy_port;
+    using protocol::ofp_switch_features;
+    using protocol::ofp_port_status;
+    using protocol::ofp_port_mod;
+    using protocol::ofp_packet_in;
+    using protocol::ofp_action_output;
+    using protocol::ofp_action_vlan_vid;
+    using protocol::ofp_action_vlan_pcp;
+    using protocol::ofp_action_dl_addr;
+    using protocol::ofp_action_nw_addr;
+    using protocol::ofp_action_tp_port;
+    using protocol::ofp_action_nw_tos;
+    using protocol::ofp_action_vendor_header;
+    using protocol::ofp_action_header;
+    using protocol::ofp_packet_out;
+    using protocol::ofp_match;
+    using protocol::ofp_flow_mod;
+    using protocol::ofp_flow_removed;
+    using protocol::ofp_error_msg;
+    using protocol::ofp_stats_request;
+    using protocol::ofp_stats_reply;
+    using protocol::ofp_desc_stats;
+    using protocol::ofp_flow_stats_request;
+    using protocol::ofp_flow_stats;
+    using protocol::ofp_aggregate_stats_request;
+    using protocol::ofp_aggregate_stats_reply;
+    using protocol::ofp_table_stats;
+    using protocol::ofp_port_stats_request;
+    using protocol::ofp_port_stats;
+    using protocol::ofp_vendor_header;
+    using protocol::ofp_queue_prop_header;
+    using protocol::ofp_queue_prop_min_rate;
+    using protocol::ofp_packet_queue;
+    using protocol::ofp_queue_get_config_request;
+    using protocol::ofp_queue_get_config_reply;
+    using protocol::ofp_action_enqueue;
+    using protocol::ofp_queue_stats_request;
+    using protocol::ofp_queue_stats;
+
+  } // namespace v10_detail
 
 } // namespace v10
 } // namespace ofp

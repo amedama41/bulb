@@ -11,7 +11,7 @@ namespace net {
 namespace ofp {
 namespace v13 {
 
-    namespace v13_detail {
+    namespace protocol {
 
         struct generic_endian_reverse_inplace
         {
@@ -1008,7 +1008,7 @@ namespace v13 {
             return data;
         }
 
-    } // namespace v13_detail
+    } // namespace protocol
 
 } // namespace v13
 } // namespace ofp

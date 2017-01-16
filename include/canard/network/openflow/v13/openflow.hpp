@@ -10,7 +10,7 @@ namespace net {
 namespace ofp {
 namespace v13 {
 
-  namespace v13_detail {
+  namespace protocol {
 
     struct ofp_header
     {
@@ -778,10 +778,6 @@ namespace v13 {
       std::uint32_t flow_removed_mask[2];
     };
     static_assert(sizeof(ofp_async_config) == 32, "");
-
-  } // namespace v13_detail
-
-  namespace protocol {
 
     enum uint8_t_constants : std::uint8_t
     {
@@ -2302,6 +2298,92 @@ namespace v13 {
     using controller_role = scoped_enum<protocol_detail::ofp_controller_role>;
 
   } // namespace protocol
+
+  namespace v13_detail {
+
+    using protocol::ofp_header;
+    using protocol::ofp_hello_elem_header;
+    using protocol::ofp_hello_elem_versionbitmap;
+    using protocol::ofp_hello;
+    using protocol::ofp_switch_config;
+    using protocol::ofp_table_mod;
+    using protocol::ofp_port;
+    using protocol::ofp_switch_features;
+    using protocol::ofp_port_status;
+    using protocol::ofp_port_mod;
+    using protocol::ofp_match;
+    using protocol::ofp_oxm_experimenter_header;
+    using protocol::ofp_action_header;
+    using protocol::ofp_action_output;
+    using protocol::ofp_action_mpls_ttl;
+    using protocol::ofp_action_push;
+    using protocol::ofp_action_pop_mpls;
+    using protocol::ofp_action_group;
+    using protocol::ofp_action_nw_ttl;
+    using protocol::ofp_action_set_field;
+    using protocol::ofp_action_experimenter_header;
+    using protocol::ofp_instruction;
+    using protocol::ofp_instruction_goto_table;
+    using protocol::ofp_instruction_write_metadata;
+    using protocol::ofp_instruction_actions;
+    using protocol::ofp_instruction_meter;
+    using protocol::ofp_instruction_experimenter;
+    using protocol::ofp_flow_mod;
+    using protocol::ofp_bucket;
+    using protocol::ofp_group_mod;
+    using protocol::ofp_packet_out;
+    using protocol::ofp_packet_in;
+    using protocol::ofp_flow_removed;
+    using protocol::ofp_meter_band_header;
+    using protocol::ofp_meter_band_drop;
+    using protocol::ofp_meter_band_dscp_remark;
+    using protocol::ofp_meter_band_experimenter;
+    using protocol::ofp_meter_mod;
+    using protocol::ofp_error_msg;
+    using protocol::ofp_error_experimenter_msg;
+    using protocol::ofp_multipart_request;
+    using protocol::ofp_multipart_reply;
+    using protocol::ofp_desc;
+    using protocol::ofp_flow_stats_request;
+    using protocol::ofp_flow_stats;
+    using protocol::ofp_aggregate_stats_request;
+    using protocol::ofp_aggregate_stats_reply;
+    using protocol::ofp_table_feature_prop_header;
+    using protocol::ofp_table_feature_prop_instructions;
+    using protocol::ofp_table_feature_prop_next_tables;
+    using protocol::ofp_table_feature_prop_actions;
+    using protocol::ofp_table_feature_prop_oxm;
+    using protocol::ofp_table_feature_prop_experimenter;
+    using protocol::ofp_table_features;
+    using protocol::ofp_table_stats;
+    using protocol::ofp_port_stats_request;
+    using protocol::ofp_port_stats;
+    using protocol::ofp_group_stats_request;
+    using protocol::ofp_bucket_counter;
+    using protocol::ofp_group_stats;
+    using protocol::ofp_group_desc;
+    using protocol::ofp_group_features;
+    using protocol::ofp_meter_multipart_request;
+    using protocol::ofp_meter_band_stats;
+    using protocol::ofp_meter_stats;
+    using protocol::ofp_meter_config;
+    using protocol::ofp_meter_features;
+    using protocol::ofp_experimenter_multipart_header;
+    using protocol::ofp_experimenter_header;
+    using protocol::ofp_queue_prop_header;
+    using protocol::ofp_queue_prop_min_rate;
+    using protocol::ofp_queue_prop_max_rate;
+    using protocol::ofp_queue_prop_experimenter;
+    using protocol::ofp_packet_queue;
+    using protocol::ofp_queue_get_config_request;
+    using protocol::ofp_queue_get_config_reply;
+    using protocol::ofp_action_set_queue;
+    using protocol::ofp_queue_stats_request;
+    using protocol::ofp_queue_stats;
+    using protocol::ofp_role_request;
+    using protocol::ofp_async_config;
+
+  } // namespace v13_detail
 
 } // namespace v13
 } // namespace ofp
