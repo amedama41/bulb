@@ -29,7 +29,7 @@ namespace statistics {
         : public detail::basic_protocol_type<flow_stats>
     {
     public:
-        using raw_ofp_type = v10_detail::ofp_flow_stats;
+        using raw_ofp_type = protocol::ofp_flow_stats;
 
         flow_stats(v10::flow_entry entry
                  , std::uint8_t const table_id
@@ -244,7 +244,7 @@ namespace statistics {
 
     class flow_stats_request
         : public stats_detail::basic_stats_request<
-                flow_stats_request, v10_detail::ofp_flow_stats_request
+                flow_stats_request, protocol::ofp_flow_stats_request
           >
     {
     public:

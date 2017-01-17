@@ -28,7 +28,7 @@ namespace statistics {
         : public detail::basic_protocol_type<table_stats>
     {
     public:
-        using raw_ofp_type = v10_detail::ofp_table_stats;
+        using raw_ofp_type = protocol::ofp_table_stats;
 
         table_stats(std::uint8_t const table_id
                   , boost::string_ref name

@@ -14,7 +14,7 @@ namespace actions {
 
     class output
         : public detail::v13::basic_action<
-            output, v13_detail::ofp_action_output
+            output, protocol::ofp_action_output
           >
     {
     public:

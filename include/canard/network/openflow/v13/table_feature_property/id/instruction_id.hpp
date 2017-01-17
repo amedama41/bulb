@@ -21,7 +21,7 @@ namespace v13 {
         : public detail::basic_protocol_type<instruction_id>
     {
     public:
-        using raw_ofp_type = v13_detail::ofp_instruction;
+        using raw_ofp_type = protocol::ofp_instruction;
 
         explicit instruction_id(std::uint16_t const type) noexcept
             : type_{type}
@@ -41,7 +41,7 @@ namespace v13 {
         }
 
         static void validate_instruction_header(
-                v13_detail::ofp_instruction const& instruction)
+                protocol::ofp_instruction const& instruction)
         {
             if (instruction.type == protocol::OFPIT_EXPERIMENTER) {
                 throw std::runtime_error{"invalid instruction type"};
@@ -90,7 +90,7 @@ namespace v13 {
         : public detail::basic_protocol_type<instruction_experimenter_id>
     {
     public:
-        using raw_ofp_type = v13_detail::ofp_instruction_experimenter;
+        using raw_ofp_type = protocol::ofp_instruction_experimenter;
         using data_type = std::vector<unsigned char>;
 
         explicit instruction_experimenter_id(
@@ -140,7 +140,7 @@ namespace v13 {
         }
 
         static void validate_instruction_header(
-                v13_detail::ofp_instruction const& instruction)
+                protocol::ofp_instruction const& instruction)
         {
             if (instruction.type != protocol::OFPIT_EXPERIMENTER) {
                 throw std::runtime_error{"invalid instruction type"};

@@ -24,7 +24,7 @@ namespace v10 {
         : public detail::basic_protocol_type<packet_queue>
     {
     public:
-        using raw_ofp_type = v10_detail::ofp_packet_queue;
+        using raw_ofp_type = protocol::ofp_packet_queue;
         using properties_type = list<any_queue_property>;
         using iterator = properties_type::const_iterator;
         using const_iterator = properties_type::const_iterator;

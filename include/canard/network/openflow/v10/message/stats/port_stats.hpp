@@ -24,7 +24,7 @@ namespace statistics {
         : public detail::basic_protocol_type<port_stats>
     {
     public:
-        using raw_ofp_type = v10_detail::ofp_port_stats;
+        using raw_ofp_type = protocol::ofp_port_stats;
 
         port_stats(std::uint16_t const port_no
                  , std::uint64_t const rx_packets
@@ -176,7 +176,7 @@ namespace statistics {
 
     class port_stats_request
         : public stats_detail::basic_stats_request<
-                port_stats_request, v10_detail::ofp_port_stats_request
+                port_stats_request, protocol::ofp_port_stats_request
           >
     {
     public:

@@ -40,7 +40,7 @@ namespace v13 {
         }
 
         static void validate_action_header(
-                ofp::v13::v13_detail::ofp_action_header const& header)
+                ofp::v13::protocol::ofp_action_header const& header)
         {
             if (header.type != T::action_type) {
                 throw std::runtime_error{"invalid action type"};

@@ -102,7 +102,7 @@ namespace v13_detail {
 
     private:
         auto base_port() const noexcept
-            -> v13_detail::ofp_port const&
+            -> protocol::ofp_port const&
         {
             return static_cast<T const*>(this)->ofp_port();
         }

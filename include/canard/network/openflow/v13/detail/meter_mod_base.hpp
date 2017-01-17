@@ -22,7 +22,7 @@ namespace v13 {
     using base_t = ofp::detail::v13::basic_openflow_message<MeterMod>;
 
   public:
-    using raw_ofp_type = ofp::v13::v13_detail::ofp_meter_mod;
+    using raw_ofp_type = ofp::v13::protocol::ofp_meter_mod;
     using bands_type = ofp::list<ofp::v13::any_meter_band>;
 
     static constexpr ofp::v13::protocol::ofp_type message_type
@@ -35,7 +35,7 @@ namespace v13 {
     }
 
     auto header() const noexcept
-      -> ofp::v13::v13_detail::ofp_header const&
+      -> ofp::v13::protocol::ofp_header const&
     {
       return meter_mod_.header;
     }
@@ -73,7 +73,7 @@ namespace v13 {
         , std::uint16_t const flags, bands_type&& bands
         , std::uint32_t const xid)
       : meter_mod_{
-            ofp::v13::v13_detail::ofp_header{
+            ofp::v13::protocol::ofp_header{
                 base_t::version()
               , base_t::type()
               , bands.calc_ofp_length(sizeof(raw_ofp_type))
@@ -89,7 +89,7 @@ namespace v13 {
 
     meter_mod_base(std::uint32_t const meter_id, std::uint32_t const xid)
       : meter_mod_{
-            ofp::v13::v13_detail::ofp_header{
+            ofp::v13::protocol::ofp_header{
                 base_t::version()
               , base_t::type()
               , sizeof(raw_ofp_type)

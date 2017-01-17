@@ -41,7 +41,7 @@ namespace v13 {
           std::tuple_size<hello_element_list>::value == 1
         , "not match to the number of hello element types");
 
-    using header_type = v13_detail::ofp_hello_elem_header;
+    using header_type = protocol::ofp_hello_elem_header;
     using type_id = std::uint16_t;
     using decode_type_list = hello_element_decoder_detail::tuple_append_t<
       hello_element_list, unknwon_type

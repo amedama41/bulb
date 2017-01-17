@@ -17,7 +17,7 @@ namespace statistics {
 
     class aggregate_stats_request
         : public stats_detail::basic_stats_request<
-              aggregate_stats_request, v10_detail::ofp_aggregate_stats_request
+              aggregate_stats_request, protocol::ofp_aggregate_stats_request
           >
     {
     public:
@@ -71,7 +71,7 @@ namespace statistics {
 
     class aggregate_stats_reply
         : public stats_detail::basic_stats_reply<
-              aggregate_stats_reply, v10_detail::ofp_aggregate_stats_reply
+              aggregate_stats_reply, protocol::ofp_aggregate_stats_reply
           >
     {
     public:

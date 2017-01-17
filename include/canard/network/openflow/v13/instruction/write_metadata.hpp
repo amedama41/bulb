@@ -14,7 +14,7 @@ namespace instructions {
 
     class write_metadata
         : public detail::v13::basic_instruction<
-            write_metadata, v13_detail::ofp_instruction_write_metadata
+            write_metadata, protocol::ofp_instruction_write_metadata
           >
     {
     public:

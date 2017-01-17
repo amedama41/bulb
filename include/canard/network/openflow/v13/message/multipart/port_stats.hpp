@@ -23,7 +23,7 @@ namespace multipart {
         : public detail::basic_protocol_type<port_stats>
     {
     public:
-        using raw_ofp_type = v13_detail::ofp_port_stats;
+        using raw_ofp_type = protocol::ofp_port_stats;
 
         port_stats(std::uint32_t const port_no
                  , std::uint64_t const rx_packets
@@ -184,7 +184,7 @@ namespace multipart {
 
     class port_stats_request
         : public multipart_detail::basic_multipart_request<
-                port_stats_request, v13_detail::ofp_port_stats_request
+                port_stats_request, protocol::ofp_port_stats_request
           >
     {
     public:
@@ -196,7 +196,7 @@ namespace multipart {
                 , std::uint32_t const xid = get_xid()) noexcept
             : basic_multipart_request{
                   0
-                , v13_detail::ofp_port_stats_request{port_no, { 0, 0, 0, 0 }}
+                , protocol::ofp_port_stats_request{port_no, { 0, 0, 0, 0 }}
                 , xid
               }
         {
@@ -212,8 +212,8 @@ namespace multipart {
         friend basic_multipart_request::base_type;
 
         port_stats_request(
-                  v13_detail::ofp_multipart_request const& multipart_request
-                , v13_detail::ofp_port_stats_request const& port_stats_request) noexcept
+                  protocol::ofp_multipart_request const& multipart_request
+                , protocol::ofp_port_stats_request const& port_stats_request) noexcept
             : basic_multipart_request{multipart_request, port_stats_request}
         {
         }
@@ -241,7 +241,7 @@ namespace multipart {
         friend basic_multipart_reply::base_type;
 
         port_stats_reply(
-                  v13_detail::ofp_multipart_reply const& reply
+                  protocol::ofp_multipart_reply const& reply
                 , body_type&& port_stats)
             : basic_multipart_reply{reply, std::move(port_stats)}
         {

@@ -18,7 +18,7 @@ namespace v13 {
 
   struct meter_band_decoder
   {
-    using header_type = v13_detail::ofp_meter_band_header;
+    using header_type = protocol::ofp_meter_band_header;
     using type_id = std::uint16_t;
     using decode_type_list = default_meter_band_list;
     static constexpr std::uint16_t header_size = sizeof(header_type);

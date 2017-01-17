@@ -56,7 +56,7 @@ namespace v10 {
     >::type;
 
   public:
-    using raw_ofp_type = v10_detail::ofp_match;
+    using raw_ofp_type = protocol::ofp_match;
 
     match() noexcept
       : match_{protocol::OFPFW_ALL, 0}

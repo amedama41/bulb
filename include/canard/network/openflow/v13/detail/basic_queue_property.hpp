@@ -45,7 +45,7 @@ namespace queue_property_detail {
         }
 
         static void validate_header(
-                v13_detail::ofp_queue_prop_header const& prop_header)
+                protocol::ofp_queue_prop_header const& prop_header)
         {
             if (prop_header.property != property()) {
                 throw std::runtime_error{"invalid queue property"};

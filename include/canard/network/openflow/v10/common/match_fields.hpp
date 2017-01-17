@@ -102,7 +102,7 @@ namespace v10 {
         }
 
         inline auto get_dl_addr(
-                  v10_detail::ofp_match& match
+                  protocol::ofp_match& match
                 , field_type<protocol::OFPFW_DL_DST>) noexcept
             -> std::uint8_t(&)[protocol::OFP_ETH_ALEN]
         {
@@ -110,7 +110,7 @@ namespace v10 {
         }
 
         inline auto get_dl_addr(
-                  v10_detail::ofp_match const& match
+                  protocol::ofp_match const& match
                 , field_type<protocol::OFPFW_DL_DST>) noexcept
             -> std::uint8_t const(&)[protocol::OFP_ETH_ALEN]
         {
@@ -118,7 +118,7 @@ namespace v10 {
         }
 
         inline auto get_dl_addr(
-                  v10_detail::ofp_match& match
+                  protocol::ofp_match& match
                 , field_type<protocol::OFPFW_DL_SRC>) noexcept
             -> std::uint8_t(&)[protocol::OFP_ETH_ALEN]
         {
@@ -126,7 +126,7 @@ namespace v10 {
         }
 
         inline auto get_dl_addr(
-                  v10_detail::ofp_match const& match
+                  protocol::ofp_match const& match
                 , field_type<protocol::OFPFW_DL_SRC>) noexcept
             -> std::uint8_t const(&)[protocol::OFP_ETH_ALEN]
         {
@@ -152,7 +152,7 @@ namespace v10 {
         public:
             using field_type = FieldType;
             using value_type = typename boost::fusion::result_of::value_at<
-                v10_detail::ofp_match, member_index
+                protocol::ofp_match, member_index
             >::type;
 
             explicit match_field(value_type const value) noexcept
@@ -185,7 +185,7 @@ namespace v10 {
                 -> bool;
 
         private:
-            explicit match_field(v10_detail::ofp_match const& match)
+            explicit match_field(protocol::ofp_match const& match)
                 : value_(boost::fusion::at<member_index>(match))
             {
             }
@@ -198,26 +198,26 @@ namespace v10 {
 
             friend match;
 
-            void set_value(v10_detail::ofp_match& match) const noexcept
+            void set_value(protocol::ofp_match& match) const noexcept
             {
                 boost::fusion::at<member_index>(match) = value_;
                 match.wildcards &= ~FieldType::value;
             }
 
-            static auto is_wildcard(v10_detail::ofp_match const& match) noexcept
+            static auto is_wildcard(protocol::ofp_match const& match) noexcept
                 -> bool
             {
                 return match.wildcards & FieldType::value;
             }
 
             static auto create_from_match(
-                    v10_detail::ofp_match const& match) noexcept
+                    protocol::ofp_match const& match) noexcept
                 -> match_field
             {
                 return match_field{match};
             }
 
-            static void erase_from_match(v10_detail::ofp_match& match) noexcept
+            static void erase_from_match(protocol::ofp_match& match) noexcept
             {
                 boost::fusion::at<member_index>(match) = 0;
                 match.wildcards |= FieldType::value;
@@ -296,7 +296,7 @@ namespace v10 {
         private:
             friend match;
 
-            void set_value(v10_detail::ofp_match& match) const noexcept
+            void set_value(protocol::ofp_match& match) const noexcept
             {
                 std::memcpy(match_detail::get_dl_addr(match, FieldType{})
                           , value().to_bytes().data()
@@ -304,7 +304,7 @@ namespace v10 {
                 match.wildcards &= ~FieldType::value;
             }
 
-            static auto is_wildcard(v10_detail::ofp_match const& match) noexcept
+            static auto is_wildcard(protocol::ofp_match const& match) noexcept
                 -> bool
             {
                 return match.wildcards & FieldType::value;
@@ -312,7 +312,7 @@ namespace v10 {
 
 
             static auto create_from_match(
-                    v10_detail::ofp_match const& match) noexcept
+                    protocol::ofp_match const& match) noexcept
                 -> dl_addr_match_field
             {
                 return dl_addr_match_field{
@@ -320,7 +320,7 @@ namespace v10 {
                 };
             }
 
-            static void erase_from_match(v10_detail::ofp_match& match) noexcept
+            static void erase_from_match(protocol::ofp_match& match) noexcept
             {
                 std::memset(match_detail::get_dl_addr(match, FieldType{})
                           , 0, protocol::OFP_ETH_ALEN);
@@ -423,7 +423,7 @@ namespace v10 {
             }
 
         private:
-            explicit nw_addr_match_field(v10_detail::ofp_match const& match)
+            explicit nw_addr_match_field(protocol::ofp_match const& match)
                 : value_{boost::fusion::at<member_index>(match)}
                 , wildcard_bit_count_(
                         (match.wildcards & mask_info::mask) >> mask_info::shift)
@@ -432,7 +432,7 @@ namespace v10 {
 
             friend match;
 
-            void set_value(v10_detail::ofp_match& match) const noexcept
+            void set_value(protocol::ofp_match& match) const noexcept
             {
                 boost::fusion::at<member_index>(match) = value().to_ulong();
                 match.wildcards &= ~mask_info::mask;
@@ -440,19 +440,19 @@ namespace v10 {
                     |= (std::uint32_t{wildcard_bit_count_} << mask_info::shift);
             }
 
-            static auto is_wildcard(v10_detail::ofp_match const& match) noexcept
+            static auto is_wildcard(protocol::ofp_match const& match) noexcept
                 -> bool
             {
                 return match.wildcards & FieldType::value;
             }
 
-            static auto create_from_match(v10_detail::ofp_match const& match)
+            static auto create_from_match(protocol::ofp_match const& match)
                 -> nw_addr_match_field
             {
                 return nw_addr_match_field{match};
             }
 
-            static void erase_from_match(v10_detail::ofp_match& match) noexcept
+            static void erase_from_match(protocol::ofp_match& match) noexcept
             {
                 boost::fusion::at<member_index>(match) = 0;
                 match.wildcards |= FieldType::value;

@@ -20,7 +20,7 @@ namespace v13 {
 
   struct table_feature_property_decoder
   {
-    using header_type = v13_detail::ofp_table_feature_prop_header;
+    using header_type = protocol::ofp_table_feature_prop_header;
     using type_id = std::uint16_t;
     using decode_type_list = default_table_feature_property_list;
     static constexpr std::uint16_t header_size = sizeof(header_type);

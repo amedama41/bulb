@@ -24,7 +24,7 @@ namespace statistics {
         : public detail::basic_protocol_type<queue_stats>
     {
     public:
-        using raw_ofp_type = v10_detail::ofp_queue_stats;
+        using raw_ofp_type = protocol::ofp_queue_stats;
 
         queue_stats(std::uint32_t const queue_id
                   , std::uint16_t const port_no
@@ -112,7 +112,7 @@ namespace statistics {
 
     class queue_stats_request
         : public stats_detail::basic_stats_request<
-                queue_stats_request, v10_detail::ofp_queue_stats_request
+                queue_stats_request, protocol::ofp_queue_stats_request
           >
     {
     public:

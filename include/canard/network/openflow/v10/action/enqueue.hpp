@@ -15,7 +15,7 @@ namespace actions {
 
     class enqueue
         : public actions_detail::basic_action<
-                enqueue, v10_detail::ofp_action_enqueue
+                enqueue, protocol::ofp_action_enqueue
           >
     {
     public:

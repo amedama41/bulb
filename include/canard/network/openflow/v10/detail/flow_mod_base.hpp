@@ -27,7 +27,7 @@ namespace flow_mod_detail {
         : public v10_detail::basic_openflow_message<FlowMod>
     {
     public:
-        using raw_ofp_type = v10_detail::ofp_flow_mod;
+        using raw_ofp_type = protocol::ofp_flow_mod;
 
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_FLOW_MOD;
@@ -39,7 +39,7 @@ namespace flow_mod_detail {
         }
 
         auto header() const noexcept
-            -> v10_detail::ofp_header const&
+            -> protocol::ofp_header const&
         {
             return flow_mod_.header;
         }
@@ -59,7 +59,7 @@ namespace flow_mod_detail {
             return actions;
         }
 
-        static void validate_header(v10_detail::ofp_header const& header)
+        static void validate_header(protocol::ofp_header const& header)
         {
             if (header.version != protocol::OFP_VERSION) {
                 throw std::runtime_error{"invalid version"};
@@ -84,7 +84,7 @@ namespace flow_mod_detail {
                 , std::uint32_t const buffer_id
                 , std::uint32_t const xid)
             : flow_mod_{
-                  v10_detail::ofp_header{
+                  protocol::ofp_header{
                       protocol::OFP_VERSION
                     , message_type
                     , actions.calc_ofp_length(sizeof(raw_ofp_type))
@@ -110,7 +110,7 @@ namespace flow_mod_detail {
                 , std::uint16_t const out_port
                 , std::uint32_t const xid)
             : flow_mod_{
-                  v10_detail::ofp_header{
+                  protocol::ofp_header{
                       protocol::OFP_VERSION
                     , message_type
                     , std::uint16_t(sizeof(raw_ofp_type))

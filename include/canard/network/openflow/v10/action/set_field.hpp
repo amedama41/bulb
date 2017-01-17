@@ -29,15 +29,15 @@ namespace actions {
         };
 
         using set_field_info_table = boost::fusion::map<
-              boost::fusion::pair<match_fields::eth_src  , ofp_action_info<protocol::OFPAT_SET_DL_SRC   , v10_detail::ofp_action_dl_addr  > >
-            , boost::fusion::pair<match_fields::eth_dst  , ofp_action_info<protocol::OFPAT_SET_DL_DST   , v10_detail::ofp_action_dl_addr  > >
-            , boost::fusion::pair<match_fields::vlan_vid , ofp_action_info<protocol::OFPAT_SET_VLAN_VID , v10_detail::ofp_action_vlan_vid > >
-            , boost::fusion::pair<match_fields::vlan_pcp , ofp_action_info<protocol::OFPAT_SET_VLAN_PCP , v10_detail::ofp_action_vlan_pcp > >
-            , boost::fusion::pair<match_fields::ip_dscp  , ofp_action_info<protocol::OFPAT_SET_NW_TOS   , v10_detail::ofp_action_nw_tos   > >
-            , boost::fusion::pair<match_fields::ipv4_src , ofp_action_info<protocol::OFPAT_SET_NW_SRC   , v10_detail::ofp_action_nw_addr  > >
-            , boost::fusion::pair<match_fields::ipv4_dst , ofp_action_info<protocol::OFPAT_SET_NW_DST   , v10_detail::ofp_action_nw_addr  > >
-            , boost::fusion::pair<match_fields::tcp_src  , ofp_action_info<protocol::OFPAT_SET_TP_SRC   , v10_detail::ofp_action_tp_port  > >
-            , boost::fusion::pair<match_fields::tcp_dst  , ofp_action_info<protocol::OFPAT_SET_TP_DST   , v10_detail::ofp_action_tp_port  > >
+              boost::fusion::pair<match_fields::eth_src  , ofp_action_info<protocol::OFPAT_SET_DL_SRC   , protocol::ofp_action_dl_addr  > >
+            , boost::fusion::pair<match_fields::eth_dst  , ofp_action_info<protocol::OFPAT_SET_DL_DST   , protocol::ofp_action_dl_addr  > >
+            , boost::fusion::pair<match_fields::vlan_vid , ofp_action_info<protocol::OFPAT_SET_VLAN_VID , protocol::ofp_action_vlan_vid > >
+            , boost::fusion::pair<match_fields::vlan_pcp , ofp_action_info<protocol::OFPAT_SET_VLAN_PCP , protocol::ofp_action_vlan_pcp > >
+            , boost::fusion::pair<match_fields::ip_dscp  , ofp_action_info<protocol::OFPAT_SET_NW_TOS   , protocol::ofp_action_nw_tos   > >
+            , boost::fusion::pair<match_fields::ipv4_src , ofp_action_info<protocol::OFPAT_SET_NW_SRC   , protocol::ofp_action_nw_addr  > >
+            , boost::fusion::pair<match_fields::ipv4_dst , ofp_action_info<protocol::OFPAT_SET_NW_DST   , protocol::ofp_action_nw_addr  > >
+            , boost::fusion::pair<match_fields::tcp_src  , ofp_action_info<protocol::OFPAT_SET_TP_SRC   , protocol::ofp_action_tp_port  > >
+            , boost::fusion::pair<match_fields::tcp_dst  , ofp_action_info<protocol::OFPAT_SET_TP_DST   , protocol::ofp_action_tp_port  > >
         >;
 
         template <class MatchField>
@@ -113,22 +113,22 @@ namespace actions {
         }
 
         inline auto access(
-                v10_detail::ofp_action_nw_tos const& set_nw_tos) noexcept
+                protocol::ofp_action_nw_tos const& set_nw_tos) noexcept
             -> typename boost::fusion::result_of::value_at_c<
-                   v10_detail::ofp_action_nw_tos, 2
+                   protocol::ofp_action_nw_tos, 2
                >::type
         {
             return std::uint32_t{boost::fusion::at_c<2>(set_nw_tos)} >> 2;
         }
 
         inline auto access(
-                v10_detail::ofp_action_dl_addr const& set_dl_addr) noexcept
+                protocol::ofp_action_dl_addr const& set_dl_addr) noexcept
             -> canard::mac_address
         {
             return canard::mac_address{set_dl_addr.dl_addr};
         }
 
-        inline auto access(v10_detail::ofp_action_nw_addr const& set_nw_addr)
+        inline auto access(protocol::ofp_action_nw_addr const& set_nw_addr)
             -> boost::asio::ip::address_v4
         {
             return boost::asio::ip::address_v4{set_nw_addr.nw_addr};

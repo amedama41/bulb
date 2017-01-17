@@ -47,7 +47,7 @@ namespace v13 {
     }
 
     static void validate_header(
-        ofp::v13::v13_detail::ofp_meter_band_header const& header)
+        ofp::v13::protocol::ofp_meter_band_header const& header)
     {
       if (header.type != type()) {
         throw std::runtime_error{"invalid meter band type"};

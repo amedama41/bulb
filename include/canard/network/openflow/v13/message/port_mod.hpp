@@ -24,7 +24,7 @@ namespace messages {
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_PORT_MOD;
 
-        using raw_ofp_type = v13_detail::ofp_port_mod;
+        using raw_ofp_type = protocol::ofp_port_mod;
 
         port_mod(std::uint32_t const port_no
                , canard::mac_address const& macaddr
@@ -33,7 +33,7 @@ namespace messages {
                , std::uint32_t const advertise
                , std::uint32_t const xid = get_xid()) noexcept
             : port_mod_{
-                  v13_detail::ofp_header{
+                  protocol::ofp_header{
                       version()
                     , type()
                     , sizeof(raw_ofp_type)
@@ -69,7 +69,7 @@ namespace messages {
         }
 
         auto header() const noexcept
-            -> v13_detail::ofp_header const&
+            -> protocol::ofp_header const&
         {
             return port_mod_.header;
         }

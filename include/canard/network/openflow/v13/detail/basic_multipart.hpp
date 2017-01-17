@@ -28,14 +28,14 @@ namespace multipart_detail {
     struct multipart_message_type;
 
     template <>
-    struct multipart_message_type<v13_detail::ofp_multipart_request>
+    struct multipart_message_type<protocol::ofp_multipart_request>
     {
         static constexpr protocol::ofp_type value
             = protocol::OFPT_MULTIPART_REQUEST;
     };
 
     template <>
-    struct multipart_message_type<v13_detail::ofp_multipart_reply>
+    struct multipart_message_type<protocol::ofp_multipart_reply>
     {
         static constexpr protocol::ofp_type value
             = protocol::OFPT_MULTIPART_REPLY;
@@ -50,7 +50,7 @@ namespace multipart_detail {
             = multipart_message_type<MultipartType>::value;
 
         auto header() const noexcept
-            -> v13_detail::ofp_header const&
+            -> protocol::ofp_header const&
         {
             return static_cast<T const*>(this)->multipart().header;
         }
@@ -92,7 +92,7 @@ namespace multipart_detail {
         empty_body_multipart(
                 std::uint16_t const flags, std::uint32_t const xid) noexcept
             : multipart_{
-                  v13_detail::ofp_header{
+                  protocol::ofp_header{
                       base_t::version()
                     , base_t::type()
                     , sizeof(raw_ofp_type)
@@ -155,7 +155,7 @@ namespace multipart_detail {
                 , body_type const& body
                 , std::uint32_t const xid) noexcept
             : multipart_{
-                  v13_detail::ofp_header{
+                  protocol::ofp_header{
                       base_t::version()
                     , base_t::type()
                     , sizeof(raw_ofp_type) + sizeof(body_type)
@@ -245,7 +245,7 @@ namespace multipart_detail {
                 , oxm_match&& match
                 , std::uint32_t const xid) noexcept
             : multipart_{
-                  v13_detail::ofp_header{
+                  protocol::ofp_header{
                       base_t::version()
                     , base_t::type()
                     , match.calc_ofp_length(
@@ -342,7 +342,7 @@ namespace multipart_detail {
 
             auto it = first;
             auto const ofp_match
-                = detail::decode<v13_detail::ofp_match>(it, last);
+                = detail::decode<protocol::ofp_match>(it, last);
             oxm_match::validate_header(ofp_match);
             if (std::distance(first, last)
                     != v13_detail::exact_length(ofp_match.length)) {
@@ -424,7 +424,7 @@ namespace multipart_detail {
                 , body_type&& body
                 , std::uint32_t const xid)
             : multipart_{
-                  v13_detail::ofp_header{
+                  protocol::ofp_header{
                       base_t::version()
                     , base_t::type()
                     , body.calc_ofp_length(sizeof(raw_ofp_type))
@@ -526,12 +526,12 @@ namespace multipart_detail {
     template <class T, class BodyType, bool HasMatch = false>
     class basic_multipart_request
          : public basic_multipart_t<
-                v13_detail::ofp_multipart_request, T, BodyType, HasMatch
+                protocol::ofp_multipart_request, T, BodyType, HasMatch
            >
     {
     protected:
         using base_type = basic_multipart_t<
-            v13_detail::ofp_multipart_request, T, BodyType, HasMatch
+            protocol::ofp_multipart_request, T, BodyType, HasMatch
         >;
 
     public:
@@ -542,12 +542,12 @@ namespace multipart_detail {
     template <class T, class BodyType, bool HasMatch = false>
     class basic_multipart_reply
          : public basic_multipart_t<
-                v13_detail::ofp_multipart_reply, T, BodyType, HasMatch
+                protocol::ofp_multipart_reply, T, BodyType, HasMatch
            >
     {
     protected:
         using base_type = basic_multipart_t<
-            v13_detail::ofp_multipart_reply, T, BodyType, HasMatch
+            protocol::ofp_multipart_reply, T, BodyType, HasMatch
         >;
 
     public:

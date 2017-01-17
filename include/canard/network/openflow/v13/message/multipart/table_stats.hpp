@@ -22,7 +22,7 @@ namespace multipart {
         : public detail::basic_protocol_type<table_stats>
     {
     public:
-        using raw_ofp_type = v13_detail::ofp_table_stats;
+        using raw_ofp_type = protocol::ofp_table_stats;
 
         table_stats(std::uint8_t const table_id
                   , std::uint32_t const active_count
@@ -113,7 +113,7 @@ namespace multipart {
         friend basic_multipart_request::base_type;
 
         explicit table_stats_request(
-                v13_detail::ofp_multipart_request const& multipart_request) noexcept
+                protocol::ofp_multipart_request const& multipart_request) noexcept
             : basic_multipart_request{multipart_request}
         {
         }
@@ -141,7 +141,7 @@ namespace multipart {
         friend basic_multipart_reply::base_type;
 
         table_stats_reply(
-                  v13_detail::ofp_multipart_reply const& reply
+                  protocol::ofp_multipart_reply const& reply
                 , body_type&& table_stats)
             : basic_multipart_reply{reply, std::move(table_stats)}
         {

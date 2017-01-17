@@ -18,7 +18,7 @@ namespace v10 {
         {
         private:
             auto header() const
-                -> v10_detail::ofp_header
+                -> protocol::ofp_header
             {
                 return static_cast<T const*>(this)->header();
             }

@@ -33,11 +33,11 @@ namespace flow_mod_detail {
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_FLOW_MOD;
 
-        using raw_ofp_type = v13_detail::ofp_flow_mod;
+        using raw_ofp_type = protocol::ofp_flow_mod;
         using instructions_type = ofp::list<any_instruction>;
 
         auto header() const noexcept
-            -> v13_detail::ofp_header const&
+            -> protocol::ofp_header const&
         {
             return flow_mod_.header;
         }
@@ -87,7 +87,7 @@ namespace flow_mod_detail {
                 , std::uint32_t const buffer_id
                 , std::uint32_t const xid)
             : flow_mod_{
-                  v13_detail::ofp_header{
+                  protocol::ofp_header{
                       base_t::version()
                     , base_t::type()
                     , instructions.calc_ofp_length(
@@ -122,7 +122,7 @@ namespace flow_mod_detail {
                 , std::uint32_t const out_group
                 , std::uint32_t const xid)
             : flow_mod_{
-                  v13_detail::ofp_header{
+                  protocol::ofp_header{
                       base_t::version()
                     , base_t::type()
                     , match.calc_ofp_length(sizeof(raw_ofp_type))
@@ -182,7 +182,7 @@ namespace flow_mod_detail {
         }
 
         auto ofp_flow_mod() const noexcept
-            -> v13_detail::ofp_flow_mod const&
+            -> protocol::ofp_flow_mod const&
         {
             return flow_mod_;
         }
@@ -193,7 +193,7 @@ namespace flow_mod_detail {
         friend constexpr auto get_min_length(FlowMod*) noexcept
             -> std::uint16_t
         {
-            return sizeof(v13_detail::ofp_flow_mod)
+            return sizeof(protocol::ofp_flow_mod)
                  + oxm_match::min_byte_length();
         }
 
@@ -215,7 +215,7 @@ namespace flow_mod_detail {
 
             auto copy_first = first;
             auto const ofp_match
-                = detail::decode<v13_detail::ofp_match>(copy_first, last);
+                = detail::decode<protocol::ofp_match>(copy_first, last);
             oxm_match::validate_header(ofp_match);
             if (std::distance(first, last)
                     < v13_detail::exact_length(ofp_match.length)) {

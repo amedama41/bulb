@@ -23,7 +23,7 @@ namespace multipart {
         : public detail::basic_protocol_type<queue_stats>
     {
     public:
-        using raw_ofp_type = v13_detail::ofp_queue_stats;
+        using raw_ofp_type = protocol::ofp_queue_stats;
 
         queue_stats(std::uint32_t const queue_id
                   , std::uint32_t const port_no
@@ -125,10 +125,10 @@ namespace multipart {
 
     class queue_stats_request
         : public multipart_detail::basic_multipart_request<
-                queue_stats_request, v13_detail::ofp_queue_stats_request
+                queue_stats_request, protocol::ofp_queue_stats_request
           >
     {
-        using raw_ofp_type = v13_detail::ofp_queue_stats_request;
+        using raw_ofp_type = protocol::ofp_queue_stats_request;
 
     public:
         static constexpr protocol::ofp_multipart_type multipart_type_value
@@ -162,7 +162,7 @@ namespace multipart {
         friend basic_multipart_request::base_type;
 
         queue_stats_request(
-                  v13_detail::ofp_multipart_request const& multipart_request
+                  protocol::ofp_multipart_request const& multipart_request
                 , raw_ofp_type const& queue_stats_request) noexcept
             : basic_multipart_request{multipart_request, queue_stats_request}
         {
@@ -191,7 +191,7 @@ namespace multipart {
         friend basic_multipart_reply::base_type;
 
         queue_stats_reply(
-                  v13_detail::ofp_multipart_reply const multipart_reply
+                  protocol::ofp_multipart_reply const multipart_reply
                 , body_type&& queue_stats)
             : basic_multipart_reply{multipart_reply, std::move(queue_stats)}
         {

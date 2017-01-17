@@ -22,13 +22,13 @@ namespace messages {
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_TABLE_MOD;
 
-        using raw_ofp_type = v13_detail::ofp_table_mod;
+        using raw_ofp_type = protocol::ofp_table_mod;
 
         table_mod(std::uint8_t const table_id
                 , std::uint32_t const config
                 , std::uint32_t const xid = get_xid())
             : table_mod_{
-                  v13_detail::ofp_header{
+                  protocol::ofp_header{
                       version()
                     , type()
                     , sizeof(raw_ofp_type)
@@ -42,7 +42,7 @@ namespace messages {
         }
 
         auto header() const noexcept
-            -> v13_detail::ofp_header const&
+            -> protocol::ofp_header const&
         {
             return table_mod_.header;
         }

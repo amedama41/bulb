@@ -13,7 +13,7 @@ namespace actions {
 
     class set_nw_ttl
         : public detail::v13::basic_action<
-            set_nw_ttl, v13_detail::ofp_action_nw_ttl
+            set_nw_ttl, protocol::ofp_action_nw_ttl
           >
     {
     public:

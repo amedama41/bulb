@@ -25,7 +25,7 @@ namespace actions {
     class basic_set_field
     {
     protected:
-        using raw_ofp_type = v13_detail::ofp_action_set_field;
+        using raw_ofp_type = protocol::ofp_action_set_field;
 
         basic_set_field() = default;
 
@@ -48,7 +48,7 @@ namespace actions {
         }
 
         static void validate_action_header(
-                v13_detail::ofp_action_header const& header)
+                protocol::ofp_action_header const& header)
         {
             if (header.type != action_type) {
                 throw std::runtime_error{"invalid action type"};

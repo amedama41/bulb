@@ -14,7 +14,7 @@ namespace actions {
 
     class set_queue
         : public detail::v13::basic_action<
-            set_queue, v13_detail::ofp_action_set_queue
+            set_queue, protocol::ofp_action_set_queue
           >
     {
     public:

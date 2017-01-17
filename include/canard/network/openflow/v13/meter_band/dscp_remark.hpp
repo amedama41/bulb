@@ -19,7 +19,7 @@ namespace meter_bands {
       = protocol::OFPMBT_DSCP_REMARK;
 
   public:
-    using raw_ofp_type = v13_detail::ofp_meter_band_dscp_remark;
+    using raw_ofp_type = protocol::ofp_meter_band_dscp_remark;
 
     dscp_remark(
           std::uint8_t const prec_level

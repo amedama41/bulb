@@ -136,7 +136,7 @@ namespace messages {
     private:
         friend flow_mod_base;
 
-        flow_modify(v13_detail::ofp_flow_mod const& flow_mod
+        flow_modify(protocol::ofp_flow_mod const& flow_mod
                   , oxm_match&& match
                   , instructions_type&& instructions)
             : flow_mod_base{
@@ -332,7 +332,7 @@ namespace messages {
         friend flow_mod_base;
 
         flow_modify_strict(
-                  v13_detail::ofp_flow_mod const& flow_mod
+                  protocol::ofp_flow_mod const& flow_mod
                 , oxm_match&& match
                 , instructions_type&& instructions)
             : flow_mod_base{

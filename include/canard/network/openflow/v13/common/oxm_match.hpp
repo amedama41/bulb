@@ -32,7 +32,7 @@ namespace v13 {
     static constexpr protocol::ofp_match_type match_type = protocol::OFPMT_OXM;
 
   public:
-    using raw_ofp_type = v13_detail::ofp_match;
+    using raw_ofp_type = protocol::ofp_match;
     using oxm_fields_type = ofp::list<any_oxm_match_field>;
 
   private:
@@ -137,7 +137,7 @@ namespace v13 {
       return base_length + length;
     }
 
-    static void validate_header(v13_detail::ofp_match const& match)
+    static void validate_header(protocol::ofp_match const& match)
     {
       if (match.type != match_type) {
         throw std::runtime_error{"match type is not OFPMT_OXM"};

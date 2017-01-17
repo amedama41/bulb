@@ -13,10 +13,9 @@ namespace v13 {
 
     template <class T>
     class basic_action_push
-        : public basic_action<T, ofp::v13::v13_detail::ofp_action_push>
+        : public basic_action<T, ofp::v13::protocol::ofp_action_push>
     {
-        using base_type
-            = basic_action<T, ofp::v13::v13_detail::ofp_action_push>;
+        using base_type = basic_action<T, ofp::v13::protocol::ofp_action_push>;
 
     public:
         using raw_ofp_type = typename base_type::raw_ofp_type;

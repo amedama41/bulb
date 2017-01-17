@@ -23,7 +23,7 @@ namespace v13 {
         : public detail::basic_protocol_type<bucket>
     {
     public:
-        using raw_ofp_type = v13_detail::ofp_bucket;
+        using raw_ofp_type = protocol::ofp_bucket;
 
         bucket(std::uint16_t const weight
              , std::uint32_t const watch_port

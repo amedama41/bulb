@@ -25,7 +25,7 @@ namespace messages {
         : public v10_detail::basic_openflow_message<packet_out>
     {
     public:
-        using raw_ofp_type = v10_detail::ofp_packet_out;
+        using raw_ofp_type = protocol::ofp_packet_out;
         using data_type = ofp::data_type;
 
         static constexpr protocol::ofp_type message_type
@@ -39,7 +39,7 @@ namespace messages {
                  , data_type&& data
                  , std::uint32_t const xid)
             : packet_out_{
-                  v10_detail::ofp_header{
+                  protocol::ofp_header{
                         protocol::OFP_VERSION
                       , message_type
                       , length
@@ -127,7 +127,7 @@ namespace messages {
         }
 
         auto header() const noexcept
-            -> v10_detail::ofp_header const&
+            -> protocol::ofp_header const&
         {
             return packet_out_.header;
         }
@@ -187,7 +187,7 @@ namespace messages {
             return data_.size();
         }
 
-        static void validate_header(v10_detail::ofp_header const& header)
+        static void validate_header(protocol::ofp_header const& header)
         {
             if (header.version != protocol::OFP_VERSION) {
                 throw std::runtime_error{"invalid version"};

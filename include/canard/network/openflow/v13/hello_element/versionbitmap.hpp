@@ -31,7 +31,7 @@ namespace hello_elements {
     : public detail::basic_protocol_type<versionbitmap>
   {
   public:
-    using raw_ofp_type = v13_detail::ofp_hello_elem_versionbitmap;
+    using raw_ofp_type = protocol::ofp_hello_elem_versionbitmap;
     using bitmaps_type = std::vector<std::uint32_t>;
 
   private:
@@ -133,7 +133,7 @@ namespace hello_elements {
       return shift + std::distance(bitmaps_.begin(), it) * bitmap_bits;
     }
 
-    static void validate_header(v13_detail::ofp_hello_elem_header const& header)
+    static void validate_header(protocol::ofp_hello_elem_header const& header)
     {
       if (header.type != type()) {
         throw std::runtime_error{"type is not versionbitmap"};

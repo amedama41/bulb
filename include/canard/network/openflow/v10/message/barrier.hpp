@@ -24,15 +24,15 @@ namespace messages {
             : public v10_detail::basic_openflow_message<T>
         {
         public:
-            using raw_ofp_type = v10_detail::ofp_header;
+            using raw_ofp_type = protocol::ofp_header;
 
             auto header() const noexcept
-                -> v10_detail::ofp_header const&
+                -> protocol::ofp_header const&
             {
                 return header_;
             }
 
-            static void validate_header(v10_detail::ofp_header const& header)
+            static void validate_header(protocol::ofp_header const& header)
             {
                 if (header.version != protocol::OFP_VERSION) {
                     throw std::runtime_error{"invalid version"};

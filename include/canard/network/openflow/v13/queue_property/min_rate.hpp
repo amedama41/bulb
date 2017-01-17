@@ -14,7 +14,7 @@ namespace queue_properties {
 
     class min_rate
         : public queue_property_detail::basic_queue_property<
-            min_rate, v13_detail::ofp_queue_prop_min_rate
+            min_rate, protocol::ofp_queue_prop_min_rate
           >
     {
     public:
@@ -23,7 +23,7 @@ namespace queue_properties {
 
         explicit min_rate(std::uint16_t const rate) noexcept
             : min_rate_{
-                  v13_detail::ofp_queue_prop_header{
+                  protocol::ofp_queue_prop_header{
                       queue_property
                     , sizeof(raw_ofp_type)
                     , { 0, 0, 0, 0 }

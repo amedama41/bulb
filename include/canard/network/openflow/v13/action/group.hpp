@@ -13,7 +13,7 @@ namespace v13 {
 namespace actions {
 
     class group
-        : public detail::v13::basic_action<group, v13_detail::ofp_action_group>
+        : public detail::v13::basic_action<group, protocol::ofp_action_group>
     {
     public:
         static constexpr protocol::ofp_action_type action_type
@@ -38,7 +38,7 @@ namespace actions {
         friend basic_action;
 
         explicit group(
-                v13_detail::ofp_action_group const& action_group) noexcept
+                protocol::ofp_action_group const& action_group) noexcept
             : action_group_(action_group)
         {
         }

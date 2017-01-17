@@ -25,7 +25,7 @@ namespace messages {
         : public v10_detail::basic_openflow_message<error>
     {
     public:
-        using raw_ofp_type = v10_detail::ofp_error_msg;
+        using raw_ofp_type = protocol::ofp_error_msg;
         using data_type = ofp::data_type;
 
         static constexpr protocol::ofp_type message_type = protocol::OFPT_ERROR;
@@ -35,7 +35,7 @@ namespace messages {
             , data_type data
             , std::uint32_t const xid = get_xid()) noexcept
             : error_msg_{
-                  v10_detail::ofp_header{
+                  protocol::ofp_header{
                         protocol::OFP_VERSION
                       , message_type
                       , ofp::calc_ofp_length(data, sizeof(raw_ofp_type))
@@ -83,7 +83,7 @@ namespace messages {
         }
 
         auto header() const noexcept
-            -> v10_detail::ofp_header const&
+            -> protocol::ofp_header const&
         {
             return error_msg_.header;
         }
@@ -122,14 +122,14 @@ namespace messages {
         }
 
         auto failed_request_header() const
-            -> v10_detail::ofp_header
+            -> protocol::ofp_header
         {
             auto it = data_.data();
             auto const it_end = data_.data() + data_.size();
-            return detail::decode<v10_detail::ofp_header>(it, it_end);
+            return detail::decode<protocol::ofp_header>(it, it_end);
         }
 
-        static void validate_header(v10_detail::ofp_header const& header)
+        static void validate_header(protocol::ofp_header const& header)
         {
             if (header.version != protocol::OFP_VERSION) {
                 throw std::runtime_error{"invalid version"};

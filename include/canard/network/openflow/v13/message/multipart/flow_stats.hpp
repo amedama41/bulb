@@ -30,11 +30,11 @@ namespace multipart {
     class flow_stats
         : public detail::basic_protocol_type<flow_stats>
         , public v13_detail::flow_entry_adaptor<
-                flow_stats, v13_detail::ofp_flow_stats
+                flow_stats, protocol::ofp_flow_stats
           >
     {
     public:
-        using raw_ofp_type = v13_detail::ofp_flow_stats;
+        using raw_ofp_type = protocol::ofp_flow_stats;
         using instructions_type = ofp::list<any_instruction>;
 
         flow_stats(v13::flow_entry entry
@@ -148,7 +148,7 @@ namespace multipart {
         friend flow_entry_adaptor;
 
         auto ofp_flow_entry() const noexcept
-            -> v13_detail::ofp_flow_stats const&
+            -> protocol::ofp_flow_stats const&
         {
             return flow_stats_;
         }
@@ -188,7 +188,7 @@ namespace multipart {
 
             auto copy_first = first;
             auto const ofp_match
-                = detail::decode<v13_detail::ofp_match>(copy_first, last);
+                = detail::decode<protocol::ofp_match>(copy_first, last);
             oxm_match::validate_header(ofp_match);
             if (std::distance(first, last)
                     < v13_detail::exact_length(ofp_match.length)) {
@@ -210,7 +210,7 @@ namespace multipart {
 
     class flow_stats_request
         : public multipart_detail::basic_multipart_request<
-              flow_stats_request, v13_detail::ofp_flow_stats_request, true
+              flow_stats_request, protocol::ofp_flow_stats_request, true
           >
     {
     public:
@@ -225,7 +225,7 @@ namespace multipart {
                 , std::uint32_t const xid = get_xid())
             : basic_multipart_request{
                   0
-                , v13_detail::ofp_flow_stats_request{
+                , protocol::ofp_flow_stats_request{
                       table_id
                     , { 0, 0, 0 }
                     , out_port
@@ -249,7 +249,7 @@ namespace multipart {
                 , std::uint32_t const xid = get_xid())
             : basic_multipart_request{
                   0
-                , v13_detail::ofp_flow_stats_request{
+                , protocol::ofp_flow_stats_request{
                       table_id
                     , { 0, 0, 0 }
                     , out_port
@@ -315,8 +315,8 @@ namespace multipart {
         friend basic_multipart_request::base_type;
 
         flow_stats_request(
-                  v13_detail::ofp_multipart_request const& request
-                , v13_detail::ofp_flow_stats_request const& stats_request
+                  protocol::ofp_multipart_request const& request
+                , protocol::ofp_flow_stats_request const& stats_request
                 , oxm_match&& match)
             : basic_multipart_request{request, stats_request, std::move(match)}
         {
@@ -345,7 +345,7 @@ namespace multipart {
         friend basic_multipart_reply::base_type;
 
         flow_stats_reply(
-                  v13_detail::ofp_multipart_reply const& multipart_reply
+                  protocol::ofp_multipart_reply const& multipart_reply
                 , body_type&& flow_stats)
             : basic_multipart_reply{multipart_reply, std::move(flow_stats)}
         {

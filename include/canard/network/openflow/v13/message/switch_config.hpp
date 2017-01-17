@@ -24,10 +24,10 @@ namespace messages {
             using base_t = detail::v13::basic_openflow_message<T>;
 
         public:
-            using raw_ofp_type = v13_detail::ofp_switch_config;
+            using raw_ofp_type = protocol::ofp_switch_config;
 
             auto header() const noexcept
-                -> v13_detail::ofp_header const&
+                -> protocol::ofp_header const&
             {
                 return switch_config_.header;
             }
@@ -50,7 +50,7 @@ namespace messages {
                     , std::uint16_t const miss_send_len
                     , std::uint32_t const xid) noexcept
                 : switch_config_{
-                      v13_detail::ofp_header{
+                      protocol::ofp_header{
                           base_t::version()
                         , base_t::type()
                         , sizeof(raw_ofp_type)
@@ -94,7 +94,7 @@ namespace messages {
         : public detail::v13::basic_openflow_message<get_config_request>
     {
     public:
-        using raw_ofp_type = v13_detail::ofp_header;
+        using raw_ofp_type = protocol::ofp_header;
 
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_GET_CONFIG_REQUEST;
@@ -111,7 +111,7 @@ namespace messages {
         }
 
         auto header() const noexcept
-            -> v13_detail::ofp_header const&
+            -> protocol::ofp_header const&
         {
             return header_;
         }
@@ -171,7 +171,7 @@ namespace messages {
         friend switch_config_base;
 
         explicit get_config_reply(
-                v13_detail::ofp_switch_config const& config) noexcept
+                protocol::ofp_switch_config const& config) noexcept
             : switch_config_base{config}
         {
         }
@@ -196,7 +196,7 @@ namespace messages {
         friend switch_config_base;
 
         explicit set_config(
-                v13_detail::ofp_switch_config const& config) noexcept
+                protocol::ofp_switch_config const& config) noexcept
             : switch_config_base{config}
         {
         }

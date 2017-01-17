@@ -24,7 +24,7 @@ namespace v10 {
         , public detail::basic_protocol_type<port>
     {
     public:
-        using raw_ofp_type = v10_detail::ofp_phy_port;
+        using raw_ofp_type = protocol::ofp_phy_port;
 
         port(std::uint16_t const port_no
            , canard::mac_address const addr

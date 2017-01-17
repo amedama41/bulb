@@ -26,7 +26,7 @@ namespace v13 {
         : public detail::basic_protocol_type<T>
     {
     public:
-        using raw_ofp_type = ofp::v13::v13_detail::ofp_instruction_actions;
+        using raw_ofp_type = ofp::v13::protocol::ofp_instruction_actions;
 
         static constexpr auto type() noexcept
             -> ofp::v13::protocol::ofp_instruction_type
@@ -56,7 +56,7 @@ namespace v13 {
         }
 
         static void validate_instruction(
-                ofp::v13::v13_detail::ofp_instruction const& instruction)
+                ofp::v13::protocol::ofp_instruction const& instruction)
         {
             if (instruction.type != type()) {
                 throw std::runtime_error{"invalid instruction type"};

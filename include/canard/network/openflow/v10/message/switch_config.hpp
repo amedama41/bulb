@@ -24,7 +24,7 @@ namespace messages {
             : public v10_detail::basic_openflow_message<T>
         {
         public:
-            using raw_ofp_type = v10_detail::ofp_switch_config;
+            using raw_ofp_type = protocol::ofp_switch_config;
 
         protected:
             switch_config_base(
@@ -32,7 +32,7 @@ namespace messages {
                     , std::uint16_t const miss_send_len
                     , std::uint32_t const xid = get_xid()) noexcept
                 : config_{
-                      v10_detail::ofp_header{
+                      protocol::ofp_header{
                           protocol::OFP_VERSION
                         , T::message_type
                         , sizeof(raw_ofp_type)
@@ -51,7 +51,7 @@ namespace messages {
 
         public:
             auto header() const noexcept
-                -> v10_detail::ofp_header const&
+                -> protocol::ofp_header const&
             {
                 return config_.header;
             }
@@ -68,7 +68,7 @@ namespace messages {
                 return config_.miss_send_len;
             }
 
-            static void validate_header(v10_detail::ofp_header const& header)
+            static void validate_header(protocol::ofp_header const& header)
             {
                 if (header.version != protocol::OFP_VERSION) {
                     throw std::runtime_error{"invalid version"};
@@ -115,7 +115,7 @@ namespace messages {
         : public v10_detail::basic_openflow_message<get_config_request>
     {
     public:
-        using raw_ofp_type = v10_detail::ofp_header;
+        using raw_ofp_type = protocol::ofp_header;
 
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_GET_CONFIG_REQUEST;
@@ -132,12 +132,12 @@ namespace messages {
         }
 
         auto header() const noexcept
-            -> v10_detail::ofp_header const&
+            -> protocol::ofp_header const&
         {
             return header_;
         }
 
-        static void validate_header(v10_detail::ofp_header const& header)
+        static void validate_header(protocol::ofp_header const& header)
         {
             if (header.version != protocol::OFP_VERSION) {
                 throw std::runtime_error{"invalid version"};

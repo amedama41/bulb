@@ -24,7 +24,7 @@ namespace messages {
         : public detail::v13::basic_openflow_message<packet_out>
     {
     public:
-        using raw_ofp_type = v13_detail::ofp_packet_out;
+        using raw_ofp_type = protocol::ofp_packet_out;
         using data_type = ofp::data_type;
 
         static constexpr protocol::ofp_type message_type
@@ -38,7 +38,7 @@ namespace messages {
                  , data_type&& data
                  , std::uint32_t const xid)
             : packet_out_{
-                  v13_detail::ofp_header{
+                  protocol::ofp_header{
                         version()
                       , type()
                       , length
@@ -109,7 +109,7 @@ namespace messages {
         }
 
         auto header() const noexcept
-            -> v13_detail::ofp_header const&
+            -> protocol::ofp_header const&
         {
             return packet_out_.header;
         }

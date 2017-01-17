@@ -25,7 +25,7 @@ namespace messages {
         : public v10_detail::basic_openflow_message<queue_get_config_request>
     {
     public:
-        using raw_ofp_type = v10_detail::ofp_queue_get_config_request;
+        using raw_ofp_type = protocol::ofp_queue_get_config_request;
 
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_QUEUE_GET_CONFIG_REQUEST;
@@ -34,7 +34,7 @@ namespace messages {
                   std::uint16_t const port_no
                 , std::uint32_t const xid = get_xid()) noexcept
             : queue_get_config_request_{
-                  v10_detail::ofp_header{
+                  protocol::ofp_header{
                       protocol::OFP_VERSION
                     , message_type
                     , sizeof(raw_ofp_type)
@@ -47,7 +47,7 @@ namespace messages {
         }
 
         auto header() const noexcept
-            -> v10_detail::ofp_header const&
+            -> protocol::ofp_header const&
         {
             return queue_get_config_request_.header;
         }
@@ -58,7 +58,7 @@ namespace messages {
             return queue_get_config_request_.port;
         }
 
-        static void validate_header(v10_detail::ofp_header const& header)
+        static void validate_header(protocol::ofp_header const& header)
         {
             if (header.version != protocol::OFP_VERSION) {
                 throw std::runtime_error{"invalid version"};
@@ -111,7 +111,7 @@ namespace messages {
         : public v10_detail::basic_openflow_message<queue_get_config_reply>
     {
     public:
-        using raw_ofp_type = v10_detail::ofp_queue_get_config_reply;
+        using raw_ofp_type = protocol::ofp_queue_get_config_reply;
         using queues_type = ofp::list<packet_queue>;
 
         static constexpr protocol::ofp_type message_type
@@ -122,7 +122,7 @@ namespace messages {
                 , queues_type queues
                 , std::uint32_t const xid = get_xid())
             : queue_get_config_reply_{
-                  v10_detail::ofp_header{
+                  protocol::ofp_header{
                       protocol::OFP_VERSION
                     , message_type
                     , queues.calc_ofp_length(sizeof(raw_ofp_type))
@@ -159,7 +159,7 @@ namespace messages {
         }
 
         auto header() const noexcept
-            -> v10_detail::ofp_header const&
+            -> protocol::ofp_header const&
         {
             return queue_get_config_reply_.header;
         }
@@ -185,7 +185,7 @@ namespace messages {
             return queues;
         }
 
-        static void validate_header(v10_detail::ofp_header const& header)
+        static void validate_header(protocol::ofp_header const& header)
         {
             if (header.version != protocol::OFP_VERSION) {
                 throw std::runtime_error{"invalid version"};

@@ -23,7 +23,7 @@ namespace messages {
         : public v10_detail::basic_openflow_message<port_mod>
     {
     public:
-        using raw_ofp_type = v10_detail::ofp_port_mod;
+        using raw_ofp_type = protocol::ofp_port_mod;
 
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_PORT_MOD;
@@ -35,7 +35,7 @@ namespace messages {
                , std::uint32_t const advertise
                , std::uint32_t const xid = get_xid()) noexcept
             : port_mod_{
-                  v10_detail::ofp_header{
+                  protocol::ofp_header{
                       protocol::OFP_VERSION
                     , message_type
                     , sizeof(raw_ofp_type)
@@ -69,7 +69,7 @@ namespace messages {
         }
 
         auto header() const noexcept
-            -> v10_detail::ofp_header const&
+            -> protocol::ofp_header const&
         {
             return port_mod_.header;
         }
@@ -104,7 +104,7 @@ namespace messages {
             return port_mod_.advertise;
         }
 
-        static void validate_header(v10_detail::ofp_header const& header)
+        static void validate_header(protocol::ofp_header const& header)
         {
             if (header.version != protocol::OFP_VERSION) {
                 throw std::runtime_error{"invalid version"};

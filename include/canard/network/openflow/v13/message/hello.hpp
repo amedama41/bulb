@@ -57,14 +57,14 @@ namespace messages {
     public:
         static constexpr protocol::ofp_type message_type = protocol::OFPT_HELLO;
 
-        using raw_ofp_type = v13_detail::ofp_hello;
+        using raw_ofp_type = protocol::ofp_hello;
         using hello_elements_type = ofp::list<any_hello_element>;
 
         explicit hello(
                   std::uint8_t const version = protocol::OFP_VERSION
                 , std::uint32_t const xid = get_xid())
             : hello_{
-                v13_detail::ofp_header{
+                protocol::ofp_header{
                       version
                     , message_type
                     , sizeof(raw_ofp_type)
@@ -79,7 +79,7 @@ namespace messages {
             , hello_elements_type elements
             , std::uint32_t const xid = get_xid())
             : hello_{
-                v13_detail::ofp_header{
+                protocol::ofp_header{
                       version
                     , message_type
                     , elements.calc_ofp_length(sizeof(raw_ofp_type))
@@ -138,7 +138,7 @@ namespace messages {
         }
 
         auto header() const noexcept
-            -> v13_detail::ofp_header const&
+            -> protocol::ofp_header const&
         {
             return hello_.header;
         }

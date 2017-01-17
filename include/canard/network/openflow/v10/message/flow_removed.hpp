@@ -23,7 +23,7 @@ namespace messages {
         : public v10_detail::basic_openflow_message<flow_removed>
     {
     public:
-        using raw_ofp_type = v10_detail::ofp_flow_removed;
+        using raw_ofp_type = protocol::ofp_flow_removed;
 
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_FLOW_REMOVED;
@@ -38,7 +38,7 @@ namespace messages {
                 , v10::counters const& counters
                 , std::uint32_t const xid = get_xid())
             : flow_removed_{
-                  v10_detail::ofp_header{
+                  protocol::ofp_header{
                       protocol::OFP_VERSION
                     , message_type
                     , sizeof(raw_ofp_type)
@@ -74,7 +74,7 @@ namespace messages {
         }
 
         auto header() const noexcept
-            -> v10_detail::ofp_header const&
+            -> protocol::ofp_header const&
         {
             return flow_removed_.header;
         }
@@ -145,7 +145,7 @@ namespace messages {
             return v10::counters{packet_count(), byte_count()};
         }
 
-        static void validate_header(v10_detail::ofp_header const& header)
+        static void validate_header(protocol::ofp_header const& header)
         {
             if (header.version != protocol::OFP_VERSION) {
                 throw std::runtime_error{"invalid version"};

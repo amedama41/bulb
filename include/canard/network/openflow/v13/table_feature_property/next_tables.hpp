@@ -32,7 +32,7 @@ namespace table_feature_properties {
         static constexpr protocol::ofp_table_feature_prop_type prop_type
             = T::prop_type;
 
-        using raw_ofp_type = v13_detail::ofp_table_feature_prop_next_tables;
+        using raw_ofp_type = protocol::ofp_table_feature_prop_next_tables;
         using next_table_ids_type = std::vector<std::uint8_t>;
         using iterator = next_table_ids_type::iterator;
         using const_iterator = next_table_ids_type::const_iterator;

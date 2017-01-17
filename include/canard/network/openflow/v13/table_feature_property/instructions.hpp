@@ -27,7 +27,7 @@ namespace table_feature_properties {
         : public detail::basic_protocol_type<basic_prop_instructions<T>>
     {
     public:
-        using raw_ofp_type = v13_detail::ofp_table_feature_prop_instructions;
+        using raw_ofp_type = protocol::ofp_table_feature_prop_instructions;
         using instruction_ids_type = ofp::list<any_instruction_id>;
         using iterator = instruction_ids_type::iterator;
         using const_iterator = instruction_ids_type::const_iterator;

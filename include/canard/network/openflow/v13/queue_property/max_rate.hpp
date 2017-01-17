@@ -14,7 +14,7 @@ namespace queue_properties {
 
     class max_rate
         : public queue_property_detail::basic_queue_property<
-            max_rate, v13_detail::ofp_queue_prop_max_rate
+            max_rate, protocol::ofp_queue_prop_max_rate
           >
     {
     public:
@@ -23,7 +23,7 @@ namespace queue_properties {
 
         explicit max_rate(std::uint16_t const rate) noexcept
             : max_rate_{
-                  v13_detail::ofp_queue_prop_header{
+                  protocol::ofp_queue_prop_header{
                       queue_property
                     , sizeof(raw_ofp_type)
                     , { 0, 0, 0, 0 }

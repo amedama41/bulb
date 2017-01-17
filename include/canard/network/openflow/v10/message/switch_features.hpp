@@ -23,7 +23,7 @@ namespace messages {
         : public v10_detail::basic_openflow_message<features_request>
     {
     public:
-        using raw_ofp_type = v10_detail::ofp_header;
+        using raw_ofp_type = protocol::ofp_header;
 
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_FEATURES_REQUEST;
@@ -39,7 +39,7 @@ namespace messages {
         }
 
         auto header() const noexcept
-            -> v10_detail::ofp_header
+            -> protocol::ofp_header
         {
             return header_;
         }
@@ -94,7 +94,7 @@ namespace messages {
         : public v10_detail::basic_openflow_message<features_reply>
     {
     public:
-        using raw_ofp_type = v10_detail::ofp_switch_features;
+        using raw_ofp_type = protocol::ofp_switch_features;
         using ports_type = ofp::list<port>;
 
         static constexpr protocol::ofp_type message_type
@@ -108,7 +108,7 @@ namespace messages {
                      , ports_type ports
                      , std::uint32_t const xid = get_xid())
             : switch_features_{
-                  v10_detail::ofp_header{
+                  protocol::ofp_header{
                       protocol::OFP_VERSION
                     , message_type
                     , ports.calc_ofp_length(sizeof(raw_ofp_type))
@@ -163,7 +163,7 @@ namespace messages {
         }
 
         auto header() const noexcept
-            -> v10_detail::ofp_header
+            -> protocol::ofp_header
         {
             return switch_features_.header;
         }
@@ -213,7 +213,7 @@ namespace messages {
             return tmp;
         }
 
-        static void validate_header(v10_detail::ofp_header const& header)
+        static void validate_header(protocol::ofp_header const& header)
         {
             if (header.version != protocol::OFP_VERSION) {
                 throw std::runtime_error{"invalid version"};

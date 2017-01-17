@@ -14,7 +14,7 @@ namespace instructions {
 
     class meter
         : public detail::v13::basic_instruction<
-            meter, v13_detail::ofp_instruction_meter
+            meter, protocol::ofp_instruction_meter
           >
     {
     public:

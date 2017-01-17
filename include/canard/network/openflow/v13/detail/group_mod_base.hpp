@@ -28,11 +28,11 @@ namespace v13 {
     static ofp::v13::protocol::ofp_type const message_type
       = ofp::v13::protocol::OFPT_GROUP_MOD;
 
-    using raw_ofp_type = ofp::v13::v13_detail::ofp_group_mod;
+    using raw_ofp_type = ofp::v13::protocol::ofp_group_mod;
     using buckets_type = ofp::list<ofp::v13::bucket>;
 
     auto header() const noexcept
-      -> ofp::v13::v13_detail::ofp_header const&
+      -> ofp::v13::protocol::ofp_header const&
     {
       return group_mod_.header;
     }
@@ -77,7 +77,7 @@ namespace v13 {
         , buckets_type&& buckets
         , std::uint32_t const xid)
       : group_mod_{
-            ofp::v13::v13_detail::ofp_header{
+            ofp::v13::protocol::ofp_header{
                 base_t::version()
               , base_t::type()
               , buckets.calc_ofp_length(sizeof(raw_ofp_type))
@@ -94,7 +94,7 @@ namespace v13 {
 
     group_mod_base(std::uint32_t const group_id, std::uint32_t const xid)
       : group_mod_{
-            ofp::v13::v13_detail::ofp_header{
+            ofp::v13::protocol::ofp_header{
                 base_t::version()
               , base_t::type()
               , sizeof(raw_ofp_type)

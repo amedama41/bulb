@@ -20,14 +20,14 @@ namespace queue_properties {
         : public detail::basic_protocol_type<min_rate>
     {
     public:
-        using raw_ofp_type = v10_detail::ofp_queue_prop_min_rate;
+        using raw_ofp_type = protocol::ofp_queue_prop_min_rate;
 
         static constexpr protocol::ofp_queue_properties queue_property
             = protocol::OFPQT_MIN_RATE;
 
         explicit min_rate(std::uint16_t const rate) noexcept
             : min_rate_{
-                  v10_detail::ofp_queue_prop_header{
+                  protocol::ofp_queue_prop_header{
                       queue_property
                     , sizeof(raw_ofp_type)
                     , { 0, 0, 0, 0 }
@@ -69,7 +69,7 @@ namespace queue_properties {
         }
 
         static void validate_header(
-                v10_detail::ofp_queue_prop_header const& prop_header)
+                protocol::ofp_queue_prop_header const& prop_header)
         {
             if (prop_header.property != queue_property) {
                 throw std::runtime_error{"invalid queue property"};

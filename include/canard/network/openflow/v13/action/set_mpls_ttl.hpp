@@ -13,7 +13,7 @@ namespace actions {
 
     class set_mpls_ttl
         : public detail::v13::basic_action<
-            set_mpls_ttl, v13_detail::ofp_action_mpls_ttl
+            set_mpls_ttl, protocol::ofp_action_mpls_ttl
           >
     {
     public:

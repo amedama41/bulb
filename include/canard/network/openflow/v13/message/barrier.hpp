@@ -24,10 +24,10 @@ namespace messages {
             using base_t = detail::v13::basic_openflow_message<T>;
 
         public:
-            using raw_ofp_type = v13_detail::ofp_header;
+            using raw_ofp_type = protocol::ofp_header;
 
             auto header() const noexcept
-                -> v13_detail::ofp_header const&
+                -> protocol::ofp_header const&
             {
                 return header_;
             }

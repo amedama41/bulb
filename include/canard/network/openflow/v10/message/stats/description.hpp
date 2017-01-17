@@ -43,7 +43,7 @@ namespace statistics {
 
     class description_reply
         : public stats_detail::basic_stats_reply<
-                description_reply, v10_detail::ofp_desc_stats
+                description_reply, protocol::ofp_desc_stats
           >
     {
     public:

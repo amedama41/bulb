@@ -26,18 +26,18 @@ namespace messages {
     class flow_removed
         : public detail::v13::basic_openflow_message<flow_removed>
         , public v13_detail::flow_entry_adaptor<
-                flow_removed, v13_detail::ofp_flow_removed
+                flow_removed, protocol::ofp_flow_removed
           >
     {
         static constexpr std::size_t base_flow_removed_size
-            = sizeof(v13_detail::ofp_flow_removed)
+            = sizeof(protocol::ofp_flow_removed)
             + oxm_match::min_byte_length();
 
     public:
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_FLOW_REMOVED;
 
-        using raw_ofp_type = v13_detail::ofp_flow_removed;
+        using raw_ofp_type = protocol::ofp_flow_removed;
 
         flow_removed(
                   oxm_match match
@@ -50,7 +50,7 @@ namespace messages {
                 , v13::counters const& counters
                 , std::uint32_t const xid = get_xid())
             : flow_removed_{
-                  v13_detail::ofp_header{
+                  protocol::ofp_header{
                       version()
                     , type()
                     , match.calc_ofp_length(sizeof(raw_ofp_type))
@@ -116,7 +116,7 @@ namespace messages {
         }
 
         auto header() const noexcept
-            -> v13_detail::ofp_header const&
+            -> protocol::ofp_header const&
         {
             return flow_removed_.header;
         }
@@ -176,7 +176,7 @@ namespace messages {
 
             auto copy_first = first;
             auto const ofp_match
-                = detail::decode<v13_detail::ofp_match>(copy_first, last);
+                = detail::decode<protocol::ofp_match>(copy_first, last);
             oxm_match::validate_header(ofp_match);
             if (v13_detail::exact_length(ofp_match.length) != match_length) {
                 throw std::runtime_error{"invalid oxm_match length"};
@@ -189,7 +189,7 @@ namespace messages {
         friend flow_entry_adaptor;
 
         auto ofp_flow_entry() const noexcept
-            -> v13_detail::ofp_flow_removed const&
+            -> protocol::ofp_flow_removed const&
         {
             return flow_removed_;
         }

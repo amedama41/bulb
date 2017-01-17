@@ -26,8 +26,8 @@ namespace messages {
         : public v10_detail::basic_openflow_message<packet_in>
     {
         static constexpr std::uint16_t min_pkt_in_len
-            = offsetof(v10_detail::ofp_packet_in, pad)
-            + sizeof(v10_detail::ofp_packet_in::pad);
+            = offsetof(protocol::ofp_packet_in, pad)
+            + sizeof(protocol::ofp_packet_in::pad);
 
         friend constexpr auto get_min_length(packet_in*) noexcept
             -> std::uint16_t
@@ -36,7 +36,7 @@ namespace messages {
         }
 
     public:
-        using raw_ofp_type = v10_detail::ofp_packet_in;
+        using raw_ofp_type = protocol::ofp_packet_in;
         using data_type = ofp::data_type;
 
         static constexpr protocol::ofp_type message_type
@@ -49,7 +49,7 @@ namespace messages {
                 , std::uint32_t const buffer_id
                 , std::uint32_t const xid = get_xid()) noexcept
             : packet_in_{
-                  v10_detail::ofp_header{
+                  protocol::ofp_header{
                       protocol::OFP_VERSION
                     , message_type
                     , ofp::calc_ofp_length(data, min_pkt_in_len)
@@ -90,7 +90,7 @@ namespace messages {
         }
 
         auto header() const noexcept
-            -> v10_detail::ofp_header const&
+            -> protocol::ofp_header const&
         {
             return packet_in_.header;
         }
@@ -140,7 +140,7 @@ namespace messages {
             return data;
         }
 
-        static void validate_header(v10_detail::ofp_header const& header)
+        static void validate_header(protocol::ofp_header const& header)
         {
             if (header.version != protocol::OFP_VERSION) {
                 throw std::runtime_error{"invalid version"};

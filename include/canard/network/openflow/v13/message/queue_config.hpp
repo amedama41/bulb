@@ -26,13 +26,13 @@ namespace messages {
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_QUEUE_GET_CONFIG_REQUEST;
 
-        using raw_ofp_type = v13_detail::ofp_queue_get_config_request;
+        using raw_ofp_type = protocol::ofp_queue_get_config_request;
 
         explicit queue_get_config_request(
                   std::uint32_t const port_no
                 , std::uint32_t const xid = get_xid()) noexcept
             : queue_get_config_request_{
-                  v13_detail::ofp_header{
+                  protocol::ofp_header{
                       version()
                     , type()
                     , sizeof(raw_ofp_type)
@@ -45,7 +45,7 @@ namespace messages {
         }
 
         auto header() const noexcept
-            -> v13_detail::ofp_header const&
+            -> protocol::ofp_header const&
         {
             return queue_get_config_request_.header;
         }
@@ -92,7 +92,7 @@ namespace messages {
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_QUEUE_GET_CONFIG_REPLY;
 
-        using raw_ofp_type = v13_detail::ofp_queue_get_config_reply;
+        using raw_ofp_type = protocol::ofp_queue_get_config_reply;
         using queues_type = ofp::list<packet_queue>;
         using iterator = queues_type::const_iterator;
         using const_iterator = queues_type::const_iterator;
@@ -102,7 +102,7 @@ namespace messages {
                 , queues_type queues
                 , std::uint32_t const xid = get_xid())
             : queue_get_config_reply_{
-                  v13_detail::ofp_header{
+                  protocol::ofp_header{
                       version()
                     , type()
                     , queues.calc_ofp_length(sizeof(raw_ofp_type))
@@ -139,7 +139,7 @@ namespace messages {
         }
 
         auto header() const noexcept
-            -> v13_detail::ofp_header const&
+            -> protocol::ofp_header const&
         {
             return queue_get_config_reply_.header;
         }

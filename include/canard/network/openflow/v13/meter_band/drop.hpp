@@ -19,7 +19,7 @@ namespace meter_bands {
       = protocol::OFPMBT_DROP;
 
   public:
-    using raw_ofp_type = v13_detail::ofp_meter_band_drop;
+    using raw_ofp_type = protocol::ofp_meter_band_drop;
 
     drop(std::uint32_t const rate, std::uint32_t const burst_size) noexcept
       : drop_{

@@ -19,7 +19,7 @@ namespace messages {
     class flow_add
         : public flow_mod_detail::flow_mod_base<flow_add>
         , public v13_detail::flow_entry_adaptor<
-                flow_add, v13_detail::ofp_flow_mod
+                flow_add, protocol::ofp_flow_mod
           >
     {
     public:
@@ -91,7 +91,7 @@ namespace messages {
     private:
         friend flow_mod_base;
 
-        flow_add(v13_detail::ofp_flow_mod const& flow_mod
+        flow_add(protocol::ofp_flow_mod const& flow_mod
                , oxm_match&& match
                , instructions_type&& instructions)
             : flow_mod_base{
@@ -103,7 +103,7 @@ namespace messages {
         friend flow_entry_adaptor;
 
         auto ofp_flow_entry() const noexcept
-            -> v13_detail::ofp_flow_mod const&
+            -> protocol::ofp_flow_mod const&
         {
             return ofp_flow_mod();
         }

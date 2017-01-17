@@ -16,7 +16,7 @@ namespace net {
 namespace ofp {
 
     using hello = v13::hello;
-    using ofp_header = v13::v13_detail::ofp_header;
+    using ofp_header = v13::protocol::ofp_header;
     namespace hello_elements = v13::hello_elements;
 
     namespace detail {

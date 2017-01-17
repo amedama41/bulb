@@ -26,14 +26,14 @@ namespace stats_detail {
     struct stats_message_type;
 
     template <>
-    struct stats_message_type<v10_detail::ofp_stats_request>
+    struct stats_message_type<protocol::ofp_stats_request>
     {
         static constexpr protocol::ofp_type value
             = protocol::OFPT_STATS_REQUEST;
     };
 
     template <>
-    struct stats_message_type<v10_detail::ofp_stats_reply>
+    struct stats_message_type<protocol::ofp_stats_reply>
     {
         static constexpr protocol::ofp_type value
             = protocol::OFPT_STATS_REPLY;
@@ -50,7 +50,7 @@ namespace stats_detail {
             = stats_message_type<raw_ofp_type>::value;
 
         auto header() const noexcept
-            -> v10_detail::ofp_header const&
+            -> protocol::ofp_header const&
         {
             return static_cast<T const*>(this)->stats().header;
         }
@@ -67,7 +67,7 @@ namespace stats_detail {
             return static_cast<T const*>(this)->stats().flags;
         }
 
-        static void validate_header(v10_detail::ofp_header const& header)
+        static void validate_header(protocol::ofp_header const& header)
         {
             if (header.version != protocol::OFP_VERSION) {
                 throw std::runtime_error{"invalid version"};
@@ -105,7 +105,7 @@ namespace stats_detail {
         empty_body_stats(
                 std::uint16_t const flags, std::uint32_t const xid) noexcept
             : stats_{
-                  v10_detail::ofp_header{
+                  protocol::ofp_header{
                       protocol::OFP_VERSION
                     , T::message_type
                     , sizeof(raw_ofp_type)
@@ -184,7 +184,7 @@ namespace stats_detail {
                 , raw_ofp_stats_type const& body
                 , std::uint32_t const xid) noexcept
             : stats_{
-                  v10_detail::ofp_header{
+                  protocol::ofp_header{
                       protocol::OFP_VERSION
                     , T::message_type
                     , sizeof(raw_ofp_type) + sizeof(raw_ofp_stats_type)
@@ -292,7 +292,7 @@ namespace stats_detail {
                 , body_type&& body
                 , std::uint32_t const xid)
             : stats_{
-                  v10_detail::ofp_header{
+                  protocol::ofp_header{
                       protocol::OFP_VERSION
                     , T::message_type
                     , body.calc_ofp_length(sizeof(raw_ofp_type))
@@ -393,11 +393,11 @@ namespace stats_detail {
 
     template <class T, class BodyType>
     class basic_stats_request
-        : public basic_stats_t<v10_detail::ofp_stats_request, T, BodyType>
+        : public basic_stats_t<protocol::ofp_stats_request, T, BodyType>
     {
     protected:
         using base_type
-            = basic_stats_t<v10_detail::ofp_stats_request, T, BodyType>;
+            = basic_stats_t<protocol::ofp_stats_request, T, BodyType>;
 
         using base_type::base_type;
     };
@@ -405,11 +405,11 @@ namespace stats_detail {
 
     template <class T, class BodyType>
     class basic_stats_reply
-        : public basic_stats_t<v10_detail::ofp_stats_reply, T, BodyType>
+        : public basic_stats_t<protocol::ofp_stats_reply, T, BodyType>
     {
     protected:
         using base_type
-            = basic_stats_t<v10_detail::ofp_stats_reply, T, BodyType>;
+            = basic_stats_t<protocol::ofp_stats_reply, T, BodyType>;
 
         using base_type::base_type;
     };

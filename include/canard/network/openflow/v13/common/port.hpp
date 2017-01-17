@@ -24,7 +24,7 @@ namespace v13 {
         , public detail::basic_protocol_type<port>
     {
     public:
-        using raw_ofp_type = v13_detail::ofp_port;
+        using raw_ofp_type = protocol::ofp_port;
 
         port(std::uint32_t const port_no
            , canard::mac_address const addr

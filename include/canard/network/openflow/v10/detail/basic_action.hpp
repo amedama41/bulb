@@ -38,7 +38,7 @@ namespace actions_detail {
             return sizeof(raw_ofp_type);
         }
 
-        static void validate_header(v10_detail::ofp_action_header const& header)
+        static void validate_header(protocol::ofp_action_header const& header)
         {
             if (header.type != T::action_type) {
                 throw std::runtime_error{"invalid action type"};

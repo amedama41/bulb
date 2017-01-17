@@ -12,10 +12,10 @@ namespace v13 {
 
     template <class T>
     class basic_generic_action
-        : public basic_action<T, ofp::v13::v13_detail::ofp_action_header>
+        : public basic_action<T, ofp::v13::protocol::ofp_action_header>
     {
         using base_type
-            = basic_action<T, ofp::v13::v13_detail::ofp_action_header>;
+            = basic_action<T, ofp::v13::protocol::ofp_action_header>;
 
     public:
         using raw_ofp_type = typename base_type::raw_ofp_type;

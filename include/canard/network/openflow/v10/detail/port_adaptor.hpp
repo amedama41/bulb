@@ -90,7 +90,7 @@ namespace v10_detail {
 
     private:
         auto base_port() const noexcept
-            -> v10_detail::ofp_phy_port const&
+            -> protocol::ofp_phy_port const&
         {
             return static_cast<T const*>(this)->ofp_port();
         }

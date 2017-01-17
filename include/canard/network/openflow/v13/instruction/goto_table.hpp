@@ -14,7 +14,7 @@ namespace instructions {
 
     class goto_table
         : public detail::v13::basic_instruction<
-            goto_table, v13_detail::ofp_instruction_goto_table
+            goto_table, protocol::ofp_instruction_goto_table
           >
     {
     public:

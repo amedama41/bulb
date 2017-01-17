@@ -23,7 +23,7 @@ namespace v13 {
         : public detail::basic_protocol_type<action_id>
     {
     public:
-        using raw_ofp_type = v13_detail::ofp_action_header;
+        using raw_ofp_type = protocol::ofp_action_header;
 
         explicit action_id(std::uint16_t const type) noexcept
             : type_(type)
@@ -43,12 +43,12 @@ namespace v13 {
         }
 
         static void validate_action_header(
-                v13_detail::ofp_action_header const& header)
+                protocol::ofp_action_header const& header)
         {
             if (header.type == protocol::OFPAT_EXPERIMENTER) {
                 throw std::runtime_error{"invalid action type"};
             }
-            if (header.len != offsetof(v13_detail::ofp_action_header, pad)) {
+            if (header.len != offsetof(protocol::ofp_action_header, pad)) {
                 throw std::runtime_error{"action id length must be 4"};
             }
         }
@@ -102,7 +102,7 @@ namespace v13 {
         : public detail::basic_protocol_type<action_experimenter_id>
     {
     public:
-        using raw_ofp_type = v13_detail::ofp_action_experimenter_header;
+        using raw_ofp_type = protocol::ofp_action_experimenter_header;
         using data_type = std::vector<unsigned char>;
 
         explicit action_experimenter_id(std::uint32_t const experimenter)
@@ -150,7 +150,7 @@ namespace v13 {
         }
 
         static void validate_action_header(
-                v13_detail::ofp_action_header const& header)
+                protocol::ofp_action_header const& header)
         {
             if (header.type != protocol::OFPAT_EXPERIMENTER) {
                 throw std::runtime_error{"invalid action type"};

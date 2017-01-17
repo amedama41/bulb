@@ -22,7 +22,7 @@ namespace messages {
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_FEATURES_REQUEST;
 
-        using raw_ofp_type = v13_detail::ofp_header;
+        using raw_ofp_type = protocol::ofp_header;
 
         features_request(std::uint32_t const xid = get_xid()) noexcept
             : header_{
@@ -35,7 +35,7 @@ namespace messages {
         }
 
         auto header() const noexcept
-            -> v13_detail::ofp_header const&
+            -> protocol::ofp_header const&
         {
             return header_;
         }
@@ -73,7 +73,7 @@ namespace messages {
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_FEATURES_REPLY;
 
-        using raw_ofp_type = v13_detail::ofp_switch_features;
+        using raw_ofp_type = protocol::ofp_switch_features;
 
         features_reply(features_request const& request
                      , std::uint64_t const dpid
@@ -82,7 +82,7 @@ namespace messages {
                      , std::uint8_t const auxiliary_id
                      , std::uint32_t const capabilities) noexcept
             : switch_features_{
-                  v13_detail::ofp_header{
+                  protocol::ofp_header{
                       version()
                     , type()
                     , sizeof(raw_ofp_type)
@@ -100,7 +100,7 @@ namespace messages {
         }
 
         auto header() const noexcept
-            -> v13_detail::ofp_header const&
+            -> protocol::ofp_header const&
         {
             return switch_features_.header;
         }

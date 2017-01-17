@@ -23,7 +23,7 @@ struct set_field_decoder
     {
         auto it = first;
         auto const set_field
-            = detail::decode<v13_detail::ofp_action_set_field>(it, last);
+            = detail::decode<protocol::ofp_action_set_field>(it, last);
 
         auto const oxm_header
             = actions::basic_set_field::extract_oxm_header(set_field);

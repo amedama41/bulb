@@ -23,7 +23,7 @@ namespace hello_elements {
     : public detail::basic_protocol_type<unknown_element>
   {
   public:
-    using raw_ofp_type = v13_detail::ofp_hello_elem_header;
+    using raw_ofp_type = protocol::ofp_hello_elem_header;
     using data_type = std::vector<unsigned char>;
 
     explicit unknown_element(std::uint16_t const type)
@@ -88,7 +88,7 @@ namespace hello_elements {
       return data;
     }
 
-    static void validate_header(v13_detail::ofp_hello_elem_header const& header)
+    static void validate_header(protocol::ofp_hello_elem_header const& header)
     {
       if (header.length < sizeof(raw_ofp_type)) {
         throw std::runtime_error{"hello_element length is too small"};

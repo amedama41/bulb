@@ -39,7 +39,7 @@ namespace v13 {
         }
 
         static void validate_header(
-                ofp::v13::v13_detail::ofp_instruction const& instruction)
+                ofp::v13::protocol::ofp_instruction const& instruction)
         {
             if (instruction.type != type()) {
                 throw std::runtime_error{"invalid instruction type"};

@@ -13,7 +13,7 @@ namespace actions {
 
     class pop_mpls
         : public detail::v13::basic_action<
-            pop_mpls, v13_detail::ofp_action_pop_mpls
+            pop_mpls, protocol::ofp_action_pop_mpls
           >
     {
     public:

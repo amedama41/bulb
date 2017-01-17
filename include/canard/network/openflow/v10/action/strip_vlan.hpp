@@ -12,7 +12,7 @@ namespace actions {
 
     class strip_vlan
         : public actions_detail::basic_action<
-                strip_vlan, v10_detail::ofp_action_header
+                strip_vlan, protocol::ofp_action_header
           >
     {
     public:

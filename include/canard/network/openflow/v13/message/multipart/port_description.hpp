@@ -34,7 +34,7 @@ namespace multipart {
         friend basic_multipart_request::base_type;
 
         explicit port_description_request(
-                v13_detail::ofp_multipart_request const& request) noexcept
+                protocol::ofp_multipart_request const& request) noexcept
             : basic_multipart_request{request}
         {
         }
@@ -62,7 +62,7 @@ namespace multipart {
         friend basic_multipart_reply::base_type;
 
         port_description_reply(
-                  v13_detail::ofp_multipart_reply const& reply
+                  protocol::ofp_multipart_reply const& reply
                 , body_type&& ports)
             : basic_multipart_reply{reply, std::move(ports)}
         {

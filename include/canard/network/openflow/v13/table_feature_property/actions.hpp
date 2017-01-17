@@ -30,7 +30,7 @@ namespace table_feature_properties {
         static constexpr protocol::ofp_table_feature_prop_type prop_type
             = T::prop_type;
 
-        using raw_ofp_type = v13_detail::ofp_table_feature_prop_actions;
+        using raw_ofp_type = protocol::ofp_table_feature_prop_actions;
         using action_ids_type = ofp::list<any_action_id>;
         using iterator = action_ids_type::iterator;
         using const_iterator = action_ids_type::const_iterator;

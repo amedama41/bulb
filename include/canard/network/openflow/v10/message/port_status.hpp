@@ -23,7 +23,7 @@ namespace messages {
         , public v10_detail::port_adaptor<port_status>
     {
     public:
-        using raw_ofp_type = v10_detail::ofp_port_status;
+        using raw_ofp_type = protocol::ofp_port_status;
 
         static constexpr protocol::ofp_type message_type
             = protocol::OFPT_PORT_STATUS;
@@ -32,7 +32,7 @@ namespace messages {
                   , v10::port const& port
                   , std::uint32_t const xid = get_xid()) noexcept
             : port_status_{
-                  v10_detail::ofp_header{
+                  protocol::ofp_header{
                       protocol::OFP_VERSION
                     , message_type
                     , sizeof(raw_ofp_type)
@@ -46,7 +46,7 @@ namespace messages {
         }
 
         auto header() const noexcept
-            -> v10_detail::ofp_header const&
+            -> protocol::ofp_header const&
         {
             return port_status_.header;
         }
@@ -63,7 +63,7 @@ namespace messages {
             return v10::port::from_ofp_port(port_status_.desc);
         }
 
-        static void validate_header(v10_detail::ofp_header const& header)
+        static void validate_header(protocol::ofp_header const& header)
         {
             if (header.version != protocol::OFP_VERSION) {
                 throw std::runtime_error{"invalid version"};
@@ -106,7 +106,7 @@ namespace messages {
         friend port_adaptor;
 
         auto ofp_port() const noexcept
-            -> v10_detail::ofp_phy_port const&
+            -> protocol::ofp_phy_port const&
         {
             return port_status_.desc;
         }

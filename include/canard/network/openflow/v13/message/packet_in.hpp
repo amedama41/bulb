@@ -29,12 +29,12 @@ namespace messages {
     {
         static constexpr std::uint16_t data_alignment_padding_size = 2;
         static constexpr std::uint16_t base_pkt_in_size
-            = sizeof(v13_detail::ofp_packet_in)
+            = sizeof(protocol::ofp_packet_in)
             + oxm_match::min_byte_length()
             + data_alignment_padding_size;
 
     public:
-        using raw_ofp_type = v13_detail::ofp_packet_in;
+        using raw_ofp_type = protocol::ofp_packet_in;
         using data_type = ofp::data_type;
 
         static constexpr protocol::ofp_type message_type
@@ -49,7 +49,7 @@ namespace messages {
                 , data_type data
                 , std::uint32_t const xid = get_xid())
             : packet_in_{
-                  v13_detail::ofp_header{
+                  protocol::ofp_header{
                       version()
                     , type()
                     , ofp::calc_ofp_length(data, match.calc_ofp_length(
@@ -113,7 +113,7 @@ namespace messages {
         }
 
         auto header() const noexcept
-            -> v13_detail::ofp_header const&
+            -> protocol::ofp_header const&
         {
             return packet_in_.header;
         }
@@ -232,7 +232,7 @@ namespace messages {
 
             auto it = first;
             auto const ofp_match
-                = detail::decode<v13_detail::ofp_match>(it, last);
+                = detail::decode<protocol::ofp_match>(it, last);
             oxm_match::validate_header(ofp_match);
             auto const match_length
                 = v13_detail::exact_length(ofp_match.length);

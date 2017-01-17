@@ -30,7 +30,7 @@ namespace multipart {
         : public detail::basic_protocol_type<table_features>
     {
     public:
-        using raw_ofp_type = v13_detail::ofp_table_features;
+        using raw_ofp_type = protocol::ofp_table_features;
         using properties_type = ofp::list<any_table_feature_property>;
 
         table_features(
@@ -223,7 +223,7 @@ namespace multipart {
         friend basic_multipart_request::base_type;
 
         table_features_request(
-                  v13_detail::ofp_multipart_request const& multipart_request
+                  protocol::ofp_multipart_request const& multipart_request
                 , body_type&& table_features)
             : basic_multipart_request{
                 multipart_request, std::move(table_features)
@@ -254,7 +254,7 @@ namespace multipart {
         friend basic_multipart_reply::base_type;
 
         table_features_reply(
-                  v13_detail::ofp_multipart_reply const& multipart_reply
+                  protocol::ofp_multipart_reply const& multipart_reply
                 , body_type&& table_features)
             : basic_multipart_reply{multipart_reply, std::move(table_features)}
         {

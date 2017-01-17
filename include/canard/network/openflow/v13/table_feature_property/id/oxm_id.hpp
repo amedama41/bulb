@@ -120,7 +120,7 @@ namespace v13 {
     {
     public:
         using oxm_header_type = std::uint32_t;
-        using raw_ofp_type = v13_detail::ofp_oxm_experimenter_header;
+        using raw_ofp_type = protocol::ofp_oxm_experimenter_header;
 
         oxm_experimenter_id(
                   std::uint8_t const oxm_field

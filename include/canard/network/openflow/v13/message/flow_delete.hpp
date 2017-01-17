@@ -91,7 +91,7 @@ namespace messages {
     private:
         friend flow_mod_base;
 
-        flow_delete(v13_detail::ofp_flow_mod const& flow_mod
+        flow_delete(protocol::ofp_flow_mod const& flow_mod
                   , oxm_match&& match
                   , instructions_type&& instructions)
             : flow_mod_base{flow_mod, std::move(match), std::move(instructions)}
@@ -212,7 +212,7 @@ namespace messages {
         friend flow_mod_base;
 
         flow_delete_strict(
-                  v13_detail::ofp_flow_mod const& flow_mod
+                  protocol::ofp_flow_mod const& flow_mod
                 , oxm_match&& match
                 , instructions_type&& instructions)
             : flow_mod_base{flow_mod, std::move(match), std::move(instructions)}

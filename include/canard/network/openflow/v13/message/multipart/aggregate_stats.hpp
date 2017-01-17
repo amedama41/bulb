@@ -19,7 +19,7 @@ namespace multipart {
     class aggregate_stats_request
         : public multipart_detail::basic_multipart_request<
               aggregate_stats_request
-            , v13_detail::ofp_aggregate_stats_request, true
+            , protocol::ofp_aggregate_stats_request, true
           >
     {
     public:
@@ -35,7 +35,7 @@ namespace multipart {
                 , std::uint32_t const xid = get_xid())
             : basic_multipart_request{
                   0
-                , v13_detail::ofp_aggregate_stats_request{
+                , protocol::ofp_aggregate_stats_request{
                       table_id
                     , { 0, 0, 0 }
                     , out_port
@@ -101,8 +101,8 @@ namespace multipart {
         friend basic_multipart_request::base_type;
 
         aggregate_stats_request(
-                  v13_detail::ofp_multipart_request const& multipart_request
-                , v13_detail::ofp_aggregate_stats_request const& aggregate_stats_request
+                  protocol::ofp_multipart_request const& multipart_request
+                , protocol::ofp_aggregate_stats_request const& aggregate_stats_request
                 , oxm_match&& match)
             : basic_multipart_request{
                   multipart_request, aggregate_stats_request, std::move(match)
@@ -114,7 +114,7 @@ namespace multipart {
 
     class aggregate_stats_reply
         : public multipart_detail::basic_multipart_reply<
-              aggregate_stats_reply, v13_detail::ofp_aggregate_stats_reply
+              aggregate_stats_reply, protocol::ofp_aggregate_stats_reply
           >
     {
     public:
@@ -127,7 +127,7 @@ namespace multipart {
                 , std::uint32_t const xid = get_xid()) noexcept
             : basic_multipart_reply{
                 0
-                , v13_detail::ofp_aggregate_stats_reply{
+                , protocol::ofp_aggregate_stats_reply{
                       counters.packet_count()
                     , counters.byte_count()
                     , flow_count
@@ -166,8 +166,8 @@ namespace multipart {
         friend basic_multipart_reply::base_type;
 
         aggregate_stats_reply(
-                  v13_detail::ofp_multipart_reply const& multipart_reply
-                , v13_detail::ofp_aggregate_stats_reply const& aggregate_stats_reply) noexcept
+                  protocol::ofp_multipart_reply const& multipart_reply
+                , protocol::ofp_aggregate_stats_reply const& aggregate_stats_reply) noexcept
             : basic_multipart_reply{multipart_reply, aggregate_stats_reply}
         {
         }

@@ -18,7 +18,7 @@ namespace v13 {
   {
   private:
     auto base_header() const noexcept
-      -> ofp::v13::v13_detail::ofp_header const&
+      -> ofp::v13::protocol::ofp_header const&
     {
       return static_cast<T const*>(this)->header();
     }
@@ -48,7 +48,7 @@ namespace v13 {
       return base_header().xid;
     }
 
-    static void validate_header(ofp::v13::v13_detail::ofp_header const& header)
+    static void validate_header(ofp::v13::protocol::ofp_header const& header)
     {
       if (header.version != version()) {
         throw std::runtime_error{"invalid version"};
