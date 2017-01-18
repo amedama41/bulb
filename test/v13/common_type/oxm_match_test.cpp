@@ -12,20 +12,20 @@
 namespace ofp = canard::net::ofp;
 namespace v13 = ofp::v13;
 namespace fields = v13::oxm_match_fields;
+namespace protocol = v13::protocol;
 
 namespace {
 
-  namespace proto = v13::protocol;
   using oxm_fields_type = v13::oxm_match::oxm_fields_type;
 
   struct parameter
   {
-    fields::in_port in_port{proto::OFPP_MAX}; // 8
+    fields::in_port in_port{protocol::OFPP_MAX}; // 8
     fields::eth_dst eth_dst{"\x01\x02\x03\x04\x05\x06"_mac}; // 10
     fields::eth_src eth_src{"\x01\x02\x03\x04\x05\x06"_mac}; // 10
     fields::eth_type eth_type{0x0800}; // 6
     fields::vlan_vid vlan_vid{
-      proto::OFPVID_PRESENT | 0x0023, proto::OFPVID_PRESENT | 0x00ff
+      protocol::OFPVID_PRESENT | 0x0023, protocol::OFPVID_PRESENT | 0x00ff
     }; // 8
     fields::ip_proto ip_proto{6}; // 5
     fields::ipv4_src ipv4_src{"192.168.10.0"_ipv4, 24}; // 12
@@ -257,7 +257,7 @@ BOOST_AUTO_TEST_SUITE(oxm_match)
         throw_no_exception_if_type_is_oxm_and_length_is_equal_to_4)
     {
       using sut = v13::oxm_match;
-      auto const match = v13::v13_detail::ofp_match{ proto::OFPMT_OXM, 4 };
+      auto const match = protocol::ofp_match{ protocol::OFPMT_OXM, 4 };
 
       BOOST_CHECK_NO_THROW(sut::validate_header(match));
     }
@@ -265,7 +265,7 @@ BOOST_AUTO_TEST_SUITE(oxm_match)
         throw_no_exception_if_type_is_oxm_and_length_is_larger_than_4)
     {
       using sut = v13::oxm_match;
-      auto const match = v13::v13_detail::ofp_match{ proto::OFPMT_OXM, 5 };
+      auto const match = protocol::ofp_match{ protocol::OFPMT_OXM, 5 };
 
       BOOST_CHECK_NO_THROW(sut::validate_header(match));
     }
@@ -273,7 +273,7 @@ BOOST_AUTO_TEST_SUITE(oxm_match)
         throw_exception_if_type_is_not_oxm)
     {
       using sut = v13::oxm_match;
-      auto const match = v13::v13_detail::ofp_match{ proto::OFPMT_OXM + 1, 4 };
+      auto const match = protocol::ofp_match{ protocol::OFPMT_OXM + 1, 4 };
 
       BOOST_CHECK_THROW(sut::validate_header(match), std::runtime_error);
     }
@@ -281,7 +281,7 @@ BOOST_AUTO_TEST_SUITE(oxm_match)
         throw_exception_if_type_is_oxm_but_length_is_smaller_than_4)
     {
       using sut = v13::oxm_match;
-      auto const match = v13::v13_detail::ofp_match{ proto::OFPMT_OXM, 3 };
+      auto const match = protocol::ofp_match{ protocol::OFPMT_OXM, 3 };
 
       BOOST_CHECK_THROW(sut::validate_header(match), std::runtime_error);
     }

@@ -9,9 +9,7 @@ namespace ofp = canard::net::ofp;
 namespace v10 = ofp::v10;
 namespace msg = v10::messages;
 namespace act = v10::actions;
-namespace detail = v10::v10_detail;
-
-namespace proto = v10::protocol;
+namespace protocol = v10::protocol;
 
 namespace {
 struct parameters : match_fixture, action_fixture {
@@ -55,16 +53,16 @@ BOOST_AUTO_TEST_SUITE(flow_delete)
     {
       msg::flow_delete sut{match};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_flow_mod));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_flow_mod));
       BOOST_TEST((sut.match() == match));
-      BOOST_TEST(sut.out_port() == proto::OFPP_NONE);
+      BOOST_TEST(sut.out_port() == protocol::OFPP_NONE);
     }
     BOOST_FIXTURE_TEST_CASE(
         is_constructible_from_match_and_out_port, parameters)
     {
       msg::flow_delete sut{match, out_port};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_flow_mod));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_flow_mod));
       BOOST_TEST((sut.match() == match));
       BOOST_TEST(sut.out_port() == out_port);
     }
@@ -73,7 +71,7 @@ BOOST_AUTO_TEST_SUITE(flow_delete)
     {
       msg::flow_delete sut{match, out_port, xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_flow_mod));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_flow_mod));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST((sut.match() == match));
       BOOST_TEST(sut.out_port() == out_port);
@@ -101,7 +99,7 @@ BOOST_AUTO_TEST_SUITE(flow_delete)
       auto const copy = std::move(moved);
 
       BOOST_TEST((copy == sut));
-      BOOST_TEST(moved.length() == sizeof(detail::ofp_flow_mod));
+      BOOST_TEST(moved.length() == sizeof(protocol::ofp_flow_mod));
       BOOST_TEST((moved.actions() == v10::action_list{}));
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor
@@ -141,17 +139,17 @@ BOOST_AUTO_TEST_SUITE(flow_delete_strict)
     {
       msg::flow_delete_strict sut{match, priority};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_flow_mod));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_flow_mod));
       BOOST_TEST((sut.match() == match));
       BOOST_TEST(sut.priority() == priority);
-      BOOST_TEST(sut.out_port() == proto::OFPP_NONE);
+      BOOST_TEST(sut.out_port() == protocol::OFPP_NONE);
     }
     BOOST_FIXTURE_TEST_CASE(
         is_constructible_from_match_and_priority_and_out_port, parameters)
     {
       msg::flow_delete_strict sut{match, priority, out_port};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_flow_mod));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_flow_mod));
       BOOST_TEST((sut.match() == match));
       BOOST_TEST(sut.priority() == priority);
       BOOST_TEST(sut.out_port() == out_port);
@@ -162,7 +160,7 @@ BOOST_AUTO_TEST_SUITE(flow_delete_strict)
     {
       msg::flow_delete_strict sut{match, priority, out_port, xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_flow_mod));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_flow_mod));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST((sut.match() == match));
       BOOST_TEST(sut.priority() == priority);
@@ -191,7 +189,7 @@ BOOST_AUTO_TEST_SUITE(flow_delete_strict)
       auto const copy = std::move(moved);
 
       BOOST_TEST((copy == sut));
-      BOOST_TEST(moved.length() == sizeof(detail::ofp_flow_mod));
+      BOOST_TEST(moved.length() == sizeof(protocol::ofp_flow_mod));
       BOOST_TEST((moved.actions() == v10::action_list{}));
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor

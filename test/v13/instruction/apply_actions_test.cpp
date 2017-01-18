@@ -11,9 +11,9 @@
 
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
+namespace protocol = v13::protocol;
 namespace actions = v13::actions;
 namespace instructions = v13::instructions;
-namespace detail = v13::v13_detail;
 
 namespace {
 
@@ -21,10 +21,10 @@ struct apply_actions_fixture
 {
     instructions::apply_actions sut{
           actions::push_vlan{0x8100}
-        , actions::set_vlan_vid{v13::protocol::OFPVID_PRESENT | 0x0123}
+        , actions::set_vlan_vid{protocol::OFPVID_PRESENT | 0x0123}
         , actions::output{0x12345678}
         , actions::set_eth_dst{"\x66\x55\x44\x33\x22\x11"_mac}
-        , actions::output{v13::protocol::OFPP_MAX}
+        , actions::output{protocol::OFPP_MAX}
     }; // 8 + 8 + 16 + 16 + 16 + 16
     std::vector<unsigned char> binary
         = "\x00\x04\x00\x50\x00\x00\x00\x00""\x00\x11\x00\x08\x81\x00\x00\x00"
@@ -44,14 +44,14 @@ BOOST_AUTO_TEST_SUITE(apply_actions_test)
     {
         using sut = instructions::apply_actions;
 
-        BOOST_TEST(sut::type() == v13::protocol::OFPIT_APPLY_ACTIONS);
+        BOOST_TEST(sut::type() == protocol::OFPIT_APPLY_ACTIONS);
     }
 
     BOOST_AUTO_TEST_CASE(default_construct_test)
     {
         auto const sut = instructions::apply_actions{};
 
-        BOOST_TEST(sut.length() == sizeof(detail::ofp_instruction_actions));
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_instruction_actions));
         BOOST_TEST(sut.actions().empty());
     }
 
@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_SUITE(apply_actions_test)
         auto const sut = instructions::apply_actions{action_list};
 
         BOOST_TEST(sut.length()
-                == sizeof(detail::ofp_instruction_actions) + 24);
+                == sizeof(protocol::ofp_instruction_actions) + 24);
         BOOST_TEST((sut.actions() == action_list));
     }
 
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_SUITE(apply_actions_test)
 
         auto const sut = instructions::apply_actions{group};
 
-        BOOST_TEST(sut.length() == sizeof(detail::ofp_instruction_actions) + 8);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_instruction_actions) + 8);
         BOOST_TEST((sut.actions() == action_list));
     }
 
@@ -84,10 +84,10 @@ BOOST_AUTO_TEST_SUITE(apply_actions_test)
         auto const copy_ttl_in = actions::copy_ttl_in{};
         auto const set_ipv4_src = actions::set_ipv4_src{"127.0.0.1"_ipv4};
         auto const set_vlan_vid1
-            = actions::set_vlan_vid{v13::protocol::OFPVID_PRESENT | 1};
+            = actions::set_vlan_vid{protocol::OFPVID_PRESENT | 1};
         auto const push_vlan = actions::push_vlan{0x8100};
         auto const set_vlan_vid2
-            = actions::set_vlan_vid{v13::protocol::OFPVID_PRESENT | 1024};
+            = actions::set_vlan_vid{protocol::OFPVID_PRESENT | 1024};
         auto const output = actions::output{4};
         auto const action_list = v13::action_list{
               copy_ttl_in, set_ipv4_src, set_vlan_vid1
@@ -100,18 +100,18 @@ BOOST_AUTO_TEST_SUITE(apply_actions_test)
         };
 
         BOOST_TEST(sut.length()
-                == sizeof(detail::ofp_instruction_actions) + 80);
+                == sizeof(protocol::ofp_instruction_actions) + 80);
         BOOST_TEST((sut.actions() == action_list));
     }
 
     BOOST_AUTO_TEST_CASE(create_test)
     {
         auto const sut = instructions::apply_actions::create(
-                  actions::set_vlan_vid{v13::protocol::OFPVID_PRESENT | 0x0123}
+                  actions::set_vlan_vid{protocol::OFPVID_PRESENT | 0x0123}
                 , actions::output{1});
 
         BOOST_TEST(sut.length()
-                == sizeof(detail::ofp_instruction_actions) + 16 + 16);
+                == sizeof(protocol::ofp_instruction_actions) + 16 + 16);
     }
 
     BOOST_FIXTURE_TEST_CASE(copy_construct_test, apply_actions_fixture)
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_SUITE(apply_actions_test)
         auto const copy = std::move(src);
 
         BOOST_TEST((copy == sut));
-        BOOST_TEST(src.length() == sizeof(detail::ofp_instruction_actions));
+        BOOST_TEST(src.length() == sizeof(protocol::ofp_instruction_actions));
         BOOST_TEST(src.actions().empty());
     }
 
@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_SUITE(apply_actions_test)
         copy = std::move(src);
 
         BOOST_TEST((copy == sut));
-        BOOST_TEST(src.length() == sizeof(detail::ofp_instruction_actions));
+        BOOST_TEST(src.length() == sizeof(protocol::ofp_instruction_actions));
         BOOST_TEST(src.actions().empty());
     }
 

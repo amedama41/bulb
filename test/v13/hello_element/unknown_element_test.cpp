@@ -8,7 +8,7 @@
 namespace ofp = canard::net::ofp;
 namespace v13 = ofp::v13;
 namespace helems = v13::hello_elements;
-namespace detail = v13::v13_detail;
+namespace protocol = v13::protocol;
 
 namespace {
 struct parameters {
@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_SUITE(unknown_element)
       helems::unknown_element const sut{type};
 
       BOOST_TEST(sut.type() == type);
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_hello_elem_header));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_hello_elem_header));
       BOOST_TEST(sut.data().empty());
     }
     BOOST_AUTO_TEST_CASE(is_constructible_from_type_and_data)
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_SUITE(unknown_element)
 
       BOOST_TEST(sut.type() == type);
       BOOST_TEST(
-          sut.length() == sizeof(detail::ofp_hello_elem_header) + data.size());
+          sut.length() == sizeof(protocol::ofp_hello_elem_header) + data.size());
       BOOST_TEST(sut.data() == data, boost::test_tools::per_element{});
     }
     BOOST_FIXTURE_TEST_CASE(
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_SUITE(unknown_element)
       auto const copy = std::move(moved);
 
       BOOST_TEST((copy == sut));
-      BOOST_TEST(moved.length() == sizeof(detail::ofp_hello_elem_header));
+      BOOST_TEST(moved.length() == sizeof(protocol::ofp_hello_elem_header));
       BOOST_TEST(moved.data().empty());
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor

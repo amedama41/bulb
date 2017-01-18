@@ -8,9 +8,7 @@ namespace ofp = canard::net::ofp;
 namespace v10 = ofp::v10;
 namespace msg = v10::messages;
 namespace stats = msg::statistics;
-namespace detail = v10::v10_detail;
-
-namespace proto = v10::protocol;
+namespace protocol = v10::protocol;
 
 namespace {
 struct port_stats_parameters {
@@ -45,7 +43,7 @@ struct port_stats_fixture : port_stats_parameters {
       ""_bin;
 };
 struct port_stats_request_fixture {
-  std::uint16_t port_no = proto::OFPP_MAX;
+  std::uint16_t port_no = protocol::OFPP_MAX;
   std::uint32_t xid = 0x12345678;
   stats::port_stats_request sut{port_no, xid};
   std::vector<unsigned char> bin
@@ -82,7 +80,7 @@ struct port_stats_reply_parameters {
     , 0x3070000012345678, 0x3080000012345678
   };
   body_type body{ stats1, stats2, stats3 };
-  std::uint16_t flags = proto::OFPSF_REPLY_MORE;
+  std::uint16_t flags = protocol::OFPSF_REPLY_MORE;
   std::uint32_t xid = 0x12345678;
 };
 struct port_stats_reply_fixture : port_stats_reply_parameters {
@@ -141,7 +139,7 @@ BOOST_AUTO_TEST_SUITE(port_stats)
         , rx_frame_err, rx_over_err, rx_crc_err, collisions
       };
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_port_stats));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_port_stats));
       BOOST_TEST(sut.port_no() == port_no);
       BOOST_TEST(sut.rx_packets() == rx_packets);
       BOOST_TEST(sut.tx_packets() == tx_packets);
@@ -387,13 +385,13 @@ BOOST_AUTO_TEST_SUITE(port_stats_request)
   BOOST_AUTO_TEST_SUITE(constructor)
     BOOST_AUTO_TEST_CASE(is_constructible_from_port_no_and_xid)
     {
-      auto const port_no = proto::OFPP_MAX;
+      auto const port_no = protocol::OFPP_MAX;
       auto const xid = 0x11002200;
 
       stats::port_stats_request sut{port_no, xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_stats_request)
-                               + sizeof(detail::ofp_port_stats_request));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_stats_request)
+                               + sizeof(protocol::ofp_port_stats_request));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.port_no() == port_no);
     }
@@ -403,8 +401,8 @@ BOOST_AUTO_TEST_SUITE(port_stats_request)
 
       stats::port_stats_request sut{port_no};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_stats_request)
-                               + sizeof(detail::ofp_port_stats_request));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_stats_request)
+                               + sizeof(protocol::ofp_port_stats_request));
       BOOST_TEST(sut.port_no() == port_no);
     }
     BOOST_FIXTURE_TEST_CASE(
@@ -452,7 +450,7 @@ BOOST_AUTO_TEST_SUITE(port_stats_request)
     }
     BOOST_AUTO_TEST_CASE(is_false_if_xid_is_not_equal)
     {
-      auto const port_no = proto::OFPP_NONE;
+      auto const port_no = protocol::OFPP_NONE;
 
       BOOST_TEST(
           (stats::port_stats_request{port_no, 1}
@@ -499,7 +497,7 @@ BOOST_AUTO_TEST_SUITE(port_stats_reply)
 
       stats::port_stats_reply sut{{ stats1, stats2 }, flags, xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_stats_reply)
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_stats_reply)
                                + stats1.length() + stats2.length());
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST((sut.body() == body_type{ stats1, stats2 }));
@@ -507,12 +505,12 @@ BOOST_AUTO_TEST_SUITE(port_stats_reply)
     BOOST_FIXTURE_TEST_CASE(
         is_constructible_from_single_port_stats, port_stats_reply_parameters)
     {
-      auto const flags = proto::OFPSF_REPLY_MORE;
+      auto const flags = protocol::OFPSF_REPLY_MORE;
       auto const xid = 0x00000001;
 
       stats::port_stats_reply sut{{ stats3 }, flags, xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_stats_reply)
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_stats_reply)
                                + stats3.length());
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST((sut.body() == body_type{ stats3 }));
@@ -520,12 +518,12 @@ BOOST_AUTO_TEST_SUITE(port_stats_reply)
     BOOST_FIXTURE_TEST_CASE(
         is_constructible_from_no_port_stats, port_stats_reply_parameters)
     {
-      auto const flags = proto::OFPSF_REPLY_MORE;
+      auto const flags = protocol::OFPSF_REPLY_MORE;
       auto const xid = 0;
 
       stats::port_stats_reply sut{{}, flags, xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_stats_reply));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_stats_reply));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.body().empty());
     }
@@ -552,7 +550,7 @@ BOOST_AUTO_TEST_SUITE(port_stats_reply)
       auto const copy = std::move(moved);
 
       BOOST_TEST((copy == sut));
-      BOOST_TEST(moved.length() == sizeof(detail::ofp_stats_reply));
+      BOOST_TEST(moved.length() == sizeof(protocol::ofp_stats_reply));
       BOOST_TEST(moved.body().empty());
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor

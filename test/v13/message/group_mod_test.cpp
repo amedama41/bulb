@@ -12,7 +12,6 @@ namespace ofp = canard::net::ofp;
 namespace v13 = ofp::v13;
 namespace msg = v13::messages;
 namespace actions = v13::actions;
-namespace v13_detail = v13::v13_detail;
 namespace protocol = v13::protocol;
 
 namespace {
@@ -74,7 +73,7 @@ BOOST_AUTO_TEST_SUITE(group_add_test)
 
       BOOST_TEST(sut.version() == protocol::OFP_VERSION);
       BOOST_TEST(sut.type() == protocol::OFPT_GROUP_MOD);
-      BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_group_mod) + sizeof(v13_detail::ofp_bucket) + sizeof(v13_detail::ofp_action_output));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_group_mod) + sizeof(protocol::ofp_bucket) + sizeof(protocol::ofp_action_output));
       BOOST_TEST(sut.command() == protocol::OFPGC_ADD);
       BOOST_TEST(sut.group_id() == group_id);
       BOOST_TEST(sut.group_type() == protocol::OFPGT_INDIRECT);
@@ -94,7 +93,7 @@ BOOST_AUTO_TEST_SUITE(group_add_test)
 
       BOOST_TEST(copy.version() == sut.version());
       BOOST_TEST(copy.type() == sut.type());
-      BOOST_TEST(copy.length() == sizeof(v13_detail::ofp_group_mod) + 40 + 48);
+      BOOST_TEST(copy.length() == sizeof(protocol::ofp_group_mod) + 40 + 48);
       BOOST_TEST(copy.command() == sut.command());
       BOOST_TEST(copy.group_id() == sut.group_id());
       BOOST_TEST(copy.group_type() == sut.group_type());
@@ -146,7 +145,7 @@ BOOST_AUTO_TEST_SUITE(group_delete_test)
 
       BOOST_TEST(sut.version() == protocol::OFP_VERSION);
       BOOST_TEST(sut.type() == protocol::OFPT_GROUP_MOD);
-      BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_group_mod));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_group_mod));
       BOOST_TEST(sut.command() == protocol::OFPGC_DELETE);
       BOOST_TEST(sut.group_id() == group_id);
     }
@@ -159,7 +158,7 @@ BOOST_AUTO_TEST_SUITE(group_delete_test)
 
       BOOST_TEST(copy.version() == sut.version());
       BOOST_TEST(copy.type() == sut.type());
-      BOOST_TEST(copy.length() == sizeof(v13_detail::ofp_group_mod));
+      BOOST_TEST(copy.length() == sizeof(protocol::ofp_group_mod));
       BOOST_TEST(copy.command() == sut.command());
       BOOST_TEST(copy.group_id() == sut.group_id());
     }

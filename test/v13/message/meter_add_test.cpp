@@ -8,10 +8,10 @@ namespace ofp = canard::net::ofp;
 namespace v13 = ofp::v13;
 namespace msg = v13::messages;
 namespace meter_bands = v13::meter_bands;
+namespace protocol = v13::protocol;
 
 namespace {
   using bands_type = msg::meter_add::bands_type;
-  namespace protocol = v13::protocol;
 
   struct meter_bands_fixture
   {
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_SUITE(meter_add)
 
       msg::meter_add const sut{meter_id, flags, bands, xid};
 
-      BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_meter_mod) + 32);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_meter_mod) + 32);
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.meter_id() == meter_id);
       BOOST_TEST(sut.flags() == flags);
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_SUITE(meter_add)
 
       msg::meter_add const sut{meter_id, flags, bands};
 
-      BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_meter_mod) + 16);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_meter_mod) + 16);
       BOOST_TEST(sut.meter_id() == meter_id);
       BOOST_TEST(sut.flags() == flags);
       BOOST_TEST((sut.bands() == bands));
@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_SUITE(meter_add)
       auto const extracted_bands = sut.extract_bands();
 
       BOOST_TEST((extracted_bands == prev_bands));
-      BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_meter_mod));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_meter_mod));
       BOOST_TEST(sut.bands().empty());
     }
   BOOST_AUTO_TEST_SUITE_END() // extract_bands

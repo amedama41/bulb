@@ -9,9 +9,7 @@ namespace ofp = canard::net::ofp;
 namespace v10 = ofp::v10;
 namespace msg = v10::messages;
 namespace act = v10::actions;
-namespace detail = v10::v10_detail;
-
-namespace proto = v10::protocol;
+namespace protocol = v10::protocol;
 
 namespace {
 
@@ -25,7 +23,8 @@ struct parameters : match_fixture, action_fixture {
     set_vlan_vid, output, strip_vlan, enqueue, set_eth_src, set_ipv4_src, output
   };
   v10::timeouts timeouts{0x3232, 0x8989};
-  std::uint16_t flags = proto::OFPFF_SEND_FLOW_REM | proto::OFPFF_CHECK_OVERLAP;
+  std::uint16_t flags
+    = protocol::OFPFF_SEND_FLOW_REM | protocol::OFPFF_CHECK_OVERLAP;
   std::uint32_t buffer_id = 0x01020304;
   std::uint32_t xid = 0x12345678;
 };
@@ -70,7 +69,7 @@ BOOST_AUTO_TEST_SUITE(flow_modify)
   BOOST_AUTO_TEST_SUITE(command)
     BOOST_AUTO_TEST_CASE(returns_flow_modify_command)
     {
-      BOOST_TEST(msg::flow_modify::command() == proto::OFPFC_MODIFY);
+      BOOST_TEST(msg::flow_modify::command() == protocol::OFPFC_MODIFY);
     }
   BOOST_AUTO_TEST_SUITE_END() // command
 
@@ -86,7 +85,7 @@ BOOST_AUTO_TEST_SUITE(flow_modify)
       BOOST_TEST(sut.priority() == 0);
       BOOST_TEST((sut.timeouts() == v10::timeouts{0, 0}));
       BOOST_TEST(sut.flags() == 0);
-      BOOST_TEST(sut.buffer_id() == proto::OFP_NO_BUFFER);
+      BOOST_TEST(sut.buffer_id() == protocol::OFP_NO_BUFFER);
     }
     BOOST_FIXTURE_TEST_CASE(is_constructible_from_all_parameters, parameters)
     {
@@ -95,7 +94,7 @@ BOOST_AUTO_TEST_SUITE(flow_modify)
       };
 
       BOOST_TEST(
-          sut.length() == sizeof(detail::ofp_flow_mod) + actions.length());
+          sut.length() == sizeof(protocol::ofp_flow_mod) + actions.length());
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST((sut.match() == match));
       BOOST_TEST(sut.priority() == priority);
@@ -113,7 +112,7 @@ BOOST_AUTO_TEST_SUITE(flow_modify)
       msg::flow_modify sut{entry, new_actions, timeouts, flags, buffer_id, xid};
 
       BOOST_TEST(
-          sut.length() == sizeof(detail::ofp_flow_mod) + new_actions.length());
+          sut.length() == sizeof(protocol::ofp_flow_mod) + new_actions.length());
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST((sut.match() == entry.id().match()));
       BOOST_TEST(sut.priority() == entry.id().priority());
@@ -132,7 +131,7 @@ BOOST_AUTO_TEST_SUITE(flow_modify)
       auto const copy = std::move(moved);
 
       BOOST_TEST((copy == sut));
-      BOOST_TEST(moved.length() == sizeof(detail::ofp_flow_mod));
+      BOOST_TEST(moved.length() == sizeof(protocol::ofp_flow_mod));
       BOOST_TEST((moved.actions() == v10::action_list{}));
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor
@@ -170,7 +169,7 @@ BOOST_AUTO_TEST_SUITE(flow_modify_strict)
     BOOST_AUTO_TEST_CASE(returns_flow_modify_strict_command)
     {
       BOOST_TEST(
-          msg::flow_modify_strict::command() == proto::OFPFC_MODIFY_STRICT);
+          msg::flow_modify_strict::command() == protocol::OFPFC_MODIFY_STRICT);
     }
   BOOST_AUTO_TEST_SUITE_END() // command
 
@@ -187,7 +186,7 @@ BOOST_AUTO_TEST_SUITE(flow_modify_strict)
       BOOST_TEST(sut.priority() == priority);
       BOOST_TEST((sut.timeouts() == v10::timeouts{0, 0}));
       BOOST_TEST(sut.flags() == 0);
-      BOOST_TEST(sut.buffer_id() == proto::OFP_NO_BUFFER);
+      BOOST_TEST(sut.buffer_id() == protocol::OFP_NO_BUFFER);
     }
     BOOST_FIXTURE_TEST_CASE(is_constructible_from_all_parameters, parameters)
     {
@@ -196,7 +195,7 @@ BOOST_AUTO_TEST_SUITE(flow_modify_strict)
       };
 
       BOOST_TEST(
-          sut.length() == sizeof(detail::ofp_flow_mod) + actions.length());
+          sut.length() == sizeof(protocol::ofp_flow_mod) + actions.length());
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST((sut.match() == match));
       BOOST_TEST(sut.priority() == priority);
@@ -216,7 +215,7 @@ BOOST_AUTO_TEST_SUITE(flow_modify_strict)
       };
 
       BOOST_TEST(
-          sut.length() == sizeof(detail::ofp_flow_mod) + new_actions.length());
+          sut.length() == sizeof(protocol::ofp_flow_mod) + new_actions.length());
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST((sut.match() == entry.id().match()));
       BOOST_TEST(sut.priority() == entry.id().priority());
@@ -235,7 +234,7 @@ BOOST_AUTO_TEST_SUITE(flow_modify_strict)
       auto const copy = std::move(moved);
 
       BOOST_TEST((copy == sut));
-      BOOST_TEST(moved.length() == sizeof(detail::ofp_flow_mod));
+      BOOST_TEST(moved.length() == sizeof(protocol::ofp_flow_mod));
       BOOST_TEST((moved.actions() == v10::action_list{}));
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor

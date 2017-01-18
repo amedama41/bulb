@@ -8,9 +8,7 @@
 namespace ofp = canard::net::ofp;
 namespace v10 = ofp::v10;
 namespace msg = v10::messages;
-namespace detail = v10::v10_detail;
-
-namespace proto = v10::protocol;
+namespace protocol = v10::protocol;
 
 namespace {
 
@@ -22,7 +20,7 @@ struct get_config_request_fixture {
 
 struct get_config_reply_fixture {
   std::uint32_t xid = 0x12345678;
-  std::uint16_t flags = proto::OFPC_FRAG_DROP;
+  std::uint16_t flags = protocol::OFPC_FRAG_DROP;
   std::uint16_t miss_send_len = 0x4321;
   msg::get_config_reply sut{flags, miss_send_len, xid};
   std::vector<unsigned char> bin
@@ -31,7 +29,7 @@ struct get_config_reply_fixture {
 
 struct set_config_fixture {
   std::uint32_t xid = 0x12345678;
-  std::uint16_t flags = proto::OFPC_FRAG_DROP;
+  std::uint16_t flags = protocol::OFPC_FRAG_DROP;
   std::uint16_t miss_send_len = 0x1010;
   msg::set_config sut{flags, miss_send_len, xid};
   std::vector<unsigned char> bin
@@ -49,9 +47,9 @@ BOOST_AUTO_TEST_SUITE(get_config_request)
     {
       auto const sut = msg::get_config_request{};
 
-      BOOST_TEST(sut.version() == proto::OFP_VERSION);
-      BOOST_TEST(sut.type() == proto::OFPT_GET_CONFIG_REQUEST);
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_header));
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_GET_CONFIG_REQUEST);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
     }
     BOOST_AUTO_TEST_CASE(is_constructible_from_xid)
     {
@@ -59,7 +57,7 @@ BOOST_AUTO_TEST_SUITE(get_config_request)
 
       auto const sut = msg::get_config_request{xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_header));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
       BOOST_TEST(sut.xid() == xid);
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor
@@ -118,26 +116,26 @@ BOOST_AUTO_TEST_SUITE(get_config_reply)
   BOOST_AUTO_TEST_SUITE(constructor)
     BOOST_AUTO_TEST_CASE(is_constructible_from_flags_and_length)
     {
-      auto const flags = proto::OFPC_FRAG_REASM;
+      auto const flags = protocol::OFPC_FRAG_REASM;
       auto const miss_send_len = 64;
 
       auto const sut = msg::get_config_reply{flags, miss_send_len};
 
-      BOOST_TEST(sut.version() == proto::OFP_VERSION);
-      BOOST_TEST(sut.type() == proto::OFPT_GET_CONFIG_REPLY);
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_switch_config));
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_GET_CONFIG_REPLY);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_switch_config));
       BOOST_TEST(sut.flags() == flags);
       BOOST_TEST(sut.miss_send_length() == miss_send_len);
     }
     BOOST_AUTO_TEST_CASE(is_constructible_from_xid)
     {
       auto const xid = std::uint32_t{5678};
-      auto const flags = proto::OFPC_FRAG_NORMAL;
+      auto const flags = protocol::OFPC_FRAG_NORMAL;
       auto const miss_send_len = 1024;
 
       auto const sut = msg::get_config_reply{flags, miss_send_len, xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_switch_config));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_switch_config));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.flags() == flags);
       BOOST_TEST(sut.miss_send_length() == miss_send_len);
@@ -145,12 +143,12 @@ BOOST_AUTO_TEST_SUITE(get_config_reply)
     BOOST_AUTO_TEST_CASE(is_constructible_from_get_config_request)
     {
       auto const request = msg::get_config_request{6535};
-      auto const flags = proto::OFPC_FRAG_DROP;
+      auto const flags = protocol::OFPC_FRAG_DROP;
       auto const miss_send_len = 512;
 
       auto const sut = msg::get_config_reply{request, flags, miss_send_len};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_switch_config));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_switch_config));
       BOOST_TEST(sut.xid() == request.xid());
       BOOST_TEST(sut.flags() == flags);
       BOOST_TEST(sut.miss_send_length() == miss_send_len);
@@ -161,13 +159,13 @@ BOOST_AUTO_TEST_SUITE(get_config_reply)
     BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
     {
       auto const sut
-        = msg::get_config_reply{proto::OFPC_FRAG_REASM, 0x1111, 0x12345678};
+        = msg::get_config_reply{protocol::OFPC_FRAG_REASM, 0x1111, 0x12345678};
 
       BOOST_TEST((sut == sut));
     }
     BOOST_AUTO_TEST_CASE(is_true_if_all_parameters_are_equal)
     {
-      auto const flags = proto::OFPC_FRAG_NORMAL;
+      auto const flags = protocol::OFPC_FRAG_NORMAL;
       auto const miss_send_len = 0x2211;
       auto const xid = 0x01020304;
 
@@ -181,12 +179,12 @@ BOOST_AUTO_TEST_SUITE(get_config_reply)
       auto const xid = 0x01020304;
 
       BOOST_TEST(
-          (msg::get_config_reply{proto::OFPC_FRAG_REASM, miss_send_len, xid}
-        != msg::get_config_reply{proto::OFPC_FRAG_DROP, miss_send_len, xid}));
+          (msg::get_config_reply{protocol::OFPC_FRAG_REASM, miss_send_len, xid}
+        != msg::get_config_reply{protocol::OFPC_FRAG_DROP, miss_send_len, xid}));
     }
     BOOST_AUTO_TEST_CASE(is_false_if_miss_send_len_is_not_equal)
     {
-      auto const flags = proto::OFPC_FRAG_NORMAL;
+      auto const flags = protocol::OFPC_FRAG_NORMAL;
       auto const xid = 0x01020304;
 
       BOOST_TEST(
@@ -195,7 +193,7 @@ BOOST_AUTO_TEST_SUITE(get_config_reply)
     }
     BOOST_AUTO_TEST_CASE(is_false_if_xid_is_not_equal)
     {
-      auto const flags = proto::OFPC_FRAG_NORMAL;
+      auto const flags = protocol::OFPC_FRAG_NORMAL;
       auto const miss_send_len = 0x2211;
 
       BOOST_TEST(
@@ -237,26 +235,26 @@ BOOST_AUTO_TEST_SUITE(set_config)
   BOOST_AUTO_TEST_SUITE(constructor)
     BOOST_AUTO_TEST_CASE(is_constructible_from_flags_and_length)
     {
-      auto const flags = proto::OFPC_FRAG_DROP;
+      auto const flags = protocol::OFPC_FRAG_DROP;
       auto const miss_send_len = std::numeric_limits<std::uint16_t>::max();
 
       auto const sut = msg::set_config{flags, miss_send_len};
 
-      BOOST_TEST(sut.version() == proto::OFP_VERSION);
-      BOOST_TEST(sut.type() == proto::OFPT_SET_CONFIG);
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_switch_config));
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_SET_CONFIG);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_switch_config));
       BOOST_TEST(sut.flags() == flags);
       BOOST_TEST(sut.miss_send_length() == miss_send_len);
     }
     BOOST_AUTO_TEST_CASE(is_constructible_from_xid)
     {
       auto const xid = std::uint32_t{0x12345678};
-      auto const flags = proto::OFPC_FRAG_DROP;
+      auto const flags = protocol::OFPC_FRAG_DROP;
       auto const miss_send_len = std::numeric_limits<std::uint16_t>::max();
 
       auto const sut = msg::set_config{flags, miss_send_len, xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_switch_config));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_switch_config));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.flags() == flags);
       BOOST_TEST(sut.miss_send_length() == miss_send_len);
@@ -267,13 +265,13 @@ BOOST_AUTO_TEST_SUITE(set_config)
     BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
     {
       auto const sut
-        = msg::set_config{proto::OFPC_FRAG_REASM, 0x1111, 0x12345678};
+        = msg::set_config{protocol::OFPC_FRAG_REASM, 0x1111, 0x12345678};
 
       BOOST_TEST((sut == sut));
     }
     BOOST_AUTO_TEST_CASE(is_true_if_all_parameters_are_equal)
     {
-      auto const flags = proto::OFPC_FRAG_NORMAL;
+      auto const flags = protocol::OFPC_FRAG_NORMAL;
       auto const miss_send_len = 0x2211;
       auto const xid = 0x01020304;
 
@@ -287,12 +285,12 @@ BOOST_AUTO_TEST_SUITE(set_config)
       auto const xid = 0x01020304;
 
       BOOST_TEST(
-          (msg::set_config{proto::OFPC_FRAG_REASM, miss_send_len, xid}
-        != msg::set_config{proto::OFPC_FRAG_DROP, miss_send_len, xid}));
+          (msg::set_config{protocol::OFPC_FRAG_REASM, miss_send_len, xid}
+        != msg::set_config{protocol::OFPC_FRAG_DROP, miss_send_len, xid}));
     }
     BOOST_AUTO_TEST_CASE(is_false_if_miss_send_len_is_not_equal)
     {
-      auto const flags = proto::OFPC_FRAG_NORMAL;
+      auto const flags = protocol::OFPC_FRAG_NORMAL;
       auto const xid = 0x01020304;
 
       BOOST_TEST(
@@ -301,7 +299,7 @@ BOOST_AUTO_TEST_SUITE(set_config)
     }
     BOOST_AUTO_TEST_CASE(is_false_if_xid_is_not_equal)
     {
-      auto const flags = proto::OFPC_FRAG_NORMAL;
+      auto const flags = protocol::OFPC_FRAG_NORMAL;
       auto const miss_send_len = 0x2211;
 
       BOOST_TEST(

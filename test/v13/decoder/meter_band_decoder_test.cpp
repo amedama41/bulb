@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_SUITE(meter_band_decoder)
       using sut = v13::meter_band_decoder;
 
       using is_same = std::is_same<
-        sut::header_type, v13::v13_detail::ofp_meter_band_header
+        sut::header_type, v13::protocol::ofp_meter_band_header
       >;
 
       BOOST_TEST(is_same::value);

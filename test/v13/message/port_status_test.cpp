@@ -10,8 +10,7 @@
 
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
-namespace v13_detail = v13::v13_detail;
-namespace proto = v13::protocol;
+namespace protocol = v13::protocol;
 
 BOOST_AUTO_TEST_SUITE(message_test)
 
@@ -19,29 +18,29 @@ BOOST_AUTO_TEST_SUITE(port_status_test)
 
     struct ofp_port_fixture
     {
-        v13_detail::ofp_port const ofp_port{
+        protocol::ofp_port const ofp_port{
               1, {0}, {0x10, 0x20, 0x30, 0x40, 0x50, 0x60}, {0}
-            , "eth0", proto::OFPPC_PORT_DOWN, proto::OFPPS_LINK_DOWN
-            , proto::OFPPF_10GB_FD | proto::OFPPF_FIBER
-            , proto::OFPPF_10GB_FD | proto::OFPPF_FIBER | proto::OFPPF_AUTONEG
-            , proto::OFPPF_10GB_FD | proto::OFPPF_1GB_FD | proto::OFPPF_FIBER | proto::OFPPF_AUTONEG
-            , proto::OFPPF_10GB_FD | proto::OFPPF_1GB_FD | proto::OFPPF_COPPER | proto::OFPPF_AUTONEG
+            , "eth0", protocol::OFPPC_PORT_DOWN, protocol::OFPPS_LINK_DOWN
+            , protocol::OFPPF_10GB_FD | protocol::OFPPF_FIBER
+            , protocol::OFPPF_10GB_FD | protocol::OFPPF_FIBER | protocol::OFPPF_AUTONEG
+            , protocol::OFPPF_10GB_FD | protocol::OFPPF_1GB_FD | protocol::OFPPF_FIBER | protocol::OFPPF_AUTONEG
+            , protocol::OFPPF_10GB_FD | protocol::OFPPF_1GB_FD | protocol::OFPPF_COPPER | protocol::OFPPF_AUTONEG
             , 10000, 12000
         };
     };
 
     BOOST_FIXTURE_TEST_CASE(construct_test, ofp_port_fixture)
     {
-        auto const reason = proto::OFPPR_ADD;
+        auto const reason = protocol::OFPPR_ADD;
         auto const xid = 0x0123;
 
         auto const sut = v13::messages::port_status{
             reason, v13::port::from_ofp_port(ofp_port), xid
         };
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_PORT_STATUS);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_port_status));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_PORT_STATUS);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_port_status));
         BOOST_TEST(sut.xid() == xid);
         BOOST_TEST(sut.reason() == reason);
         BOOST_TEST(sut.port_no() == ofp_port.port_no);
@@ -58,19 +57,19 @@ BOOST_AUTO_TEST_SUITE(port_status_test)
     }
 
     struct port_status_fixture {
-        v13_detail::ofp_port const ofp_port{
-              proto::OFPP_MAX, {0}, {0x10, 0x20, 0x30, 0x40, 0x50, 0x60}, {0}
+        protocol::ofp_port const ofp_port{
+              protocol::OFPP_MAX, {0}, {0x10, 0x20, 0x30, 0x40, 0x50, 0x60}, {0}
             , "eth1"
-            , proto::OFPPC_PORT_DOWN | proto::OFPPC_NO_FWD
-            , proto::OFPPS_LINK_DOWN | proto::OFPPS_LIVE
-            , proto::OFPPF_10GB_FD | proto::OFPPF_FIBER
-            , proto::OFPPF_10GB_FD | proto::OFPPF_FIBER | proto::OFPPF_AUTONEG
-            , proto::OFPPF_10GB_FD | proto::OFPPF_1GB_FD | proto::OFPPF_FIBER | proto::OFPPF_AUTONEG
-            , proto::OFPPF_10GB_FD | proto::OFPPF_1GB_FD | proto::OFPPF_COPPER | proto::OFPPF_AUTONEG
+            , protocol::OFPPC_PORT_DOWN | protocol::OFPPC_NO_FWD
+            , protocol::OFPPS_LINK_DOWN | protocol::OFPPS_LIVE
+            , protocol::OFPPF_10GB_FD | protocol::OFPPF_FIBER
+            , protocol::OFPPF_10GB_FD | protocol::OFPPF_FIBER | protocol::OFPPF_AUTONEG
+            , protocol::OFPPF_10GB_FD | protocol::OFPPF_1GB_FD | protocol::OFPPF_FIBER | protocol::OFPPF_AUTONEG
+            , protocol::OFPPF_10GB_FD | protocol::OFPPF_1GB_FD | protocol::OFPPF_COPPER | protocol::OFPPF_AUTONEG
             , 10000, 12000
         };
         v13::messages::port_status const sut{
-            proto::OFPPR_DELETE, v13::port::from_ofp_port(ofp_port), 0x87654321
+            protocol::OFPPR_DELETE, v13::port::from_ofp_port(ofp_port), 0x87654321
         };
         std::vector<std::uint8_t> bin_port_status
             = "\x04\x0c\x00\x50\x87\x65\x43\x21" "\x01\x00\x00\x00\x00\x00\x00\x00"

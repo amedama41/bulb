@@ -8,9 +8,7 @@ namespace ofp = canard::net::ofp;
 namespace v10 = ofp::v10;
 namespace msg = v10::messages;
 namespace props = v10::queue_properties;
-namespace detail = v10::v10_detail;
-
-namespace proto = v10::protocol;
+namespace protocol = v10::protocol;
 
 namespace {
 struct queue_get_config_request_fixture {
@@ -59,22 +57,22 @@ BOOST_AUTO_TEST_SUITE(queue_get_config_request)
   BOOST_AUTO_TEST_SUITE(constructor)
     BOOST_AUTO_TEST_CASE(is_constructible_from_port_no)
     {
-      auto const port_no = proto::OFPP_MAX;
+      auto const port_no = protocol::OFPP_MAX;
       auto const xid = 0x12345678;
 
       msg::queue_get_config_request sut{port_no, xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_queue_get_config_request));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_queue_get_config_request));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.port_no() == port_no);
     }
     BOOST_AUTO_TEST_CASE(is_constructible_from_port_no_without_xid)
     {
-      auto const port_no = proto::OFPP_MAX;
+      auto const port_no = protocol::OFPP_MAX;
 
       msg::queue_get_config_request sut{port_no};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_queue_get_config_request));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_queue_get_config_request));
       BOOST_TEST(sut.port_no() == port_no);
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor
@@ -151,7 +149,7 @@ BOOST_AUTO_TEST_SUITE(queue_get_config_reply)
 
       BOOST_TEST(
           sut.length()
-       == sizeof(detail::ofp_queue_get_config_reply) + queues_length);
+       == sizeof(protocol::ofp_queue_get_config_reply) + queues_length);
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.port_no() == port_no);
       BOOST_TEST((sut.queues() == queues));
@@ -163,7 +161,7 @@ BOOST_AUTO_TEST_SUITE(queue_get_config_reply)
 
       BOOST_TEST(
           sut.length()
-       == sizeof(detail::ofp_queue_get_config_reply) + queues_length);
+       == sizeof(protocol::ofp_queue_get_config_reply) + queues_length);
       BOOST_TEST(sut.port_no() == port_no);
       BOOST_TEST((sut.queues() == queues));
     }
@@ -174,7 +172,7 @@ BOOST_AUTO_TEST_SUITE(queue_get_config_reply)
 
       msg::queue_get_config_reply sut{port_no, empty_queues};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_queue_get_config_reply));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_queue_get_config_reply));
       BOOST_TEST(sut.port_no() == port_no);
       BOOST_TEST((sut.queues() == empty_queues));
     }
@@ -204,7 +202,7 @@ BOOST_AUTO_TEST_SUITE(queue_get_config_reply)
       auto const copy = std::move(moved);
 
       BOOST_TEST((copy == sut));
-      BOOST_TEST(moved.length() == sizeof(detail::ofp_queue_get_config_reply));
+      BOOST_TEST(moved.length() == sizeof(protocol::ofp_queue_get_config_reply));
       BOOST_TEST((moved.queues() == queues_t{}));
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor
@@ -255,8 +253,8 @@ BOOST_AUTO_TEST_SUITE(queue_get_config_reply)
     BOOST_AUTO_TEST_CASE(generates_empty_queues_binary)
     {
       auto const sut = msg::queue_get_config_reply{port_no, queues_t{}, xid};
-      bin.resize(sizeof(detail::ofp_queue_get_config_reply));
-      bin[3] = sizeof(detail::ofp_queue_get_config_reply);
+      bin.resize(sizeof(protocol::ofp_queue_get_config_reply));
+      bin[3] = sizeof(protocol::ofp_queue_get_config_reply);
       auto buf = std::vector<unsigned char>{};
 
       sut.encode(buf);
@@ -280,8 +278,8 @@ BOOST_AUTO_TEST_SUITE(queue_get_config_reply)
     BOOST_AUTO_TEST_CASE(constructs_empty_queues_queue_get_config_reply)
     {
       auto const sut = msg::queue_get_config_reply{port_no, queues_t{}, xid};
-      bin.resize(sizeof(detail::ofp_queue_get_config_reply));
-      bin[3] = sizeof(detail::ofp_queue_get_config_reply);
+      bin.resize(sizeof(protocol::ofp_queue_get_config_reply));
+      bin[3] = sizeof(protocol::ofp_queue_get_config_reply);
       auto it = bin.begin();
 
       auto const queue_get_config_reply

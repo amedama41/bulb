@@ -7,7 +7,6 @@
 namespace ofp = canard::net::ofp;
 namespace v10 = ofp::v10;
 namespace msg = v10::messages;
-namespace detail = v10::v10_detail;
 
 namespace proto = v10::protocol;
 
@@ -33,7 +32,7 @@ BOOST_AUTO_TEST_SUITE(barrier_request)
     {
       msg::barrier_request sut;
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_header));
+      BOOST_TEST(sut.length() == sizeof(v10::protocol::ofp_header));
     }
     BOOST_AUTO_TEST_CASE(is_constructible_from_xid)
     {
@@ -41,7 +40,7 @@ BOOST_AUTO_TEST_SUITE(barrier_request)
 
       msg::barrier_request sut{xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_header));
+      BOOST_TEST(sut.length() == sizeof(v10::protocol::ofp_header));
       BOOST_TEST(sut.xid() == xid);
     }
     BOOST_FIXTURE_TEST_CASE(
@@ -115,7 +114,7 @@ BOOST_AUTO_TEST_SUITE(barrier_reply)
     {
       msg::barrier_reply sut;
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_header));
+      BOOST_TEST(sut.length() == sizeof(v10::protocol::ofp_header));
     }
     BOOST_AUTO_TEST_CASE(is_constructible_from_xid)
     {
@@ -123,7 +122,7 @@ BOOST_AUTO_TEST_SUITE(barrier_reply)
 
       msg::barrier_reply sut{xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_header));
+      BOOST_TEST(sut.length() == sizeof(v10::protocol::ofp_header));
       BOOST_TEST(sut.xid() == xid);
     }
     BOOST_AUTO_TEST_CASE(is_constructible_from_barrier_request)
@@ -132,7 +131,7 @@ BOOST_AUTO_TEST_SUITE(barrier_reply)
 
       msg::barrier_reply sut{barrier_request};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_header));
+      BOOST_TEST(sut.length() == sizeof(v10::protocol::ofp_header));
       BOOST_TEST(sut.xid() == barrier_request.xid());
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor

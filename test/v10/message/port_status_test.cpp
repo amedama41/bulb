@@ -7,26 +7,24 @@
 namespace ofp = canard::net::ofp;
 namespace v10 = ofp::v10;
 namespace msg = v10::messages;
-namespace detail = v10::v10_detail;
-
-namespace proto = v10::protocol;
+namespace protocol = v10::protocol;
 
 namespace {
 struct parameters {
-  proto::ofp_port_reason reason = proto::OFPPR_MODIFY;
-  std::uint32_t config = proto::OFPPC_PORT_DOWN | proto::OFPPC_NO_FLOOD;
-  std::uint32_t state = proto::OFPPS_LINK_DOWN | proto::OFPPS_STP_FORWARD;
+  protocol::ofp_port_reason reason = protocol::OFPPR_MODIFY;
+  std::uint32_t config = protocol::OFPPC_PORT_DOWN | protocol::OFPPC_NO_FLOOD;
+  std::uint32_t state = protocol::OFPPS_LINK_DOWN | protocol::OFPPS_STP_FORWARD;
   std::uint32_t curr
-    = proto::OFPPF_10MB_HD | proto::OFPPF_COPPER | proto::OFPPF_AUTONEG;
+    = protocol::OFPPF_10MB_HD | protocol::OFPPF_COPPER | protocol::OFPPF_AUTONEG;
   std::uint32_t advertised
-    = proto::OFPPF_10MB_HD | proto::OFPPF_10MB_FD | proto::OFPPF_100MB_HD
-    | proto::OFPPF_100MB_FD | proto::OFPPF_COPPER | proto::OFPPF_AUTONEG;
+    = protocol::OFPPF_10MB_HD | protocol::OFPPF_10MB_FD | protocol::OFPPF_100MB_HD
+    | protocol::OFPPF_100MB_FD | protocol::OFPPF_COPPER | protocol::OFPPF_AUTONEG;
   std::uint32_t supported
-    = proto::OFPPF_10MB_HD | proto::OFPPF_10MB_FD | proto::OFPPF_100MB_HD
-    | proto::OFPPF_100MB_FD | proto::OFPPF_1GB_HD | proto::OFPPF_1GB_FD
-    | proto::OFPPF_10GB_FD | proto::OFPPF_COPPER | proto::OFPPF_AUTONEG;
+    = protocol::OFPPF_10MB_HD | protocol::OFPPF_10MB_FD | protocol::OFPPF_100MB_HD
+    | protocol::OFPPF_100MB_FD | protocol::OFPPF_1GB_HD | protocol::OFPPF_1GB_FD
+    | protocol::OFPPF_10GB_FD | protocol::OFPPF_COPPER | protocol::OFPPF_AUTONEG;
   std::uint32_t peer
-    = proto::OFPPF_10MB_HD | proto::OFPPF_COPPER | proto::OFPPF_AUTONEG;
+    = protocol::OFPPF_10MB_HD | protocol::OFPPF_COPPER | protocol::OFPPF_AUTONEG;
   v10::port port{
       1, "\xA1\xA2\xA3\xA4\xA5\xA6"_mac, "123456789abcdef"
     , config, state, curr, advertised, supported, peer
@@ -49,7 +47,7 @@ BOOST_AUTO_TEST_SUITE(port_status)
   BOOST_AUTO_TEST_SUITE(constructor)
     BOOST_FIXTURE_TEST_CASE(is_constructible_from_reason_and_port, parameters)
     {
-      auto const reason = proto::OFPPR_ADD;
+      auto const reason = protocol::OFPPR_ADD;
       auto const port = v10::port{
           1, "\x01\x02\x03\x04\x05\x06"_mac, "eth0"
         , config, state, curr, advertised, supported, peer
@@ -57,7 +55,7 @@ BOOST_AUTO_TEST_SUITE(port_status)
 
       msg::port_status sut{reason, port, xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_port_status));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_port_status));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.reason() == reason);
       BOOST_TEST((sut.port() == port));
@@ -65,15 +63,15 @@ BOOST_AUTO_TEST_SUITE(port_status)
     BOOST_FIXTURE_TEST_CASE(
         is_constructible_from_reason_and_port_without_xid, parameters)
     {
-      auto const reason = proto::OFPPR_DELETE;
+      auto const reason = protocol::OFPPR_DELETE;
       auto const port = v10::port{
-          proto::OFPP_MAX, "\x01\x02\x03\x04\x05\x06"_mac, "veth1"
+          protocol::OFPP_MAX, "\x01\x02\x03\x04\x05\x06"_mac, "veth1"
         , config, state, curr, advertised, supported, peer
       };
 
       msg::port_status sut{reason, port};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_port_status));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_port_status));
       BOOST_TEST(sut.reason() == reason);
       BOOST_TEST((sut.port() == port));
     }

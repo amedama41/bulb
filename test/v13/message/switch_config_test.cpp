@@ -8,7 +8,7 @@
 
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
-namespace proto = v13::protocol;
+namespace protocol = v13::protocol;
 
 template <std::size_t N>
 static auto to_buffer(char const (&expected)[N])
@@ -25,9 +25,9 @@ BOOST_AUTO_TEST_SUITE(get_config_request_test)
     {
         auto const sut = v13::messages::get_config_request{};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_GET_CONFIG_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_header));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_GET_CONFIG_REQUEST);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
     }
 
     BOOST_AUTO_TEST_CASE(constructor_test)
@@ -36,9 +36,9 @@ BOOST_AUTO_TEST_SUITE(get_config_request_test)
 
         auto const sut = v13::messages::get_config_request{xid};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_GET_CONFIG_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_header));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_GET_CONFIG_REQUEST);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
         BOOST_TEST(sut.xid() == xid);
     }
 
@@ -62,9 +62,9 @@ BOOST_AUTO_TEST_SUITE(get_config_request_test)
         auto sut = v13::messages::get_config_request::decode(it, it_end);
 
         BOOST_TEST(it == it_end);
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_GET_CONFIG_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_header));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_GET_CONFIG_REQUEST);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
         BOOST_TEST(sut.xid() == 0x80);
     }
 
@@ -75,16 +75,16 @@ BOOST_AUTO_TEST_SUITE(get_config_reply_test)
 
     BOOST_AUTO_TEST_CASE(constructor_test)
     {
-        auto const flags = proto::OFPC_FRAG_NORMAL;
-        auto const miss_send_len = std::uint16_t{proto::OFPCML_MAX};
+        auto const flags = protocol::OFPC_FRAG_NORMAL;
+        auto const miss_send_len = std::uint16_t{protocol::OFPCML_MAX};
         auto const xid = std::uint32_t{0x79};
 
         auto const sut
             = v13::messages::get_config_reply{flags, miss_send_len, xid};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_GET_CONFIG_REPLY);
-        BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_switch_config));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_GET_CONFIG_REPLY);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_switch_config));
         BOOST_TEST(sut.xid() == xid);
         BOOST_TEST(sut.flags() == flags);
         BOOST_TEST(sut.miss_send_length() == miss_send_len);
@@ -93,15 +93,15 @@ BOOST_AUTO_TEST_SUITE(get_config_reply_test)
     BOOST_AUTO_TEST_CASE(constructor_from_request_test)
     {
         auto const request = v13::messages::get_config_request{0x3382};
-        auto const flags = proto::OFPC_FRAG_NORMAL;
+        auto const flags = protocol::OFPC_FRAG_NORMAL;
         auto const miss_send_len = std::uint16_t{0x3456};
 
         auto const sut
             = v13::messages::get_config_reply{request, flags, miss_send_len};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_GET_CONFIG_REPLY);
-        BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_switch_config));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_GET_CONFIG_REPLY);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_switch_config));
         BOOST_TEST(sut.xid() == request.xid());
         BOOST_TEST(sut.flags() == flags);
         BOOST_TEST(sut.miss_send_length() == miss_send_len);
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_SUITE(get_config_reply_test)
         auto buffer = std::vector<unsigned char>{};
         auto const sut = v13::messages::get_config_reply{
               v13::messages::get_config_request{0x8}
-            , proto::OFPC_FRAG_DROP, 0xff07
+            , protocol::OFPC_FRAG_DROP, 0xff07
         };
 
         sut.encode(buffer);
@@ -134,12 +134,12 @@ BOOST_AUTO_TEST_SUITE(get_config_reply_test)
         auto const sut = v13::messages::get_config_reply::decode(it, it_end);
 
         BOOST_TEST(it == it_end);
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_GET_CONFIG_REPLY);
-        BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_switch_config));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_GET_CONFIG_REPLY);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_switch_config));
         BOOST_TEST(sut.xid() == 0x10203);
-        BOOST_TEST(sut.flags() == proto::OFPC_FRAG_REASM);
-        BOOST_TEST(sut.miss_send_length() == proto::OFPCML_NO_BUFFER);
+        BOOST_TEST(sut.flags() == protocol::OFPC_FRAG_REASM);
+        BOOST_TEST(sut.miss_send_length() == protocol::OFPCML_NO_BUFFER);
     }
 
 BOOST_AUTO_TEST_SUITE_END() // get_config_reply_test
@@ -149,16 +149,16 @@ BOOST_AUTO_TEST_SUITE(set_config_test)
 
     BOOST_AUTO_TEST_CASE(constructor_test)
     {
-        auto const flags = proto::OFPC_FRAG_NORMAL;
-        auto const miss_send_len = std::uint16_t{proto::OFPCML_MAX};
+        auto const flags = protocol::OFPC_FRAG_NORMAL;
+        auto const miss_send_len = std::uint16_t{protocol::OFPCML_MAX};
         auto const xid = std::uint32_t{0x79};
 
         auto const sut
             = v13::messages::set_config{flags, miss_send_len, xid};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_SET_CONFIG);
-        BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_switch_config));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_SET_CONFIG);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_switch_config));
         BOOST_TEST(sut.xid() == xid);
         BOOST_TEST(sut.flags() == flags);
         BOOST_TEST(sut.miss_send_length() == miss_send_len);
@@ -168,7 +168,7 @@ BOOST_AUTO_TEST_SUITE(set_config_test)
     {
         auto buffer = std::vector<unsigned char>{};
         auto const sut
-            = v13::messages::set_config{proto::OFPC_FRAG_DROP, 0xff07, 0x8};
+            = v13::messages::set_config{protocol::OFPC_FRAG_DROP, 0xff07, 0x8};
 
         sut.encode(buffer);
 
@@ -189,12 +189,12 @@ BOOST_AUTO_TEST_SUITE(set_config_test)
         auto sut = v13::messages::set_config::decode(it, it_end);
 
         BOOST_TEST(it == it_end);
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_SET_CONFIG);
-        BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_switch_config));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_SET_CONFIG);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_switch_config));
         BOOST_TEST(sut.xid() == 0x10203);
-        BOOST_TEST(sut.flags() == proto::OFPC_FRAG_REASM);
-        BOOST_TEST(sut.miss_send_length() == proto::OFPCML_NO_BUFFER);
+        BOOST_TEST(sut.flags() == protocol::OFPC_FRAG_REASM);
+        BOOST_TEST(sut.miss_send_length() == protocol::OFPCML_NO_BUFFER);
     }
 
 

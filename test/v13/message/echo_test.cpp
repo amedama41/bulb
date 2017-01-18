@@ -7,8 +7,7 @@
 
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
-namespace v13_detail = v13::v13_detail;
-namespace proto = v13::protocol;
+namespace protocol = v13::protocol;
 
 BOOST_AUTO_TEST_SUITE(message_test)
 
@@ -18,9 +17,9 @@ BOOST_AUTO_TEST_SUITE(echo_request_test)
     {
         auto const sut = v13::messages::echo_request{};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_ECHO_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_header));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REQUEST);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
         BOOST_TEST(sut.data_length() == 0);
         BOOST_TEST(sut.data().empty());
     }
@@ -31,9 +30,9 @@ BOOST_AUTO_TEST_SUITE(echo_request_test)
 
         auto const sut = v13::messages::echo_request{xid};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_ECHO_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_header));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REQUEST);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
         BOOST_TEST(sut.xid() == xid);
         BOOST_TEST(sut.data_length() == 0);
         BOOST_TEST(sut.data().empty());
@@ -45,9 +44,9 @@ BOOST_AUTO_TEST_SUITE(echo_request_test)
 
         auto const sut = v13::messages::echo_request{data};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_ECHO_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_header) + data.size());
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REQUEST);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header) + data.size());
         BOOST_TEST(sut.data_length() == data.size());
         BOOST_TEST(sut.data() == data, boost::test_tools::per_element{});
     }
@@ -59,9 +58,9 @@ BOOST_AUTO_TEST_SUITE(echo_request_test)
 
         auto const sut = v13::messages::echo_request{data, xid};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_ECHO_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_header) + data.size());
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REQUEST);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header) + data.size());
         BOOST_TEST(sut.xid() == xid);
         BOOST_TEST(sut.data_length() == data.size());
         BOOST_TEST(sut.data() == data, boost::test_tools::per_element{});
@@ -101,7 +100,7 @@ BOOST_AUTO_TEST_SUITE(echo_request_test)
         BOOST_TEST(copy.data_length() == sut.data_length());
         BOOST_TEST((copy.data() == sut.data()));
 
-        BOOST_TEST(src.length() == sizeof(v13_detail::ofp_header));
+        BOOST_TEST(src.length() == sizeof(protocol::ofp_header));
         BOOST_TEST(src.data_length() == 0);
         BOOST_TEST(src.data().empty());
     }
@@ -134,7 +133,7 @@ BOOST_AUTO_TEST_SUITE(echo_request_test)
         BOOST_TEST(copy.data_length() == sut.data_length());
         BOOST_TEST((copy.data() == sut.data()));
 
-        BOOST_TEST(src.length() == sizeof(v13_detail::ofp_header));
+        BOOST_TEST(src.length() == sizeof(protocol::ofp_header));
         BOOST_TEST(src.data_length() == 0);
         BOOST_TEST(src.data().empty());
     }
@@ -143,7 +142,7 @@ BOOST_AUTO_TEST_SUITE(echo_request_test)
     {
         auto const extracted_data = sut.extract_data();
 
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_header));
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
         BOOST_TEST(sut.data_length() == 0);
         BOOST_TEST(sut.data().empty());
 
@@ -220,9 +219,9 @@ BOOST_AUTO_TEST_SUITE(echo_reply_test)
     {
         auto const sut = v13::messages::echo_reply{};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_ECHO_REPLY);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_header));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REPLY);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
         BOOST_TEST(sut.data_length() == 0);
         BOOST_TEST(sut.data().empty());
     }
@@ -233,9 +232,9 @@ BOOST_AUTO_TEST_SUITE(echo_reply_test)
 
         auto const sut = v13::messages::echo_reply{xid};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_ECHO_REPLY);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_header));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REPLY);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
         BOOST_TEST(sut.xid() == xid);
         BOOST_TEST(sut.data_length() == 0);
         BOOST_TEST(sut.data().empty());
@@ -247,9 +246,9 @@ BOOST_AUTO_TEST_SUITE(echo_reply_test)
 
         auto const sut = v13::messages::echo_reply{data};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_ECHO_REPLY);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_header) + data.size());
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REPLY);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header) + data.size());
         BOOST_TEST(sut.data_length() == data.size());
         BOOST_TEST(sut.data() == data, boost::test_tools::per_element{});
     }
@@ -261,9 +260,9 @@ BOOST_AUTO_TEST_SUITE(echo_reply_test)
 
         auto const sut = v13::messages::echo_reply{data, xid};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_ECHO_REPLY);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_header) + data.size());
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REPLY);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header) + data.size());
         BOOST_TEST(sut.xid() == xid);
         BOOST_TEST(sut.data_length() == data.size());
         BOOST_TEST(sut.data() == data, boost::test_tools::per_element{});
@@ -278,9 +277,9 @@ BOOST_AUTO_TEST_SUITE(echo_reply_test)
 
         auto const sut = v13::messages::echo_reply{request};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_ECHO_REPLY);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_header) + data.size());
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REPLY);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header) + data.size());
         BOOST_TEST(sut.xid() == xid);
         BOOST_TEST(sut.data_length() == data.size());
         BOOST_TEST(sut.data() == data, boost::test_tools::per_element{});
@@ -294,14 +293,14 @@ BOOST_AUTO_TEST_SUITE(echo_reply_test)
 
         auto const sut = v13::messages::echo_reply{std::move(request)};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_ECHO_REPLY);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_header) + data.size());
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REPLY);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header) + data.size());
         BOOST_TEST(sut.xid() == xid);
         BOOST_TEST(sut.data_length() == data.size());
         BOOST_TEST(sut.data() == data, boost::test_tools::per_element{});
 
-        BOOST_TEST(request.length() == sizeof(v13_detail::ofp_header));
+        BOOST_TEST(request.length() == sizeof(protocol::ofp_header));
         BOOST_TEST(request.data_length() == 0);
         BOOST_TEST(request.data().empty());
     }
@@ -339,7 +338,7 @@ BOOST_AUTO_TEST_SUITE(echo_reply_test)
         BOOST_TEST(copy.data_length() == sut.data_length());
         BOOST_TEST((copy.data() == sut.data()));
 
-        BOOST_TEST(src.length() == sizeof(v13_detail::ofp_header));
+        BOOST_TEST(src.length() == sizeof(protocol::ofp_header));
         BOOST_TEST(src.data_length() == 0);
         BOOST_TEST(src.data().empty());
     }
@@ -372,7 +371,7 @@ BOOST_AUTO_TEST_SUITE(echo_reply_test)
         BOOST_TEST(copy.data_length() == sut.data_length());
         BOOST_TEST((copy.data() == sut.data()));
 
-        BOOST_TEST(src.length() == sizeof(v13_detail::ofp_header));
+        BOOST_TEST(src.length() == sizeof(protocol::ofp_header));
         BOOST_TEST(src.data_length() == 0);
         BOOST_TEST(src.data().empty());
     }
@@ -381,7 +380,7 @@ BOOST_AUTO_TEST_SUITE(echo_reply_test)
     {
         auto const extracted_data = sut.extract_data();
 
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_header));
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
         BOOST_TEST(sut.data_length() == 0);
         BOOST_TEST(sut.data().empty());
         BOOST_TEST(extracted_data == data, boost::test_tools::per_element{});

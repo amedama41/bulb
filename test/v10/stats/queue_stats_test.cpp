@@ -8,9 +8,7 @@ namespace ofp = canard::net::ofp;
 namespace v10 = ofp::v10;
 namespace msg = v10::messages;
 namespace stats = msg::statistics;
-namespace detail = v10::v10_detail;
-
-namespace proto = v10::protocol;
+namespace protocol = v10::protocol;
 
 namespace {
 struct queue_stats_parameters {
@@ -28,8 +26,8 @@ struct queue_stats_fixture : queue_stats_parameters {
       "\x10\xff\xff\xff\x12\x34\x56\x78"_bin;
 };
 struct queue_stats_request_parameters {
-  std::uint32_t queue_id = proto::OFPQ_ALL;
-  std::uint16_t port_no = proto::OFPP_MAX;
+  std::uint32_t queue_id = protocol::OFPQ_ALL;
+  std::uint16_t port_no = protocol::OFPP_MAX;
   std::uint32_t xid = 0x10305070;
 };
 struct queue_stats_request_fixture : queue_stats_request_parameters {
@@ -81,7 +79,7 @@ BOOST_AUTO_TEST_SUITE(queue_stats)
     BOOST_AUTO_TEST_CASE(is_constructible_from_parameters)
     {
       auto const queue_id = 0x10203040;
-      auto const port_no = proto::OFPP_MAX;
+      auto const port_no = protocol::OFPP_MAX;
       auto const tx_packets = 0x0102030405060708;
       auto const tx_bytes = 0x1020304050607080;
       auto const tx_errors = 0xffffffffffffffff;
@@ -90,7 +88,7 @@ BOOST_AUTO_TEST_SUITE(queue_stats)
         queue_id, port_no, tx_packets, tx_bytes, tx_errors
       };
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_queue_stats));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_queue_stats));
       BOOST_TEST(sut.queue_id() == queue_id);
       BOOST_TEST(sut.port_no() == port_no);
       BOOST_TEST(sut.tx_packets() == tx_packets);
@@ -207,13 +205,13 @@ BOOST_AUTO_TEST_SUITE(queue_stats_request)
     BOOST_AUTO_TEST_CASE(is_constructible_from_queue_id_and_port_no_and_xid)
     {
       auto const queue_id = 1;
-      auto const port_no = proto::OFPP_MAX;
+      auto const port_no = protocol::OFPP_MAX;
       auto const xid = 0x01020304;
 
       stats::queue_stats_request sut{queue_id, port_no, xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_stats_request)
-                               + sizeof(detail::ofp_queue_stats_request));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_stats_request)
+                               + sizeof(protocol::ofp_queue_stats_request));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.queue_id() == queue_id);
       BOOST_TEST(sut.port_no() == port_no);
@@ -221,12 +219,12 @@ BOOST_AUTO_TEST_SUITE(queue_stats_request)
     BOOST_AUTO_TEST_CASE(is_constructible_without_xid)
     {
       auto const queue_id = 1;
-      auto const port_no = proto::OFPP_MAX;
+      auto const port_no = protocol::OFPP_MAX;
 
       stats::queue_stats_request sut{queue_id, port_no};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_stats_request)
-                               + sizeof(detail::ofp_queue_stats_request));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_stats_request)
+                               + sizeof(protocol::ofp_queue_stats_request));
       BOOST_TEST(sut.queue_id() == queue_id);
       BOOST_TEST(sut.port_no() == port_no);
     }
@@ -317,12 +315,12 @@ BOOST_AUTO_TEST_SUITE(queue_stats_reply)
           is_constructible_from_multiple_queue_stats
         , queue_stats_reply_parameters)
     {
-      auto const flags = proto::OFPSF_REPLY_MORE;
+      auto const flags = protocol::OFPSF_REPLY_MORE;
       auto const xid = 0x12345678;
 
       stats::queue_stats_reply sut{{ stats1, stats2 }, flags, xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_stats_reply)
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_stats_reply)
                                + stats1.length() + stats2.length());
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.flags() == flags);
@@ -337,7 +335,7 @@ BOOST_AUTO_TEST_SUITE(queue_stats_reply)
 
       stats::queue_stats_reply sut{{ stats3 }, flags, xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_stats_reply)
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_stats_reply)
                                + stats3.length());
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.flags() == flags);
@@ -345,12 +343,12 @@ BOOST_AUTO_TEST_SUITE(queue_stats_reply)
     }
     BOOST_AUTO_TEST_CASE(is_constructible_from_no_queue_stats)
     {
-      auto const flags = proto::OFPSF_REPLY_MORE;
+      auto const flags = protocol::OFPSF_REPLY_MORE;
       auto const xid = 0x00005678;
 
       stats::queue_stats_reply sut{{}, flags, xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_stats_reply));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_stats_reply));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.flags() == flags);
       BOOST_TEST(sut.body().empty());
@@ -378,7 +376,7 @@ BOOST_AUTO_TEST_SUITE(queue_stats_reply)
       auto const copy = std::move(moved);
 
       BOOST_TEST((copy == sut));
-      BOOST_TEST(moved.length() == sizeof(detail::ofp_stats_reply));
+      BOOST_TEST(moved.length() == sizeof(protocol::ofp_stats_reply));
       BOOST_TEST(moved.body().empty());
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor

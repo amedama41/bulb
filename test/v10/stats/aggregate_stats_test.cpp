@@ -9,9 +9,7 @@ namespace ofp = canard::net::ofp;
 namespace v10 = ofp::v10;
 namespace msg = v10::messages;
 namespace stats = msg::statistics;
-namespace detail = v10::v10_detail;
-
-namespace proto = v10::protocol;
+namespace protocol = v10::protocol;
 
 namespace {
 struct aggregate_stats_request_parameter : match_fixture {
@@ -57,8 +55,8 @@ BOOST_AUTO_TEST_SUITE(aggregate_stats_request)
 
       stats::aggregate_stats_request sut{match, table_id, out_port, xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_stats_request)
-                               + sizeof(detail::ofp_aggregate_stats_request));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_stats_request)
+                               + sizeof(protocol::ofp_aggregate_stats_request));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST((sut.match() == match));
       BOOST_TEST(sut.table_id() == table_id);
@@ -73,8 +71,8 @@ BOOST_AUTO_TEST_SUITE(aggregate_stats_request)
 
       stats::aggregate_stats_request sut{match, table_id, out_port};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_stats_request)
-                               + sizeof(detail::ofp_aggregate_stats_request));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_stats_request)
+                               + sizeof(protocol::ofp_aggregate_stats_request));
       BOOST_TEST((sut.match() == match));
       BOOST_TEST(sut.table_id() == table_id);
       BOOST_TEST(sut.out_port() == out_port);
@@ -88,11 +86,11 @@ BOOST_AUTO_TEST_SUITE(aggregate_stats_request)
 
       stats::aggregate_stats_request sut{match, table_id};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_stats_request)
-                               + sizeof(detail::ofp_aggregate_stats_request));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_stats_request)
+                               + sizeof(protocol::ofp_aggregate_stats_request));
       BOOST_TEST((sut.match() == match));
       BOOST_TEST(sut.table_id() == table_id);
-      BOOST_TEST(sut.out_port() == proto::OFPP_NONE);
+      BOOST_TEST(sut.out_port() == protocol::OFPP_NONE);
     }
     BOOST_FIXTURE_TEST_CASE(
           is_copy_constructible_from_non_const_lvalue
@@ -195,8 +193,8 @@ BOOST_AUTO_TEST_SUITE(aggregate_stats_reply)
 
       stats::aggregate_stats_reply sut{counters, flow_count, xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_stats_request)
-                               + sizeof(detail::ofp_aggregate_stats_reply));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_stats_request)
+                               + sizeof(protocol::ofp_aggregate_stats_reply));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.packet_count() == counters.packet_count());
       BOOST_TEST(sut.byte_count() == counters.byte_count());
@@ -209,8 +207,8 @@ BOOST_AUTO_TEST_SUITE(aggregate_stats_reply)
 
       stats::aggregate_stats_reply sut{counters, flow_count};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_stats_request)
-                               + sizeof(detail::ofp_aggregate_stats_reply));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_stats_request)
+                               + sizeof(protocol::ofp_aggregate_stats_reply));
       BOOST_TEST(sut.packet_count() == counters.packet_count());
       BOOST_TEST(sut.byte_count() == counters.byte_count());
       BOOST_TEST(sut.flow_count() == flow_count);

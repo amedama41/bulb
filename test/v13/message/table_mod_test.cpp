@@ -8,7 +8,7 @@
 
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
-namespace proto = v13::protocol;
+namespace protocol = v13::protocol;
 
 template <std::size_t N>
 static auto to_buffer(char const (&expected)[N])
@@ -23,15 +23,15 @@ BOOST_AUTO_TEST_SUITE(table_mod_test)
 
     BOOST_AUTO_TEST_CASE(constructor_test)
     {
-        auto const table_id = proto::OFPTT_MAX;
+        auto const table_id = protocol::OFPTT_MAX;
         auto const config = 0;
         auto const xid = std::uint32_t{0x123};
 
         auto const sut = v13::messages::table_mod{table_id, config, xid};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_TABLE_MOD);
-        BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_table_mod));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_TABLE_MOD);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_table_mod));
         BOOST_TEST(sut.xid() == xid);
         BOOST_TEST(sut.table_id() == table_id);
         BOOST_TEST(sut.config() == config);
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_SUITE(table_mod_test)
     {
         auto buffer = std::vector<unsigned char>{};
         auto sut = v13::messages::table_mod{
-            proto::OFPTT_ALL, proto::OFPTC_DEPRECATED_MASK, 0x234
+            protocol::OFPTT_ALL, protocol::OFPTC_DEPRECATED_MASK, 0x234
         };
 
         sut.encode(buffer);
@@ -63,12 +63,12 @@ BOOST_AUTO_TEST_SUITE(table_mod_test)
         auto sut = v13::messages::table_mod::decode(it, it_end);
 
         BOOST_TEST(it == it_end);
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_TABLE_MOD);
-        BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_table_mod));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_TABLE_MOD);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_table_mod));
         BOOST_TEST(sut.xid() == 0x234);
         BOOST_TEST(sut.table_id() == 0x0);
-        BOOST_TEST(sut.config() == proto::OFPTC_DEPRECATED_MASK);
+        BOOST_TEST(sut.config() == protocol::OFPTC_DEPRECATED_MASK);
     }
 
 BOOST_AUTO_TEST_SUITE_END() // table_mod_test

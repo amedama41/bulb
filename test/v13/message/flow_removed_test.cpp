@@ -9,9 +9,8 @@
 
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
-namespace v13_detail = v13::v13_detail;
 namespace fields = v13::oxm_match_fields;
-namespace proto = v13::protocol;
+namespace protocol = v13::protocol;
 
 namespace {
 
@@ -29,8 +28,8 @@ struct flow_removed_fixutre : oxm_match_fixture
 {
     v13::messages::flow_removed sut{
           match, 0xff00, 0xf010f010f010f010
-        , proto::OFPRR_DELETE
-        , proto::OFPTT_MAX
+        , protocol::OFPRR_DELETE
+        , protocol::OFPTT_MAX
         , v13::elapsed_time{0x10, 0xff0011}
         , v13::timeouts{0xff3e, 0xff13}
         , v13::counters{0xfedcba, 0xfedcba01}
@@ -56,11 +55,11 @@ BOOST_AUTO_TEST_SUITE(flow_removed_test)
     {
         auto const entry = v13::flow_entry{
               match
-            , proto::OFP_DEFAULT_PRIORITY
+            , protocol::OFP_DEFAULT_PRIORITY
             , 0xff00ff0012345678
             , v13::instruction_set{}
         };
-        auto const reason = proto::OFPRR_HARD_TIMEOUT;
+        auto const reason = protocol::OFPRR_HARD_TIMEOUT;
         auto const table_id = 1;
         auto const elapsed_time = v13::elapsed_time{1, 2};
         auto const timeouts = v13::timeouts{10, 30};
@@ -71,9 +70,9 @@ BOOST_AUTO_TEST_SUITE(flow_removed_test)
             entry, reason, table_id, elapsed_time, timeouts, counters, xid
         };
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_FLOW_REMOVED);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_flow_removed) + 40);
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_FLOW_REMOVED);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_flow_removed) + 40);
         BOOST_TEST(sut.xid() == xid);
         BOOST_TEST(sut.cookie() == entry.cookie());
         BOOST_TEST(sut.priority() == entry.priority());
@@ -128,15 +127,15 @@ BOOST_AUTO_TEST_SUITE(flow_removed_test)
         BOOST_TEST(copy.packet_count() == sut.packet_count());
         BOOST_TEST(copy.byte_count() == sut.byte_count());
 
-        BOOST_TEST(src.length() == sizeof(v13_detail::ofp_flow_removed)
-                                 + sizeof(v13_detail::ofp_match));
+        BOOST_TEST(src.length() == sizeof(protocol::ofp_flow_removed)
+                                 + sizeof(protocol::ofp_match));
         BOOST_TEST(src.match().length() == 4);
     }
 
     BOOST_FIXTURE_TEST_CASE(copy_assignment_test, flow_removed_fixutre)
     {
         auto copy = v13::messages::flow_removed{
-              v13::oxm_match{}, 0, 0, proto::OFPRR_IDLE_TIMEOUT, 0
+              v13::oxm_match{}, 0, 0, protocol::OFPRR_IDLE_TIMEOUT, 0
             , v13::elapsed_time{0, 0}, v13::timeouts{0, 0}, v13::counters{0, 0}
         };
 
@@ -162,7 +161,7 @@ BOOST_AUTO_TEST_SUITE(flow_removed_test)
     {
         auto src = sut;
         auto copy = v13::messages::flow_removed{
-              v13::oxm_match{}, 0, 0, proto::OFPRR_IDLE_TIMEOUT, 0
+              v13::oxm_match{}, 0, 0, protocol::OFPRR_IDLE_TIMEOUT, 0
             , v13::elapsed_time{0, 0}, v13::timeouts{0, 0}, v13::counters{0, 0}
         };
 
@@ -183,8 +182,8 @@ BOOST_AUTO_TEST_SUITE(flow_removed_test)
         BOOST_TEST(copy.packet_count() == sut.packet_count());
         BOOST_TEST(copy.byte_count() == sut.byte_count());
 
-        BOOST_TEST(src.length() == sizeof(v13_detail::ofp_flow_removed)
-                                 + sizeof(v13_detail::ofp_match));
+        BOOST_TEST(src.length() == sizeof(protocol::ofp_flow_removed)
+                                 + sizeof(protocol::ofp_match));
         BOOST_TEST(src.match().length() == 4);
     }
 

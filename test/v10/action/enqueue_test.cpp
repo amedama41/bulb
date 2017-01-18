@@ -10,7 +10,6 @@
 
 namespace of = canard::net::ofp;
 namespace v10 = of::v10;
-namespace detail = v10::v10_detail;
 namespace actions = v10::actions;
 
 namespace {
@@ -45,7 +44,7 @@ BOOST_AUTO_TEST_SUITE(enqueue_test)
         auto const sut = actions::enqueue{queue_id, port_no};
 
         BOOST_TEST(sut.type() == v10::protocol::OFPAT_ENQUEUE);
-        BOOST_TEST(sut.length() == sizeof(detail::ofp_action_enqueue));
+        BOOST_TEST(sut.length() == sizeof(v10::protocol::ofp_action_enqueue));
         BOOST_TEST(sut.queue_id() == queue_id);
         BOOST_TEST(sut.port_no() == port_no);
     }

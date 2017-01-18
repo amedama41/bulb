@@ -11,7 +11,6 @@
 
 namespace of = canard::net::ofp;
 namespace v10 = of::v10;
-namespace detail = v10::v10_detail;
 namespace actions = v10::actions;
 
 namespace {
@@ -41,7 +40,7 @@ BOOST_AUTO_TEST_SUITE(output_test)
         auto const sut = actions::output{port_no};
 
         BOOST_TEST(sut.type() == v10::protocol::OFPAT_OUTPUT);
-        BOOST_TEST(sut.length() == sizeof(detail::ofp_action_output));
+        BOOST_TEST(sut.length() == sizeof(v10::protocol::ofp_action_output));
         BOOST_TEST(sut.port_no() == port_no);
         BOOST_TEST(sut.max_length() == std::numeric_limits<std::uint16_t>::max());
     }
@@ -54,7 +53,7 @@ BOOST_AUTO_TEST_SUITE(output_test)
         auto const sut = actions::output{port_no, max_len};
 
         BOOST_TEST(sut.type() == v10::protocol::OFPAT_OUTPUT);
-        BOOST_TEST(sut.length() == sizeof(detail::ofp_action_output));
+        BOOST_TEST(sut.length() == sizeof(v10::protocol::ofp_action_output));
         BOOST_TEST(sut.port_no() == port_no);
         BOOST_TEST(sut.max_length() == max_len);
     }
@@ -66,7 +65,7 @@ BOOST_AUTO_TEST_SUITE(output_test)
         auto const sut = actions::output::to_controller(max_len);
 
         BOOST_TEST(sut.type() == v10::protocol::OFPAT_OUTPUT);
-        BOOST_TEST(sut.length() == sizeof(detail::ofp_action_output));
+        BOOST_TEST(sut.length() == sizeof(v10::protocol::ofp_action_output));
         BOOST_TEST(sut.port_no() == v10::protocol::OFPP_CONTROLLER);
         BOOST_TEST(sut.max_length() == max_len);
     }

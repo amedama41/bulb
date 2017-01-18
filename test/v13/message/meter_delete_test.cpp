@@ -9,9 +9,9 @@
 namespace ofp = canard::net::ofp;
 namespace v13 = ofp::v13;
 namespace msg = v13::messages;
+namespace protocol = v13::protocol;
 
 namespace {
-  namespace protocol = v13::protocol;
 
   struct meter_delete_fixture
   {
@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_SUITE(meter_delete)
 
       msg::meter_delete const sut{meter_id, xid};
 
-      BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_meter_mod));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_meter_mod));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.meter_id() == meter_id);
       BOOST_TEST(sut.flags() == 0);
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_SUITE(meter_delete)
 
       msg::meter_delete const sut{meter_id};
 
-      BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_meter_mod));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_meter_mod));
       BOOST_TEST(sut.meter_id() == meter_id);
       BOOST_TEST(sut.flags() == 0);
       BOOST_TEST(sut.bands().empty());

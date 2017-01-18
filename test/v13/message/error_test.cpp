@@ -10,10 +10,9 @@
 
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
-namespace v13_detail = v13::v13_detail;
-namespace proto = v13::protocol;
+namespace protocol = v13::protocol;
 
-constexpr auto error_size = sizeof(v13_detail::ofp_error_msg);
+constexpr auto error_size = sizeof(protocol::ofp_error_msg);
 
 BOOST_AUTO_TEST_SUITE(message_test)
 
@@ -21,15 +20,15 @@ BOOST_AUTO_TEST_SUITE(error_test)
 
     BOOST_AUTO_TEST_CASE(construct_from_binary_data_test)
     {
-        auto const etype = proto::OFPET_HELLO_FAILED;
-        auto const ecode = proto::OFPHFC_INCOMPATIBLE;
+        auto const etype = protocol::OFPET_HELLO_FAILED;
+        auto const ecode = protocol::OFPHFC_INCOMPATIBLE;
         auto const edata = "incompatible version"_bbin;
 
         auto const sut
             = v13::messages::error{etype, ecode, edata};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_ERROR);
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_ERROR);
         BOOST_TEST(sut.length() == error_size + edata.size());
         BOOST_TEST(sut.error_type() == etype);
         BOOST_TEST(sut.error_code() == ecode);
@@ -39,14 +38,14 @@ BOOST_AUTO_TEST_SUITE(error_test)
 
     BOOST_AUTO_TEST_CASE(construct_from_message_test)
     {
-        auto const etype = proto::OFPET_SWITCH_CONFIG_FAILED;
-        auto const ecode = proto::OFPSCFC_BAD_FLAGS;
+        auto const etype = protocol::OFPET_SWITCH_CONFIG_FAILED;
+        auto const ecode = protocol::OFPSCFC_BAD_FLAGS;
         auto const msg = v13::messages::set_config{0xffff, 0xffff};
 
         auto const sut = v13::messages::error{etype, ecode, msg};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_ERROR);
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_ERROR);
         BOOST_TEST(sut.length() == error_size + msg.length());
         BOOST_TEST(sut.xid() == msg.xid());
         BOOST_TEST(sut.error_type() == etype);
@@ -60,7 +59,8 @@ BOOST_AUTO_TEST_SUITE(error_test)
     {
         v13::messages::set_config const msg{0xff01, 0xfffe, 0x12345678};
         v13::messages::error sut = v13::messages::error{
-            proto::OFPET_SWITCH_CONFIG_FAILED, proto::OFPSCFC_BAD_FLAGS, msg
+              protocol::OFPET_SWITCH_CONFIG_FAILED
+            , protocol::OFPSCFC_BAD_FLAGS, msg
         };
         std::vector<std::uint8_t> bin_error
             = "\x04\x01\x00\x18\x12\x34\x56\x78"
@@ -105,8 +105,8 @@ BOOST_AUTO_TEST_SUITE(error_test)
     BOOST_FIXTURE_TEST_CASE(copy_assignment_test, error_fixture)
     {
         auto copy = v13::messages::error{
-              proto::OFPET_FLOW_MOD_FAILED
-            , proto::OFPFMFC_TABLE_FULL
+              protocol::OFPET_FLOW_MOD_FAILED
+            , protocol::OFPFMFC_TABLE_FULL
             , ""_bbin
         };
 
@@ -125,8 +125,8 @@ BOOST_AUTO_TEST_SUITE(error_test)
     BOOST_FIXTURE_TEST_CASE(move_assignment_test, error_fixture)
     {
         auto copy = v13::messages::error{
-              proto::OFPET_FLOW_MOD_FAILED
-            , proto::OFPFMFC_TABLE_FULL
+              protocol::OFPET_FLOW_MOD_FAILED
+            , protocol::OFPFMFC_TABLE_FULL
             , ""_bbin
         };
         auto src = sut;

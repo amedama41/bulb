@@ -10,8 +10,7 @@
 
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
-namespace v13_detail = v13::v13_detail;
-namespace proto = v13::protocol;
+namespace protocol = v13::protocol;
 
 BOOST_AUTO_TEST_SUITE(message_test)
 
@@ -19,15 +18,15 @@ BOOST_AUTO_TEST_SUITE(port_mod_test)
 
     BOOST_AUTO_TEST_CASE(construct_test)
     {
-        auto const port_no = std::uint32_t{proto::OFPP_MAX};
+        auto const port_no = std::uint32_t{protocol::OFPP_MAX};
         auto const hw_addr
             = canard::mac_address{{0x10, 0x20, 0x30, 0x40, 0x50, 0x60}};
-        auto const config = std::uint32_t{proto::OFPPC_NO_RECV};
+        auto const config = std::uint32_t{protocol::OFPPC_NO_RECV};
         auto const mask = std::uint32_t{
-            proto::OFPPC_PORT_DOWN | proto::OFPPC_NO_RECV
+            protocol::OFPPC_PORT_DOWN | protocol::OFPPC_NO_RECV
         };
         auto const advertise = std::uint32_t{
-            proto::OFPPF_10GB_FD | proto::OFPPF_AUTONEG
+            protocol::OFPPF_10GB_FD | protocol::OFPPF_AUTONEG
         };
         auto const xid = std::uint32_t{0x01010101};
 
@@ -35,9 +34,9 @@ BOOST_AUTO_TEST_SUITE(port_mod_test)
             port_no, hw_addr, config, mask, advertise, xid
         };
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_PORT_MOD);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_port_mod));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_PORT_MOD);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_port_mod));
         BOOST_TEST(sut.xid() == xid);
         BOOST_TEST(sut.port_no() == port_no);
         BOOST_TEST(sut.hardware_address() == hw_addr);
@@ -50,19 +49,19 @@ BOOST_AUTO_TEST_SUITE(port_mod_test)
     {
         auto const port = v13::port::from_ofp_port({
               9, {0}, {0x11, 0x21, 0x31, 0x41, 0x51, 0x61}, {0}
-            , "eth0", proto::OFPPC_PORT_DOWN, proto::OFPPS_LINK_DOWN
-            , proto::OFPPF_10GB_FD | proto::OFPPF_FIBER
-            , proto::OFPPF_10GB_FD | proto::OFPPF_FIBER | proto::OFPPF_AUTONEG
-            , proto::OFPPF_10GB_FD | proto::OFPPF_1GB_FD | proto::OFPPF_FIBER | proto::OFPPF_AUTONEG
-            , proto::OFPPF_10GB_FD | proto::OFPPF_1GB_FD | proto::OFPPF_COPPER | proto::OFPPF_AUTONEG
+            , "eth0", protocol::OFPPC_PORT_DOWN, protocol::OFPPS_LINK_DOWN
+            , protocol::OFPPF_10GB_FD | protocol::OFPPF_FIBER
+            , protocol::OFPPF_10GB_FD | protocol::OFPPF_FIBER | protocol::OFPPF_AUTONEG
+            , protocol::OFPPF_10GB_FD | protocol::OFPPF_1GB_FD | protocol::OFPPF_FIBER | protocol::OFPPF_AUTONEG
+            , protocol::OFPPF_10GB_FD | protocol::OFPPF_1GB_FD | protocol::OFPPF_COPPER | protocol::OFPPF_AUTONEG
             , 10000, 12000
         });
-        auto const config = std::uint32_t{proto::OFPPC_NO_RECV};
+        auto const config = std::uint32_t{protocol::OFPPC_NO_RECV};
         auto const mask = std::uint32_t{
-            proto::OFPPC_PORT_DOWN | proto::OFPPC_NO_RECV
+            protocol::OFPPC_PORT_DOWN | protocol::OFPPC_NO_RECV
         };
         auto const advertise = std::uint32_t{
-            proto::OFPPF_10GB_FD | proto::OFPPF_AUTONEG
+            protocol::OFPPF_10GB_FD | protocol::OFPPF_AUTONEG
         };
         auto const xid = std::uint32_t{0x01010101};
 
@@ -70,9 +69,9 @@ BOOST_AUTO_TEST_SUITE(port_mod_test)
             port, config, mask, advertise, xid
         };
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_PORT_MOD);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_port_mod));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_PORT_MOD);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_port_mod));
         BOOST_TEST(sut.xid() == xid);
         BOOST_TEST(sut.port_no() == port.port_no());
         BOOST_TEST(sut.hardware_address() == port.hardware_address());
@@ -84,11 +83,11 @@ BOOST_AUTO_TEST_SUITE(port_mod_test)
     struct port_mod_fixture
     {
         v13::messages::port_mod const sut{
-              proto::OFPP_MAX
+              protocol::OFPP_MAX
             , canard::mac_address{{0xff, 0x11, 0xff, 0x12, 0x13, 0x14}}
-            , proto::OFPPC_NO_FWD
-            , proto::OFPPC_PORT_DOWN | proto::OFPPC_NO_RECV
-            , proto::OFPPF_10GB_FD | proto::OFPPF_AUTONEG
+            , protocol::OFPPC_NO_FWD
+            , protocol::OFPPC_PORT_DOWN | protocol::OFPPC_NO_RECV
+            , protocol::OFPPF_10GB_FD | protocol::OFPPF_AUTONEG
             , 0x01010101
         };
         std::vector<std::uint8_t> bin_port_mod

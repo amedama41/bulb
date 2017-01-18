@@ -12,7 +12,7 @@
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace match = v13::oxm_match_fields;
-namespace proto = v13::protocol;
+namespace protocol = v13::protocol;
 
 BOOST_AUTO_TEST_SUITE(message_test)
 
@@ -22,9 +22,9 @@ BOOST_AUTO_TEST_SUITE(packet_in_test)
 
     BOOST_AUTO_TEST_CASE(constructor_from_binary_test)
     {
-        auto const buffer_id = proto::OFP_NO_BUFFER;
+        auto const buffer_id = protocol::OFP_NO_BUFFER;
         auto const total_len = std::uint16_t{1514};
-        auto const reason = proto::OFPR_NO_MATCH;
+        auto const reason = protocol::OFPR_NO_MATCH;
         auto const table_id = std::uint8_t{0};
         auto const cookie = std::uint64_t{0xffffffffffffffff};
         auto const match = v13::oxm_match{
@@ -40,9 +40,9 @@ BOOST_AUTO_TEST_SUITE(packet_in_test)
             , match, std::move(data)
         };
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_PACKET_IN);
-        BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_packet_in)
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_PACKET_IN);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_packet_in)
                                  + v13::v13_detail::exact_length(match.length())
                                  + data_padding_size + data.size());
         BOOST_TEST(sut.buffer_id() == buffer_id);
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_SUITE(packet_in_test)
     {
         auto const buffer_id = 0;
         auto const total_len = std::uint16_t{0};
-        auto const reason = proto::OFPR_ACTION;
+        auto const reason = protocol::OFPR_ACTION;
         auto const table_id = std::uint8_t{0xff};
         auto const cookie = std::uint64_t{0};
         auto const match = v13::oxm_match{};
@@ -70,8 +70,8 @@ BOOST_AUTO_TEST_SUITE(packet_in_test)
             , match, data
         };
 
-        BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_packet_in)
-                                 + sizeof(v13::v13_detail::ofp_match)
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_packet_in)
+                                 + sizeof(protocol::ofp_match)
                                  + data_padding_size + data.size());
         BOOST_TEST(sut.buffer_id() == buffer_id);
         BOOST_TEST(sut.total_length() == total_len);
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_SUITE(packet_in_test)
     {
         auto const buffer_id = 0;
         auto const total_len = std::uint16_t{0};
-        auto const reason = proto::OFPR_INVALID_TTL;
+        auto const reason = protocol::OFPR_INVALID_TTL;
         auto const table_id = std::uint8_t{0xff};
         auto const cookie = std::uint64_t{0};
         auto const match = v13::oxm_match{
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_SUITE(packet_in_test)
             , match, data
         };
 
-        BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_packet_in)
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_packet_in)
                                  + v13::v13_detail::exact_length(match.length())
                                  + data_padding_size);
         BOOST_TEST(sut.buffer_id() == buffer_id);
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_SUITE(packet_in_test)
     struct packet_in_fixture
     {
         v13::messages::packet_in pkt_in = v13::messages::packet_in{
-              0x01234567, 512, proto::OFPR_NO_MATCH, 2, 0x0001020304050607
+              0x01234567, 512, protocol::OFPR_NO_MATCH, 2, 0x0001020304050607
             , v13::oxm_match{
                   match::in_port{1}
                 , match::eth_dst{"\x01\x02\x03\x04\x05\x06"_mac}
@@ -159,8 +159,8 @@ BOOST_AUTO_TEST_SUITE(packet_in_test)
         BOOST_TEST(sut.frame_length() == org_pkt_in.frame_length());
         BOOST_TEST((sut.frame() == org_pkt_in.frame()));
 
-        BOOST_TEST(pkt_in.length() == sizeof(v13::v13_detail::ofp_packet_in)
-                                    + sizeof(v13::v13_detail::ofp_match)
+        BOOST_TEST(pkt_in.length() == sizeof(protocol::ofp_packet_in)
+                                    + sizeof(protocol::ofp_match)
                                     + data_padding_size);
         BOOST_TEST(pkt_in.frame().empty());
     }
@@ -168,7 +168,7 @@ BOOST_AUTO_TEST_SUITE(packet_in_test)
     BOOST_FIXTURE_TEST_CASE(copy_assignment_test, packet_in_fixture)
     {
         auto sut = v13::messages::packet_in{
-            0, 0, proto::OFPR_ACTION, 0, 0, {}, ""
+            0, 0, protocol::OFPR_ACTION, 0, 0, {}, ""
         };
 
         sut = pkt_in;
@@ -188,7 +188,7 @@ BOOST_AUTO_TEST_SUITE(packet_in_test)
     {
         auto org_pkt_in = pkt_in;
         auto sut = v13::messages::packet_in{
-            0, 0, proto::OFPR_INVALID_TTL, 0, 0, {}, ""
+            0, 0, protocol::OFPR_INVALID_TTL, 0, 0, {}, ""
         };
 
         sut = std::move(pkt_in);
@@ -203,8 +203,8 @@ BOOST_AUTO_TEST_SUITE(packet_in_test)
         BOOST_TEST(sut.frame_length() == org_pkt_in.frame_length());
         BOOST_TEST((sut.frame() == org_pkt_in.frame()));
 
-        BOOST_TEST(pkt_in.length() == sizeof(v13::v13_detail::ofp_packet_in)
-                                    + sizeof(v13::v13_detail::ofp_match)
+        BOOST_TEST(pkt_in.length() == sizeof(protocol::ofp_packet_in)
+                                    + sizeof(protocol::ofp_match)
                                     + data_padding_size);
         BOOST_TEST(pkt_in.frame().empty());
     }
@@ -268,8 +268,8 @@ BOOST_AUTO_TEST_SUITE(packet_in_test)
         auto const sut = v13::messages::packet_in::decode(it, it_end);
 
         BOOST_TEST(it == it_end);
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_PACKET_IN);
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_PACKET_IN);
         BOOST_TEST(sut.length() == sizeof(buffer) - 1);
         BOOST_TEST(sut.xid() == 0x00010203);
         BOOST_TEST(sut.buffer_id() == 0x1234567);

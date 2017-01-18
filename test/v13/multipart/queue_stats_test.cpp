@@ -9,9 +9,8 @@
 
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
-namespace v13_detail = v13::v13_detail;
 namespace multipart = v13::messages::multipart;
-namespace proto = v13::protocol;
+namespace protocol = v13::protocol;
 
 namespace {
 
@@ -20,7 +19,7 @@ using body_type = multipart::queue_stats_reply::body_type;
 struct queue_stats_fixture
 {
     multipart::queue_stats sut{
-          0x12345678, proto::OFPP_MAX
+          0x12345678, protocol::OFPP_MAX
         , 0x0102030405060708
         , 0xf1f2f3f4f5f6f7f8
         , 0xff00ff00ff00ff00
@@ -37,7 +36,7 @@ struct queue_stats_fixture
 struct queue_stats_request_fixture
 {
     multipart::queue_stats_request sut{
-        0x12345678, proto::OFPP_MAX, 0x12345678
+        0x12345678, protocol::OFPP_MAX, 0x12345678
     };
     std::vector<std::uint8_t> binary
         = "\x04\x12\x00\x18\x12\x34\x56\x78""\x00\x05\x00\x00\x00\x00\x00\x00"
@@ -61,12 +60,12 @@ struct queue_stats_reply_fixture
                 , v13::elapsed_time{0x20001234, 0x20005678}
               }
             , multipart::queue_stats{
-                  0x2, proto::OFPP_MAX
+                  0x2, protocol::OFPP_MAX
                 , 0x8182838485868788, 0xa1a2a3a4a5a6a7a8, 0xbf00bf00bf00bf00
                 , v13::elapsed_time{0x30001234, 0x30005678}
               }
           }
-        , proto::OFPMPF_REPLY_MORE
+        , protocol::OFPMPF_REPLY_MORE
         , 0x12345678
     };
     std::vector<std::uint8_t> binary
@@ -107,7 +106,7 @@ BOOST_AUTO_TEST_SUITE(queue_stats_test)
             queue_id, port_no, tx_packets, tx_bytes, tx_errors, elapsed_time
         };
 
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_queue_stats));
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_queue_stats));
         BOOST_TEST(sut.queue_id() == queue_id);
         BOOST_TEST(sut.port_no() == port_no);
         BOOST_TEST(sut.tx_packets() == tx_packets);
@@ -171,11 +170,11 @@ BOOST_AUTO_TEST_SUITE(queue_stats_request_test)
 
         auto const sut = multipart::queue_stats_request{queue_id, port_no};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_MULTIPART_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_multipart_request)
-                                 + sizeof(v13_detail::ofp_queue_stats_request));
-        BOOST_TEST(sut.multipart_type() == proto::OFPMP_QUEUE);
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_MULTIPART_REQUEST);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_multipart_request)
+                                 + sizeof(protocol::ofp_queue_stats_request));
+        BOOST_TEST(sut.multipart_type() == protocol::OFPMP_QUEUE);
         BOOST_TEST(sut.flags() == 0);
         BOOST_TEST(sut.queue_id() == queue_id);
         BOOST_TEST(sut.port_no() == port_no);
@@ -236,11 +235,11 @@ BOOST_AUTO_TEST_SUITE(queue_stats_reply_test)
 
         auto const sut = multipart::queue_stats_reply{queue_stats};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_MULTIPART_REPLY);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_multipart_request)
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_MULTIPART_REPLY);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_multipart_request)
                                  + queue_stats_fixture::sut.length() * size);
-        BOOST_TEST(sut.multipart_type() == proto::OFPMP_QUEUE);
+        BOOST_TEST(sut.multipart_type() == protocol::OFPMP_QUEUE);
         BOOST_TEST(sut.flags() == 0);
         BOOST_TEST(sut.size() == size);
     }
@@ -271,7 +270,7 @@ BOOST_AUTO_TEST_SUITE(queue_stats_reply_test)
         BOOST_TEST(copy.multipart_type() == sut.multipart_type());
         BOOST_TEST(copy.flags() == sut.flags());
         BOOST_TEST(copy.size() == sut.size());
-        BOOST_TEST(src.length() == sizeof(v13_detail::ofp_multipart_reply));
+        BOOST_TEST(src.length() == sizeof(protocol::ofp_multipart_reply));
         BOOST_TEST(src.size() == 0);
     }
 
@@ -304,7 +303,7 @@ BOOST_AUTO_TEST_SUITE(queue_stats_reply_test)
         BOOST_TEST(copy.multipart_type() == sut.multipart_type());
         BOOST_TEST(copy.flags() == sut.flags());
         BOOST_TEST(copy.size() == sut.size());
-        BOOST_TEST(src.length() == sizeof(v13_detail::ofp_multipart_reply));
+        BOOST_TEST(src.length() == sizeof(protocol::ofp_multipart_reply));
         BOOST_TEST(src.size() == 0);
     }
 

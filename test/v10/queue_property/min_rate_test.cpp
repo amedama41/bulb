@@ -6,7 +6,7 @@
 
 namespace ofp = canard::net::ofp;
 namespace queue_properties = ofp::v10::queue_properties;
-namespace v10_detail = ofp::v10::v10_detail;
+namespace protocol = ofp::v10::protocol;
 
 namespace {
 
@@ -29,8 +29,8 @@ BOOST_AUTO_TEST_SUITE(min_rate_test)
 
     auto const sut = queue_properties::min_rate{rate};
 
-    BOOST_TEST(sut.property() == ofp::v10::protocol::OFPQT_MIN_RATE);
-    BOOST_TEST(sut.length() == sizeof(v10_detail::ofp_queue_prop_min_rate));
+    BOOST_TEST(sut.property() == protocol::OFPQT_MIN_RATE);
+    BOOST_TEST(sut.length() == sizeof(protocol::ofp_queue_prop_min_rate));
     BOOST_TEST(sut.rate() == sut.rate());
   }
 

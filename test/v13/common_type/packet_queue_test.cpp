@@ -7,9 +7,8 @@
 
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
-namespace v13_detail = v13::v13_detail;
+namespace protocol = v13::protocol;
 namespace queue_props = v13::queue_properties;
-namespace proto = v13::protocol;
 
 namespace {
 
@@ -50,7 +49,7 @@ BOOST_AUTO_TEST_SUITE(packet_queue_test)
 
         BOOST_TEST(sut.queue_id() == queue_id.queue());
         BOOST_TEST(sut.port_no() == queue_id.port());
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_packet_queue) + 32);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_packet_queue) + 32);
         BOOST_TEST(sut.properties().size() == properties.size());
         BOOST_TEST(sut.properties()[0].type() == properties[0].type());
         BOOST_TEST(sut.properties()[0].length() == properties[0].length());
@@ -78,7 +77,7 @@ BOOST_AUTO_TEST_SUITE(packet_queue_test)
         BOOST_TEST(copy.port_no() == sut.port_no());
         BOOST_TEST(copy.length() == sut.length());
         BOOST_TEST(copy.properties().size() == sut.properties().size());
-        BOOST_TEST(src.length() == sizeof(v13_detail::ofp_packet_queue));
+        BOOST_TEST(src.length() == sizeof(protocol::ofp_packet_queue));
         BOOST_TEST(src.properties().size() == 0);
     }
 
@@ -104,7 +103,7 @@ BOOST_AUTO_TEST_SUITE(packet_queue_test)
         BOOST_TEST(copy.port_no() == sut.port_no());
         BOOST_TEST(copy.length() == sut.length());
         BOOST_TEST(copy.properties().size() == sut.properties().size());
-        BOOST_TEST(src.length() == sizeof(v13_detail::ofp_packet_queue));
+        BOOST_TEST(src.length() == sizeof(protocol::ofp_packet_queue));
         BOOST_TEST(src.properties().size() == 0);
     }
 

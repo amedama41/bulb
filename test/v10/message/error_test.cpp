@@ -10,7 +10,6 @@
 namespace ofp = canard::net::ofp;
 namespace v10 = ofp::v10;
 namespace msg = v10::messages;
-namespace detail = v10::v10_detail;
 
 namespace proto = v10::protocol;
 
@@ -67,7 +66,8 @@ BOOST_AUTO_TEST_SUITE(error)
 
       msg::error sut{type, code, data, xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_error_msg) + data.size());
+      BOOST_TEST(
+          sut.length() == sizeof(v10::protocol::ofp_error_msg) + data.size());
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.error_type() == type);
       BOOST_TEST(sut.error_code() == code);
@@ -81,7 +81,8 @@ BOOST_AUTO_TEST_SUITE(error)
 
       msg::error sut{type, code, data};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_error_msg) + data.size());
+      BOOST_TEST(
+          sut.length() == sizeof(v10::protocol::ofp_error_msg) + data.size());
       BOOST_TEST(sut.error_type() == type);
       BOOST_TEST(sut.error_code() == code);
       BOOST_TEST((sut.data() == data));
@@ -96,7 +97,8 @@ BOOST_AUTO_TEST_SUITE(error)
 
       msg::error sut{type, code, req};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_error_msg) + req.length());
+      BOOST_TEST(
+          sut.length() == sizeof(v10::protocol::ofp_error_msg) + req.length());
       BOOST_TEST(sut.xid() == req.xid());
       BOOST_TEST(sut.error_type() == type);
       BOOST_TEST(sut.error_code() == code);
@@ -116,7 +118,8 @@ BOOST_AUTO_TEST_SUITE(error)
 
       msg::error sut{type, code, packet_out, data_size};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_error_msg) + data_size);
+      BOOST_TEST(
+          sut.length() == sizeof(v10::protocol::ofp_error_msg) + data_size);
       BOOST_TEST(sut.xid() == packet_out.xid());
       BOOST_TEST(sut.error_type() == type);
       BOOST_TEST(sut.error_code() == code);
@@ -150,7 +153,7 @@ BOOST_AUTO_TEST_SUITE(error)
       auto const copy = std::move(moved);
 
       BOOST_TEST((copy == sut));
-      BOOST_TEST(moved.length() == sizeof(detail::ofp_error_msg));
+      BOOST_TEST(moved.length() == sizeof(v10::protocol::ofp_error_msg));
       BOOST_TEST(moved.data().empty());
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor
@@ -210,7 +213,7 @@ BOOST_AUTO_TEST_SUITE(error)
 
       no_data_sut.encode(buf);
 
-      BOOST_TEST(buf.size() == sizeof(detail::ofp_error_msg));
+      BOOST_TEST(buf.size() == sizeof(v10::protocol::ofp_error_msg));
       BOOST_TEST(buf == no_data_bin, boost::test_tools::per_element{});
     }
   BOOST_AUTO_TEST_SUITE_END() // encode

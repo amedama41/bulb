@@ -12,9 +12,7 @@
 namespace ofp = canard::net::ofp;
 namespace v13 = ofp::v13;
 namespace helems = v13::hello_elements;
-namespace detail = v13::v13_detail;
-
-namespace proto = v13::protocol;
+namespace protocol = v13::protocol;
 
 namespace bdata = boost::unit_test::data;
 
@@ -56,7 +54,7 @@ BOOST_AUTO_TEST_SUITE(versionbitmap)
 
       using type = std::integral_constant<std::uint16_t, sut::type()>;
 
-      BOOST_TEST(type::value == proto::OFPHET_VERSIONBITMAP);
+      BOOST_TEST(type::value == protocol::OFPHET_VERSIONBITMAP);
     }
     BOOST_AUTO_TEST_CASE(min_length)
     {
@@ -107,7 +105,7 @@ BOOST_AUTO_TEST_SUITE(versionbitmap)
 
       BOOST_TEST((copy == sut));
       BOOST_TEST(
-          moved.length() == sizeof(detail::ofp_hello_elem_versionbitmap));
+          moved.length() == sizeof(protocol::ofp_hello_elem_versionbitmap));
       BOOST_TEST(moved.bitmaps().empty());
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor

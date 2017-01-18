@@ -12,8 +12,6 @@
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace actions = v13::actions;
-namespace v13_detail = v13::v13_detail;
-
 namespace protocol = v13::protocol;
 
 namespace bdata = boost::unit_test::data;
@@ -36,7 +34,7 @@ BOOST_AUTO_TEST_SUITE(set_queue_test)
         using sut = actions::set_queue;
 
         BOOST_TEST(sut::type() == protocol::OFPAT_SET_QUEUE);
-        BOOST_TEST(sut::length() == sizeof(v13_detail::ofp_action_set_queue));
+        BOOST_TEST(sut::length() == sizeof(protocol::ofp_action_set_queue));
     }
 
     BOOST_AUTO_TEST_CASE(constructor_test)

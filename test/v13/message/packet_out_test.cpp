@@ -7,13 +7,13 @@
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace match = v13::oxm_match_fields;
-namespace proto = v13::protocol;
+namespace protocol = v13::protocol;
 
 BOOST_AUTO_TEST_SUITE(message_test)
 
 BOOST_AUTO_TEST_SUITE(packet_out_test)
 
-    constexpr auto ofp_pkt_out_size = sizeof(v13::v13_detail::ofp_packet_out);
+    constexpr auto ofp_pkt_out_size = sizeof(protocol::ofp_packet_out);
 
     BOOST_AUTO_TEST_CASE(constructor_from_buffer_id_test)
     {
@@ -28,8 +28,8 @@ BOOST_AUTO_TEST_SUITE(packet_out_test)
             buffer_id, in_port, actions, xid
         };
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_PACKET_OUT);
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_PACKET_OUT);
         BOOST_TEST(sut.length() == ofp_pkt_out_size + actions.length());
         BOOST_TEST(sut.xid() == xid);
         BOOST_TEST(sut.buffer_id() == buffer_id);
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_SUITE(packet_out_test)
     BOOST_AUTO_TEST_CASE(constructor_from_binary_test)
     {
         auto const data = "\x00\x01\x02\x03\x04\x05"_bbin;
-        auto const in_port = proto::OFPP_CONTROLLER;
+        auto const in_port = protocol::OFPP_CONTROLLER;
         auto const actions = v13::action_list{
               v13::actions::push_vlan{0x8100}
             , v13::actions::set_vlan_vid{3}
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_SUITE(packet_out_test)
 
         BOOST_TEST(sut.length() == ofp_pkt_out_size + actions.length() + data.size());
         BOOST_TEST(sut.xid() == xid);
-        BOOST_TEST(sut.buffer_id() == proto::OFP_NO_BUFFER);
+        BOOST_TEST(sut.buffer_id() == protocol::OFP_NO_BUFFER);
         BOOST_TEST(sut.in_port() == in_port);
         BOOST_TEST(sut.actions_length() == 40);
         BOOST_TEST(sut.frame_length() == data.size());
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_SUITE(packet_out_test)
 
         BOOST_TEST(sut.length() == ofp_pkt_out_size + data.size());
         BOOST_TEST(sut.xid() == xid);
-        BOOST_TEST(sut.buffer_id() == proto::OFP_NO_BUFFER);
+        BOOST_TEST(sut.buffer_id() == protocol::OFP_NO_BUFFER);
         BOOST_TEST(sut.in_port() == in_port);
         BOOST_TEST(sut.actions_length() == 0);
         BOOST_TEST(sut.frame_length() == data.size());
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_SUITE(packet_out_test)
         };
 
         BOOST_TEST(sut.length() == ofp_pkt_out_size);
-        BOOST_TEST(sut.buffer_id() == proto::OFP_NO_BUFFER);
+        BOOST_TEST(sut.buffer_id() == protocol::OFP_NO_BUFFER);
         BOOST_TEST(sut.in_port() == in_port);
         BOOST_TEST(sut.actions_length() == 0);
         BOOST_TEST(sut.frame_length() == 0);
@@ -121,10 +121,10 @@ BOOST_AUTO_TEST_SUITE(packet_out_test)
     {
         v13::messages::packet_out sut = v13::messages::packet_out{
               "\x10\x11\x12\x13\x14\x15"_bbin
-            , proto::OFPP_CONTROLLER
+            , protocol::OFPP_CONTROLLER
             , v13::action_list{
                   v13::actions::push_vlan{0x8100}
-                , v13::actions::set_vlan_vid{proto::OFPVID_PRESENT | 3}
+                , v13::actions::set_vlan_vid{protocol::OFPVID_PRESENT | 3}
                 , v13::actions::output{3}
               }
             , 0x1234

@@ -12,7 +12,6 @@
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace instructions = v13::instructions;
-namespace detail = v13::v13_detail;
 
 namespace bdata = boost::unit_test::data;
 
@@ -39,7 +38,7 @@ BOOST_AUTO_TEST_SUITE(write_metadata_test)
 
         BOOST_TEST(sut::type() == v13::protocol::OFPIT_WRITE_METADATA);
         BOOST_TEST(sut::length()
-                == sizeof(detail::ofp_instruction_write_metadata));
+                == sizeof(v13::protocol::ofp_instruction_write_metadata));
     }
 
     BOOST_AUTO_TEST_CASE(construct_from_metadata_test)

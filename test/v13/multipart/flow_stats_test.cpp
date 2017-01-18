@@ -11,10 +11,9 @@
 
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
-namespace v13_detail = v13::v13_detail;
 namespace match = v13::oxm_match_fields;
 namespace multipart = v13::messages::multipart;
-namespace proto = v13::protocol;
+namespace protocol = v13::protocol;
 
 namespace {
 
@@ -29,7 +28,7 @@ struct flow_entry_fixture {
             , match::eth_dst{eth_dst}
             , match::eth_src{eth_src}
           } // 4 + 8 + 10 + 10 = 32
-        , proto::OFP_DEFAULT_PRIORITY
+        , protocol::OFP_DEFAULT_PRIORITY
         , 0xf1f2f3f4f5f6f7f8
         , v13::instruction_set{
               v13::instructions::apply_actions{
@@ -50,7 +49,7 @@ struct flow_stats_fixture : flow_entry_fixture
 {
     multipart::flow_stats sut = {
           entry, 0x01
-        , proto::OFPFF_SEND_FLOW_REM | proto::OFPFF_NO_PKT_COUNTS
+        , protocol::OFPFF_SEND_FLOW_REM | protocol::OFPFF_NO_PKT_COUNTS
         , v13::timeouts{0x1234, 0}
         , v13::elapsed_time{0x12345678, 0x87654321}
         , v13::counters{0, 0x1234567887654321}
@@ -77,7 +76,7 @@ struct flow_stats_fixture : flow_entry_fixture
 struct flow_stats_request_fixture : flow_entry_fixture
 {
     multipart::flow_stats_request sut = {
-        entry, 0xf3, proto::OFPP_FLOOD, proto::OFPG_MAX, 0x12345678
+        entry, 0xf3, protocol::OFPP_FLOOD, protocol::OFPG_MAX, 0x12345678
     };
     std::vector<std::uint8_t> bin_flow_stats_request
         = "\x04\x12\x00\x50\x12\x34\x56\x78""\x00\x01\x00\x00\x00\x00\x00\x00"
@@ -92,7 +91,7 @@ struct flow_stats_reply_fixture : flow_stats_fixture
 {
     multipart::flow_stats_reply sut = multipart::flow_stats_reply{
           ::body_type(6, flow_stats_fixture::sut)
-        , proto::OFPMPF_REPLY_MORE
+        , protocol::OFPMPF_REPLY_MORE
         , 0x12345678
     };
     std::vector<std::uint8_t> bin_flow_stats_reply
@@ -193,9 +192,9 @@ BOOST_AUTO_TEST_SUITE(flow_stats_test)
 
     BOOST_FIXTURE_TEST_CASE(construct_from_entry_test, flow_entry_fixture)
     {
-        auto const table_id = std::uint8_t{proto::OFPTT_MAX};
+        auto const table_id = std::uint8_t{protocol::OFPTT_MAX};
         auto const flags = std::uint16_t(
-            proto::OFPFF_SEND_FLOW_REM | proto::OFPFF_CHECK_OVERLAP);
+            protocol::OFPFF_SEND_FLOW_REM | protocol::OFPFF_CHECK_OVERLAP);
         auto const timeouts = v13::timeouts{0x1234, 0x5678};
         auto const elapsed_time = v13::elapsed_time{3624, 5432};
         auto const counters
@@ -205,7 +204,7 @@ BOOST_AUTO_TEST_SUITE(flow_stats_test)
             entry, table_id, flags, timeouts, elapsed_time, counters
         };
 
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_flow_stats) + 32 + 104);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_flow_stats) + 32 + 104);
         BOOST_TEST(sut.match().length() == entry.match().length());
         BOOST_TEST(sut.priority() == entry.priority());
         BOOST_TEST(sut.cookie() == entry.cookie());
@@ -258,8 +257,8 @@ BOOST_AUTO_TEST_SUITE(flow_stats_test)
         BOOST_TEST(copy.packet_count() == sut.packet_count());
         BOOST_TEST(copy.byte_count() == sut.byte_count());
         BOOST_TEST(copy.instructions().length() == sut.instructions().length());
-        BOOST_TEST(src.length() == sizeof(v13_detail::ofp_flow_stats)
-                                 + sizeof(v13_detail::ofp_match));
+        BOOST_TEST(src.length() == sizeof(protocol::ofp_flow_stats)
+                                 + sizeof(protocol::ofp_match));
         BOOST_TEST(src.match().length() == 4);
         BOOST_TEST(src.instructions().length() == 0);
     }
@@ -313,8 +312,8 @@ BOOST_AUTO_TEST_SUITE(flow_stats_test)
         BOOST_TEST(copy.packet_count() == sut.packet_count());
         BOOST_TEST(copy.byte_count() == sut.byte_count());
         BOOST_TEST(copy.instructions().length() == sut.instructions().length());
-        BOOST_TEST(src.length() == sizeof(v13_detail::ofp_flow_stats)
-                                 + sizeof(v13_detail::ofp_match));
+        BOOST_TEST(src.length() == sizeof(protocol::ofp_flow_stats)
+                                 + sizeof(protocol::ofp_match));
         BOOST_TEST(src.match().length() == 4);
         BOOST_TEST(src.instructions().length() == 0);
     }
@@ -364,19 +363,19 @@ BOOST_AUTO_TEST_SUITE(flow_stats_request_test)
             entry, table_id
         };
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_MULTIPART_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_multipart_request)
-                                 + sizeof(v13_detail::ofp_flow_stats_request)
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_MULTIPART_REQUEST);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_multipart_request)
+                                 + sizeof(protocol::ofp_flow_stats_request)
                                  + entry.match().length());
-        BOOST_TEST(sut.multipart_type() == proto::OFPMP_FLOW);
+        BOOST_TEST(sut.multipart_type() == protocol::OFPMP_FLOW);
         BOOST_TEST(sut.flags() == 0);
         BOOST_TEST(sut.match().length() == entry.match().length());
         BOOST_TEST(sut.table_id() == table_id);
         BOOST_TEST(sut.cookie() == entry.cookie());
         BOOST_TEST(sut.cookie_mask() == 0xffffffffffffffff);
-        BOOST_TEST(sut.out_port() == proto::OFPP_ANY);
-        BOOST_TEST(sut.out_group() == proto::OFPG_ANY);
+        BOOST_TEST(sut.out_port() == protocol::OFPP_ANY);
+        BOOST_TEST(sut.out_group() == protocol::OFPG_ANY);
     }
 
     BOOST_FIXTURE_TEST_CASE(copy_construct_test, flow_stats_request_fixture)
@@ -413,9 +412,9 @@ BOOST_AUTO_TEST_SUITE(flow_stats_request_test)
         BOOST_TEST(copy.cookie_mask() == sut.cookie_mask());
         BOOST_TEST(copy.out_port() == sut.out_port());
         BOOST_TEST(copy.out_group() == sut.out_group());
-        BOOST_TEST(src.length() == sizeof(v13_detail::ofp_multipart_request)
-                                 + sizeof(v13_detail::ofp_flow_stats_request)
-                                 + sizeof(v13_detail::ofp_match));
+        BOOST_TEST(src.length() == sizeof(protocol::ofp_multipart_request)
+                                 + sizeof(protocol::ofp_flow_stats_request)
+                                 + sizeof(protocol::ofp_match));
         BOOST_TEST(src.match().length() == 4);
     }
 
@@ -456,9 +455,9 @@ BOOST_AUTO_TEST_SUITE(flow_stats_request_test)
         BOOST_TEST(copy.cookie_mask() == sut.cookie_mask());
         BOOST_TEST(copy.out_port() == sut.out_port());
         BOOST_TEST(copy.out_group() == sut.out_group());
-        BOOST_TEST(src.length() == sizeof(v13_detail::ofp_multipart_request)
-                                 + sizeof(v13_detail::ofp_flow_stats_request)
-                                 + sizeof(v13_detail::ofp_match));
+        BOOST_TEST(src.length() == sizeof(protocol::ofp_multipart_request)
+                                 + sizeof(protocol::ofp_flow_stats_request)
+                                 + sizeof(protocol::ofp_match));
         BOOST_TEST(src.match().length() == 4);
     }
 
@@ -503,15 +502,15 @@ BOOST_AUTO_TEST_SUITE(flow_stats_reply_test)
     {
         auto const size = std::size_t{32};
         auto stats = ::body_type(size, sut);
-        auto const flags = std::uint16_t{proto::OFPMPF_REPLY_MORE};
+        auto const flags = std::uint16_t{protocol::OFPMPF_REPLY_MORE};
 
         auto const sut = multipart::flow_stats_reply{stats, flags};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_MULTIPART_REPLY);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_multipart_reply)
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_MULTIPART_REPLY);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_multipart_reply)
                                  + flow_stats_fixture::sut.length() * size);
-        BOOST_TEST(sut.multipart_type() == proto::OFPMP_FLOW);
+        BOOST_TEST(sut.multipart_type() == protocol::OFPMP_FLOW);
         BOOST_TEST(sut.flags() == flags);
         BOOST_TEST(sut.size() == size);
     }
@@ -540,7 +539,7 @@ BOOST_AUTO_TEST_SUITE(flow_stats_reply_test)
         BOOST_TEST(copy.multipart_type() == sut.multipart_type());
         BOOST_TEST(copy.flags() == sut.flags());
         BOOST_TEST(copy.size() == sut.size());
-        BOOST_TEST(src.length() == sizeof(v13_detail::ofp_multipart_reply));
+        BOOST_TEST(src.length() == sizeof(protocol::ofp_multipart_reply));
         BOOST_TEST(src.size() == 0);
     }
 
@@ -571,7 +570,7 @@ BOOST_AUTO_TEST_SUITE(flow_stats_reply_test)
         BOOST_TEST(copy.multipart_type() == sut.multipart_type());
         BOOST_TEST(copy.flags() == sut.flags());
         BOOST_TEST(copy.size() == sut.size());
-        BOOST_TEST(src.length() == sizeof(v13_detail::ofp_multipart_reply));
+        BOOST_TEST(src.length() == sizeof(protocol::ofp_multipart_reply));
         BOOST_TEST(src.size() == 0);
     }
 

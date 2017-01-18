@@ -7,7 +7,6 @@
 namespace ofp = canard::net::ofp;
 namespace v10 = ofp::v10;
 namespace msg = v10::messages;
-namespace detail = v10::v10_detail;
 
 namespace proto = v10::protocol;
 
@@ -46,7 +45,8 @@ BOOST_AUTO_TEST_SUITE(echo_request)
 
       msg::echo_request sut{data, xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_header) + data.size());
+      BOOST_TEST(
+          sut.length() == sizeof(v10::protocol::ofp_header) + data.size());
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST((sut.data() == data));
     }
@@ -56,7 +56,8 @@ BOOST_AUTO_TEST_SUITE(echo_request)
 
       msg::echo_request sut{data};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_header) + data.size());
+      BOOST_TEST(
+          sut.length() == sizeof(v10::protocol::ofp_header) + data.size());
       BOOST_TEST((sut.data() == data));
     }
     BOOST_AUTO_TEST_CASE(is_constructible_from_xid)
@@ -65,7 +66,7 @@ BOOST_AUTO_TEST_SUITE(echo_request)
 
       msg::echo_request sut{xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_header));
+      BOOST_TEST(sut.length() == sizeof(v10::protocol::ofp_header));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.data().empty());
     }
@@ -73,7 +74,7 @@ BOOST_AUTO_TEST_SUITE(echo_request)
     {
       msg::echo_request sut{};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_header));
+      BOOST_TEST(sut.length() == sizeof(v10::protocol::ofp_header));
       BOOST_TEST(sut.data().empty());
     }
     BOOST_AUTO_TEST_CASE(is_constructible_from_echo_request)
@@ -100,7 +101,7 @@ BOOST_AUTO_TEST_SUITE(echo_request)
       BOOST_TEST(sut.length() == request.length());
       BOOST_TEST(sut.xid() == request.xid());
       BOOST_TEST((sut.data() == request.data()));
-      BOOST_TEST(rvalue_request.length() == sizeof(detail::ofp_header));
+      BOOST_TEST(rvalue_request.length() == sizeof(v10::protocol::ofp_header));
       BOOST_TEST(rvalue_request.data().empty());
     }
     BOOST_FIXTURE_TEST_CASE(
@@ -128,7 +129,7 @@ BOOST_AUTO_TEST_SUITE(echo_request)
       auto const copy = std::move(moved);
 
       BOOST_TEST((copy == sut));
-      BOOST_TEST(moved.length() == sizeof(detail::ofp_header));
+      BOOST_TEST(moved.length() == sizeof(v10::protocol::ofp_header));
       BOOST_TEST(moved.data().empty());
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor
@@ -170,12 +171,12 @@ BOOST_AUTO_TEST_SUITE(echo_request)
     }
     BOOST_AUTO_TEST_CASE(generates_no_data_binary_from_no_data_echo_request)
     {
-      no_data_bin.resize(sizeof(detail::ofp_header));
+      no_data_bin.resize(sizeof(v10::protocol::ofp_header));
       auto buf = std::vector<unsigned char>{};
 
       no_data_sut.encode(buf);
 
-      BOOST_TEST(buf.size() == sizeof(detail::ofp_header));
+      BOOST_TEST(buf.size() == sizeof(v10::protocol::ofp_header));
       BOOST_TEST(buf == no_data_bin, boost::test_tools::per_element{});
     }
   BOOST_AUTO_TEST_SUITE_END() // encode
@@ -198,7 +199,8 @@ BOOST_AUTO_TEST_SUITE(echo_request)
         = msg::echo_request::decode(it, no_data_bin.end());
 
       BOOST_TEST(
-          (it == std::next(no_data_bin.begin(), sizeof(detail::ofp_header))));
+          (it
+        == std::next(no_data_bin.begin(), sizeof(v10::protocol::ofp_header))));
       BOOST_TEST((echo_request == no_data_sut));
     }
   BOOST_AUTO_TEST_SUITE_END() // decode
@@ -215,7 +217,8 @@ BOOST_AUTO_TEST_SUITE(echo_reply)
 
       msg::echo_reply sut{data, xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_header) + data.size());
+      BOOST_TEST(
+          sut.length() == sizeof(v10::protocol::ofp_header) + data.size());
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST((sut.data() == data));
     }
@@ -225,7 +228,8 @@ BOOST_AUTO_TEST_SUITE(echo_reply)
 
       msg::echo_reply sut{data};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_header) + data.size());
+      BOOST_TEST(
+          sut.length() == sizeof(v10::protocol::ofp_header) + data.size());
       BOOST_TEST((sut.data() == data));
     }
     BOOST_AUTO_TEST_CASE(is_constructible_from_xid)
@@ -234,7 +238,7 @@ BOOST_AUTO_TEST_SUITE(echo_reply)
 
       msg::echo_reply sut{xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_header));
+      BOOST_TEST(sut.length() == sizeof(v10::protocol::ofp_header));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.data().empty());
     }
@@ -242,7 +246,7 @@ BOOST_AUTO_TEST_SUITE(echo_reply)
     {
       msg::echo_reply sut{};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_header));
+      BOOST_TEST(sut.length() == sizeof(v10::protocol::ofp_header));
       BOOST_TEST(sut.data().empty());
     }
     BOOST_FIXTURE_TEST_CASE(
@@ -270,7 +274,7 @@ BOOST_AUTO_TEST_SUITE(echo_reply)
       auto const copy = std::move(moved);
 
       BOOST_TEST((copy == sut));
-      BOOST_TEST(moved.length() == sizeof(detail::ofp_header));
+      BOOST_TEST(moved.length() == sizeof(v10::protocol::ofp_header));
       BOOST_TEST(moved.data().empty());
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor
@@ -312,12 +316,12 @@ BOOST_AUTO_TEST_SUITE(echo_reply)
     }
     BOOST_AUTO_TEST_CASE(generates_no_data_binary_from_no_data_echo_reply)
     {
-      no_data_bin.resize(sizeof(detail::ofp_header));
+      no_data_bin.resize(sizeof(v10::protocol::ofp_header));
       auto buf = std::vector<unsigned char>{};
 
       no_data_sut.encode(buf);
 
-      BOOST_TEST(buf.size() == sizeof(detail::ofp_header));
+      BOOST_TEST(buf.size() == sizeof(v10::protocol::ofp_header));
       BOOST_TEST(buf == no_data_bin, boost::test_tools::per_element{});
     }
   BOOST_AUTO_TEST_SUITE_END() // encode
@@ -340,7 +344,8 @@ BOOST_AUTO_TEST_SUITE(echo_reply)
         = msg::echo_reply::decode(it, no_data_bin.end());
 
       BOOST_TEST(
-          (it == std::next(no_data_bin.begin(), sizeof(detail::ofp_header))));
+          (it
+        == std::next(no_data_bin.begin(), sizeof(v10::protocol::ofp_header))));
       BOOST_TEST((echo_reply == no_data_sut));
     }
   BOOST_AUTO_TEST_SUITE_END() // decode

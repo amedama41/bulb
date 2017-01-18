@@ -8,7 +8,7 @@
 
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
-namespace proto = v13::protocol;
+namespace protocol = v13::protocol;
 
 BOOST_AUTO_TEST_SUITE(message_test)
 
@@ -18,9 +18,9 @@ BOOST_AUTO_TEST_SUITE(barrier_request_test)
     {
         auto const sut = v13::messages::barrier_request{};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_BARRIER_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_header));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_BARRIER_REQUEST);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
     }
 
     BOOST_AUTO_TEST_CASE(construct_test)
@@ -28,9 +28,9 @@ BOOST_AUTO_TEST_SUITE(barrier_request_test)
         auto const xid = std::uint32_t{0xffffffff};
         auto const sut = v13::messages::barrier_request{xid};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_BARRIER_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_header));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_BARRIER_REQUEST);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
         BOOST_TEST(sut.xid() == xid);
     }
 
@@ -69,9 +69,9 @@ BOOST_AUTO_TEST_SUITE(barrier_request_test)
             = v13::messages::barrier_request::decode(it, it_end);
 
         BOOST_TEST((it == it_end));
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_BARRIER_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_header));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_BARRIER_REQUEST);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
         BOOST_TEST(sut.xid() == 0x01020304);
     }
 
@@ -84,9 +84,9 @@ BOOST_AUTO_TEST_SUITE(barrier_reply_test)
     {
         auto const sut = v13::messages::barrier_reply{};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_BARRIER_REPLY);
-        BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_header));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_BARRIER_REPLY);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
     }
 
     BOOST_AUTO_TEST_CASE(construct_from_xid)
@@ -94,9 +94,9 @@ BOOST_AUTO_TEST_SUITE(barrier_reply_test)
         auto const xid = std::uint32_t{0x00110022};
         auto const sut = v13::messages::barrier_reply{xid};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_BARRIER_REPLY);
-        BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_header));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_BARRIER_REPLY);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
         BOOST_TEST(sut.xid() == xid);
     }
 
@@ -105,9 +105,9 @@ BOOST_AUTO_TEST_SUITE(barrier_reply_test)
         auto const request = v13::messages::barrier_request{0x0abcdef0};
         auto const sut = v13::messages::barrier_reply{request};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_BARRIER_REPLY);
-        BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_header));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_BARRIER_REPLY);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
         BOOST_TEST(sut.xid() == request.xid());
     }
 
@@ -144,9 +144,9 @@ BOOST_AUTO_TEST_SUITE(barrier_reply_test)
         auto const sut = v13::messages::barrier_reply::decode(it, it_end);
 
         BOOST_TEST((it == it_end));
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_BARRIER_REPLY);
-        BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_header));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_BARRIER_REPLY);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
         BOOST_TEST(sut.xid() == 0x10203040);
     }
 

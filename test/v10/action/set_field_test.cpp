@@ -14,7 +14,6 @@
 
 namespace of = canard::net::ofp;
 namespace v10 = of::v10;
-namespace detail = v10::v10_detail;
 namespace actions = v10::actions;
 
 namespace bdata = boost::unit_test::data;
@@ -65,7 +64,7 @@ BOOST_AUTO_TEST_SUITE(set_vlan_vid_test)
         auto const sut = actions::set_vlan_vid{vid};
 
         BOOST_TEST(sut.type() == v10::protocol::OFPAT_SET_VLAN_VID);
-        BOOST_TEST(sut.length() == sizeof(detail::ofp_action_vlan_vid));
+        BOOST_TEST(sut.length() == sizeof(v10::protocol::ofp_action_vlan_vid));
         BOOST_TEST(sut.value() == vid);
     }
 
@@ -176,7 +175,7 @@ BOOST_AUTO_TEST_SUITE(set_vlan_pcp_test)
         auto const sut = actions::set_vlan_pcp{pcp};
 
         BOOST_TEST(sut.type() == v10::protocol::OFPAT_SET_VLAN_PCP);
-        BOOST_TEST(sut.length() == sizeof(detail::ofp_action_vlan_pcp));
+        BOOST_TEST(sut.length() == sizeof(v10::protocol::ofp_action_vlan_pcp));
         BOOST_TEST(sut.value() == pcp);
     }
 
@@ -278,7 +277,7 @@ BOOST_AUTO_TEST_SUITE(set_eth_src_test)
         auto const sut = actions::set_eth_src{mac};
 
         BOOST_TEST(sut.type() == v10::protocol::OFPAT_SET_DL_SRC);
-        BOOST_TEST(sut.length() == sizeof(detail::ofp_action_dl_addr));
+        BOOST_TEST(sut.length() == sizeof(v10::protocol::ofp_action_dl_addr));
         BOOST_TEST(sut.value() == mac);
     }
 
@@ -387,7 +386,7 @@ BOOST_AUTO_TEST_SUITE(set_ipv4_dst_test)
         auto const sut = actions::set_ipv4_dst{addr};
 
         BOOST_TEST(sut.type() == v10::protocol::OFPAT_SET_NW_DST);
-        BOOST_TEST(sut.length() == sizeof(detail::ofp_action_nw_addr));
+        BOOST_TEST(sut.length() == sizeof(v10::protocol::ofp_action_nw_addr));
         BOOST_TEST(sut.value() == addr);
     }
 
@@ -479,7 +478,7 @@ BOOST_AUTO_TEST_SUITE(set_ip_dscp_test)
         auto const sut = actions::set_ip_dscp{dscp};
 
         BOOST_TEST(sut.type() == v10::protocol::OFPAT_SET_NW_TOS);
-        BOOST_TEST(sut.length() == sizeof(detail::ofp_action_nw_tos));
+        BOOST_TEST(sut.length() == sizeof(v10::protocol::ofp_action_nw_tos));
         BOOST_TEST(sut.value() == dscp);
     }
 
@@ -583,7 +582,7 @@ BOOST_AUTO_TEST_SUITE(set_tcp_src_test)
         auto const sut = actions::set_tcp_src{port};
 
         BOOST_TEST(sut.type() == v10::protocol::OFPAT_SET_TP_SRC);
-        BOOST_TEST(sut.length() == sizeof(detail::ofp_action_tp_port));
+        BOOST_TEST(sut.length() == sizeof(v10::protocol::ofp_action_tp_port));
         BOOST_TEST(sut.value() == port);
     }
 

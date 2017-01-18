@@ -12,7 +12,6 @@
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace actions = v13::actions;
-namespace detail = v13::v13_detail;
 
 namespace protocol = v13::protocol;
 
@@ -57,7 +56,7 @@ BOOST_AUTO_TEST_SUITE(bucket_test)
         auto const sut = v13::bucket{actions};
 
         BOOST_TEST(sut.length()
-                == sizeof(detail::ofp_bucket) + actions.length());
+                == sizeof(protocol::ofp_bucket) + actions.length());
         BOOST_TEST(sut.weight() == 0);
         BOOST_TEST(sut.watch_port() == protocol::OFPP_ANY);
         BOOST_TEST(sut.watch_group() == protocol::OFPG_ANY);
@@ -72,7 +71,7 @@ BOOST_AUTO_TEST_SUITE(bucket_test)
         auto const sut = v13::bucket{weight, actions};
 
         BOOST_TEST(sut.length()
-                == sizeof(detail::ofp_bucket) + actions.length());
+                == sizeof(protocol::ofp_bucket) + actions.length());
         BOOST_TEST(sut.weight() == weight);
         BOOST_TEST(sut.watch_port() == protocol::OFPP_ANY);
         BOOST_TEST(sut.watch_group() == protocol::OFPG_ANY);
@@ -90,7 +89,7 @@ BOOST_AUTO_TEST_SUITE(bucket_test)
         auto const sut = v13::bucket{watch_port, watch_group, actions};
 
         BOOST_TEST(sut.length()
-                == sizeof(detail::ofp_bucket) + actions.length());
+                == sizeof(protocol::ofp_bucket) + actions.length());
         BOOST_TEST(sut.weight() == 0);
         BOOST_TEST(sut.watch_port() == watch_port);
         BOOST_TEST(sut.watch_group() == watch_group);
@@ -111,7 +110,7 @@ BOOST_AUTO_TEST_SUITE(bucket_test)
         auto const sut = v13::bucket{weight, watch_port, watch_group, actions};
 
         BOOST_TEST(sut.length()
-                == sizeof(detail::ofp_bucket) + actions.length());
+                == sizeof(protocol::ofp_bucket) + actions.length());
         BOOST_TEST(sut.weight() == weight);
         BOOST_TEST(sut.watch_port() == watch_port);
         BOOST_TEST(sut.watch_group() == watch_group);
@@ -132,7 +131,7 @@ BOOST_AUTO_TEST_SUITE(bucket_test)
         auto const copy = std::move(src);
 
         BOOST_TEST((copy == sut));
-        BOOST_TEST(src.length() == sizeof(detail::ofp_bucket));
+        BOOST_TEST(src.length() == sizeof(protocol::ofp_bucket));
         BOOST_TEST(src.actions() == v13::action_list{});
     }
 
@@ -153,7 +152,7 @@ BOOST_AUTO_TEST_SUITE(bucket_test)
         copy = std::move(src);
 
         BOOST_TEST((copy == sut));
-        BOOST_TEST(src.length() == sizeof(detail::ofp_bucket));
+        BOOST_TEST(src.length() == sizeof(protocol::ofp_bucket));
         BOOST_TEST(src.actions() == v13::action_list{});
     }
 
@@ -426,7 +425,7 @@ BOOST_AUTO_TEST_SUITE(bucket_test)
         auto const sut = v13::bucket::all(actions);
 
         BOOST_TEST(sut.length()
-                == sizeof(detail::ofp_bucket) + actions.length());
+                == sizeof(protocol::ofp_bucket) + actions.length());
         BOOST_TEST(sut.weight() == 0);
         BOOST_TEST(sut.watch_port() == protocol::OFPP_ANY);
         BOOST_TEST(sut.watch_group() == protocol::OFPG_ANY);
@@ -441,7 +440,7 @@ BOOST_AUTO_TEST_SUITE(bucket_test)
         auto const sut = v13::bucket::select(weight, actions);
 
         BOOST_TEST(sut.length()
-                == sizeof(detail::ofp_bucket) + actions.length());
+                == sizeof(protocol::ofp_bucket) + actions.length());
         BOOST_TEST(sut.weight() == weight);
         BOOST_TEST(sut.watch_port() == protocol::OFPP_ANY);
         BOOST_TEST(sut.watch_group() == protocol::OFPG_ANY);
@@ -455,7 +454,7 @@ BOOST_AUTO_TEST_SUITE(bucket_test)
         auto const sut = v13::bucket::indirect(actions);
 
         BOOST_TEST(sut.length()
-                == sizeof(detail::ofp_bucket) + actions.length());
+                == sizeof(protocol::ofp_bucket) + actions.length());
         BOOST_TEST(sut.weight() == 0);
         BOOST_TEST(sut.watch_port() == protocol::OFPP_ANY);
         BOOST_TEST(sut.watch_group() == protocol::OFPG_ANY);
@@ -472,7 +471,7 @@ BOOST_AUTO_TEST_SUITE(bucket_test)
             = v13::bucket::failover(watch_port, watch_group, actions);
 
         BOOST_TEST(sut.length()
-                == sizeof(detail::ofp_bucket) + actions.length());
+                == sizeof(protocol::ofp_bucket) + actions.length());
         BOOST_TEST(sut.weight() == 0);
         BOOST_TEST(sut.watch_port() == watch_port);
         BOOST_TEST(sut.watch_group() == watch_group);

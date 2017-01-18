@@ -9,9 +9,8 @@
 
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
-namespace v13_detail = v13::v13_detail;
 namespace multipart = v13::messages::multipart;
-namespace proto = v13::protocol;
+namespace protocol = v13::protocol;
 
 namespace {
 
@@ -20,7 +19,7 @@ using body_type = multipart::port_stats_reply::body_type;
 struct port_stats_fixutre
 {
     multipart::port_stats sut{
-          proto::OFPP_MAX
+          protocol::OFPP_MAX
         , 0x12 // rx_packets
         , 0x34 // tx_packets
         , 0x56 // rx_bytes
@@ -132,7 +131,7 @@ BOOST_AUTO_TEST_SUITE(port_stats_test)
             , elapsed_time
         };
 
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_port_stats));
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_port_stats));
         BOOST_TEST(sut.port_no() == port_no);
         BOOST_TEST(sut.rx_packets() == rx_packets);
         BOOST_TEST(sut.tx_packets() == tx_packets);
@@ -239,15 +238,15 @@ BOOST_AUTO_TEST_SUITE(port_stats_request_test)
 
     BOOST_AUTO_TEST_CASE(construct_test)
     {
-        auto const port_no = std::uint32_t{proto::OFPP_ANY};
+        auto const port_no = std::uint32_t{protocol::OFPP_ANY};
 
         auto const sut = multipart::port_stats_request{port_no};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_MULTIPART_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_multipart_request)
-                                 + sizeof(v13_detail::ofp_port_stats_request));
-        BOOST_TEST(sut.multipart_type() == proto::OFPMP_PORT_STATS);
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_MULTIPART_REQUEST);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_multipart_request)
+                                 + sizeof(protocol::ofp_port_stats_request));
+        BOOST_TEST(sut.multipart_type() == protocol::OFPMP_PORT_STATS);
         BOOST_TEST(sut.flags() == 0);
         BOOST_TEST(sut.port_no() == port_no);
     }
@@ -321,11 +320,11 @@ BOOST_AUTO_TEST_SUITE(port_stats_reply_test)
 
         auto const sut = multipart::port_stats_reply{port_stats};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_MULTIPART_REPLY);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_multipart_reply)
-                                 + sizeof(v13_detail::ofp_port_stats) * size);
-        BOOST_TEST(sut.multipart_type() == proto::OFPMP_PORT_STATS);
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_MULTIPART_REPLY);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_multipart_reply)
+                                 + sizeof(protocol::ofp_port_stats) * size);
+        BOOST_TEST(sut.multipart_type() == protocol::OFPMP_PORT_STATS);
         BOOST_TEST(sut.flags() == 0);
         BOOST_TEST(sut.size() == size);
     }
@@ -334,15 +333,15 @@ BOOST_AUTO_TEST_SUITE(port_stats_reply_test)
     {
         auto const size = std::size_t{0};
         auto const port_stats = ::body_type(size, port_stats_fixutre::sut);
-        auto const flags = std::uint16_t{proto::OFPMPF_REPLY_MORE};
+        auto const flags = std::uint16_t{protocol::OFPMPF_REPLY_MORE};
 
         auto const sut = multipart::port_stats_reply{port_stats, flags};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_MULTIPART_REPLY);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_multipart_reply)
-                                 + sizeof(v13_detail::ofp_port_stats) * size);
-        BOOST_TEST(sut.multipart_type() == proto::OFPMP_PORT_STATS);
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_MULTIPART_REPLY);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_multipart_reply)
+                                 + sizeof(protocol::ofp_port_stats) * size);
+        BOOST_TEST(sut.multipart_type() == protocol::OFPMP_PORT_STATS);
         BOOST_TEST(sut.flags() == flags);
         BOOST_TEST(sut.size() == size);
     }
@@ -373,7 +372,7 @@ BOOST_AUTO_TEST_SUITE(port_stats_reply_test)
         BOOST_TEST(copy.multipart_type() == sut.multipart_type());
         BOOST_TEST(copy.flags() == sut.flags());
         BOOST_TEST(copy.size() == sut.size());
-        BOOST_TEST(src.length() == sizeof(v13_detail::ofp_multipart_reply));
+        BOOST_TEST(src.length() == sizeof(protocol::ofp_multipart_reply));
         BOOST_TEST(src.size() == 0);
     }
 

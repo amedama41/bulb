@@ -8,16 +8,14 @@ namespace ofp = canard::net::ofp;
 namespace v10 = ofp::v10;
 namespace msg = v10::messages;
 namespace stats = msg::statistics;
-namespace detail = v10::v10_detail;
-
-namespace proto = v10::protocol;
+namespace protocol = v10::protocol;
 
 namespace {
 struct table_stats_parameters {
   std::uint8_t table_id = 0x11;
   std::string name = "table1";
   std::uint32_t wildcards
-    = proto::OFPFW_ALL & ~proto::OFPFW_IN_PORT & ~proto::OFPFW_DL_TYPE;
+    = protocol::OFPFW_ALL & ~protocol::OFPFW_IN_PORT & ~protocol::OFPFW_DL_TYPE;
   std::uint32_t max_entries = 0xf0f0f0f0;
   std::uint32_t active_count = 0x0f0f0f0f;
   std::uint64_t lookup_count = 0xf1f2f3f4f5f6f7f8;
@@ -46,12 +44,12 @@ using body_type = stats::table_stats_reply::body_type;
 struct table_stats_reply_parameters {
   stats::table_stats stats1{
       0x11, "table1"
-    , proto::OFPFW_ALL & ~proto::OFPFW_IN_PORT & ~proto::OFPFW_DL_TYPE
+    , protocol::OFPFW_ALL & ~protocol::OFPFW_IN_PORT & ~protocol::OFPFW_DL_TYPE
     , 0xf0f0f0f0, 0x0f0f0f0f, 0xf1f2f3f4f5f6f7f8, 0x0102030405060708
   };
   stats::table_stats stats2{
       0x12, "table2"
-    , proto::OFPFW_ALL
+    , protocol::OFPFW_ALL
     , 0xe0e0e0e0, 0x0e0e0e0e, 0xe1e2e3e4e5e6e7e8, 0xa1a2a3a4a5a6a7a8
   };
   stats::table_stats stats3{
@@ -60,7 +58,7 @@ struct table_stats_reply_parameters {
     , 0xd0d0d0d0, 0x0d0d0d0d, 0xd1d2d3d4d5d6d7d8, 0xb1b2b3b4b5b6b7b8
   };
   body_type body{ stats1, stats2, stats3 };
-  std::uint16_t flags = proto::OFPSF_REPLY_MORE;
+  std::uint16_t flags = protocol::OFPSF_REPLY_MORE;
   std::uint32_t xid = 0x12345678;
 };
 struct table_stats_reply_fixture : table_stats_reply_parameters {
@@ -95,7 +93,7 @@ BOOST_AUTO_TEST_SUITE(table_stats)
     {
       constexpr auto table_id = 0x12;
       constexpr auto name = "table1";
-      constexpr auto wildcards = proto::OFPFW_ALL;
+      constexpr auto wildcards = protocol::OFPFW_ALL;
       constexpr auto max_entries  = 255;
       constexpr auto active_count = 100;
       constexpr auto lookup_count = 0xffffffffffffffff;
@@ -106,7 +104,7 @@ BOOST_AUTO_TEST_SUITE(table_stats)
         , active_count, lookup_count, matched_count
       };
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_table_stats));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_table_stats));
       BOOST_TEST(sut.table_id() == table_id);
       BOOST_TEST(sut.name() == name);
       BOOST_TEST(sut.wildcards() == wildcards);
@@ -118,8 +116,8 @@ BOOST_AUTO_TEST_SUITE(table_stats)
     BOOST_AUTO_TEST_CASE(is_constructible_from_too_large_name)
     {
       constexpr auto table_id = 0x12;
-      auto const name = std::string(proto::OFP_MAX_TABLE_NAME_LEN, 'A');
-      constexpr auto wildcards = proto::OFPFW_ALL;
+      auto const name = std::string(protocol::OFP_MAX_TABLE_NAME_LEN, 'A');
+      constexpr auto wildcards = protocol::OFPFW_ALL;
       constexpr auto max_entries  = 0xffffffff;
       constexpr auto active_count = 0;
       constexpr auto lookup_count = 32;
@@ -130,9 +128,9 @@ BOOST_AUTO_TEST_SUITE(table_stats)
         , active_count, lookup_count, matched_count
       };
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_table_stats));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_table_stats));
       BOOST_TEST(sut.table_id() == table_id);
-      BOOST_TEST(sut.name().size() == proto::OFP_MAX_TABLE_NAME_LEN - 1);
+      BOOST_TEST(sut.name().size() == protocol::OFP_MAX_TABLE_NAME_LEN - 1);
       BOOST_TEST(
           sut.name() == boost::string_ref(name.data(), sut.name().size()));
       BOOST_TEST(sut.wildcards() == wildcards);
@@ -203,10 +201,10 @@ BOOST_AUTO_TEST_SUITE(table_stats)
     {
       BOOST_TEST(
           (stats::table_stats{
-              table_id, name, proto::OFPFW_DL_DST, max_entries
+              table_id, name, protocol::OFPFW_DL_DST, max_entries
             , active_count, lookup_count, matched_count}
         != stats::table_stats{
-              table_id, name, proto::OFPFW_DL_SRC, max_entries
+              table_id, name, protocol::OFPFW_DL_SRC, max_entries
             , active_count, lookup_count, matched_count}));
     }
     BOOST_AUTO_TEST_CASE(is_false_if_max_entries_is_not_equal)
@@ -287,14 +285,14 @@ BOOST_AUTO_TEST_SUITE(table_stats_request)
 
       stats::table_stats_request sut{xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_stats_request));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_stats_request));
       BOOST_TEST(sut.xid() == xid);
     }
     BOOST_AUTO_TEST_CASE(is_default_constructible)
     {
       stats::table_stats_request sut{};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_stats_request));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_stats_request));
     }
     BOOST_FIXTURE_TEST_CASE(
           is_copy_constructible_from_non_const_lvalue
@@ -371,12 +369,12 @@ BOOST_AUTO_TEST_SUITE(table_stats_reply)
           is_constructible_from_multiple_table_stats
         , table_stats_reply_parameters)
     {
-      auto const flags = proto::OFPSF_REPLY_MORE;
+      auto const flags = protocol::OFPSF_REPLY_MORE;
       auto const xid = 0x01020304;
 
       stats::table_stats_reply sut{{ stats1, stats2 }, flags, xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_stats_reply)
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_stats_reply)
                                + stats1.length() + stats2.length());
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.flags() == flags);
@@ -391,7 +389,7 @@ BOOST_AUTO_TEST_SUITE(table_stats_reply)
 
       stats::table_stats_reply sut{{ stats3 }, flags, xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_stats_reply)
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_stats_reply)
                                + stats3.length());
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.flags() == flags);
@@ -404,18 +402,18 @@ BOOST_AUTO_TEST_SUITE(table_stats_reply)
 
       stats::table_stats_reply sut{{}, flags, xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_stats_reply));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_stats_reply));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.flags() == flags);
       BOOST_TEST(sut.body().empty());
     }
     BOOST_AUTO_TEST_CASE(is_constructible_without_xid)
     {
-      auto const flags = proto::OFPSF_REPLY_MORE;
+      auto const flags = protocol::OFPSF_REPLY_MORE;
 
       stats::table_stats_reply sut{{}, flags};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_stats_reply));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_stats_reply));
       BOOST_TEST(sut.flags() == flags);
       BOOST_TEST(sut.body().empty());
     }
@@ -442,7 +440,7 @@ BOOST_AUTO_TEST_SUITE(table_stats_reply)
       auto const copy = std::move(moved);
 
       BOOST_TEST((copy == sut));
-      BOOST_TEST(moved.length() == sizeof(detail::ofp_stats_reply));
+      BOOST_TEST(moved.length() == sizeof(protocol::ofp_stats_reply));
       BOOST_TEST(moved.body().empty());
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor

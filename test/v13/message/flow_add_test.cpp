@@ -12,8 +12,7 @@
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace match = v13::oxm_match_fields;
-namespace v13_detail = v13::v13_detail;
-namespace proto = v13::protocol;
+namespace protocol = v13::protocol;
 
 namespace {
 
@@ -26,7 +25,7 @@ struct flow_entry_fixture {
             , match::eth_dst{eth_dst}
             , match::eth_src{eth_src}
           } // 4 + 8 + 10 + 10 = 32
-        , proto::OFP_DEFAULT_PRIORITY
+        , protocol::OFP_DEFAULT_PRIORITY
         , 0xf1f2f3f4f5f6f7f8
         , v13::instruction_set{
               v13::instructions::apply_actions{
@@ -48,7 +47,7 @@ struct flow_add_fixture : flow_entry_fixture {
           entry
         , 0
         , v13::timeouts{0x1234, 0x5678}
-        , proto::OFPFF_SEND_FLOW_REM | proto::OFPFF_NO_BYT_COUNTS
+        , protocol::OFPFF_SEND_FLOW_REM | protocol::OFPFF_NO_BYT_COUNTS
         , 0xff12ff34
         , 0xff56ff78
     };
@@ -73,7 +72,7 @@ struct flow_add_fixture : flow_entry_fixture {
 };
 
 static auto const base_flow_mod_size
-    = sizeof(v13_detail::ofp_flow_mod) + sizeof(v13_detail::ofp_match);
+    = sizeof(protocol::ofp_flow_mod) + sizeof(protocol::ofp_match);
 
 }
 
@@ -85,7 +84,7 @@ BOOST_AUTO_TEST_SUITE(flow_add_test)
     {
         auto const table_id = std::uint8_t{1};
         auto const flags = std::uint16_t{
-            proto::OFPFF_SEND_FLOW_REM | proto::OFPFF_CHECK_OVERLAP
+            protocol::OFPFF_SEND_FLOW_REM | protocol::OFPFF_CHECK_OVERLAP
         };
         auto const timeouts = v13::timeouts{32, 24};
         auto const buffer_id = 3;
@@ -94,8 +93,8 @@ BOOST_AUTO_TEST_SUITE(flow_add_test)
             entry, table_id, timeouts, flags, buffer_id
         };
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_FLOW_MOD);
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_FLOW_MOD);
         BOOST_TEST(sut.length() == 48 + 32 + 56 + 8 + 40);
         BOOST_TEST(sut.match().length() == entry.match().length());
         BOOST_TEST(sut.priority() == entry.priority());
@@ -112,7 +111,7 @@ BOOST_AUTO_TEST_SUITE(flow_add_test)
     {
         auto const table_id = std::uint8_t{1};
         auto const flags = std::uint16_t{
-            proto::OFPFF_SEND_FLOW_REM | proto::OFPFF_CHECK_OVERLAP
+            protocol::OFPFF_SEND_FLOW_REM | protocol::OFPFF_CHECK_OVERLAP
         };
         auto const timeouts = v13::timeouts{32, 24};
         auto const buffer_id = 3;
@@ -122,8 +121,8 @@ BOOST_AUTO_TEST_SUITE(flow_add_test)
             std::move(src), table_id, timeouts, flags, buffer_id
         };
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_FLOW_MOD);
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_FLOW_MOD);
         BOOST_TEST(sut.length() == 48 + 32 + 56 + 8 + 40);
         BOOST_TEST(sut.match().length() == entry.match().length());
         BOOST_TEST(sut.priority() == entry.priority());
@@ -145,8 +144,8 @@ BOOST_AUTO_TEST_SUITE(flow_add_test)
 
         auto const sut = v13::messages::flow_add{entry, table_id};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_FLOW_MOD);
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_FLOW_MOD);
         BOOST_TEST(sut.length() == 48 + 32 + 56 + 8 + 40);
         BOOST_TEST(sut.match().length() == entry.match().length());
         BOOST_TEST(sut.priority() == entry.priority());
@@ -155,7 +154,7 @@ BOOST_AUTO_TEST_SUITE(flow_add_test)
         BOOST_TEST(sut.flags() == 0);
         BOOST_TEST(sut.idle_timeout() == 0);
         BOOST_TEST(sut.hard_timeout() == 0);
-        BOOST_TEST(sut.buffer_id() == proto::OFP_NO_BUFFER);
+        BOOST_TEST(sut.buffer_id() == protocol::OFP_NO_BUFFER);
         BOOST_TEST(sut.instructions().length() == entry.instructions().length());
     }
 
@@ -166,8 +165,8 @@ BOOST_AUTO_TEST_SUITE(flow_add_test)
 
         auto const sut = v13::messages::flow_add{entry, table_id, timeouts};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_FLOW_MOD);
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_FLOW_MOD);
         BOOST_TEST(sut.length() == 48 + 32 + 56 + 8 + 40);
         BOOST_TEST(sut.match().length() == entry.match().length());
         BOOST_TEST(sut.priority() == entry.priority());
@@ -176,19 +175,19 @@ BOOST_AUTO_TEST_SUITE(flow_add_test)
         BOOST_TEST(sut.flags() == 0);
         BOOST_TEST(sut.idle_timeout() == timeouts.idle_timeout());
         BOOST_TEST(sut.hard_timeout() == timeouts.hard_timeout());
-        BOOST_TEST(sut.buffer_id() == proto::OFP_NO_BUFFER);
+        BOOST_TEST(sut.buffer_id() == protocol::OFP_NO_BUFFER);
         BOOST_TEST(sut.instructions().length() == entry.instructions().length());
     }
 
     BOOST_FIXTURE_TEST_CASE(construct_from_flags_test, flow_entry_fixture)
     {
         auto const table_id = std::uint8_t{0};
-        auto const flags = std::uint16_t{proto::OFPFF_CHECK_OVERLAP};
+        auto const flags = std::uint16_t{protocol::OFPFF_CHECK_OVERLAP};
 
         auto const sut = v13::messages::flow_add{entry, table_id, flags};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_FLOW_MOD);
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_FLOW_MOD);
         BOOST_TEST(sut.length() == 48 + 32 + 56 + 8 + 40);
         BOOST_TEST(sut.match().length() == entry.match().length());
         BOOST_TEST(sut.priority() == entry.priority());
@@ -197,7 +196,7 @@ BOOST_AUTO_TEST_SUITE(flow_add_test)
         BOOST_TEST(sut.flags() == flags);
         BOOST_TEST(sut.idle_timeout() == 0);
         BOOST_TEST(sut.hard_timeout() == 0);
-        BOOST_TEST(sut.buffer_id() == proto::OFP_NO_BUFFER);
+        BOOST_TEST(sut.buffer_id() == protocol::OFP_NO_BUFFER);
         BOOST_TEST(sut.instructions().length() == entry.instructions().length());
     }
 

@@ -10,8 +10,6 @@
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace table_feature_properties = v13::table_feature_properties;
-namespace detail = v13::v13_detail;
-
 namespace protocol = v13::protocol;
 
 namespace {
@@ -71,7 +69,7 @@ BOOST_AUTO_TEST_SUITE(instructions_test)
         auto const sut = table_feature_properties::instructions{};
 
         BOOST_TEST(sut.length()
-                == sizeof(detail::ofp_table_feature_prop_instructions));
+                == sizeof(protocol::ofp_table_feature_prop_instructions));
         BOOST_TEST((sut.begin() == sut.end()));
         BOOST_TEST(sut.instruction_ids().empty());
     }
@@ -84,7 +82,7 @@ BOOST_AUTO_TEST_SUITE(instructions_test)
 
         BOOST_TEST_REQUIRE(goto_table.length() == 4);
         BOOST_TEST(sut.length()
-               ==  sizeof(detail::ofp_table_feature_prop_instructions) + 4);
+               ==  sizeof(protocol::ofp_table_feature_prop_instructions) + 4);
         BOOST_TEST((sut.begin() != sut.end()));
         BOOST_TEST(sut.instruction_ids().size() == 1);
         BOOST_TEST((*sut.begin() == goto_table));
@@ -111,7 +109,7 @@ BOOST_AUTO_TEST_SUITE(instructions_test)
         };
 
         BOOST_TEST(sut.length()
-               ==  sizeof(detail::ofp_table_feature_prop_instructions) + 4 * 6 + 8);
+               ==  sizeof(protocol::ofp_table_feature_prop_instructions) + 4 * 6 + 8);
         BOOST_TEST((sut.begin() != sut.end()));
         BOOST_TEST_REQUIRE(sut.instruction_ids().size() == 7);
         auto it = sut.begin();
@@ -140,7 +138,7 @@ BOOST_AUTO_TEST_SUITE(instructions_test)
 
         BOOST_TEST((copy == sut));
         BOOST_TEST(src.length()
-                == sizeof(detail::ofp_table_feature_prop_instructions));
+                == sizeof(protocol::ofp_table_feature_prop_instructions));
         BOOST_TEST(src.instruction_ids().empty());
     }
 
@@ -162,7 +160,7 @@ BOOST_AUTO_TEST_SUITE(instructions_test)
 
         BOOST_TEST((copy == sut));
         BOOST_TEST(src.length()
-                == sizeof(detail::ofp_table_feature_prop_instructions));
+                == sizeof(protocol::ofp_table_feature_prop_instructions));
         BOOST_TEST(src.instruction_ids().empty());
     }
 

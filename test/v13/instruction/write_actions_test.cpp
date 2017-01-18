@@ -11,9 +11,9 @@
 
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
+namespace protocol = v13::protocol;
 namespace actions = v13::actions;
 namespace instructions = v13::instructions;
-namespace detail = v13::v13_detail;
 
 namespace {
 
@@ -59,14 +59,14 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
     {
         using sut = instructions::write_actions;
 
-        BOOST_TEST(sut::type() == v13::protocol::OFPIT_WRITE_ACTIONS);
+        BOOST_TEST(sut::type() == protocol::OFPIT_WRITE_ACTIONS);
     }
 
     BOOST_AUTO_TEST_CASE(default_construct_test)
     {
         auto const sut = instructions::write_actions{};
 
-        BOOST_TEST(sut.length() == sizeof(detail::ofp_instruction_actions));
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_instruction_actions));
         BOOST_TEST(sut.actions().empty());
     }
 
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
         auto const sut = instructions::write_actions{action_list};
 
         BOOST_TEST(sut.length()
-                == sizeof(detail::ofp_instruction_actions) + 32);
+                == sizeof(protocol::ofp_instruction_actions) + 32);
         BOOST_TEST(sut.actions() == action_list);
     }
 
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
         auto const sut = instructions::write_actions{action_set};
 
         BOOST_TEST(sut.length()
-                == sizeof(detail::ofp_instruction_actions) + 32);
+                == sizeof(protocol::ofp_instruction_actions) + 32);
         BOOST_TEST(sut.actions() == action_set.to_list());
     }
 
@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
         auto const sut = instructions::write_actions{group};
 
         BOOST_TEST(sut.length()
-                == sizeof(detail::ofp_instruction_actions) + 8);
+                == sizeof(protocol::ofp_instruction_actions) + 8);
         BOOST_TEST(sut.actions() == action_list);
     }
 
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
         };
 
         BOOST_TEST(sut.length()
-                == sizeof(detail::ofp_instruction_actions) + 48);
+                == sizeof(protocol::ofp_instruction_actions) + 48);
         BOOST_TEST(sut.actions() == action_set.to_list());
     }
 
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
                 actions::output{1}, actions::group{2});
 
         BOOST_TEST(sut.length()
-                == sizeof(detail::ofp_instruction_actions) + 16 + 8);
+                == sizeof(protocol::ofp_instruction_actions) + 16 + 8);
     }
 
     BOOST_AUTO_TEST_CASE(create_failure_test)
@@ -166,7 +166,7 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
 
         BOOST_TEST(copy.length() == sut.length());
         BOOST_TEST((copy.actions() == sut.actions()));
-        BOOST_TEST(src.length() == sizeof(detail::ofp_instruction_actions));
+        BOOST_TEST(src.length() == sizeof(protocol::ofp_instruction_actions));
         BOOST_TEST(src.actions().empty());
     }
 
@@ -189,7 +189,7 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
 
         BOOST_TEST(copy.length() == sut.length());
         BOOST_TEST((copy.actions() == sut.actions()));
-        BOOST_TEST(src.length() == sizeof(detail::ofp_instruction_actions));
+        BOOST_TEST(src.length() == sizeof(protocol::ofp_instruction_actions));
         BOOST_TEST(src.actions().empty());
     }
 

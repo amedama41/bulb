@@ -11,8 +11,6 @@
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace table_feature_properties = v13::table_feature_properties;
-namespace detail = v13::v13_detail;
-
 namespace protocol = v13::protocol;
 
 namespace {
@@ -72,7 +70,7 @@ BOOST_AUTO_TEST_SUITE(match_test)
     {
         auto const sut = table_feature_properties::match{};
 
-        BOOST_TEST(sut.length() == sizeof(detail::ofp_table_feature_prop_oxm));
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_table_feature_prop_oxm));
         BOOST_TEST((sut.begin() == sut.end()));
         BOOST_TEST(sut.oxm_ids().empty());
     }
@@ -85,7 +83,7 @@ BOOST_AUTO_TEST_SUITE(match_test)
 
         BOOST_TEST_REQUIRE(in_port.length() == 4);
         BOOST_TEST(sut.length()
-                == sizeof(detail::ofp_table_feature_prop_oxm) + 4);
+                == sizeof(protocol::ofp_table_feature_prop_oxm) + 4);
         BOOST_TEST((sut.begin() != sut.end()));
         BOOST_TEST_REQUIRE(sut.oxm_ids().size() == 1);
         BOOST_TEST((sut.oxm_ids()[0] == in_port));
@@ -106,7 +104,7 @@ BOOST_AUTO_TEST_SUITE(match_test)
 
         BOOST_TEST_REQUIRE(experimenter.length() == 8);
         BOOST_TEST(sut.length()
-                == sizeof(detail::ofp_table_feature_prop_oxm) + 4 * 4 + 8);
+                == sizeof(protocol::ofp_table_feature_prop_oxm) + 4 * 4 + 8);
         BOOST_TEST((sut.begin() != sut.end()));
         BOOST_TEST_REQUIRE(sut.oxm_ids().size() == 5);
         BOOST_TEST((sut.oxm_ids()[0] == in_port));
@@ -130,7 +128,7 @@ BOOST_AUTO_TEST_SUITE(match_test)
         auto const copy = std::move(src);
 
         BOOST_TEST((copy == sut));
-        BOOST_TEST(src.length() == sizeof(detail::ofp_table_feature_prop_oxm));
+        BOOST_TEST(src.length() == sizeof(protocol::ofp_table_feature_prop_oxm));
         BOOST_TEST(src.oxm_ids().empty());
     }
 
@@ -151,7 +149,7 @@ BOOST_AUTO_TEST_SUITE(match_test)
         copy = std::move(src);
 
         BOOST_TEST((copy == sut));
-        BOOST_TEST(src.length() == sizeof(detail::ofp_table_feature_prop_oxm));
+        BOOST_TEST(src.length() == sizeof(protocol::ofp_table_feature_prop_oxm));
         BOOST_TEST(src.oxm_ids().empty());
     }
 

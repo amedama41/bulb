@@ -8,14 +8,12 @@
 namespace ofp = canard::net::ofp;
 namespace v10 = ofp::v10;
 namespace msg = v10::messages;
-namespace detail = v10::v10_detail;
-
-namespace proto = v10::protocol;
+namespace protocol = v10::protocol;
 
 namespace {
 struct parameters : action_fixture {
   std::uint32_t buffer_id = 0xf2f4f6f8;
-  std::uint16_t in_port = proto::OFPP_CONTROLLER;
+  std::uint16_t in_port = protocol::OFPP_CONTROLLER;
   v10::action_list actions{ set_vlan_vid, output, strip_vlan, enqueue };
   std::uint32_t xid = 0x12345678;
   msg::packet_out::data_type data
@@ -61,7 +59,7 @@ BOOST_AUTO_TEST_SUITE(packet_out)
       msg::packet_out sut{buffer_id, in_port, actions, xid};
 
       BOOST_TEST(
-          sut.length() == sizeof(detail::ofp_packet_out) + actions.length());
+          sut.length() == sizeof(protocol::ofp_packet_out) + actions.length());
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.buffer_id() == buffer_id);
       BOOST_TEST(sut.in_port() == in_port);
@@ -75,7 +73,7 @@ BOOST_AUTO_TEST_SUITE(packet_out)
       msg::packet_out sut{buffer_id, in_port, actions};
 
       BOOST_TEST(
-          sut.length() == sizeof(detail::ofp_packet_out) + actions.length());
+          sut.length() == sizeof(protocol::ofp_packet_out) + actions.length());
       BOOST_TEST(sut.buffer_id() == buffer_id);
       BOOST_TEST(sut.in_port() == in_port);
       BOOST_TEST(sut.actions_length() == actions.length());
@@ -88,10 +86,10 @@ BOOST_AUTO_TEST_SUITE(packet_out)
       msg::packet_out sut{buffer_id, actions, xid};
 
       BOOST_TEST(
-          sut.length() == sizeof(detail::ofp_packet_out) + actions.length());
+          sut.length() == sizeof(protocol::ofp_packet_out) + actions.length());
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.buffer_id() == buffer_id);
-      BOOST_TEST(sut.in_port() == proto::OFPP_NONE);
+      BOOST_TEST(sut.in_port() == protocol::OFPP_NONE);
       BOOST_TEST(sut.actions_length() == actions.length());
       BOOST_TEST((sut.actions() == actions));
       BOOST_TEST(sut.frame_length() == 0);
@@ -103,9 +101,9 @@ BOOST_AUTO_TEST_SUITE(packet_out)
       msg::packet_out sut{buffer_id, actions};
 
       BOOST_TEST(
-          sut.length() == sizeof(detail::ofp_packet_out) + actions.length());
+          sut.length() == sizeof(protocol::ofp_packet_out) + actions.length());
       BOOST_TEST(sut.buffer_id() == buffer_id);
-      BOOST_TEST(sut.in_port() == proto::OFPP_NONE);
+      BOOST_TEST(sut.in_port() == protocol::OFPP_NONE);
       BOOST_TEST(sut.actions_length() == actions.length());
       BOOST_TEST((sut.actions() == actions));
       BOOST_TEST(sut.frame_length() == 0);
@@ -117,7 +115,7 @@ BOOST_AUTO_TEST_SUITE(packet_out)
 
       msg::packet_out sut{buffer_id, in_port, empty_actions, xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_packet_out));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_packet_out));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.buffer_id() == buffer_id);
       BOOST_TEST(sut.in_port() == in_port);
@@ -132,9 +130,9 @@ BOOST_AUTO_TEST_SUITE(packet_out)
 
       BOOST_TEST(
           sut.length()
-       == sizeof(detail::ofp_packet_out) + actions.length() + data.size());
+       == sizeof(protocol::ofp_packet_out) + actions.length() + data.size());
       BOOST_TEST(sut.xid() == xid);
-      BOOST_TEST(sut.buffer_id() == proto::OFP_NO_BUFFER);
+      BOOST_TEST(sut.buffer_id() == protocol::OFP_NO_BUFFER);
       BOOST_TEST(sut.in_port() == in_port);
       BOOST_TEST(sut.actions_length() == actions.length());
       BOOST_TEST((sut.actions() == actions));
@@ -147,8 +145,8 @@ BOOST_AUTO_TEST_SUITE(packet_out)
 
       BOOST_TEST(
           sut.length()
-       == sizeof(detail::ofp_packet_out) + actions.length() + data.size());
-      BOOST_TEST(sut.buffer_id() == proto::OFP_NO_BUFFER);
+       == sizeof(protocol::ofp_packet_out) + actions.length() + data.size());
+      BOOST_TEST(sut.buffer_id() == protocol::OFP_NO_BUFFER);
       BOOST_TEST(sut.in_port() == in_port);
       BOOST_TEST(sut.actions_length() == actions.length());
       BOOST_TEST((sut.actions() == actions));
@@ -161,10 +159,10 @@ BOOST_AUTO_TEST_SUITE(packet_out)
 
       BOOST_TEST(
           sut.length()
-       == sizeof(detail::ofp_packet_out) + actions.length() + data.size());
+       == sizeof(protocol::ofp_packet_out) + actions.length() + data.size());
       BOOST_TEST(sut.xid() == xid);
-      BOOST_TEST(sut.buffer_id() == proto::OFP_NO_BUFFER);
-      BOOST_TEST(sut.in_port() == proto::OFPP_NONE);
+      BOOST_TEST(sut.buffer_id() == protocol::OFP_NO_BUFFER);
+      BOOST_TEST(sut.in_port() == protocol::OFPP_NONE);
       BOOST_TEST(sut.actions_length() == actions.length());
       BOOST_TEST((sut.actions() == actions));
       BOOST_TEST(sut.frame_length() == data.size());
@@ -176,9 +174,9 @@ BOOST_AUTO_TEST_SUITE(packet_out)
 
       BOOST_TEST(
           sut.length()
-       == sizeof(detail::ofp_packet_out) + actions.length() + data.size());
-      BOOST_TEST(sut.buffer_id() == proto::OFP_NO_BUFFER);
-      BOOST_TEST(sut.in_port() == proto::OFPP_NONE);
+       == sizeof(protocol::ofp_packet_out) + actions.length() + data.size());
+      BOOST_TEST(sut.buffer_id() == protocol::OFP_NO_BUFFER);
+      BOOST_TEST(sut.in_port() == protocol::OFPP_NONE);
       BOOST_TEST(sut.actions_length() == actions.length());
       BOOST_TEST((sut.actions() == actions));
       BOOST_TEST(sut.frame_length() == data.size());
@@ -191,9 +189,9 @@ BOOST_AUTO_TEST_SUITE(packet_out)
       msg::packet_out sut{data, in_port, empty_actions, xid};
 
       BOOST_TEST(
-          sut.length() == sizeof(detail::ofp_packet_out) + data.size());
+          sut.length() == sizeof(protocol::ofp_packet_out) + data.size());
       BOOST_TEST(sut.xid() == xid);
-      BOOST_TEST(sut.buffer_id() == proto::OFP_NO_BUFFER);
+      BOOST_TEST(sut.buffer_id() == protocol::OFP_NO_BUFFER);
       BOOST_TEST(sut.in_port() == in_port);
       BOOST_TEST(sut.actions_length() == 0);
       BOOST_TEST((sut.actions() == empty_actions));
@@ -320,9 +318,9 @@ BOOST_AUTO_TEST_SUITE(packet_out)
     }
     BOOST_AUTO_TEST_CASE(generates_no_actions_binary_from_no_actions_packet_out)
     {
-      no_data_bin.resize(sizeof(detail::ofp_packet_out));
+      no_data_bin.resize(sizeof(protocol::ofp_packet_out));
       no_data_bin[3] = no_data_bin.size();
-      no_data_bin[offsetof(detail::ofp_packet_out, actions_len) + 1] = 0;
+      no_data_bin[offsetof(protocol::ofp_packet_out, actions_len) + 1] = 0;
       auto const sut
         = msg::packet_out{buffer_id, in_port, v10::action_list{}, xid};
 
@@ -356,9 +354,9 @@ BOOST_AUTO_TEST_SUITE(packet_out)
     }
     BOOST_AUTO_TEST_CASE(generates_no_actions_binary_from_no_actions_packet_out)
     {
-      constexpr auto length = sizeof(detail::ofp_packet_out);
+      constexpr auto length = sizeof(protocol::ofp_packet_out);
       no_data_bin[3] = length;
-      no_data_bin[offsetof(detail::ofp_packet_out, actions_len) + 1] = 0;
+      no_data_bin[offsetof(protocol::ofp_packet_out, actions_len) + 1] = 0;
       auto it = no_data_bin.begin();
 
       auto const packet_out = msg::packet_out::decode(it, no_data_bin.end());
@@ -371,7 +369,7 @@ BOOST_AUTO_TEST_SUITE(packet_out)
     BOOST_AUTO_TEST_CASE(
         throws_exception_if_actions_len_is_larger_than_binary_size)
     {
-      no_data_bin[offsetof(detail::ofp_packet_out, actions_len)] = 0xff;
+      no_data_bin[offsetof(protocol::ofp_packet_out, actions_len)] = 0xff;
       auto it = no_data_bin.begin();
 
       BOOST_CHECK_THROW(

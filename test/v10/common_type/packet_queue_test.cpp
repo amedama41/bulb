@@ -7,7 +7,7 @@
 namespace ofp = canard::net::ofp;
 namespace v10 = ofp::v10;
 namespace queue_props = v10::queue_properties;
-namespace v10_detail = v10::v10_detail;
+namespace protocol = v10::protocol;
 
 using properties_t = v10::packet_queue::properties_type;
 
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_SUITE(packet_queue_test)
       auto const sut = v10::packet_queue{queue_id, empty_props};
 
       BOOST_TEST(sut.queue_id() == queue_id);
-      BOOST_TEST(sut.length() == sizeof(v10_detail::ofp_packet_queue));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_packet_queue));
       BOOST_TEST((sut.properties() == empty_props));
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor
@@ -268,8 +268,8 @@ BOOST_AUTO_TEST_SUITE(packet_queue_test)
         throw_exception_if_binary_size_is_invalid)
     {
       binary.resize(
-            sizeof(v10_detail::ofp_packet_queue)
-          + (sizeof(v10_detail::ofp_queue_prop_header) - 1));
+            sizeof(protocol::ofp_packet_queue)
+          + (sizeof(protocol::ofp_queue_prop_header) - 1));
       auto it = binary.begin();
 
       BOOST_CHECK_THROW(

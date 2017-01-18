@@ -8,7 +8,6 @@
 
 namespace of = canard::net::ofp;
 namespace v10 = of::v10;
-namespace detail = v10::v10_detail;
 namespace actions = v10::actions;
 
 namespace {
@@ -38,7 +37,7 @@ BOOST_AUTO_TEST_SUITE(strip_vlan_test)
         auto const sut = actions::strip_vlan{};
 
         BOOST_TEST(sut.type() == v10::protocol::OFPAT_STRIP_VLAN);
-        BOOST_TEST(sut.length() == sizeof(detail::ofp_action_header));
+        BOOST_TEST(sut.length() == sizeof(v10::protocol::ofp_action_header));
     }
 
     BOOST_AUTO_TEST_CASE(create_test)

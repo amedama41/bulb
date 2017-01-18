@@ -10,8 +10,6 @@
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace table_feature_properties = v13::table_feature_properties;
-namespace detail = v13::v13_detail;
-
 namespace protocol = v13::protocol;
 
 namespace {
@@ -71,7 +69,7 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
         auto const sut = table_feature_properties::write_actions{};
 
         BOOST_TEST(sut.length()
-                == sizeof(detail::ofp_table_feature_prop_actions));
+                == sizeof(protocol::ofp_table_feature_prop_actions));
         BOOST_TEST((sut.begin() == sut.end()));
         BOOST_TEST(sut.action_ids().empty());
     }
@@ -84,7 +82,7 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
 
         BOOST_TEST_REQUIRE(output.length() == 4);
         BOOST_TEST(sut.length()
-                == sizeof(detail::ofp_table_feature_prop_actions) + 4);
+                == sizeof(protocol::ofp_table_feature_prop_actions) + 4);
         BOOST_TEST((sut.begin() != sut.end()));
         BOOST_TEST(sut.action_ids().size() == 1);
         BOOST_TEST((*sut.begin() == output));
@@ -103,7 +101,7 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
         };
 
         BOOST_TEST(sut.length()
-                == sizeof(detail::ofp_table_feature_prop_actions)
+                == sizeof(protocol::ofp_table_feature_prop_actions)
                  + 4 * 3 + experimenter.length());
         BOOST_TEST((sut.begin() != sut.end()));
         BOOST_TEST_REQUIRE(sut.action_ids().size() == 4);
@@ -130,7 +128,7 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
 
         BOOST_TEST((copy == sut));
         BOOST_TEST(src.length()
-                == sizeof(detail::ofp_table_feature_prop_actions));
+                == sizeof(protocol::ofp_table_feature_prop_actions));
         BOOST_TEST((src.begin() == src.end()));
     }
 
@@ -152,7 +150,7 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
 
         BOOST_TEST((copy == sut));
         BOOST_TEST(src.length()
-                == sizeof(detail::ofp_table_feature_prop_actions));
+                == sizeof(protocol::ofp_table_feature_prop_actions));
         BOOST_TEST((src.begin() == src.end()));
     }
 

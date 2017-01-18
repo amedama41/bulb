@@ -9,9 +9,8 @@
 
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
-namespace v13_detail = v13::v13_detail;
 namespace multipart = v13::messages::multipart;
-namespace proto = v13::protocol;
+namespace protocol = v13::protocol;
 
 namespace {
 
@@ -115,10 +114,10 @@ BOOST_AUTO_TEST_SUITE(description_request_test)
     {
         auto const sut = multipart::description_request{};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_MULTIPART_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_multipart_request));
-        BOOST_TEST(sut.multipart_type() == proto::OFPMP_DESC);
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_MULTIPART_REQUEST);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_multipart_request));
+        BOOST_TEST(sut.multipart_type() == protocol::OFPMP_DESC);
         BOOST_TEST(sut.flags() == 0);
     }
 
@@ -176,11 +175,11 @@ BOOST_AUTO_TEST_SUITE(description_reply_test)
             , "datapath_desc"
         };
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_MULTIPART_REPLY);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_multipart_reply)
-                                 + sizeof(v13_detail::ofp_desc));
-        BOOST_TEST(sut.multipart_type() == proto::OFPMP_DESC);
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_MULTIPART_REPLY);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_multipart_reply)
+                                 + sizeof(protocol::ofp_desc));
+        BOOST_TEST(sut.multipart_type() == protocol::OFPMP_DESC);
         BOOST_TEST(sut.flags() == 0);
         BOOST_TEST(sut.manufacture_desc() == "manufacture_desc");
         BOOST_TEST(sut.hardware_desc() == "hardware_desc");

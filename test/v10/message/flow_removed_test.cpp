@@ -8,9 +8,7 @@
 namespace ofp = canard::net::ofp;
 namespace v10 = ofp::v10;
 namespace msg = v10::messages;
-namespace detail = v10::v10_detail;
-
-namespace proto = v10::protocol;
+namespace protocol = v10::protocol;
 
 namespace {
 struct parameters : match_fixture {
@@ -19,7 +17,7 @@ struct parameters : match_fixture {
   };
   std::uint16_t priority = 0x1024;
   std::uint64_t cookie = 0x0102030405060708;
-  proto::ofp_flow_removed_reason reason = proto::OFPRR_DELETE;
+  protocol::ofp_flow_removed_reason reason = protocol::OFPRR_DELETE;
   v10::elapsed_time elapsed_time{0x10203040, 0x50607080};
   std::uint16_t idle_timeout = 0x1200;
   v10::counters counters{0x0101010140302010, 0x0101010144332211};
@@ -51,7 +49,7 @@ BOOST_AUTO_TEST_SUITE(flow_removed)
         , elapsed_time, idle_timeout, counters, xid
       };
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_flow_removed));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_flow_removed));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST((sut.match() == match));
       BOOST_TEST(sut.priority() == priority);
@@ -68,7 +66,7 @@ BOOST_AUTO_TEST_SUITE(flow_removed)
         match, priority, cookie, reason, elapsed_time, idle_timeout, counters
       };
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_flow_removed));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_flow_removed));
       BOOST_TEST((sut.match() == match));
       BOOST_TEST(sut.priority() == priority);
       BOOST_TEST(sut.cookie() == cookie);
@@ -86,7 +84,7 @@ BOOST_AUTO_TEST_SUITE(flow_removed)
         entry, reason, elapsed_time, idle_timeout, counters, xid
       };
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_flow_removed));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_flow_removed));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST((sut.match() == match));
       BOOST_TEST(sut.priority() == priority);
@@ -105,7 +103,7 @@ BOOST_AUTO_TEST_SUITE(flow_removed)
         entry, reason, elapsed_time, idle_timeout, counters
       };
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_flow_removed));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_flow_removed));
       BOOST_TEST((sut.match() == match));
       BOOST_TEST(sut.priority() == priority);
       BOOST_TEST(sut.cookie() == cookie);
@@ -194,11 +192,11 @@ BOOST_AUTO_TEST_SUITE(flow_removed)
     {
       BOOST_TEST(
           (msg::flow_removed{
-               match, priority, cookie, proto::OFPRR_IDLE_TIMEOUT
+               match, priority, cookie, protocol::OFPRR_IDLE_TIMEOUT
              , elapsed_time, idle_timeout, counters, xid
            }
         != msg::flow_removed{
-               match, priority, cookie, proto::OFPRR_HARD_TIMEOUT
+               match, priority, cookie, protocol::OFPRR_HARD_TIMEOUT
              , elapsed_time, idle_timeout, counters, xid
            }));
     }

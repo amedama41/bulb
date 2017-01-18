@@ -10,9 +10,8 @@
 
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
-namespace v13_detail = v13::v13_detail;
 namespace multipart = v13::messages::multipart;
-namespace proto = v13::protocol;
+namespace protocol = v13::protocol;
 
 namespace {
 
@@ -32,12 +31,12 @@ struct port_fixture
     v13::port port1 = v13::port::from_ofp_port({
               0x1
             , {0}, {0x01, 0x02, 0x03, 0x04, 0x05, 0x06}, {0}, "eth1"
-            , proto::OFPPC_PORT_DOWN
-            , proto::OFPPS_LINK_DOWN
-            , proto::OFPPF_100GB_FD | proto::OFPPF_FIBER
-            , proto::OFPPF_10MB_HD | proto::OFPPF_100MB_HD | proto::OFPPF_100GB_FD | proto::OFPPF_AUTONEG
-            , proto::OFPPF_10MB_HD | proto::OFPPF_100MB_HD | proto::OFPPF_100GB_FD | proto::OFPPF_AUTONEG
-            , proto::OFPPF_10MB_FD | proto::OFPPF_100MB_FD | proto::OFPPF_100GB_FD | proto::OFPPF_AUTONEG
+            , protocol::OFPPC_PORT_DOWN
+            , protocol::OFPPS_LINK_DOWN
+            , protocol::OFPPF_100GB_FD | protocol::OFPPF_FIBER
+            , protocol::OFPPF_10MB_HD | protocol::OFPPF_100MB_HD | protocol::OFPPF_100GB_FD | protocol::OFPPF_AUTONEG
+            , protocol::OFPPF_10MB_HD | protocol::OFPPF_100MB_HD | protocol::OFPPF_100GB_FD | protocol::OFPPF_AUTONEG
+            , protocol::OFPPF_10MB_FD | protocol::OFPPF_100MB_FD | protocol::OFPPF_100GB_FD | protocol::OFPPF_AUTONEG
             , 0xf1f2f3f4, 0xf5f6f7f8
     });
     v13::port port2 = v13::port::from_ofp_port({
@@ -45,21 +44,21 @@ struct port_fixture
             , {0}, {0x11, 0x12, 0x13, 0x14, 0x15, 0x16}, {0}, "eth2"
             , 0
             , 0
-            , proto::OFPPF_100MB_FD | proto::OFPPF_COPPER
-            , proto::OFPPF_10MB_FD | proto::OFPPF_100MB_FD | proto::OFPPF_AUTONEG
-            , proto::OFPPF_10MB_FD | proto::OFPPF_100MB_FD | proto::OFPPF_AUTONEG
-            , proto::OFPPF_100MB_FD | proto::OFPPF_100GB_FD | proto::OFPPF_AUTONEG
+            , protocol::OFPPF_100MB_FD | protocol::OFPPF_COPPER
+            , protocol::OFPPF_10MB_FD | protocol::OFPPF_100MB_FD | protocol::OFPPF_AUTONEG
+            , protocol::OFPPF_10MB_FD | protocol::OFPPF_100MB_FD | protocol::OFPPF_AUTONEG
+            , protocol::OFPPF_100MB_FD | protocol::OFPPF_100GB_FD | protocol::OFPPF_AUTONEG
             , 0xe1e2e3e4, 0xe5e6e7e8
     });
     v13::port port3 = v13::port::from_ofp_port({
-              proto::OFPP_MAX
+              protocol::OFPP_MAX
             , {0}, {0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6}, {0}, "eth100"
-            , proto::OFPPC_NO_RECV | proto::OFPPC_NO_PACKET_IN
-            , proto::OFPPS_BLOCKED | proto::OFPPS_LIVE
-            , proto::OFPPF_1TB_FD | proto::OFPPF_FIBER
-            , proto::OFPPF_100GB_FD | proto::OFPPF_1TB_FD | proto::OFPPF_AUTONEG
-            , proto::OFPPF_100GB_FD | proto::OFPPF_1TB_FD | proto::OFPPF_AUTONEG
-            , proto::OFPPF_40GB_FD | proto::OFPPF_1TB_FD | proto::OFPPF_AUTONEG
+            , protocol::OFPPC_NO_RECV | protocol::OFPPC_NO_PACKET_IN
+            , protocol::OFPPS_BLOCKED | protocol::OFPPS_LIVE
+            , protocol::OFPPF_1TB_FD | protocol::OFPPF_FIBER
+            , protocol::OFPPF_100GB_FD | protocol::OFPPF_1TB_FD | protocol::OFPPF_AUTONEG
+            , protocol::OFPPF_100GB_FD | protocol::OFPPF_1TB_FD | protocol::OFPPF_AUTONEG
+            , protocol::OFPPF_40GB_FD | protocol::OFPPF_1TB_FD | protocol::OFPPF_AUTONEG
             , 0x01020304, 0x05060708
     });
 };
@@ -67,7 +66,7 @@ struct port_fixture
 struct port_description_reply_fixture : port_fixture
 {
     multipart::port_description_reply sut{
-        {port1, port2, port3}, proto::OFPMPF_REPLY_MORE, 0x12345678
+        {port1, port2, port3}, protocol::OFPMPF_REPLY_MORE, 0x12345678
     };
     std::vector<std::uint8_t> binary
         = "\x04\x13\x00\xd0\x12\x34\x56\x78""\x00\x0d\x00\x01\x00\x00\x00\x00"
@@ -98,10 +97,10 @@ BOOST_AUTO_TEST_SUITE(port_description_request_test)
     {
         auto const sut = multipart::port_description_request{};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_MULTIPART_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_multipart_request));
-        BOOST_TEST(sut.multipart_type() == proto::OFPMP_PORT_DESC);
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_MULTIPART_REQUEST);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_multipart_request));
+        BOOST_TEST(sut.multipart_type() == protocol::OFPMP_PORT_DESC);
         BOOST_TEST(sut.flags() == 0);
     }
 
@@ -142,11 +141,11 @@ BOOST_AUTO_TEST_SUITE(port_description_reply_test)
 
         auto const sut = multipart::port_description_reply{ports};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_MULTIPART_REPLY);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_multipart_reply)
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_MULTIPART_REPLY);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_multipart_reply)
                                  + v13::port::length() * ports.size());
-        BOOST_TEST(sut.multipart_type() == proto::OFPMP_PORT_DESC);
+        BOOST_TEST(sut.multipart_type() == protocol::OFPMP_PORT_DESC);
         BOOST_TEST(sut.flags() == 0);
         BOOST_TEST(sut.size() == 2);
     }

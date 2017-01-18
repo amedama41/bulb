@@ -13,7 +13,6 @@
 
 namespace of = canard::net::ofp;
 namespace v10 = of::v10;
-namespace detail = v10::v10_detail;
 namespace fields = v10::match_fields;
 
 namespace proto = v10::protocol;
@@ -198,7 +197,7 @@ BOOST_AUTO_TEST_SUITE(ip_dscp_test)
       //     is_false_if_dspc_is_equal_but_tos_lower_2_bits_are_not_equal)
       // {
       //   auto const dscp = std::uint32_t{0x11};
-      //   auto match = detail::ofp_match{};
+      //   auto match = v10::protocol::ofp_match{};
       //   match.nw_tos = dscp << 2 | 0x3;
 
       //   BOOST_TEST((fields::ip_dscp{dscp} != fields::ip_dscp{match}));
@@ -226,7 +225,7 @@ BOOST_AUTO_TEST_SUITE(ip_dscp_test)
       //     is_true_if_dspc_is_equal_but_tos_lower_2_bits_are_not_equal)
       // {
       //   auto const dscp = std::uint32_t{0x11};
-      //   auto match = detail::ofp_match{};
+      //   auto match = v10::protocol::ofp_match{};
       //   match.nw_tos = dscp << 2 | 0x3;
 
       //   BOOST_TEST(equivalent(fields::ip_dscp{dscp}, fields::ip_dscp{match}));

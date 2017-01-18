@@ -7,9 +7,8 @@
 
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
-namespace v13_detail = v13::v13_detail;
 namespace queue_props = v13::queue_properties;
-namespace proto = v13::protocol;
+namespace protocol = v13::protocol;
 
 namespace {
 
@@ -40,8 +39,8 @@ BOOST_AUTO_TEST_SUITE(min_rate_test)
 
         auto const sut = queue_props::min_rate{rate};
 
-        BOOST_TEST(sut.property() == proto::OFPQT_MIN_RATE);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_queue_prop_min_rate));
+        BOOST_TEST(sut.property() == protocol::OFPQT_MIN_RATE);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_queue_prop_min_rate));
         BOOST_TEST(sut.rate() == rate);
     }
 
@@ -59,8 +58,8 @@ BOOST_AUTO_TEST_SUITE(min_rate_test)
       BOOST_AUTO_TEST_CASE(is_true_if_both_rate_are_not_configurable)
       {
         BOOST_TEST(
-            (queue_props::min_rate{proto::OFPQ_MIN_RATE_UNCFG}
-          == queue_props::min_rate{proto::OFPQ_MIN_RATE_UNCFG}));
+            (queue_props::min_rate{protocol::OFPQ_MIN_RATE_UNCFG}
+          == queue_props::min_rate{protocol::OFPQ_MIN_RATE_UNCFG}));
       }
       BOOST_AUTO_TEST_CASE(false_if_rate_is_not_equal)
       {
@@ -75,7 +74,7 @@ BOOST_AUTO_TEST_SUITE(min_rate_test)
       {
         BOOST_TEST(
             (queue_props::min_rate{1001}
-          != queue_props::min_rate{proto::OFPQ_MIN_RATE_UNCFG}));
+          != queue_props::min_rate{protocol::OFPQ_MIN_RATE_UNCFG}));
       }
       BOOST_AUTO_TEST_CASE(is_false_if_lhs_rate_is_over_1000)
       {
@@ -116,8 +115,8 @@ BOOST_AUTO_TEST_SUITE(min_rate_test)
       {
         BOOST_TEST(
             equivalent(
-                queue_props::min_rate{proto::OFPQ_MIN_RATE_UNCFG}
-              , queue_props::min_rate{proto::OFPQ_MIN_RATE_UNCFG}));
+                queue_props::min_rate{protocol::OFPQ_MIN_RATE_UNCFG}
+              , queue_props::min_rate{protocol::OFPQ_MIN_RATE_UNCFG}));
       }
       BOOST_AUTO_TEST_CASE(false_if_rate_is_not_equal)
       {
@@ -135,7 +134,7 @@ BOOST_AUTO_TEST_SUITE(min_rate_test)
         BOOST_TEST(
             !equivalent(
                 queue_props::min_rate{1001}
-              , queue_props::min_rate{proto::OFPQ_MIN_RATE_UNCFG}));
+              , queue_props::min_rate{protocol::OFPQ_MIN_RATE_UNCFG}));
       }
       BOOST_AUTO_TEST_CASE(is_false_if_lhs_rate_is_over_1000)
       {

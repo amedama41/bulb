@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_SUITE(drop)
 
       constexpr auto length = sut::length();
 
-      BOOST_TEST(length == sizeof(v13::v13_detail::ofp_meter_band_drop));
+      BOOST_TEST(length == sizeof(v13::protocol::ofp_meter_band_drop));
     }
   BOOST_AUTO_TEST_SUITE_END() // type_definition_test
 

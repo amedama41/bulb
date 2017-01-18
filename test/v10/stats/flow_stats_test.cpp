@@ -9,9 +9,7 @@ namespace ofp = canard::net::ofp;
 namespace v10 = ofp::v10;
 namespace msg = v10::messages;
 namespace stats = msg::statistics;
-namespace detail = v10::v10_detail;
-
-namespace proto = v10::protocol;
+namespace protocol = v10::protocol;
 
 namespace {
 struct flow_stats_parameters : match_fixture, action_fixture {
@@ -107,7 +105,7 @@ struct flow_stats_reply_parameters : match_fixture, action_fixture {
     , v10::counters{0xe1e2e3e4e5e6e7e8, 0xf1f2f3f4f5f6f7f8}
   };
   body_type body{ stats1, stats2, stats3 };
-  std::uint16_t flags = proto::OFPSF_REPLY_MORE;
+  std::uint16_t flags = protocol::OFPSF_REPLY_MORE;
   std::uint32_t xid= 0x12345678;
 };
 struct flow_stats_reply_fixture : flow_stats_reply_parameters {
@@ -169,7 +167,7 @@ BOOST_AUTO_TEST_SUITE(flow_stats)
 
       BOOST_TEST(
           sut.length()
-       == sizeof(detail::ofp_flow_stats) + entry.actions().length());
+       == sizeof(protocol::ofp_flow_stats) + entry.actions().length());
       BOOST_TEST((sut.match() == entry.match()));
       BOOST_TEST(sut.priority() == entry.priority());
       BOOST_TEST(sut.cookie() == entry.cookie());
@@ -202,7 +200,7 @@ BOOST_AUTO_TEST_SUITE(flow_stats)
       auto const copy = std::move(moved);
 
       BOOST_TEST((copy == sut));
-      BOOST_TEST(moved.length() == sizeof(detail::ofp_flow_stats));
+      BOOST_TEST(moved.length() == sizeof(protocol::ofp_flow_stats));
       BOOST_TEST(moved.actions().empty());
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor
@@ -334,7 +332,7 @@ BOOST_AUTO_TEST_SUITE(flow_stats)
     }
     BOOST_AUTO_TEST_CASE(generates_no_actions_binary_from_no_actions_flow_stats)
     {
-      no_actions_bin.resize(sizeof(detail::ofp_flow_stats));
+      no_actions_bin.resize(sizeof(protocol::ofp_flow_stats));
       auto buf = std::vector<unsigned char>{};
 
       no_actions_sut.encode(buf);
@@ -363,12 +361,12 @@ BOOST_AUTO_TEST_SUITE(flow_stats)
         = stats::flow_stats::decode(it, no_actions_bin.end());
 
       BOOST_TEST((it == std::next(
-              no_actions_bin.begin(), sizeof(detail::ofp_flow_stats))));
+              no_actions_bin.begin(), sizeof(protocol::ofp_flow_stats))));
       BOOST_TEST((flow_stats == no_actions_sut));
     }
     BOOST_AUTO_TEST_CASE(throws_exception_if_length_is_too_small)
     {
-      bin[1] = sizeof(detail::ofp_flow_stats) - 1;
+      bin[1] = sizeof(protocol::ofp_flow_stats) - 1;
       auto it = bin.begin();
 
       BOOST_CHECK_THROW(
@@ -400,8 +398,8 @@ BOOST_AUTO_TEST_SUITE(flow_stats_request)
 
       BOOST_TEST(
           sut.length()
-       == sizeof(detail::ofp_stats_request)
-        + sizeof(detail::ofp_flow_stats_request));
+       == sizeof(protocol::ofp_stats_request)
+        + sizeof(protocol::ofp_flow_stats_request));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST((sut.match() == match));
       BOOST_TEST(sut.table_id() == table_id);
@@ -417,8 +415,8 @@ BOOST_AUTO_TEST_SUITE(flow_stats_request)
 
       BOOST_TEST(
           sut.length()
-       == sizeof(detail::ofp_stats_request)
-        + sizeof(detail::ofp_flow_stats_request));
+       == sizeof(protocol::ofp_stats_request)
+        + sizeof(protocol::ofp_flow_stats_request));
       BOOST_TEST((sut.match() == match));
       BOOST_TEST(sut.table_id() == table_id);
       BOOST_TEST(sut.out_port() == out_port);
@@ -433,11 +431,11 @@ BOOST_AUTO_TEST_SUITE(flow_stats_request)
 
       BOOST_TEST(
           sut.length()
-       == sizeof(detail::ofp_stats_request)
-        + sizeof(detail::ofp_flow_stats_request));
+       == sizeof(protocol::ofp_stats_request)
+        + sizeof(protocol::ofp_flow_stats_request));
       BOOST_TEST((sut.match() == match));
       BOOST_TEST(sut.table_id() == table_id);
-      BOOST_TEST(sut.out_port() == proto::OFPP_NONE);
+      BOOST_TEST(sut.out_port() == protocol::OFPP_NONE);
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor
 
@@ -524,7 +522,7 @@ BOOST_AUTO_TEST_SUITE(flow_stats_reply)
 
       BOOST_TEST(
           sut.length()
-       == sizeof(detail::ofp_stats_reply) + stats1.length() + stats2.length());
+       == sizeof(protocol::ofp_stats_reply) + stats1.length() + stats2.length());
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.flags() == flags);
       BOOST_TEST((sut.body() == body_type{ stats1, stats2 }));
@@ -532,13 +530,13 @@ BOOST_AUTO_TEST_SUITE(flow_stats_reply)
     BOOST_FIXTURE_TEST_CASE(
         is_constructible_from_single_flow_stats, flow_stats_reply_parameters)
     {
-      auto const flags = proto::OFPSF_REPLY_MORE;
+      auto const flags = protocol::OFPSF_REPLY_MORE;
       auto const xid = 0x01010202;
 
       stats::flow_stats_reply sut{{ stats3 }, flags, xid};
 
       BOOST_TEST(
-          sut.length() == sizeof(detail::ofp_stats_reply) + stats3.length());
+          sut.length() == sizeof(protocol::ofp_stats_reply) + stats3.length());
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.flags() == flags);
       BOOST_TEST((sut.body() == body_type{ stats3 }));
@@ -550,18 +548,18 @@ BOOST_AUTO_TEST_SUITE(flow_stats_reply)
 
       stats::flow_stats_reply sut{{}, flags, xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_stats_reply));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_stats_reply));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.flags() == flags);
       BOOST_TEST((sut.body() == body_type{}));
     }
     BOOST_AUTO_TEST_CASE(is_constructible_without_xid)
     {
-      auto const flags = proto::OFPSF_REPLY_MORE;
+      auto const flags = protocol::OFPSF_REPLY_MORE;
 
       stats::flow_stats_reply sut{{}, flags};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_stats_reply));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_stats_reply));
       BOOST_TEST(sut.flags() == flags);
       BOOST_TEST((sut.body() == body_type{}));
     }
@@ -588,7 +586,7 @@ BOOST_AUTO_TEST_SUITE(flow_stats_reply)
       auto const copy = std::move(moved);
 
       BOOST_TEST((copy == sut));
-      BOOST_TEST(moved.length() == sizeof(detail::ofp_stats_reply));
+      BOOST_TEST(moved.length() == sizeof(protocol::ofp_stats_reply));
       BOOST_TEST(moved.body().empty());
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor
@@ -641,7 +639,7 @@ BOOST_AUTO_TEST_SUITE(flow_stats_reply)
     {
       auto const sut = stats::flow_stats_reply{{}, flags, xid};
       auto buf = std::vector<unsigned char>{};
-      constexpr auto size = sizeof(detail::ofp_stats_reply);
+      constexpr auto size = sizeof(protocol::ofp_stats_reply);
       bin[2] = 0;
       bin[3] = size;
       bin.resize(size);
@@ -667,7 +665,7 @@ BOOST_AUTO_TEST_SUITE(flow_stats_reply)
     BOOST_AUTO_TEST_CASE(
         constructs_no_flow_stats_reply_from_no_flow_stats_binary)
     {
-      constexpr auto size = sizeof(detail::ofp_stats_reply);
+      constexpr auto size = sizeof(protocol::ofp_stats_reply);
       bin[2] = 0;
       bin[3] = size;
       auto it = bin.begin();
@@ -683,7 +681,7 @@ BOOST_AUTO_TEST_SUITE(flow_stats_reply)
     {
       bin[2] = 0;
       bin[3]
-        = sizeof(detail::ofp_stats_reply) + sizeof(detail::ofp_flow_stats) - 1;
+        = sizeof(protocol::ofp_stats_reply) + sizeof(protocol::ofp_flow_stats) - 1;
       auto it = bin.begin();
 
       BOOST_CHECK_THROW(

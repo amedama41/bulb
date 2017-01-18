@@ -10,9 +10,7 @@ namespace ofp = canard::net::ofp;
 namespace v13 = ofp::v13;
 namespace msg = v13::messages;
 namespace helems = v13::hello_elements;
-namespace detail = v13::v13_detail;
-
-namespace proto = v13::protocol;
+namespace protocol = v13::protocol;
 
 namespace {
 using helems_type = msg::hello::hello_elements_type;
@@ -48,7 +46,7 @@ BOOST_AUTO_TEST_SUITE(hello)
 
     using msg_type = std::integral_constant<std::uint8_t, sut::type()>;
 
-    BOOST_TEST(msg_type::value == proto::OFPT_HELLO);
+    BOOST_TEST(msg_type::value == protocol::OFPT_HELLO);
   }
 
   BOOST_AUTO_TEST_SUITE(constructor)
@@ -60,7 +58,7 @@ BOOST_AUTO_TEST_SUITE(hello)
       msg::hello sut{version, xid};
 
       BOOST_TEST(sut.version() == version);
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_hello));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_hello));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.elements().empty());
     }
@@ -71,7 +69,7 @@ BOOST_AUTO_TEST_SUITE(hello)
       msg::hello sut{version};
 
       BOOST_TEST(sut.version() == version);
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_hello));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_hello));
       BOOST_TEST(sut.elements().empty());
     }
     BOOST_AUTO_TEST_CASE(is_constructible_from_versionbitmap_and_xid)
@@ -115,7 +113,7 @@ BOOST_AUTO_TEST_SUITE(hello)
       msg::hello sut{version, elements, xid};
 
       BOOST_TEST(sut.version() == version);
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_hello));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_hello));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST((sut.elements() == elements));
     }
@@ -142,7 +140,7 @@ BOOST_AUTO_TEST_SUITE(hello)
       auto const copy = std::move(moved);
 
       BOOST_TEST((copy == sut));
-      BOOST_TEST(moved.length() == sizeof(detail::ofp_hello));
+      BOOST_TEST(moved.length() == sizeof(protocol::ofp_hello));
       BOOST_TEST(moved.elements().empty());
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor

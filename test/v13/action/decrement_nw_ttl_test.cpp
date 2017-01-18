@@ -12,8 +12,6 @@
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace actions = v13::actions;
-namespace v13_detail = v13::v13_detail;
-
 namespace protocol = v13::protocol;
 
 namespace bdata = boost::unit_test::data;
@@ -36,7 +34,7 @@ BOOST_AUTO_TEST_SUITE(decrement_nw_ttl_test)
         using sut = actions::decrement_nw_ttl;
 
         BOOST_TEST(sut::type() == protocol::OFPAT_DEC_NW_TTL);
-        BOOST_TEST(sut::length() == sizeof(v13_detail::ofp_action_header));
+        BOOST_TEST(sut::length() == sizeof(protocol::ofp_action_header));
     }
 
     BOOST_AUTO_TEST_CASE(construct_test)

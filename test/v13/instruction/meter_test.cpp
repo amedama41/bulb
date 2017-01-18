@@ -12,7 +12,6 @@
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace instructions = v13::instructions;
-namespace detail = v13::v13_detail;
 
 namespace bdata = boost::unit_test::data;
 
@@ -34,7 +33,8 @@ BOOST_AUTO_TEST_SUITE(meter_test)
         using sut = instructions::meter;
 
         BOOST_TEST(sut::type() == v13::protocol::OFPIT_METER);
-        BOOST_TEST(sut::length() == sizeof(detail::ofp_instruction_meter));
+        BOOST_TEST(sut::length()
+                == sizeof(v13::protocol::ofp_instruction_meter));
     }
 
     BOOST_AUTO_TEST_CASE(construct_from_meter_id_test)

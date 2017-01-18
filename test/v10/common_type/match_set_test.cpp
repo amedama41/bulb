@@ -9,7 +9,6 @@
 
 namespace of = canard::net::ofp;
 namespace v10 = of::v10;
-namespace detail = v10::v10_detail;
 namespace fields = v10::match_fields;
 
 namespace proto = v10::protocol;
@@ -59,7 +58,7 @@ BOOST_AUTO_TEST_SUITE(match_set_test)
     {
         auto const sut = v10::match{};
 
-        BOOST_TEST(sut.length() == sizeof(detail::ofp_match));
+        BOOST_TEST(sut.length() == sizeof(v10::protocol::ofp_match));
         BOOST_TEST(sut.empty());
         BOOST_TEST(sut.wildcards() == proto::OFPFW_ALL);
         BOOST_TEST((sut.get<fields::in_port>() == boost::none));
@@ -171,7 +170,7 @@ BOOST_AUTO_TEST_SUITE(match_set_test)
 
     BOOST_AUTO_TEST_CASE(construct_from_ofp_match_test)
     {
-        auto ofp_match = detail::ofp_match{};
+        auto ofp_match = v10::protocol::ofp_match{};
         ofp_match.wildcards = proto::OFPFW_ALL;
         ofp_match.wildcards &= ~proto::OFPFW_IN_PORT;
         ofp_match.in_port = proto::OFPP_ANY;
@@ -293,7 +292,7 @@ BOOST_AUTO_TEST_SUITE(match_set_test)
       }
       BOOST_AUTO_TEST_CASE(is_false_if_wildcards_is_not_equal_but_equivalent)
       {
-        auto match = detail::ofp_match{};
+        auto match = v10::protocol::ofp_match{};
         match.wildcards = proto::OFPFW_ALL;
         auto const sut1 = v10::match{match};
         match.wildcards = std::numeric_limits<std::uint32_t>::max();
@@ -303,7 +302,7 @@ BOOST_AUTO_TEST_SUITE(match_set_test)
       }
       BOOST_AUTO_TEST_CASE(is_false_if_padding_is_not_equal)
       {
-        auto match = detail::ofp_match{};
+        auto match = v10::protocol::ofp_match{};
         auto const sut1 = v10::match{match};
         match.pad1[0] = 0xff;
         auto const sut2 = v10::match{match};
@@ -361,7 +360,7 @@ BOOST_AUTO_TEST_SUITE(match_set_test)
       }
       BOOST_AUTO_TEST_CASE(is_true_if_wildcards_is_not_equal_but_equivalent)
       {
-        auto match = detail::ofp_match{};
+        auto match = v10::protocol::ofp_match{};
         match.wildcards = proto::OFPFW_ALL;
         auto const sut1 = v10::match{match};
         match.wildcards = std::numeric_limits<std::uint32_t>::max();
@@ -371,7 +370,7 @@ BOOST_AUTO_TEST_SUITE(match_set_test)
       }
       BOOST_AUTO_TEST_CASE(is_true_if_padding_is_not_equal)
       {
-        auto match = detail::ofp_match{};
+        auto match = v10::protocol::ofp_match{};
         auto const sut1 = v10::match{match};
         match.pad1[0] = 0xff;
         auto const sut2 = v10::match{match};

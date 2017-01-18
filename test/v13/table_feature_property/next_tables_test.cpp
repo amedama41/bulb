@@ -8,8 +8,6 @@
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace table_feature_properties = v13::table_feature_properties;
-namespace detail = v13::v13_detail;
-
 namespace protocol = v13::protocol;
 
 namespace {
@@ -62,7 +60,7 @@ BOOST_AUTO_TEST_SUITE(next_tables_test)
         auto const sut = table_feature_properties::next_tables{};
 
         BOOST_TEST(sut.length()
-                == sizeof(detail::ofp_table_feature_prop_next_tables));
+                == sizeof(protocol::ofp_table_feature_prop_next_tables));
         BOOST_TEST((sut.begin() == sut.end()));
         BOOST_TEST(sut.next_table_ids().empty());
     }
@@ -74,7 +72,7 @@ BOOST_AUTO_TEST_SUITE(next_tables_test)
         auto const sut = table_feature_properties::next_tables{table_id};
 
         BOOST_TEST(sut.length()
-                == sizeof(detail::ofp_table_feature_prop_next_tables) + 1);
+                == sizeof(protocol::ofp_table_feature_prop_next_tables) + 1);
         BOOST_TEST(sut.next_table_ids().size() == 1);
         auto it = sut.begin();
         BOOST_TEST_REQUIRE((it != sut.end()));
@@ -93,7 +91,7 @@ BOOST_AUTO_TEST_SUITE(next_tables_test)
         };
 
         BOOST_TEST(sut.length()
-                == sizeof(detail::ofp_table_feature_prop_next_tables) + 1 * 3);
+                == sizeof(protocol::ofp_table_feature_prop_next_tables) + 1 * 3);
         BOOST_TEST(sut.next_table_ids().size() == 3);
         auto it = sut.begin();
         BOOST_TEST_REQUIRE((it != sut.end()));
@@ -118,7 +116,7 @@ BOOST_AUTO_TEST_SUITE(next_tables_test)
 
         BOOST_TEST((copy == sut));
         BOOST_TEST(src.length()
-                == sizeof(detail::ofp_table_feature_prop_next_tables));
+                == sizeof(protocol::ofp_table_feature_prop_next_tables));
         BOOST_TEST(src.next_table_ids().empty());
     }
 
@@ -140,7 +138,7 @@ BOOST_AUTO_TEST_SUITE(next_tables_test)
 
         BOOST_TEST((copy == sut));
         BOOST_TEST(src.length()
-                == sizeof(detail::ofp_table_feature_prop_next_tables));
+                == sizeof(protocol::ofp_table_feature_prop_next_tables));
         BOOST_TEST(src.next_table_ids().empty());
     }
 

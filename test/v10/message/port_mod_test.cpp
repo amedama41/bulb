@@ -8,17 +8,15 @@
 namespace ofp = canard::net::ofp;
 namespace v10 = ofp::v10;
 namespace msg = v10::messages;
-namespace detail = v10::v10_detail;
-
-namespace proto = v10::protocol;
+namespace protocol = v10::protocol;
 
 namespace {
 struct parameters {
   std::uint16_t port_no = 0xff00;
   canard::mac_address addr = "\x01\x02\x03\x04\x05\x06"_mac;
-  std::uint32_t config = proto::OFPPC_NO_FLOOD;
-  std::uint32_t mask = proto::OFPPC_PORT_DOWN | config;
-  std::uint32_t advertise = proto::OFPPF_100MB_FD | proto::OFPPF_AUTONEG;
+  std::uint32_t config = protocol::OFPPC_NO_FLOOD;
+  std::uint32_t mask = protocol::OFPPC_PORT_DOWN | config;
+  std::uint32_t advertise = protocol::OFPPF_100MB_FD | protocol::OFPPF_AUTONEG;
   std::uint32_t xid = 0x12345678;
 };
 struct port_mod_fixture : parameters {
@@ -37,14 +35,14 @@ BOOST_AUTO_TEST_SUITE(port_mod)
     {
       auto const port_no = std::uint16_t{12};
       auto const addr = "\x01\x02\x03\x04\x05\x06"_mac;
-      auto const config = proto::OFPPC_NO_FLOOD;
-      auto const mask = proto::OFPPC_PORT_DOWN | config;
-      auto const advertise = proto::OFPPF_100MB_FD | proto::OFPPF_AUTONEG;
+      auto const config = protocol::OFPPC_NO_FLOOD;
+      auto const mask = protocol::OFPPC_PORT_DOWN | config;
+      auto const advertise = protocol::OFPPF_100MB_FD | protocol::OFPPF_AUTONEG;
       auto const xid = 0x12345678;
 
       msg::port_mod sut{port_no, addr, config, mask, advertise, xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_port_mod));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_port_mod));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.port_no() == port_no);
       BOOST_TEST(sut.hardware_address() == addr);
@@ -56,13 +54,13 @@ BOOST_AUTO_TEST_SUITE(port_mod)
     {
       auto const port_no = std::uint16_t{12};
       auto const addr = "\x01\x02\x03\x04\x05\x06"_mac;
-      auto const config = proto::OFPPC_NO_FLOOD;
-      auto const mask = proto::OFPPC_PORT_DOWN | config;
-      auto const advertise = proto::OFPPF_100MB_FD | proto::OFPPF_AUTONEG;
+      auto const config = protocol::OFPPC_NO_FLOOD;
+      auto const mask = protocol::OFPPC_PORT_DOWN | config;
+      auto const advertise = protocol::OFPPF_100MB_FD | protocol::OFPPF_AUTONEG;
 
       msg::port_mod sut{port_no, addr, config, mask, advertise};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_port_mod));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_port_mod));
       BOOST_TEST(sut.port_no() == port_no);
       BOOST_TEST(sut.hardware_address() == addr);
       BOOST_TEST(sut.config() == config);
@@ -73,16 +71,16 @@ BOOST_AUTO_TEST_SUITE(port_mod)
     {
       auto const port = v10::port{
           1, "\x01\x02\x03\x04\x05\x06"_mac, "eth0"
-        , proto::OFPPC_PORT_DOWN, 0, 0, 0, 0, 0
+        , protocol::OFPPC_PORT_DOWN, 0, 0, 0, 0, 0
       };
-      auto const config = proto::OFPPC_NO_FLOOD;
-      auto const mask = proto::OFPPC_PORT_DOWN | config;
-      auto const advertise = proto::OFPPF_100MB_FD | proto::OFPPF_AUTONEG;
+      auto const config = protocol::OFPPC_NO_FLOOD;
+      auto const mask = protocol::OFPPC_PORT_DOWN | config;
+      auto const advertise = protocol::OFPPF_100MB_FD | protocol::OFPPF_AUTONEG;
       auto const xid = 0x12345678;
 
       msg::port_mod sut{port, config, mask, advertise, xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_port_mod));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_port_mod));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.port_no() == port.port_no());
       BOOST_TEST(sut.hardware_address() == port.hardware_address());
@@ -94,15 +92,15 @@ BOOST_AUTO_TEST_SUITE(port_mod)
     {
       auto const port = v10::port{
           1, "\x01\x02\x03\x04\x05\x06"_mac, "eth0"
-        , proto::OFPPC_PORT_DOWN, 0, 0, 0, 0, 0
+        , protocol::OFPPC_PORT_DOWN, 0, 0, 0, 0, 0
       };
-      auto const config = proto::OFPPC_NO_FLOOD;
-      auto const mask = proto::OFPPC_PORT_DOWN | config;
-      auto const advertise = proto::OFPPF_100MB_FD | proto::OFPPF_AUTONEG;
+      auto const config = protocol::OFPPC_NO_FLOOD;
+      auto const mask = protocol::OFPPC_PORT_DOWN | config;
+      auto const advertise = protocol::OFPPF_100MB_FD | protocol::OFPPF_AUTONEG;
 
       msg::port_mod sut{port, config, mask, advertise};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_port_mod));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_port_mod));
       BOOST_TEST(sut.port_no() == port.port_no());
       BOOST_TEST(sut.hardware_address() == port.hardware_address());
       BOOST_TEST(sut.config() == config);

@@ -9,9 +9,7 @@ namespace ofp = canard::net::ofp;
 namespace v10 = ofp::v10;
 namespace msg = v10::messages;
 namespace act = v10::actions;
-namespace detail = v10::v10_detail;
-
-namespace proto = v10::protocol;
+namespace protocol = v10::protocol;
 
 namespace {
 struct parameters : match_fixture, action_fixture {
@@ -24,7 +22,8 @@ struct parameters : match_fixture, action_fixture {
     set_vlan_vid, output, strip_vlan, enqueue, set_eth_src, set_ipv4_src, output
   };
   v10::timeouts timeouts{0x3232, 0x8989};
-  std::uint16_t flags = proto::OFPFF_SEND_FLOW_REM | proto::OFPFF_CHECK_OVERLAP;
+  std::uint16_t flags
+    = protocol::OFPFF_SEND_FLOW_REM | protocol::OFPFF_CHECK_OVERLAP;
   std::uint32_t buffer_id = 0x01020304;
   std::uint32_t xid = 0x12345678;
 };
@@ -54,7 +53,7 @@ BOOST_AUTO_TEST_SUITE(flow_add)
   BOOST_AUTO_TEST_SUITE(command)
     BOOST_AUTO_TEST_CASE(returns_flow_add_command)
     {
-      BOOST_TEST(msg::flow_add::command() == proto::OFPFC_ADD);
+      BOOST_TEST(msg::flow_add::command() == protocol::OFPFC_ADD);
     }
   BOOST_AUTO_TEST_SUITE_END() // command
 
@@ -68,7 +67,7 @@ BOOST_AUTO_TEST_SUITE(flow_add)
       constexpr auto cookie = std::uint64_t{0x0102030405060708};
       auto const actions = v10::action_list{ set_ipv4_src, output };
       constexpr auto timeouts = v10::timeouts{1234, 5678};
-      constexpr auto flags = proto::OFPFF_CHECK_OVERLAP;
+      constexpr auto flags = protocol::OFPFF_CHECK_OVERLAP;
       constexpr auto buffer_id = 0x12345678;
 
       msg::flow_add sut{
@@ -76,7 +75,7 @@ BOOST_AUTO_TEST_SUITE(flow_add)
       };
 
       BOOST_TEST(
-          sut.length() == sizeof(detail::ofp_flow_mod) + actions.length());
+          sut.length() == sizeof(protocol::ofp_flow_mod) + actions.length());
       BOOST_TEST((sut.match() == match));
       BOOST_TEST(sut.priority() == priority);
       BOOST_TEST(sut.cookie() == cookie);
@@ -92,7 +91,7 @@ BOOST_AUTO_TEST_SUITE(flow_add)
       constexpr auto cookie = std::uint64_t{0x0102030405060708};
       auto const actions = v10::action_list{ set_ipv4_src, output };
       constexpr auto timeouts = v10::timeouts{1234, 5678};
-      constexpr auto flags = proto::OFPFF_CHECK_OVERLAP;
+      constexpr auto flags = protocol::OFPFF_CHECK_OVERLAP;
       constexpr auto buffer_id = 0x12345678;
       constexpr auto xid = std::uint32_t{0x12003400};
 
@@ -101,7 +100,7 @@ BOOST_AUTO_TEST_SUITE(flow_add)
       };
 
       BOOST_TEST(
-          sut.length() == sizeof(detail::ofp_flow_mod) + actions.length());
+          sut.length() == sizeof(protocol::ofp_flow_mod) + actions.length());
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST((sut.match() == match));
       BOOST_TEST(sut.priority() == priority);
@@ -119,7 +118,7 @@ BOOST_AUTO_TEST_SUITE(flow_add)
 
       BOOST_TEST(
           sut.length()
-       == sizeof(detail::ofp_flow_mod) + entry.actions().length());
+       == sizeof(protocol::ofp_flow_mod) + entry.actions().length());
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST((sut.match() == entry.id().match()));
       BOOST_TEST(sut.priority() == entry.id().priority());
@@ -154,7 +153,7 @@ BOOST_AUTO_TEST_SUITE(flow_add)
       auto const copy = std::move(moved);
 
       BOOST_TEST((copy == sut));
-      BOOST_TEST(moved.length() == sizeof(detail::ofp_flow_mod));
+      BOOST_TEST(moved.length() == sizeof(protocol::ofp_flow_mod));
       BOOST_TEST((moved.actions() == v10::action_list{}));
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor
@@ -176,8 +175,8 @@ BOOST_AUTO_TEST_SUITE(flow_add)
         match, priority, cookie, actions, timeouts, flags, buffer_id, xid
       };
       bin[2] = 0;
-      bin[3] = sizeof(detail::ofp_flow_mod);
-      bin.resize(sizeof(detail::ofp_flow_mod));
+      bin[3] = sizeof(protocol::ofp_flow_mod);
+      bin.resize(sizeof(protocol::ofp_flow_mod));
       auto buf = std::vector<unsigned char>{};
 
       sut.encode(buf);
@@ -199,7 +198,7 @@ BOOST_AUTO_TEST_SUITE(flow_add)
     }
     BOOST_AUTO_TEST_CASE(constructs_flow_add_from_empty_actions_binary)
     {
-      constexpr auto len = sizeof(detail::ofp_flow_mod);
+      constexpr auto len = sizeof(protocol::ofp_flow_mod);
       bin[2] = 0;
       bin[3] = len;
       auto it = bin.begin();

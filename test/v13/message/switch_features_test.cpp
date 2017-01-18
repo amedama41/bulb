@@ -8,7 +8,7 @@
 
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
-namespace proto = v13::protocol;
+namespace protocol = v13::protocol;
 
 template <std::size_t N>
 static auto to_buffer(char const (&expected)[N])
@@ -25,9 +25,9 @@ BOOST_AUTO_TEST_SUITE(features_request_test)
     {
         auto sut = v13::messages::features_request{};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_FEATURES_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_header));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_FEATURES_REQUEST);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
     }
 
     BOOST_AUTO_TEST_CASE(constructor_test)
@@ -36,9 +36,9 @@ BOOST_AUTO_TEST_SUITE(features_request_test)
 
         auto sut = v13::messages::features_request{xid};
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_FEATURES_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_header));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_FEATURES_REQUEST);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
         BOOST_TEST(sut.xid() == xid);
     }
 
@@ -62,9 +62,9 @@ BOOST_AUTO_TEST_SUITE(features_request_test)
         auto sut = v13::messages::features_request::decode(it, it_end);
 
         BOOST_TEST(it == it_end);
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_FEATURES_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_header));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_FEATURES_REQUEST);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
         BOOST_TEST(sut.xid() == 128);
     }
 
@@ -81,15 +81,15 @@ BOOST_AUTO_TEST_SUITE(features_reply_test)
         auto const n_tables = std::uint32_t{8};
         auto const auxiliary_id = std::uint8_t{12};
         auto const capabilities
-            = proto::OFPC_FLOW_STATS | proto::OFPC_PORT_STATS;
+            = protocol::OFPC_FLOW_STATS | protocol::OFPC_PORT_STATS;
 
         auto sut = v13::messages::features_reply{
             request, dpid, n_buffers, n_tables, auxiliary_id, capabilities
         };
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_FEATURES_REPLY);
-        BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_switch_features));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_FEATURES_REPLY);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_switch_features));
         BOOST_TEST(sut.xid() == request.xid());
         BOOST_TEST(sut.datapath_id() == dpid);
         BOOST_TEST(sut.num_buffers() == n_buffers);
@@ -103,7 +103,8 @@ BOOST_AUTO_TEST_SUITE(features_reply_test)
         auto buffer = std::vector<unsigned char>{};
         auto sut = v13::messages::features_reply{
               v13::messages::features_request{8}
-            , 5, 7, 10, 11, proto::OFPC_TABLE_STATS | proto::OFPC_PORT_BLOCKED
+            , 5, 7, 10, 11
+            , protocol::OFPC_TABLE_STATS | protocol::OFPC_PORT_BLOCKED
         };
 
         sut.encode(buffer);
@@ -129,9 +130,9 @@ BOOST_AUTO_TEST_SUITE(features_reply_test)
         auto sut = v13::messages::features_reply::decode(it, it_end);
 
         BOOST_TEST(it == it_end);
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_FEATURES_REPLY);
-        BOOST_TEST(sut.length() == sizeof(v13::v13_detail::ofp_switch_features));
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_FEATURES_REPLY);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_switch_features));
         BOOST_TEST(sut.xid() == 0x10203);
         BOOST_TEST(sut.datapath_id() == 0x1200340056);
         BOOST_TEST(sut.num_buffers() == 0x1ff07);

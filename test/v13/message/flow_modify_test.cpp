@@ -12,8 +12,7 @@
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace match = v13::oxm_match_fields;
-namespace v13_detail = v13::v13_detail;
-namespace proto = v13::protocol;
+namespace protocol = v13::protocol;
 
 namespace {
 
@@ -26,7 +25,7 @@ struct flow_entry_fixture {
             , match::eth_dst{eth_dst}
             , match::eth_src{eth_src}
           } // 4 + 8 + 10 + 10 = 32
-        , proto::OFP_DEFAULT_PRIORITY
+        , protocol::OFP_DEFAULT_PRIORITY
         , 0xf1f2f3f4f5f6f7f8
         , v13::instruction_set{
               v13::instructions::apply_actions{
@@ -51,7 +50,7 @@ struct flow_modify_fixutre : flow_entry_fixture
         , entry.instructions()
         , v13::cookie_mask{0xf1f2f3f4f5f6f7f8, 0x0f0f0f0f0f0f0f0f}
         , true
-        , proto::OFP_NO_BUFFER
+        , protocol::OFP_NO_BUFFER
         , 0x12345678
     };
 
@@ -81,7 +80,7 @@ struct flow_modify_strict_fixture : flow_entry_fixture
         , 254
         , entry.instructions()
         , true
-        , proto::OFP_NO_BUFFER
+        , protocol::OFP_NO_BUFFER
         , 0x12345678
     };
 
@@ -118,15 +117,15 @@ BOOST_AUTO_TEST_SUITE(flow_modify_test)
             entry.match(), table_id, entry.instructions()
         };
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_FLOW_MOD);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_flow_mod) + 32 + 56 + 8 + 40);
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_FLOW_MOD);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_flow_mod) + 32 + 56 + 8 + 40);
         BOOST_TEST(sut.match().length() == entry.match().length());
         BOOST_TEST(sut.cookie() == 0);
         BOOST_TEST(sut.cookie_mask() == 0);
         BOOST_TEST(sut.table_id() == table_id);
         BOOST_TEST(!sut.reset_counter());
-        BOOST_TEST(sut.buffer_id() == proto::OFP_NO_BUFFER);
+        BOOST_TEST(sut.buffer_id() == protocol::OFP_NO_BUFFER);
         BOOST_TEST(sut.instructions().length() == entry.instructions().length());
     }
 
@@ -140,9 +139,9 @@ BOOST_AUTO_TEST_SUITE(flow_modify_test)
             , false, buffer_id
         };
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_FLOW_MOD);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_flow_mod) + 32 + 56 + 8 + 40);
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_FLOW_MOD);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_flow_mod) + 32 + 56 + 8 + 40);
         BOOST_TEST(sut.match().length() == entry.match().length());
         BOOST_TEST(sut.cookie() == 0);
         BOOST_TEST(sut.cookie_mask() == 0);
@@ -162,9 +161,9 @@ BOOST_AUTO_TEST_SUITE(flow_modify_test)
             , true, buffer_id
         };
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_FLOW_MOD);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_flow_mod) + 32 + 56 + 8 + 40);
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_FLOW_MOD);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_flow_mod) + 32 + 56 + 8 + 40);
         BOOST_TEST(sut.match().length() == entry.match().length());
         BOOST_TEST(sut.cookie() == 0);
         BOOST_TEST(sut.cookie_mask() == 0);
@@ -186,9 +185,9 @@ BOOST_AUTO_TEST_SUITE(flow_modify_test)
             , cookie_mask, false, buffer_id
         };
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_FLOW_MOD);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_flow_mod) + 32 + 56 + 8 + 40);
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_FLOW_MOD);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_flow_mod) + 32 + 56 + 8 + 40);
         BOOST_TEST(sut.match().length() == entry.match().length());
         BOOST_TEST(sut.cookie() == cookie_mask.value());
         BOOST_TEST(sut.cookie_mask() == cookie_mask.mask());
@@ -210,9 +209,9 @@ BOOST_AUTO_TEST_SUITE(flow_modify_test)
             , cookie_mask, true, buffer_id
         };
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_FLOW_MOD);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_flow_mod) + 32 + 56 + 8 + 40);
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_FLOW_MOD);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_flow_mod) + 32 + 56 + 8 + 40);
         BOOST_TEST(sut.match().length() == entry.match().length());
         BOOST_TEST(sut.cookie() == cookie_mask.value());
         BOOST_TEST(sut.cookie_mask() == cookie_mask.mask());
@@ -264,15 +263,15 @@ BOOST_AUTO_TEST_SUITE(flow_modify_strict_test)
         auto const table_id = std::uint8_t{1};
         auto const instructions
             = v13::instruction_set{v13::instructions::goto_table{3}};
-        auto const buffer_id = proto::OFP_NO_BUFFER;
+        auto const buffer_id = protocol::OFP_NO_BUFFER;
 
         auto const sut = v13::messages::flow_modify_strict{
             entry, table_id, instructions, true, buffer_id
         };
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_FLOW_MOD);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_flow_mod) + 32 + 8);
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_FLOW_MOD);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_flow_mod) + 32 + 8);
         BOOST_TEST(sut.match().length() == entry.match().length());
         BOOST_TEST(sut.priority() == entry.priority());
         BOOST_TEST(sut.cookie() == entry.cookie());
@@ -298,9 +297,9 @@ BOOST_AUTO_TEST_SUITE(flow_modify_strict_test)
             match, priority, table_id, instructions, false, buffer_id
         };
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_FLOW_MOD);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_flow_mod) + 24 + 24);
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_FLOW_MOD);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_flow_mod) + 24 + 24);
         BOOST_TEST(sut.match().length() == match.length());
         BOOST_TEST(sut.priority() == priority);
         BOOST_TEST(sut.cookie() == 0);
@@ -326,9 +325,9 @@ BOOST_AUTO_TEST_SUITE(flow_modify_strict_test)
             , cookie_mask, true, buffer_id
         };
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_FLOW_MOD);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_flow_mod) + 8);
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_FLOW_MOD);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_flow_mod) + 8);
         BOOST_TEST(sut.match().length() == match.length());
         BOOST_TEST(sut.priority() == priority);
         BOOST_TEST(sut.cookie() == cookie_mask.value());

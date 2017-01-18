@@ -10,10 +10,9 @@
 
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
-namespace v13_detail = v13::v13_detail;
 namespace match = v13::oxm_match_fields;
 namespace multipart = v13::messages::multipart;
-namespace proto = v13::protocol;
+namespace protocol = v13::protocol;
 
 namespace {
 
@@ -24,10 +23,10 @@ struct aggregate_stats_request_fixture
               match::in_port{4}
             , match::eth_dst{"\x01\x02\x03\x04\x05\x06"_mac}
           } // 4 + 8 + 10 = 22
-        , proto::OFPTT_ALL
+        , protocol::OFPTT_ALL
         , v13::cookie_mask{0xf1f2f3f4f5f6f7f8, 0x0f0f0f0f0f0f0f0f}
-        , proto::OFPP_TABLE
-        , proto::OFPG_MAX
+        , protocol::OFPP_TABLE
+        , protocol::OFPG_MAX
         , 0x12345678
     };
     std::vector<std::uint8_t> bin_aggregate_stats_request
@@ -73,19 +72,19 @@ BOOST_AUTO_TEST_SUITE(aggregate_stats_request_test)
             match, table_id
         };
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_MULTIPART_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_multipart_request)
-                                 + sizeof(v13_detail::ofp_aggregate_stats_request)
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_MULTIPART_REQUEST);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_multipart_request)
+                                 + sizeof(protocol::ofp_aggregate_stats_request)
                                  + 32);
-        BOOST_TEST(sut.multipart_type() == proto::OFPMP_AGGREGATE);
+        BOOST_TEST(sut.multipart_type() == protocol::OFPMP_AGGREGATE);
         BOOST_TEST(sut.flags() == 0);
         BOOST_TEST(sut.match().length() == match.length());
         BOOST_TEST(sut.table_id() == table_id);
         BOOST_TEST(sut.cookie() == 0);
         BOOST_TEST(sut.cookie_mask() == 0);
-        BOOST_TEST(sut.out_port() == proto::OFPP_ANY);
-        BOOST_TEST(sut.out_group() == proto::OFPG_ANY);
+        BOOST_TEST(sut.out_port() == protocol::OFPP_ANY);
+        BOOST_TEST(sut.out_group() == protocol::OFPG_ANY);
     }
 
     BOOST_AUTO_TEST_CASE(construct_from_cookie_mask_test)
@@ -93,26 +92,26 @@ BOOST_AUTO_TEST_SUITE(aggregate_stats_request_test)
         auto const match = v13::oxm_match{
             match::in_port{4}
         }; // 4 + 8 = 12
-        auto const table_id = std::uint8_t{proto::OFPTT_ALL};
+        auto const table_id = std::uint8_t{protocol::OFPTT_ALL};
         auto const cookie_mask = v13::cookie_mask{32, 64};
 
         auto const sut = multipart::aggregate_stats_request{
             match, table_id, cookie_mask
         };
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_MULTIPART_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_multipart_request)
-                                 + sizeof(v13_detail::ofp_aggregate_stats_request)
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_MULTIPART_REQUEST);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_multipart_request)
+                                 + sizeof(protocol::ofp_aggregate_stats_request)
                                  + 16);
-        BOOST_TEST(sut.multipart_type() == proto::OFPMP_AGGREGATE);
+        BOOST_TEST(sut.multipart_type() == protocol::OFPMP_AGGREGATE);
         BOOST_TEST(sut.flags() == 0);
         BOOST_TEST(sut.match().length() == match.length());
         BOOST_TEST(sut.table_id() == table_id);
         BOOST_TEST(sut.cookie() == cookie_mask.value());
         BOOST_TEST(sut.cookie_mask() == cookie_mask.mask());
-        BOOST_TEST(sut.out_port() == proto::OFPP_ANY);
-        BOOST_TEST(sut.out_group() == proto::OFPG_ANY);
+        BOOST_TEST(sut.out_port() == protocol::OFPP_ANY);
+        BOOST_TEST(sut.out_group() == protocol::OFPG_ANY);
     }
 
     BOOST_AUTO_TEST_CASE(construct_from_out_port_test)
@@ -120,19 +119,19 @@ BOOST_AUTO_TEST_SUITE(aggregate_stats_request_test)
         auto const match = v13::oxm_match{
         }; // 4
         auto const table_id = std::uint8_t{254};
-        auto const out_port = std::uint32_t{proto::OFPP_CONTROLLER};
+        auto const out_port = std::uint32_t{protocol::OFPP_CONTROLLER};
         auto const out_group = std::uint32_t{1};
 
         auto const sut = multipart::aggregate_stats_request{
             match, table_id, out_port, out_group
         };
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_MULTIPART_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_multipart_request)
-                                 + sizeof(v13_detail::ofp_aggregate_stats_request)
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_MULTIPART_REQUEST);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_multipart_request)
+                                 + sizeof(protocol::ofp_aggregate_stats_request)
                                  + 8);
-        BOOST_TEST(sut.multipart_type() == proto::OFPMP_AGGREGATE);
+        BOOST_TEST(sut.multipart_type() == protocol::OFPMP_AGGREGATE);
         BOOST_TEST(sut.flags() == 0);
         BOOST_TEST(sut.match().length() == match.length());
         BOOST_TEST(sut.table_id() == table_id);
@@ -178,8 +177,8 @@ BOOST_AUTO_TEST_SUITE(aggregate_stats_request_test)
         BOOST_TEST(copy.cookie_mask() == sut.cookie_mask());
         BOOST_TEST(copy.out_port() == sut.out_port());
         BOOST_TEST(copy.out_group() == sut.out_group());
-        BOOST_TEST(src.length() == sizeof(v13_detail::ofp_multipart_request)
-                                 + sizeof(v13_detail::ofp_aggregate_stats_request)
+        BOOST_TEST(src.length() == sizeof(protocol::ofp_multipart_request)
+                                 + sizeof(protocol::ofp_aggregate_stats_request)
                                  + 8);
         BOOST_TEST(src.match().length() == 4);
     }
@@ -231,11 +230,11 @@ BOOST_AUTO_TEST_SUITE(aggregate_stats_reply_test)
             counters, flow_count
         };
 
-        BOOST_TEST(sut.version() == proto::OFP_VERSION);
-        BOOST_TEST(sut.type() == proto::OFPT_MULTIPART_REPLY);
-        BOOST_TEST(sut.length() == sizeof(v13_detail::ofp_multipart_reply)
-                                 + sizeof(v13_detail::ofp_aggregate_stats_reply));
-        BOOST_TEST(sut.multipart_type() == proto::OFPMP_AGGREGATE);
+        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+        BOOST_TEST(sut.type() == protocol::OFPT_MULTIPART_REPLY);
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_multipart_reply)
+                                 + sizeof(protocol::ofp_aggregate_stats_reply));
+        BOOST_TEST(sut.multipart_type() == protocol::OFPMP_AGGREGATE);
         BOOST_TEST(sut.flags() == 0);
         BOOST_TEST(sut.packet_count() == counters.packet_count());
         BOOST_TEST(sut.byte_count() == counters.byte_count());

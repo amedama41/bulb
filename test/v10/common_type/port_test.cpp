@@ -5,7 +5,6 @@
 #include "../../test_utility.hpp"
 
 namespace ofp = canard::net::ofp;
-namespace v10_detail = ofp::v10::v10_detail;
 
 namespace protocol = ofp::v10::protocol;
 
@@ -106,7 +105,7 @@ BOOST_AUTO_TEST_SUITE(port_test)
         , curr, advertised, supported, peer
       };
 
-      constexpr auto name_max_len = sizeof(v10_detail::ofp_phy_port::name) - 1;
+      constexpr auto name_max_len = sizeof(protocol::ofp_phy_port::name) - 1;
       BOOST_TEST(sut.name().size() == name_max_len);
       BOOST_TEST(sut.name() == boost::string_ref{name}.substr(0, name_max_len));
     }
@@ -127,7 +126,7 @@ BOOST_AUTO_TEST_SUITE(port_test)
     BOOST_FIXTURE_TEST_CASE(
         is_false_if_byte_after_name_termination_null_is_not_equal, binary_port)
     {
-      bin[offsetof(v10_detail::ofp_phy_port, config) - 1] = 0xff;
+      bin[offsetof(protocol::ofp_phy_port, config) - 1] = 0xff;
       auto it = bin.begin();
       auto const port = ofp::v10::port::decode(it, bin.end());
 
@@ -139,7 +138,7 @@ BOOST_AUTO_TEST_SUITE(port_test)
     BOOST_FIXTURE_TEST_CASE(
         is_true_if_byte_after_name_termination_null_is_not_equal, binary_port)
     {
-      bin[offsetof(v10_detail::ofp_phy_port, config) - 1] = 0xff;
+      bin[offsetof(protocol::ofp_phy_port, config) - 1] = 0xff;
       auto it = bin.begin();
       auto const port = ofp::v10::port::decode(it, bin.end());
 

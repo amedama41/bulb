@@ -8,9 +8,7 @@ namespace ofp = canard::net::ofp;
 namespace v10 = ofp::v10;
 namespace msg = v10::messages;
 namespace stats = msg::statistics;
-namespace detail = v10::v10_detail;
-
-namespace proto = v10::protocol;
+namespace protocol = v10::protocol;
 
 namespace {
 struct description_request_fixture {
@@ -29,27 +27,27 @@ struct description_reply_parameters {
 struct description_reply_fixture : description_reply_parameters {
   description_reply_fixture()
   {
-    auto stats_size = sizeof(detail::ofp_stats_reply);
-    bin.reserve(stats_size + sizeof(detail::ofp_desc_stats));
+    auto stats_size = sizeof(protocol::ofp_stats_reply);
+    bin.reserve(stats_size + sizeof(protocol::ofp_desc_stats));
 
     bin.insert(bin.end(), mfr_desc.begin(), mfr_desc.end());
-    stats_size += proto::DESC_STR_LEN;
+    stats_size += protocol::DESC_STR_LEN;
     bin.resize(stats_size, '\x00');
 
     bin.insert(bin.end(), hw_desc.begin(), hw_desc.end());
-    stats_size += proto::DESC_STR_LEN;
+    stats_size += protocol::DESC_STR_LEN;
     bin.resize(stats_size, '\x00');
 
     bin.insert(bin.end(), sw_desc.begin(), sw_desc.end());
-    stats_size += proto::DESC_STR_LEN;
+    stats_size += protocol::DESC_STR_LEN;
     bin.resize(stats_size, '\x00');
 
     bin.insert(bin.end(), serial_num.begin(), serial_num.end());
-    stats_size += proto::SERIAL_NUM_LEN;
+    stats_size += protocol::SERIAL_NUM_LEN;
     bin.resize(stats_size, '\x00');
 
     bin.insert(bin.end(), dp_desc.begin(), dp_desc.end());
-    stats_size += proto::DESC_STR_LEN;
+    stats_size += protocol::DESC_STR_LEN;
     bin.resize(stats_size, '\x00');
   }
 
@@ -70,7 +68,7 @@ BOOST_AUTO_TEST_SUITE(description_request)
     {
       stats::description_request sut{};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_stats_request));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_stats_request));
       BOOST_TEST(sut.flags() == 0);
     }
     BOOST_AUTO_TEST_CASE(is_constructible_from_xid)
@@ -79,7 +77,7 @@ BOOST_AUTO_TEST_SUITE(description_request)
 
       stats::description_request sut{xid};
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_stats_request));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_stats_request));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.flags() == 0);
     }
@@ -168,7 +166,7 @@ BOOST_AUTO_TEST_SUITE(description_reply)
 
       BOOST_TEST(
           sut.length()
-       == sizeof(detail::ofp_stats_reply) + sizeof(detail::ofp_desc_stats));
+       == sizeof(protocol::ofp_stats_reply) + sizeof(protocol::ofp_desc_stats));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.manufacture_desc() == mfr_desc);
       BOOST_TEST(sut.hardware_desc() == hw_desc);
@@ -181,8 +179,8 @@ BOOST_AUTO_TEST_SUITE(description_reply)
       auto const mfr_desc = "manufacture description without xid";
       auto const hw_desc = "hardware description without xid";
       auto const sw_desc = "software description without xid";
-      auto const serial_num = std::string(proto::SERIAL_NUM_LEN - 1, '0');
-      auto const dp_desc = std::string(proto::DESC_STR_LEN - 1, 'X');
+      auto const serial_num = std::string(protocol::SERIAL_NUM_LEN - 1, '0');
+      auto const dp_desc = std::string(protocol::DESC_STR_LEN - 1, 'X');
 
       stats::description_reply sut{
         mfr_desc, hw_desc, sw_desc, serial_num, dp_desc
@@ -190,7 +188,7 @@ BOOST_AUTO_TEST_SUITE(description_reply)
 
       BOOST_TEST(
           sut.length()
-       == sizeof(detail::ofp_stats_reply) + sizeof(detail::ofp_desc_stats));
+       == sizeof(protocol::ofp_stats_reply) + sizeof(protocol::ofp_desc_stats));
       BOOST_TEST(sut.manufacture_desc() == mfr_desc);
       BOOST_TEST(sut.hardware_desc() == hw_desc);
       BOOST_TEST(sut.software_desc() == sw_desc);
@@ -199,11 +197,11 @@ BOOST_AUTO_TEST_SUITE(description_reply)
     }
     BOOST_AUTO_TEST_CASE(is_constructible_from_too_large_size_parameters)
     {
-      auto const mfr_desc = std::string(proto::DESC_STR_LEN, 'A');
-      auto const hw_desc = std::string(proto::DESC_STR_LEN + 1, 'B');
-      auto const sw_desc = std::string(proto::DESC_STR_LEN, 'C');
-      auto const serial_num = std::string(proto::DESC_STR_LEN, 'D');
-      auto const dp_desc = std::string(proto::DESC_STR_LEN, 'E');
+      auto const mfr_desc = std::string(protocol::DESC_STR_LEN, 'A');
+      auto const hw_desc = std::string(protocol::DESC_STR_LEN + 1, 'B');
+      auto const sw_desc = std::string(protocol::DESC_STR_LEN, 'C');
+      auto const serial_num = std::string(protocol::DESC_STR_LEN, 'D');
+      auto const dp_desc = std::string(protocol::DESC_STR_LEN, 'E');
       auto const xid = 0x87654321;
 
       stats::description_reply sut{
@@ -212,31 +210,31 @@ BOOST_AUTO_TEST_SUITE(description_reply)
 
       BOOST_TEST(
           sut.length()
-       == sizeof(detail::ofp_stats_reply) + sizeof(detail::ofp_desc_stats));
+       == sizeof(protocol::ofp_stats_reply) + sizeof(protocol::ofp_desc_stats));
       BOOST_TEST(sut.xid() == xid);
-      BOOST_TEST(sut.manufacture_desc().size() == proto::DESC_STR_LEN - 1);
+      BOOST_TEST(sut.manufacture_desc().size() == protocol::DESC_STR_LEN - 1);
       auto const manufacture_desc = sut.manufacture_desc();
-      BOOST_TEST(manufacture_desc.size() == proto::DESC_STR_LEN - 1);
+      BOOST_TEST(manufacture_desc.size() == protocol::DESC_STR_LEN - 1);
       BOOST_TEST(
           manufacture_desc
        == boost::string_ref(mfr_desc.data(), manufacture_desc.size()));
       auto const hardware_desc = sut.hardware_desc();
-      BOOST_TEST(hardware_desc.size() == proto::DESC_STR_LEN - 1);
+      BOOST_TEST(hardware_desc.size() == protocol::DESC_STR_LEN - 1);
       BOOST_TEST(
           hardware_desc
        == boost::string_ref(hw_desc.data(), hardware_desc.size()));
       auto const software_desc = sut.software_desc();
-      BOOST_TEST(software_desc.size() == proto::DESC_STR_LEN - 1);
+      BOOST_TEST(software_desc.size() == protocol::DESC_STR_LEN - 1);
       BOOST_TEST(
           software_desc
        == boost::string_ref(sw_desc.data(), software_desc.size()));
       auto const serial_number = sut.serial_number();
-      BOOST_TEST(serial_number.size() == proto::SERIAL_NUM_LEN - 1);
+      BOOST_TEST(serial_number.size() == protocol::SERIAL_NUM_LEN - 1);
       BOOST_TEST(
           serial_number
        == boost::string_ref(serial_num.data(), serial_number.size()));
       auto const datapath_desc = sut.datapath_desc();
-      BOOST_TEST(datapath_desc.size() == proto::DESC_STR_LEN - 1);
+      BOOST_TEST(datapath_desc.size() == protocol::DESC_STR_LEN - 1);
       BOOST_TEST(
           datapath_desc
        == boost::string_ref(dp_desc.data(), datapath_desc.size()));
@@ -249,7 +247,7 @@ BOOST_AUTO_TEST_SUITE(description_reply)
 
       BOOST_TEST(
           sut.length()
-       == sizeof(detail::ofp_stats_reply) + sizeof(detail::ofp_desc_stats));
+       == sizeof(protocol::ofp_stats_reply) + sizeof(protocol::ofp_desc_stats));
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(sut.manufacture_desc() == "");
       BOOST_TEST(sut.hardware_desc() == "");

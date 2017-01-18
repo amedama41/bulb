@@ -8,9 +8,7 @@
 namespace ofp = canard::net::ofp;
 namespace v10 = ofp::v10;
 namespace msg = v10::messages;
-namespace detail = v10::v10_detail;
-
-namespace proto = v10::protocol;
+namespace protocol = v10::protocol;
 
 namespace {
 
@@ -22,61 +20,61 @@ struct features_request_fixture {
 struct features_reply_param_fixture {
   v10::port port1{
       1, "\xA1\xA2\xA3\xA4\xA5\xA6"_mac, "123456789abcdef"
-    , proto::OFPPC_PORT_DOWN | proto::OFPPC_NO_FLOOD
-    , proto::OFPPS_LINK_DOWN | proto::OFPPS_STP_FORWARD
-    , proto::OFPPF_10MB_HD | proto::OFPPF_COPPER | proto::OFPPF_AUTONEG
-    , proto::OFPPF_10MB_HD | proto::OFPPF_10MB_FD | proto::OFPPF_100MB_HD
-    | proto::OFPPF_100MB_FD | proto::OFPPF_COPPER | proto::OFPPF_AUTONEG
-    , proto::OFPPF_10MB_HD | proto::OFPPF_10MB_FD | proto::OFPPF_100MB_HD
-    | proto::OFPPF_100MB_FD | proto::OFPPF_1GB_HD | proto::OFPPF_1GB_FD
-    | proto::OFPPF_10GB_FD | proto::OFPPF_COPPER | proto::OFPPF_AUTONEG
-    , proto::OFPPF_10MB_HD | proto::OFPPF_COPPER | proto::OFPPF_AUTONEG
+    , protocol::OFPPC_PORT_DOWN | protocol::OFPPC_NO_FLOOD
+    , protocol::OFPPS_LINK_DOWN | protocol::OFPPS_STP_FORWARD
+    , protocol::OFPPF_10MB_HD | protocol::OFPPF_COPPER | protocol::OFPPF_AUTONEG
+    , protocol::OFPPF_10MB_HD | protocol::OFPPF_10MB_FD | protocol::OFPPF_100MB_HD
+    | protocol::OFPPF_100MB_FD | protocol::OFPPF_COPPER | protocol::OFPPF_AUTONEG
+    , protocol::OFPPF_10MB_HD | protocol::OFPPF_10MB_FD | protocol::OFPPF_100MB_HD
+    | protocol::OFPPF_100MB_FD | protocol::OFPPF_1GB_HD | protocol::OFPPF_1GB_FD
+    | protocol::OFPPF_10GB_FD | protocol::OFPPF_COPPER | protocol::OFPPF_AUTONEG
+    , protocol::OFPPF_10MB_HD | protocol::OFPPF_COPPER | protocol::OFPPF_AUTONEG
   };
   v10::port port2{
-      proto::OFPP_MAX, "\xB1\xB2\xB3\xB4\xB5\xB6"_mac, "maxportno"
-    , proto::OFPPC_NO_PACKET_IN
-    , proto::OFPPS_STP_BLOCK
-    , proto::OFPPF_10MB_HD | proto::OFPPF_COPPER | proto::OFPPF_AUTONEG
-    , proto::OFPPF_10MB_HD | proto::OFPPF_10MB_FD | proto::OFPPF_100MB_HD
-    | proto::OFPPF_100MB_FD | proto::OFPPF_COPPER | proto::OFPPF_AUTONEG
-    , proto::OFPPF_10MB_HD | proto::OFPPF_10MB_FD | proto::OFPPF_100MB_HD
-    | proto::OFPPF_100MB_FD | proto::OFPPF_1GB_HD | proto::OFPPF_1GB_FD
-    | proto::OFPPF_10GB_FD | proto::OFPPF_COPPER | proto::OFPPF_AUTONEG
-    , proto::OFPPF_10MB_HD | proto::OFPPF_COPPER | proto::OFPPF_AUTONEG
+      protocol::OFPP_MAX, "\xB1\xB2\xB3\xB4\xB5\xB6"_mac, "maxportno"
+    , protocol::OFPPC_NO_PACKET_IN
+    , protocol::OFPPS_STP_BLOCK
+    , protocol::OFPPF_10MB_HD | protocol::OFPPF_COPPER | protocol::OFPPF_AUTONEG
+    , protocol::OFPPF_10MB_HD | protocol::OFPPF_10MB_FD | protocol::OFPPF_100MB_HD
+    | protocol::OFPPF_100MB_FD | protocol::OFPPF_COPPER | protocol::OFPPF_AUTONEG
+    , protocol::OFPPF_10MB_HD | protocol::OFPPF_10MB_FD | protocol::OFPPF_100MB_HD
+    | protocol::OFPPF_100MB_FD | protocol::OFPPF_1GB_HD | protocol::OFPPF_1GB_FD
+    | protocol::OFPPF_10GB_FD | protocol::OFPPF_COPPER | protocol::OFPPF_AUTONEG
+    , protocol::OFPPF_10MB_HD | protocol::OFPPF_COPPER | protocol::OFPPF_AUTONEG
   };
   v10::port port3{
-      proto::OFPP_LOCAL, "\xc1\xc2\xc3\xc4\xc5\xc6"_mac, "local"
-    , proto::OFPPC_NO_PACKET_IN
-    , proto::OFPPS_STP_BLOCK
-    , proto::OFPPF_10MB_HD | proto::OFPPF_FIBER | proto::OFPPF_AUTONEG
-    , proto::OFPPF_10MB_HD | proto::OFPPF_10MB_FD | proto::OFPPF_100MB_HD
-    | proto::OFPPF_100MB_FD | proto::OFPPF_FIBER | proto::OFPPF_AUTONEG
-    , proto::OFPPF_10MB_HD | proto::OFPPF_10MB_FD | proto::OFPPF_100MB_HD
-    | proto::OFPPF_100MB_FD | proto::OFPPF_1GB_HD | proto::OFPPF_1GB_FD
-    | proto::OFPPF_10GB_FD | proto::OFPPF_FIBER | proto::OFPPF_AUTONEG
-    , proto::OFPPF_10MB_HD | proto::OFPPF_FIBER | proto::OFPPF_AUTONEG
+      protocol::OFPP_LOCAL, "\xc1\xc2\xc3\xc4\xc5\xc6"_mac, "local"
+    , protocol::OFPPC_NO_PACKET_IN
+    , protocol::OFPPS_STP_BLOCK
+    , protocol::OFPPF_10MB_HD | protocol::OFPPF_FIBER | protocol::OFPPF_AUTONEG
+    , protocol::OFPPF_10MB_HD | protocol::OFPPF_10MB_FD | protocol::OFPPF_100MB_HD
+    | protocol::OFPPF_100MB_FD | protocol::OFPPF_FIBER | protocol::OFPPF_AUTONEG
+    , protocol::OFPPF_10MB_HD | protocol::OFPPF_10MB_FD | protocol::OFPPF_100MB_HD
+    | protocol::OFPPF_100MB_FD | protocol::OFPPF_1GB_HD | protocol::OFPPF_1GB_FD
+    | protocol::OFPPF_10GB_FD | protocol::OFPPF_FIBER | protocol::OFPPF_AUTONEG
+    , protocol::OFPPF_10MB_HD | protocol::OFPPF_FIBER | protocol::OFPPF_AUTONEG
   };
   std::uint64_t dpid = 0x0102030405060708;
   std::uint32_t n_buffers = 0x12345678;
   std::uint8_t n_tables = 0x1f;
   std::uint32_t capabilities
-    = proto::OFPC_FLOW_STATS | proto::OFPC_TABLE_STATS
-    | proto::OFPC_PORT_STATS | proto::OFPC_STP
-    | proto::OFPC_IP_REASM | proto::OFPC_QUEUE_STATS
-    | proto::OFPC_ARP_MATCH_IP;
+    = protocol::OFPC_FLOW_STATS | protocol::OFPC_TABLE_STATS
+    | protocol::OFPC_PORT_STATS | protocol::OFPC_STP
+    | protocol::OFPC_IP_REASM | protocol::OFPC_QUEUE_STATS
+    | protocol::OFPC_ARP_MATCH_IP;
   std::uint32_t actions
-    = (1 << proto::OFPAT_OUTPUT)
-    | (1 << proto::OFPAT_SET_VLAN_VID)
-    | (1 << proto::OFPAT_SET_VLAN_PCP)
-    | (1 << proto::OFPAT_STRIP_VLAN)
-    | (1 << proto::OFPAT_SET_DL_SRC)
-    | (1 << proto::OFPAT_SET_DL_DST)
-    | (1 << proto::OFPAT_SET_NW_SRC)
-    | (1 << proto::OFPAT_SET_NW_DST)
-    | (1 << proto::OFPAT_SET_NW_TOS)
-    | (1 << proto::OFPAT_SET_TP_SRC)
-    | (1 << proto::OFPAT_SET_TP_DST)
-    | (1 << proto::OFPAT_ENQUEUE);
+    = (1 << protocol::OFPAT_OUTPUT)
+    | (1 << protocol::OFPAT_SET_VLAN_VID)
+    | (1 << protocol::OFPAT_SET_VLAN_PCP)
+    | (1 << protocol::OFPAT_STRIP_VLAN)
+    | (1 << protocol::OFPAT_SET_DL_SRC)
+    | (1 << protocol::OFPAT_SET_DL_DST)
+    | (1 << protocol::OFPAT_SET_NW_SRC)
+    | (1 << protocol::OFPAT_SET_NW_DST)
+    | (1 << protocol::OFPAT_SET_NW_TOS)
+    | (1 << protocol::OFPAT_SET_TP_SRC)
+    | (1 << protocol::OFPAT_SET_TP_DST)
+    | (1 << protocol::OFPAT_ENQUEUE);
   msg::features_reply::ports_type ports{ port1, port2, port3 };
   std::uint32_t xid = 0x12345678;
 };
@@ -113,9 +111,9 @@ BOOST_AUTO_TEST_SUITE(features_request)
     {
       auto const sut = msg::features_request{};
 
-      BOOST_TEST(sut.version() == proto::OFP_VERSION);
-      BOOST_TEST(sut.type() == proto::OFPT_FEATURES_REQUEST);
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_header));
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_FEATURES_REQUEST);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
     }
     BOOST_AUTO_TEST_CASE(is_constructible_from_xid)
     {
@@ -185,8 +183,8 @@ BOOST_AUTO_TEST_SUITE(features_reply)
 
       BOOST_TEST(
           sut.length()
-       == sizeof(detail::ofp_switch_features)
-        + ports.size() * sizeof(detail::ofp_phy_port));
+       == sizeof(protocol::ofp_switch_features)
+        + ports.size() * sizeof(protocol::ofp_phy_port));
       BOOST_TEST(sut.datapath_id() == dpid);
       BOOST_TEST(sut.num_buffers() == n_buffers);
       BOOST_TEST(sut.num_tables() == n_tables);
@@ -205,8 +203,8 @@ BOOST_AUTO_TEST_SUITE(features_reply)
       BOOST_TEST(sut.xid() == xid);
       BOOST_TEST(
           sut.length()
-       == sizeof(detail::ofp_switch_features)
-        + ports.size() * sizeof(detail::ofp_phy_port));
+       == sizeof(protocol::ofp_switch_features)
+        + ports.size() * sizeof(protocol::ofp_phy_port));
       BOOST_TEST(sut.datapath_id() == dpid);
       BOOST_TEST(sut.num_buffers() == n_buffers);
       BOOST_TEST(sut.num_tables() == n_tables);
@@ -225,8 +223,8 @@ BOOST_AUTO_TEST_SUITE(features_reply)
       BOOST_TEST(sut.xid() == request.xid());
       BOOST_TEST(
           sut.length()
-       == sizeof(detail::ofp_switch_features)
-        + ports.size() * sizeof(detail::ofp_phy_port));
+       == sizeof(protocol::ofp_switch_features)
+        + ports.size() * sizeof(protocol::ofp_phy_port));
       BOOST_TEST(sut.datapath_id() == dpid);
       BOOST_TEST(sut.num_buffers() == n_buffers);
       BOOST_TEST(sut.num_tables() == n_tables);
@@ -240,7 +238,7 @@ BOOST_AUTO_TEST_SUITE(features_reply)
         dpid, n_buffers, n_tables, capabilities, actions, {}
       };
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_switch_features));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_switch_features));
       BOOST_TEST(sut.datapath_id() == dpid);
       BOOST_TEST(sut.num_buffers() == n_buffers);
       BOOST_TEST(sut.num_tables() == n_tables);
@@ -271,7 +269,7 @@ BOOST_AUTO_TEST_SUITE(features_reply)
       auto const copy = std::move(moved);
 
       BOOST_TEST((copy == sut));
-      BOOST_TEST(moved.length() == sizeof(detail::ofp_switch_features));
+      BOOST_TEST(moved.length() == sizeof(protocol::ofp_switch_features));
       BOOST_TEST(moved.ports().empty());
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor
@@ -281,7 +279,7 @@ BOOST_AUTO_TEST_SUITE(features_reply)
     {
       auto ports = sut.extract_ports();
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_switch_features));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_switch_features));
       BOOST_TEST(sut.ports().empty());
       BOOST_TEST(
           (ports == msg::features_reply::ports_type{ port1, port2, port3 }));
@@ -294,7 +292,7 @@ BOOST_AUTO_TEST_SUITE(features_reply)
 
       auto ports = sut.extract_ports();
 
-      BOOST_TEST(sut.length() == sizeof(detail::ofp_switch_features));
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_switch_features));
       BOOST_TEST(sut.ports().empty());
       BOOST_TEST(ports.empty());
     }
@@ -389,8 +387,8 @@ BOOST_AUTO_TEST_SUITE(features_reply)
     {
       sut.extract_ports();
       auto buf = std::vector<unsigned char>{};
-      bin.resize(sizeof(detail::ofp_switch_features));
-      bin[3] = sizeof(detail::ofp_switch_features);
+      bin.resize(sizeof(protocol::ofp_switch_features));
+      bin[3] = sizeof(protocol::ofp_switch_features);
 
       sut.encode(buf);
 
@@ -411,7 +409,7 @@ BOOST_AUTO_TEST_SUITE(features_reply)
     }
     BOOST_AUTO_TEST_CASE(construct_features_reply_from_no_port_binary)
     {
-      auto const bin_len = sizeof(detail::ofp_switch_features);
+      auto const bin_len = sizeof(protocol::ofp_switch_features);
       bin[3] = bin_len;
       auto it = bin.begin();
 
@@ -426,7 +424,7 @@ BOOST_AUTO_TEST_SUITE(features_reply)
     BOOST_AUTO_TEST_CASE(construct_features_reply_from_single_port_binary)
     {
       auto const bin_len
-        = sizeof(detail::ofp_switch_features) + sizeof(detail::ofp_phy_port);
+        = sizeof(protocol::ofp_switch_features) + sizeof(protocol::ofp_phy_port);
       bin[3] = bin_len;
       auto it = bin.begin();
 
