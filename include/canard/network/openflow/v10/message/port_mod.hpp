@@ -2,7 +2,6 @@
 #define CANARD_NET_OFP_V10_MESSAGES_PORT_MOD_HPP
 
 #include <cstdint>
-#include <stdexcept>
 #include <canard/mac_address.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
@@ -104,20 +103,16 @@ namespace messages {
             return port_mod_.advertise;
         }
 
-        static void validate_header(protocol::ofp_header const& header)
+    private:
+        friend basic_openflow_message;
+
+        static constexpr auto is_valid_message_length(
+                std::uint16_t const length) noexcept
+            -> bool
         {
-            if (header.version != protocol::OFP_VERSION) {
-                throw std::runtime_error{"invalid version"};
-            }
-            if (header.type != message_type) {
-                throw std::runtime_error{"invalid message type"};
-            }
-            if (header.length != sizeof(raw_ofp_type)) {
-                throw std::runtime_error{"invalid length"};
-            }
+            return length == sizeof(raw_ofp_type);
         }
 
-    private:
         friend basic_openflow_message::basic_protocol_type;
 
         explicit port_mod(raw_ofp_type const& port_mod) noexcept

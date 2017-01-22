@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <iterator>
-#include <stdexcept>
 #include <utility>
 #include <canard/network/openflow/data_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
@@ -26,6 +25,8 @@ namespace messages {
         class echo_base
             : public v10_detail::basic_openflow_message<T>
         {
+            using base_t = v10_detail::basic_openflow_message<T>;
+
         public:
             using raw_ofp_type = protocol::ofp_header;
             using data_type = ofp::data_type;
@@ -100,22 +101,17 @@ namespace messages {
                 return data;
             }
 
-            static void validate_header(protocol::ofp_header const& header)
+        private:
+            friend base_t;
+
+            static constexpr auto is_valid_message_length(
+                    std::uint16_t const length) noexcept
+                -> bool
             {
-                if (header.version != protocol::OFP_VERSION) {
-                    throw std::runtime_error{"invalid version"};
-                }
-                if (header.type != T::message_type) {
-                    throw std::runtime_error{"invalid message type"};
-                }
-                if (header.length < sizeof(raw_ofp_type)) {
-                    throw std::runtime_error{"invalid length"};
-                }
+                return length >= sizeof(raw_ofp_type);
             }
 
-        private:
-            friend typename
-                v10_detail::basic_openflow_message<T>::basic_protocol_type;
+            friend typename base_t::basic_protocol_type;
 
             template <class Container>
             void encode_impl(Container& container) const

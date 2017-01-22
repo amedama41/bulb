@@ -9,48 +9,61 @@ namespace canard {
 namespace net {
 namespace ofp {
 namespace v10 {
+namespace v10_detail {
 
-    namespace v10_detail {
+  template <class T>
+  class basic_openflow_message
+    : public detail::basic_protocol_type<T>
+  {
+  private:
+    auto header() const
+      -> protocol::ofp_header
+    {
+      return static_cast<T const*>(this)->header();
+    }
 
-        template <class T>
-        class basic_openflow_message
-            : public detail::basic_protocol_type<T>
-        {
-        private:
-            auto header() const
-                -> protocol::ofp_header
-            {
-                return static_cast<T const*>(this)->header();
-            }
+  public:
+    static constexpr auto version() noexcept
+      -> std::uint8_t
+    {
+      return protocol::OFP_VERSION;
+    }
 
-        public:
-            static constexpr auto version() noexcept
-                -> std::uint8_t
-            {
-                return protocol::OFP_VERSION;
-            }
+    static constexpr auto type() noexcept
+      -> protocol::ofp_type
+    {
+      return T::message_type;
+    }
 
-            static constexpr auto type() noexcept
-                -> protocol::ofp_type
-            {
-                return T::message_type;
-            }
+    auto length() const noexcept
+      -> std::uint16_t
+    {
+      return header().length;
+    }
 
-            auto length() const noexcept
-                -> std::uint16_t
-            {
-                return header().length;
-            }
+    auto xid() const noexcept
+      -> std::uint32_t
+    {
+      return header().xid;
+    }
 
-            auto xid() const noexcept
-                -> std::uint32_t
-            {
-                return header().xid;
-            }
-        };
+    static auto validate_header(protocol::ofp_header const& header) noexcept
+      -> char const*
+    {
+      if (header.version != version()) {
+        return "invalid version";
+      }
+      if (header.type != type()) {
+        return "invalid message type";
+      }
+      if (!T::is_valid_message_length(header.length)) {
+        return "invalid message length";
+      }
+      return nullptr;
+    }
+  };
 
-    } // namespace v10_detail
-
+} // namespace v10_detail
 } // namespace v10
 } // namespace ofp
 } // namespace net

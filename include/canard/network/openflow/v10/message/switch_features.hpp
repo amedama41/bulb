@@ -2,7 +2,6 @@
 #define CANARD_NET_OFP_V10_MESSAGES_SWITCH_FEATURES_HPP
 
 #include <cstdint>
-#include <stdexcept> // TODO
 #include <utility>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
@@ -44,20 +43,16 @@ namespace messages {
             return header_;
         }
 
-        static void validate_header(raw_ofp_type const& header)
+    private:
+        friend basic_openflow_message;
+
+        static constexpr auto is_valid_message_length(
+                std::uint16_t const length) noexcept
+            -> bool
         {
-            if (header.version != protocol::OFP_VERSION) {
-                throw std::runtime_error{"invalid version"};
-            }
-            if (header.type != message_type) {
-                throw std::runtime_error{"invalid message type"};
-            }
-            if (header.length != sizeof(raw_ofp_type)) {
-                throw std::runtime_error{"invalid length"};
-            }
+            return length == sizeof(raw_ofp_type);
         }
 
-    private:
         friend basic_openflow_message::basic_protocol_type;
 
         explicit features_request(raw_ofp_type const& header) noexcept
@@ -213,24 +208,17 @@ namespace messages {
             return tmp;
         }
 
-        static void validate_header(protocol::ofp_header const& header)
+    private:
+        friend basic_openflow_message;
+
+        static constexpr auto is_valid_message_length(
+                std::uint16_t const length) noexcept
+            -> bool
         {
-            if (header.version != protocol::OFP_VERSION) {
-                throw std::runtime_error{"invalid version"};
-            }
-            if (header.type != message_type) {
-                throw std::runtime_error{"invalid message type"};
-            }
-            if (header.length < sizeof(raw_ofp_type)) {
-                throw std::runtime_error{"too small length"};
-            }
-            if ((header.length - sizeof(raw_ofp_type))
-                    % sizeof(port::raw_ofp_type) != 0) {
-                throw std::runtime_error{"invalid length"};
-            }
+            return length >= sizeof(raw_ofp_type)
+                && (length - sizeof(raw_ofp_type)) % port::min_length() == 0;
         }
 
-    private:
         friend basic_openflow_message::basic_protocol_type;
 
         features_reply(raw_ofp_type const& features, ports_type&& ports)

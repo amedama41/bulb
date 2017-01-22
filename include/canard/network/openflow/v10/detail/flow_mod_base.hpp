@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <iterator>
-#include <stdexcept>
 #include <utility>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
@@ -26,6 +25,8 @@ namespace flow_mod_detail {
     class flow_mod_base
         : public v10_detail::basic_openflow_message<FlowMod>
     {
+        using base_t = v10_detail::basic_openflow_message<FlowMod>;
+
     public:
         using raw_ofp_type = protocol::ofp_flow_mod;
 
@@ -57,19 +58,6 @@ namespace flow_mod_detail {
             actions.swap(actions_);
             flow_mod_.header.length = sizeof(raw_ofp_type);
             return actions;
-        }
-
-        static void validate_header(protocol::ofp_header const& header)
-        {
-            if (header.version != protocol::OFP_VERSION) {
-                throw std::runtime_error{"invalid version"};
-            }
-            if (header.type != message_type) {
-                throw std::runtime_error{"invalid message type"};
-            }
-            if (header.length < sizeof(raw_ofp_type)) {
-                throw std::runtime_error{"too small length"};
-            }
         }
 
     protected:
@@ -163,8 +151,16 @@ namespace flow_mod_detail {
         }
 
     private:
-        friend typename
-            v10_detail::basic_openflow_message<FlowMod>::basic_protocol_type;
+        friend base_t;
+
+        static constexpr auto is_valid_message_length(
+                std::uint16_t const length) noexcept
+            -> bool
+        {
+            return length >= sizeof(raw_ofp_type);
+        }
+
+        friend typename base_t::basic_protocol_type;
 
         template <class Container>
         void encode_impl(Container& container) const

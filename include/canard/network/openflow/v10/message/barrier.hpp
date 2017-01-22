@@ -2,7 +2,6 @@
 #define CANARD_NET_OFP_V10_MESSAGES_BARRIER_HPP
 
 #include <cstdint>
-#include <stdexcept>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
@@ -23,6 +22,8 @@ namespace messages {
         class barrier_base
             : public v10_detail::basic_openflow_message<T>
         {
+            using base_t = v10_detail::basic_openflow_message<T>;
+
         public:
             using raw_ofp_type = protocol::ofp_header;
 
@@ -30,19 +31,6 @@ namespace messages {
                 -> protocol::ofp_header const&
             {
                 return header_;
-            }
-
-            static void validate_header(protocol::ofp_header const& header)
-            {
-                if (header.version != protocol::OFP_VERSION) {
-                    throw std::runtime_error{"invalid version"};
-                }
-                if (header.type != T::message_type) {
-                    throw std::runtime_error{"invalid message type"};
-                }
-                if (header.length != sizeof(raw_ofp_type)) {
-                    throw std::runtime_error{"invalid length"};
-                }
             }
 
         protected:
@@ -62,8 +50,16 @@ namespace messages {
             }
 
         private:
-            friend typename
-                v10_detail::basic_openflow_message<T>::basic_protocol_type;
+            friend base_t;
+
+            static constexpr auto is_valid_message_length(
+                    std::uint16_t const length) noexcept
+                -> bool
+            {
+                return length == sizeof(raw_ofp_type);
+            }
+
+            friend typename base_t::basic_protocol_type;
 
             template <class Container>
             void encode_impl(Container& container) const
