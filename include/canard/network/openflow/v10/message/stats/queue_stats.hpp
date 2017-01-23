@@ -180,6 +180,13 @@ namespace statistics {
             : basic_stats_reply{stats_reply, std::move(queue_stats)}
         {
         }
+
+        static constexpr auto is_valid_stats_body_length(
+                std::uint16_t const length) noexcept
+            -> bool
+        {
+            return length % body_type::value_type::min_length() == 0;
+        }
     };
 
 } // namespace statistics

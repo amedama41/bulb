@@ -322,6 +322,13 @@ namespace statistics {
             : basic_stats_reply{stats_reply, std::move(flow_stats)}
         {
         }
+
+        static constexpr auto is_valid_stats_body_length(
+                std::uint16_t const length) noexcept
+            -> bool
+        {
+            return true;
+        }
     };
 
 } // namespace statistics

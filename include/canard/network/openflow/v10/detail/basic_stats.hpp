@@ -43,6 +43,8 @@ namespace stats_detail {
     class basic_stats
         : public v10_detail::basic_openflow_message<T>
     {
+        using base_t = v10_detail::basic_openflow_message<T>;
+
     public:
         using raw_ofp_type = StatsType;
 
@@ -67,17 +69,28 @@ namespace stats_detail {
             return static_cast<T const*>(this)->stats().flags;
         }
 
-        static void validate_header(protocol::ofp_header const& header)
+        using base_t::validate_header;
+
+        static auto validate_header(raw_ofp_type const& stats) noexcept
+            -> char const*
         {
-            if (header.version != protocol::OFP_VERSION) {
-                throw std::runtime_error{"invalid version"};
+            if (stats.type != stats_type()) {
+                return "invalid stats type";
             }
-            if (header.type != message_type) {
-                throw std::runtime_error{"invalid message type"};
+            if (!T::is_valid_stats_length(stats.header.length)) {
+                return "invalid stats length";
             }
-            if (header.length < sizeof(raw_ofp_type)) {
-                throw std::runtime_error{"invalid length"};
-            }
+            return nullptr;
+        }
+
+    private:
+        friend base_t;
+
+        static constexpr auto is_valid_message_length(
+                std::uint16_t const length) noexcept
+            -> bool
+        {
+            return length >= sizeof(raw_ofp_type);
         }
     };
 
@@ -91,14 +104,11 @@ namespace stats_detail {
     public:
         using raw_ofp_type = typename base_t::raw_ofp_type;
 
-        static void validate_stats(raw_ofp_type const& stats)
+        static constexpr auto is_valid_stats_length(
+                std::uint16_t const length) noexcept
+            -> bool
         {
-            if (stats.type != T::stats_type_value) {
-                throw std::runtime_error{"invalid stats type"};
-            }
-            if (stats.header.length != sizeof(raw_ofp_type)) {
-                throw std::runtime_error{"invalid stats length"};
-            }
+            return length == sizeof(raw_ofp_type);
         }
 
     protected:
@@ -167,15 +177,11 @@ namespace stats_detail {
         using raw_ofp_type = typename base_t::raw_ofp_type;
         using raw_ofp_stats_type = BodyType;
 
-        static void validate_stats(raw_ofp_type const& stats)
+        static constexpr auto is_valid_stats_length(
+                std::uint16_t const length) noexcept
+            -> bool
         {
-            if (stats.type != T::stats_type_value) {
-                throw std::runtime_error{"invalid stats type"};
-            }
-            if (stats.header.length
-                    != sizeof(raw_ofp_type) + sizeof(raw_ofp_stats_type)) {
-                throw std::runtime_error{"invalid stats length"};
-            }
+            return length == sizeof(raw_ofp_type) + sizeof(raw_ofp_stats_type);
         }
 
     protected:
@@ -213,6 +219,12 @@ namespace stats_detail {
 
     private:
         friend typename base_t::basic_openflow_message::basic_protocol_type;
+
+        friend constexpr auto get_min_length(T*) noexcept
+            -> std::uint16_t
+        {
+            return sizeof(raw_ofp_type) + sizeof(raw_ofp_stats_type);
+        }
 
         template <class Container>
         void encode_impl(Container& container) const
@@ -276,14 +288,12 @@ namespace stats_detail {
             return body;
         }
 
-        static void validate_stats(raw_ofp_type const& stats)
+        static constexpr auto is_valid_stats_length(
+                std::uint16_t const length) noexcept
+            -> bool
         {
-            if (stats.type != T::stats_type_value) {
-                throw std::runtime_error{"invalid stats type"};
-            }
-            if (stats.header.length < sizeof(raw_ofp_type)) {
-                throw std::runtime_error{"invalid stats length"};
-            }
+            return length >= sizeof(raw_ofp_type)
+                && T::is_valid_stats_body_length(length - sizeof(raw_ofp_type));
         }
 
     protected:
