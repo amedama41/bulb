@@ -2,7 +2,6 @@
 #define CANARD_NET_OFP_V10_ACTIONS_BASIC_ACTION_HPP
 
 #include <cstdint>
-#include <stdexcept>
 #include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
@@ -38,14 +37,17 @@ namespace actions_detail {
             return sizeof(raw_ofp_type);
         }
 
-        static void validate_header(protocol::ofp_action_header const& header)
+        static auto validate_header(
+                protocol::ofp_action_header const& header) noexcept
+            -> char const*
         {
             if (header.type != T::action_type) {
-                throw std::runtime_error{"invalid action type"};
+                return "invalid action type";
             }
             if (header.len != sizeof(raw_ofp_type)) {
-                throw std::runtime_error{"invalid action length"};
+                return "invalid action length";
             }
+            return nullptr;
         }
 
     private:
