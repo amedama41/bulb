@@ -2,7 +2,6 @@
 #define CANARD_NET_OFP_V10_QUEUE_PROPERTIES_MIN_RATE_HPP
 
 #include <cstdint>
-#include <stdexcept>
 #include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
@@ -68,15 +67,17 @@ namespace queue_properties {
             return rate() > 1000;
         }
 
-        static void validate_header(
-                protocol::ofp_queue_prop_header const& prop_header)
+        static auto validate_header(
+                protocol::ofp_queue_prop_header const& prop_header) noexcept
+            -> char const*
         {
             if (prop_header.property != queue_property) {
-                throw std::runtime_error{"invalid queue property"};
+                return "invalid queue property type";
             }
             if (prop_header.len != sizeof(raw_ofp_type)) {
-                throw std::runtime_error{"invalid queue property length"};
+                return "invalid queue property length";
             }
+            return nullptr;
         }
 
     private:
