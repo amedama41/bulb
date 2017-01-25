@@ -34,7 +34,8 @@ set(v10_message_srcs
     v10/message/port_status_test.cpp
     v10/message/queue_config_test.cpp
     v10/message/switch_config_test.cpp
-    v10/message/switch_features_test.cpp)
+    v10/message/switch_features_test.cpp
+    v10/message/validate_header_test.cpp)
 set(v10_queue_property_srcs
     v10/queue_property/min_rate_test.cpp)
 set(v10_stats_srcs

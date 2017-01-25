@@ -7,6 +7,7 @@
 #include <boost/asio/ip/address_v4.hpp>
 #include <boost/asio/ip/address_v6.hpp>
 #include <boost/container/vector.hpp>
+#include <boost/utility/string_ref.hpp>
 #include <canard/mac_address.hpp>
 
 inline auto operator"" _bin(char const* const str, std::size_t const size)
@@ -43,6 +44,13 @@ inline auto operator"" _ipv6(char const* const ipv6, std::size_t)
     -> boost::asio::ip::address_v6
 {
     return boost::asio::ip::address_v6::from_string(ipv6);
+}
+
+constexpr auto operator ""_sr(
+    char const* const str, std::size_t const len) noexcept
+  -> boost::string_ref
+{
+  return boost::string_ref(str, len);
 }
 
 #endif // CANARD_NET_OFP_TEST_UTILITY_HPP
