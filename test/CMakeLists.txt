@@ -44,7 +44,8 @@ set(v10_stats_srcs
     v10/stats/flow_stats_test.cpp
     v10/stats/port_stats_test.cpp
     v10/stats/queue_stats_test.cpp
-    v10/stats/table_stats_test.cpp)
+    v10/stats/table_stats_test.cpp
+    v10/stats/validate_header_test.cpp)
 set(v10_utility_srcs
     v10/utility/action_list_test.cpp
     v10/utility/any_action_test.cpp
