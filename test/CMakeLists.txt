@@ -12,7 +12,8 @@ set(v10_action_srcs
     v10/action/output_test.cpp
     v10/action/set_field_test.cpp
     v10/action/strip_vlan_test.cpp
-    v10/action/enqueue_test.cpp)
+    v10/action/enqueue_test.cpp
+    v10/action/validate_header_test.cpp)
 set(v10_common_type_srcs
     v10/common_type/match_fields_test.cpp
     v10/common_type/match_set_test.cpp
