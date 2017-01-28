@@ -90,6 +90,7 @@ set(v13_action_srcs
     v13/action/pop_pbb_test.cpp)
 set(v13_common_type_srcs
     v13/common_type/port_test.cpp
+    v13/common_type/oxm_header_test.cpp
     v13/common_type/oxm_match_test.cpp
     v13/common_type/bucket_test.cpp
     v13/common_type/packet_queue_test.cpp)
