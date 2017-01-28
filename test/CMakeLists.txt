@@ -38,7 +38,8 @@ set(v10_message_srcs
     v10/message/switch_features_test.cpp
     v10/message/validate_header_test.cpp)
 set(v10_queue_property_srcs
-    v10/queue_property/min_rate_test.cpp)
+    v10/queue_property/min_rate_test.cpp
+    v10/queue_property/validate_header_test.cpp)
 set(v10_stats_srcs
     v10/stats/aggregate_stats_test.cpp
     v10/stats/description_test.cpp
