@@ -2,7 +2,6 @@
 #define CANARD_NET_OFP_V13_QUEUE_PROPERTIES_BAISC_QUEUE_PROPERTY_HPP
 
 #include <cstdint>
-#include <stdexcept>
 #include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
@@ -16,7 +15,7 @@ namespace v13 {
 namespace queue_properties {
 namespace queue_property_detail {
 
-    template <class T, class OFPQueueProperty>
+    template <class T>
     class basic_queue_property
         : public detail::basic_protocol_type<T>
     {
@@ -24,7 +23,7 @@ namespace queue_property_detail {
         basic_queue_property() = default;
 
     public:
-        using raw_ofp_type = OFPQueueProperty;
+        using ofp_header_type = protocol::ofp_queue_prop_header;
 
         static constexpr auto property() noexcept
             -> protocol::ofp_queue_properties
@@ -41,25 +40,26 @@ namespace queue_property_detail {
         static constexpr auto length() noexcept
             -> std::uint16_t
         {
-            return sizeof(raw_ofp_type);
+            return sizeof(typename T::raw_ofp_type);
         }
 
-        static void validate_header(
-                protocol::ofp_queue_prop_header const& prop_header)
+        static auto validate_header(ofp_header_type const& prop_header) noexcept
+            -> char const*
         {
             if (prop_header.property != property()) {
-                throw std::runtime_error{"invalid queue property"};
+                return "invalid queue property";
             }
             if (prop_header.len != length()) {
-                throw std::runtime_error{"invalid queue property length"};
+                return "invalid queue property length";
             }
+            return nullptr;
         }
 
     private:
-        auto base_property() const noexcept
-            -> raw_ofp_type const&
+        auto derived() const noexcept
+            -> T const&
         {
-            return static_cast<T const*>(this)->ofp_queue_property();
+            return *static_cast<T const*>(this);
         }
 
         friend detail::basic_protocol_type<T>;
@@ -72,20 +72,22 @@ namespace queue_property_detail {
         template <class Container>
         void encode_impl(Container& container) const
         {
-            detail::encode(container, base_property());
+            detail::encode(container, derived().ofp_queue_property());
         }
 
         template <class Iterator>
         static auto decode_impl(Iterator& first, Iterator last)
             -> T
         {
-            return T{detail::decode<raw_ofp_type>(first, last)};
+            return T{detail::decode<typename T::raw_ofp_type>(first, last)};
         }
 
         auto equal_impl(T const& rhs) const noexcept
             -> bool
         {
-            return detail::memcmp(base_property(), rhs.base_property());
+            return detail::memcmp(
+                      derived().ofp_queue_property()
+                    , rhs.derived().ofp_queue_property());
         }
 
         auto equivalent_impl(T const& rhs) const noexcept

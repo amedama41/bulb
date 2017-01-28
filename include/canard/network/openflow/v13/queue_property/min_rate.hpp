@@ -13,11 +13,11 @@ namespace v13 {
 namespace queue_properties {
 
     class min_rate
-        : public queue_property_detail::basic_queue_property<
-            min_rate, protocol::ofp_queue_prop_min_rate
-          >
+        : public queue_property_detail::basic_queue_property<min_rate>
     {
     public:
+        using raw_ofp_type = protocol::ofp_queue_prop_min_rate;
+
         static constexpr protocol::ofp_queue_properties queue_property
             = protocol::OFPQT_MIN_RATE;
 
@@ -69,8 +69,7 @@ namespace queue_properties {
         auto is_equivalent_property(min_rate const& rhs) const noexcept
             -> bool
         {
-            return rate() == rhs.rate()
-                || (is_disabled() && rhs.is_disabled());
+            return rate() == rhs.rate() || (is_disabled() && rhs.is_disabled());
         }
 
     private:
