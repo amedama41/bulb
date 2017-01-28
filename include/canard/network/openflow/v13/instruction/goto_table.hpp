@@ -3,7 +3,7 @@
 
 #include <cstdint>
 #include <stdexcept>
-#include <canard/network/openflow/v13/detail/basic_instruction.hpp>
+#include <canard/network/openflow/v13/detail/basic_fixed_length_instruction.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -13,11 +13,11 @@ namespace v13 {
 namespace instructions {
 
     class goto_table
-        : public detail::v13::basic_instruction<
-            goto_table, protocol::ofp_instruction_goto_table
-          >
+        : public detail::v13::basic_fixed_length_instruction<goto_table>
     {
     public:
+        using raw_ofp_type = protocol::ofp_instruction_goto_table;
+
         static constexpr protocol::ofp_instruction_type instruction_type
             = protocol::OFPIT_GOTO_TABLE;
 
@@ -38,7 +38,7 @@ namespace instructions {
         }
 
     private:
-        friend basic_instruction;
+        friend basic_fixed_length_instruction;
 
         explicit goto_table(raw_ofp_type const& instruction_goto_table) noexcept
             : instruction_goto_table_(instruction_goto_table)

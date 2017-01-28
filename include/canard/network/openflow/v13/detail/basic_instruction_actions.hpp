@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <iterator>
-#include <stdexcept>
 #include <type_traits>
 #include <utility>
 #include <canard/network/openflow/detail/basic_protocol_type.hpp>
@@ -12,6 +11,7 @@
 #include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/type_traits/is_all_constructible.hpp>
 #include <canard/network/openflow/v13/action_list.hpp>
+#include <canard/network/openflow/v13/detail/basic_instruction.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -23,16 +23,11 @@ namespace v13 {
 
     template <class T>
     class basic_instruction_actions
-        : public detail::basic_protocol_type<T>
+        : public basic_instruction<T>
+        , public detail::basic_protocol_type<T>
     {
     public:
         using raw_ofp_type = ofp::v13::protocol::ofp_instruction_actions;
-
-        static constexpr auto type() noexcept
-            -> ofp::v13::protocol::ofp_instruction_type
-        {
-            return T::instruction_type;
-        }
 
         auto length() const noexcept
             -> std::uint16_t
@@ -53,17 +48,6 @@ namespace v13 {
             actions.swap(actions_);
             instruction_actions_.len = sizeof(raw_ofp_type);
             return actions;
-        }
-
-        static void validate_instruction(
-                ofp::v13::protocol::ofp_instruction const& instruction)
-        {
-            if (instruction.type != type()) {
-                throw std::runtime_error{"invalid instruction type"};
-            }
-            if (instruction.len < sizeof(raw_ofp_type)) {
-                throw std::runtime_error{"instruction length is too small"};
-            }
         }
 
     protected:
@@ -116,6 +100,10 @@ namespace v13 {
         }
 
     private:
+        friend basic_instruction<T>;
+
+        static constexpr bool is_fixed_length_instruction = false;
+
         friend detail::basic_protocol_type<T>;
 
         template <class Validator>

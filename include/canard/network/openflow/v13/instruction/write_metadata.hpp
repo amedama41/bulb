@@ -3,7 +3,7 @@
 
 #include <cstdint>
 #include <limits>
-#include <canard/network/openflow/v13/detail/basic_instruction.hpp>
+#include <canard/network/openflow/v13/detail/basic_fixed_length_instruction.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -13,11 +13,11 @@ namespace v13 {
 namespace instructions {
 
     class write_metadata
-        : public detail::v13::basic_instruction<
-            write_metadata, protocol::ofp_instruction_write_metadata
-          >
+        : public detail::v13::basic_fixed_length_instruction<write_metadata>
     {
     public:
+        using raw_ofp_type = protocol::ofp_instruction_write_metadata;
+
         static constexpr protocol::ofp_instruction_type instruction_type
             = protocol::OFPIT_WRITE_METADATA;
 
@@ -48,7 +48,7 @@ namespace instructions {
         }
 
     private:
-        friend basic_instruction;
+        friend basic_fixed_length_instruction;
 
         explicit write_metadata(
                 raw_ofp_type const& instruction_write_metadata) noexcept

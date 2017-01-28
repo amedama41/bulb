@@ -3,7 +3,7 @@
 
 #include <cstdint>
 #include <stdexcept>
-#include <canard/network/openflow/v13/detail/basic_instruction.hpp>
+#include <canard/network/openflow/v13/detail/basic_fixed_length_instruction.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -13,11 +13,11 @@ namespace v13 {
 namespace instructions {
 
     class meter
-        : public detail::v13::basic_instruction<
-            meter, protocol::ofp_instruction_meter
-          >
+        : public detail::v13::basic_fixed_length_instruction<meter>
     {
     public:
+        using raw_ofp_type = protocol::ofp_instruction_meter;
+
         static constexpr protocol::ofp_instruction_type instruction_type
             = protocol::OFPIT_METER;
 
@@ -37,7 +37,7 @@ namespace instructions {
         }
 
     private:
-        friend basic_instruction;
+        friend basic_fixed_length_instruction;
 
         explicit meter(raw_ofp_type const& instruction_meter) noexcept
             : instruction_meter_(instruction_meter)
