@@ -68,6 +68,28 @@ BOOST_AUTO_TEST_SUITE(oxm_header)
       BOOST_TEST(header.oxm_field() == oxm_field_value);
     }
   BOOST_AUTO_TEST_SUITE_END() // oxm_field
+  BOOST_AUTO_TEST_SUITE(oxm_type)
+    BOOST_DATA_TEST_CASE(
+          return_oxm_field
+        , bdata::make(header_vec{
+            OXM_OF_IN_PORT, OXM_OF_IN_PORT_W, OXM_OF_VLAN_VID, OXM_OF_METADATA
+          })
+        ^ bdata::make(field_vec{
+              v13::protocol::ofb_match_fields::in_port
+            , v13::protocol::ofb_match_fields::in_port
+            , v13::protocol::ofb_match_fields::vlan_vid
+            , v13::protocol::ofb_match_fields::metadata
+          })
+        , oxm_header_value, oxm_field_value)
+    {
+      auto const header = v13::oxm_header{oxm_header_value};
+      auto const oxm_type
+        = (std::uint32_t(v13::protocol::oxm_class::openflow_basic) << 7)
+        | oxm_field_value;
+
+      BOOST_TEST(header.oxm_type() == oxm_type);
+    }
+  BOOST_AUTO_TEST_SUITE_END() // oxm_type
   BOOST_AUTO_TEST_SUITE(oxm_hasmask)
     BOOST_DATA_TEST_CASE(
         true_if_hasmask_bit_0, bdata::make(header_vec{

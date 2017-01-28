@@ -35,6 +35,12 @@ namespace v13 {
       return (oxm_header_ >> 9) & 0x7f;
     }
 
+    constexpr auto oxm_type() const noexcept
+      -> std::uint32_t
+    {
+      return oxm_header_ >> 9;
+    }
+
     constexpr auto oxm_hasmask() const noexcept
       -> bool
     {
