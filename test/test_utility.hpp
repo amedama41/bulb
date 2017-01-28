@@ -3,6 +3,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <ctime>
+#include <random>
 #include <vector>
 #include <boost/asio/ip/address_v4.hpp>
 #include <boost/asio/ip/address_v6.hpp>
@@ -51,6 +53,22 @@ constexpr auto operator ""_sr(
   -> boost::string_ref
 {
   return boost::string_ref(str, len);
+}
+
+template <class T = void>
+struct rand_holder
+{
+  static std::mt19937 rnd;
+};
+
+template <class T>
+std::mt19937 rand_holder<T>::rnd(std::time(nullptr));
+
+template <class T>
+inline auto random()
+  -> T
+{
+  return rand_holder<>::rnd();
 }
 
 #endif // CANARD_NET_OFP_TEST_UTILITY_HPP

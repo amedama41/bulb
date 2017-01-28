@@ -3,8 +3,6 @@
 #include <boost/test/unit_test.hpp>
 
 #include <cstdint>
-#include <ctime>
-#include <random>
 #include <boost/fusion/adapted/std_tuple.hpp>
 #include "../../test_utility.hpp"
 
@@ -27,12 +25,7 @@ using all_action_types = std::tuple<
   , actions::strip_vlan
 >;
 
-static auto random_pad()
-  -> std::uint8_t
-{
-  static std::mt19937 rnd(std::time(nullptr));
-  return rnd();
-}
+static auto& random_pad = ::random<std::uint8_t>;
 
 BOOST_AUTO_TEST_SUITE(actions_test)
   BOOST_AUTO_TEST_SUITE(validate_header)

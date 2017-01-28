@@ -5,8 +5,6 @@
 #include <boost/test/data/test_case.hpp>
 
 #include <cstdint>
-#include <ctime>
-#include <random>
 #include <boost/fusion/adapted/std_tuple.hpp>
 #include "../../test_utility.hpp"
 
@@ -14,7 +12,6 @@ namespace v10 = canard::net::ofp::v10;
 namespace protocol = v10::protocol;
 namespace msg = v10::messages;
 
-namespace {
 using fixed_length_message_types = std::tuple<
     msg::barrier_request
   , msg::barrier_reply
@@ -61,13 +58,7 @@ using all_message_types = std::tuple<
   , msg::features_reply
 >;
 
-auto random_xid()
-  -> std::uint32_t
-{
-  static std::mt19937 rnd(std::time(nullptr));
-  return rnd();
-}
-} // namespace
+static auto& random_xid = ::random<std::uint32_t>;
 
 BOOST_AUTO_TEST_SUITE(message_test)
   BOOST_AUTO_TEST_SUITE(validate_header)

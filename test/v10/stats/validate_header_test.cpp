@@ -5,8 +5,6 @@
 #include <boost/test/data/test_case.hpp>
 
 #include <cstdint>
-#include <ctime>
-#include <random>
 #include <boost/fusion/adapted/std_tuple.hpp>
 #include "../../test_utility.hpp"
 
@@ -14,7 +12,6 @@ namespace v10 = canard::net::ofp::v10;
 namespace protocol = v10::protocol;
 namespace stats = v10::messages::statistics;
 
-namespace {
 using stats_request_types = std::tuple<
     stats::aggregate_stats_request
   , stats::description_request
@@ -55,18 +52,8 @@ using all_stats_types = std::tuple<
   , stats::table_stats_reply
 >;
 
-static std::mt19937 rnd(std::time(nullptr));
-auto random_xid()
-  -> std::uint32_t
-{
-  return ::rnd();
-}
-auto random_flags()
-  -> std::uint16_t
-{
-  return ::rnd();
-}
-} // namespace
+static auto& random_xid = ::random<std::uint32_t>;
+static auto& random_flags = ::random<std::uint16_t>;
 
 BOOST_AUTO_TEST_SUITE(stats_test)
   BOOST_AUTO_TEST_SUITE(validate_header_for_ofp_header)
