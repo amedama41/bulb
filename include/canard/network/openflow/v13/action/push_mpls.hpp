@@ -37,7 +37,7 @@ namespace actions {
         }
 
     private:
-        friend basic_action;
+        friend basic_action_push::basic_fixed_length_action;
 
         explicit push_mpls(raw_ofp_type const& ofp_action) noexcept
             : basic_action_push{ofp_action}

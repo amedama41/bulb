@@ -2,7 +2,7 @@
 #define CANARD_NET_OFP_V13_ACTIONS_POP_MPLS_HPP
 
 #include <cstdint>
-#include <canard/network/openflow/v13/detail/basic_action.hpp>
+#include <canard/network/openflow/v13/detail/basic_fixed_length_action.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -12,11 +12,11 @@ namespace v13 {
 namespace actions {
 
     class pop_mpls
-        : public detail::v13::basic_action<
-            pop_mpls, protocol::ofp_action_pop_mpls
-          >
+        : public detail::v13::basic_fixed_length_action<pop_mpls>
     {
     public:
+        using raw_ofp_type = protocol::ofp_action_pop_mpls;
+
         static constexpr protocol::ofp_action_type action_type
             = protocol::OFPAT_POP_MPLS;
 
@@ -55,7 +55,7 @@ namespace actions {
         }
 
     private:
-        friend basic_action;
+        friend basic_fixed_length_action;
 
         explicit pop_mpls(raw_ofp_type const& action_pop_mpls) noexcept
             : action_pop_mpls_(action_pop_mpls)

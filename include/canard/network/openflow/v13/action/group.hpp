@@ -3,7 +3,7 @@
 
 #include <cstdint>
 #include <stdexcept>
-#include <canard/network/openflow/v13/detail/basic_action.hpp>
+#include <canard/network/openflow/v13/detail/basic_fixed_length_action.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -13,9 +13,11 @@ namespace v13 {
 namespace actions {
 
     class group
-        : public detail::v13::basic_action<group, protocol::ofp_action_group>
+        : public detail::v13::basic_fixed_length_action<group>
     {
     public:
+        using raw_ofp_type = protocol::ofp_action_group;
+
         static constexpr protocol::ofp_action_type action_type
             = protocol::OFPAT_GROUP;
 
@@ -35,10 +37,9 @@ namespace actions {
         }
 
     private:
-        friend basic_action;
+        friend basic_fixed_length_action;
 
-        explicit group(
-                protocol::ofp_action_group const& action_group) noexcept
+        explicit group(raw_ofp_type const& action_group) noexcept
             : action_group_(action_group)
         {
         }

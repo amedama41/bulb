@@ -8,6 +8,7 @@
 #include <boost/preprocessor/repeat.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/v13/action/set_field.hpp>
+#include <canard/network/openflow/v13/common/oxm_header.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -25,13 +26,14 @@ struct set_field_decoder
         auto const set_field
             = detail::decode<protocol::ofp_action_set_field>(it, last);
 
-        auto const oxm_header
-            = actions::basic_set_field::extract_oxm_header(set_field);
+        auto field_it = set_field.field;
+        auto const oxm_header = v13::oxm_header::decode(
+                field_it, field_it + sizeof(set_field.field));
 
         static_assert(
                   std::tuple_size<default_set_field_list>::value == 36
                 , "not match to the number of set_field types");
-        switch (oxm_header >> 9) {
+        switch (oxm_header.oxm_type()) {
 #       define CANARD_NET_OFP_V13_SET_FIELD_CASE(z, N, _) \
         using set_field ## N = \
             std::tuple_element<N, default_set_field_list>::type; \

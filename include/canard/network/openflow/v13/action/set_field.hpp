@@ -11,7 +11,9 @@
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/padding.hpp>
+#include <canard/network/openflow/v13/common/oxm_header.hpp>
 #include <canard/network/openflow/v13/common/oxm_match_field.hpp>
+#include <canard/network/openflow/v13/detail/basic_action.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/detail/length_utility.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
@@ -23,13 +25,14 @@ namespace v13 {
 namespace actions {
 
     class basic_set_field
+        : public detail::v13::basic_action<basic_set_field>
     {
     protected:
-        using raw_ofp_type = protocol::ofp_action_set_field;
-
         basic_set_field() = default;
 
     public:
+        using raw_ofp_type = protocol::ofp_action_set_field;
+
         static constexpr protocol::ofp_action_type action_type
             = protocol::OFPAT_SET_FIELD;
 
@@ -40,23 +43,16 @@ namespace actions {
         }
 
         static auto extract_oxm_header(raw_ofp_type const& set_field) noexcept
-            -> std::uint32_t
+            -> v13::oxm_header
         {
             auto it = set_field.field;
-            return detail::decode<std::uint32_t>(
-                    it, it + sizeof(set_field.field));
+            return v13::oxm_header::decode(it, it + sizeof(set_field.field));
         }
 
-        static void validate_action_header(
-                protocol::ofp_action_header const& header)
-        {
-            if (header.type != action_type) {
-                throw std::runtime_error{"invalid action type"};
-            }
-            if (header.len != sizeof(raw_ofp_type)) {
-                throw std::runtime_error{"invalid action length"};
-            }
-        }
+    private:
+        friend basic_action;
+
+        static constexpr bool is_fixed_length_action = false;
     };
 
 
@@ -65,11 +61,11 @@ namespace actions {
         : public basic_set_field
         , public detail::basic_protocol_type<set_field<OXMMatchField>>
     {
-    public:
         static constexpr std::size_t base_size = offsetof(raw_ofp_type, field);
 
-        using raw_ofp_type = basic_set_field::raw_ofp_type;
-        using value_type = typename OXMMatchField::value_type;
+    public:
+        using oxm_match_field = OXMMatchField;
+        using value_type = typename oxm_match_field::value_type;
 
         explicit set_field(value_type const& value)
             : field_{value}
@@ -79,7 +75,7 @@ namespace actions {
         static constexpr auto oxm_type() noexcept
             -> std::uint32_t
         {
-            return OXMMatchField::oxm_type();
+            return oxm_match_field::oxm_type();
         }
 
         auto length() const noexcept
@@ -94,25 +90,30 @@ namespace actions {
             return field_.oxm_value();
         }
 
-        static auto create_from_match_field(OXMMatchField field)
+        static auto create_from_match_field(oxm_match_field field)
             -> set_field
         {
             return set_field{std::move(field)};
         }
 
-        static void validate_set_field(raw_ofp_type const& set_field)
+        static auto validate_set_field(raw_ofp_type const& set_field) noexcept
+            -> char const*
         {
             auto const oxm_header = extract_oxm_header(set_field);
 
-            OXMMatchField::validate_oxm_header(oxm_header);
-            if (set_field.len != detail::v13::exact_length(
-                        base_size + (oxm_header & 0xff))) {
-                throw std::runtime_error{"invalid set_field length"};
+            if (auto const error_msg = oxm_match_field::validate_header(
+                        oxm_header.to_ofp_type())) {
+                return error_msg;
             }
+            if (set_field.len != detail::v13::exact_length(
+                        sizeof(raw_ofp_type) + oxm_header.oxm_length())) {
+                return "invalid set_field length";
+            }
+            return nullptr;
         }
 
     private:
-        set_field(OXMMatchField&& field)
+        explicit set_field(oxm_match_field&& field)
             : field_(std::move(field))
         {
         }
@@ -123,7 +124,7 @@ namespace actions {
             -> std::uint16_t
         {
             return detail::v13::exact_length(
-                    base_size + OXMMatchField::min_length());
+                    base_size + oxm_match_field::min_length());
         }
 
         template <class Validator>
@@ -153,7 +154,7 @@ namespace actions {
         {
             std::advance(first, sizeof(raw_ofp_type::type));
             auto const length = detail::decode<std::uint16_t>(first, last);
-            auto field = OXMMatchField::decode(first, last);
+            auto field = oxm_match_field::decode(first, last);
             std::advance(first, length - (base_size + field.length()));
             return set_field{std::move(field)};
         }
@@ -171,7 +172,7 @@ namespace actions {
         }
 
     private:
-        OXMMatchField field_;
+        oxm_match_field field_;
     };
 
     using set_eth_dst        = set_field<oxm_match_fields::eth_dst>;

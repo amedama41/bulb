@@ -2,7 +2,7 @@
 #define CANARD_NET_OFP_DETAIL_V13_BASIC_ACTION_PUSH_HPP
 
 #include <cstdint>
-#include <canard/network/openflow/v13/detail/basic_action.hpp>
+#include <canard/network/openflow/v13/detail/basic_fixed_length_action.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -13,12 +13,12 @@ namespace v13 {
 
     template <class T>
     class basic_action_push
-        : public basic_action<T, ofp::v13::protocol::ofp_action_push>
+        : public basic_fixed_length_action<T>
     {
-        using base_type = basic_action<T, ofp::v13::protocol::ofp_action_push>;
+        using base_t = basic_fixed_length_action<T>;
 
     public:
-        using raw_ofp_type = typename base_type::raw_ofp_type;
+        using raw_ofp_type = ofp::v13::protocol::ofp_action_push;
 
         auto ethertype() const noexcept
             -> std::uint16_t
@@ -30,7 +30,7 @@ namespace v13 {
         explicit basic_action_push(std::uint16_t const ethertype) noexcept
             : action_push_{
                   T::action_type
-                , base_type::length()
+                , base_t::length()
                 , ethertype
                 , { 0, 0 }
               }
@@ -43,7 +43,7 @@ namespace v13 {
         }
 
     private:
-        friend base_type;
+        friend base_t;
 
         auto ofp_action() const noexcept
             -> raw_ofp_type const&

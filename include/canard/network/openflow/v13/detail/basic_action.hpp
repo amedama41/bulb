@@ -2,13 +2,7 @@
 #define CANARD_NET_OFP_DETAIL_V13_BASIC_ACTION_HPP
 
 #include <cstdint>
-#include <stdexcept>
-#include <utility>
-#include <canard/network/openflow/detail/basic_protocol_type.hpp>
-#include <canard/network/openflow/detail/decode.hpp>
-#include <canard/network/openflow/detail/encode.hpp>
-#include <canard/network/openflow/detail/memcmp.hpp>
-#include <canard/network/openflow/v13/detail/byteorder.hpp>
+#include <type_traits>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -17,15 +11,35 @@ namespace ofp {
 namespace detail {
 namespace v13 {
 
-    template <class T, class OFPAction>
+    namespace basic_action_detail {
+
+        constexpr auto is_valid_length(
+                  std::uint16_t const length
+                , std::uint16_t const min_length, std::true_type) noexcept
+            -> bool
+        {
+            return length == min_length;
+        }
+
+        constexpr auto is_valid_length(
+                  std::uint16_t const length
+                , std::uint16_t const min_length, std::false_type) noexcept
+            -> bool
+        {
+            return length >= min_length;
+        }
+
+    } // namespace basic_action_detail
+
+
+    template <class T>
     class basic_action
-        : public detail::basic_protocol_type<T>
     {
     protected:
         basic_action() = default;
 
     public:
-        using raw_ofp_type = OFPAction;
+        using ofp_header_type = ofp::v13::protocol::ofp_action_header;
 
         static constexpr auto type() noexcept
             -> ofp::v13::protocol::ofp_action_type
@@ -33,61 +47,20 @@ namespace v13 {
             return T::action_type;
         }
 
-        static constexpr auto length() noexcept
-            -> std::uint16_t
+        static auto validate_header(ofp_header_type const& header) noexcept
+            -> char const*
         {
-            return sizeof(raw_ofp_type);
-        }
-
-        static void validate_action_header(
-                ofp::v13::protocol::ofp_action_header const& header)
-        {
-            if (header.type != T::action_type) {
-                throw std::runtime_error{"invalid action type"};
+            if (header.type != type()) {
+                return "invalid action type";
             }
-            if (header.len != sizeof(raw_ofp_type)) {
-                throw std::runtime_error{"invalid action length"};
+            using is_fixed_length
+                = std::integral_constant<bool, T::is_fixed_length_action>;
+            if (!basic_action_detail::is_valid_length(
+                          header.len, sizeof(typename T::raw_ofp_type)
+                        , is_fixed_length{})) {
+                return "invalid action length";
             }
-        }
-
-    private:
-        auto base_action() const noexcept
-            -> raw_ofp_type const&
-        {
-            return static_cast<T const*>(this)->ofp_action();
-        }
-
-        friend detail::basic_protocol_type<T>;
-
-        template <class Validator>
-        void validate_impl(Validator const&) const
-        {
-            return static_cast<T const*>(this)->validate_action();
-        }
-
-        template <class Container>
-        void encode_impl(Container& container) const
-        {
-            detail::encode(container, base_action());
-        }
-
-        template <class Iterator>
-        static auto decode_impl(Iterator& first, Iterator last)
-            -> T
-        {
-            return T{detail::decode<raw_ofp_type>(first, last)};
-        }
-
-        auto equal_impl(T const& rhs) const noexcept
-            -> bool
-        {
-            return detail::memcmp(base_action(), rhs.base_action());
-        }
-
-        auto equivalent_impl(T const& rhs) const noexcept
-            -> bool
-        {
-            return static_cast<T const*>(this)->is_equivalent_action(rhs);
+            return nullptr;
         }
     };
 

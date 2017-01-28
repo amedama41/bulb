@@ -20,7 +20,7 @@ namespace actions {
         decrement_nw_ttl() = default;
 
     private:
-        friend basic_action;
+        friend basic_generic_action::basic_fixed_length_action;
 
         explicit decrement_nw_ttl(raw_ofp_type const& ofp_action) noexcept
             : basic_generic_action{ofp_action}

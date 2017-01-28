@@ -3,7 +3,7 @@
 
 #include <cstdint>
 #include <stdexcept>
-#include <canard/network/openflow/v13/detail/basic_action.hpp>
+#include <canard/network/openflow/v13/detail/basic_fixed_length_action.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -13,11 +13,11 @@ namespace v13 {
 namespace actions {
 
     class set_queue
-        : public detail::v13::basic_action<
-            set_queue, protocol::ofp_action_set_queue
-          >
+        : public detail::v13::basic_fixed_length_action<set_queue>
     {
     public:
+        using raw_ofp_type = protocol::ofp_action_set_queue;
+
         static constexpr protocol::ofp_action_type action_type
             = protocol::OFPAT_SET_QUEUE;
 
@@ -37,7 +37,7 @@ namespace actions {
         }
 
     private:
-        friend basic_action;
+        friend basic_fixed_length_action;
 
         explicit set_queue(raw_ofp_type const& action_set_queue) noexcept
             : action_set_queue_(action_set_queue)

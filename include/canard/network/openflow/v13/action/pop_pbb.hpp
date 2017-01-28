@@ -20,7 +20,7 @@ namespace actions {
         pop_pbb() = default;
 
     private:
-        friend basic_action;
+        friend basic_generic_action::basic_fixed_length_action;
 
         explicit pop_pbb(raw_ofp_type const& ofp_action) noexcept
             : basic_generic_action{ofp_action}
