@@ -2,7 +2,6 @@
 #define CANARD_NET_OFP_DETAIL_V13_BASIC_METER_BAND_HPP
 
 #include <cstdint>
-#include <stdexcept>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
@@ -22,6 +21,8 @@ namespace v13 {
     using base_t = detail::basic_protocol_type<MeterBand>;
 
   public:
+    using ofp_header_type = ofp::v13::protocol::ofp_meter_band_header;
+
     static constexpr auto type() noexcept
       -> std::uint16_t
     {
@@ -46,15 +47,16 @@ namespace v13 {
       return derived().ofp_meter_band().burst_size;
     }
 
-    static void validate_header(
-        ofp::v13::protocol::ofp_meter_band_header const& header)
+    static auto validate_header(ofp_header_type const& header) noexcept
+      -> char const*
     {
       if (header.type != type()) {
-        throw std::runtime_error{"invalid meter band type"};
+        return "invalid meter band type";
       }
       if (header.len != length()) {
-        throw std::runtime_error{"invalid meter band length"};
+        return "invalid meter band length";
       }
+      return nullptr;
     }
 
   protected:
