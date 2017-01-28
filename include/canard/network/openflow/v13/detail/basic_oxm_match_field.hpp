@@ -16,6 +16,7 @@
 #include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
+#include <canard/network/openflow/v13/common/oxm_header.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -106,7 +107,8 @@ namespace v13 {
       : public detail::basic_protocol_type<T>
   {
   public:
-    using oxm_header_type = std::uint32_t;
+    using raw_ofp_type = std::uint32_t;
+    using oxm_header_type = raw_ofp_type;
     using value_type = typename OXMMatchFieldTraits::value_type;
 
     static constexpr auto oxm_class() noexcept
@@ -187,19 +189,22 @@ namespace v13 {
            : true;
     }
 
-    static void validate_oxm_header(oxm_header_type const oxm_header)
+    static auto validate_header(oxm_header_type const oxm_header) noexcept
+      -> char const*
     {
-      if ((oxm_header >> 16) != oxm_class()) {
-        throw std::runtime_error{"invalid oxm class"};
+      auto const header = ofp::v13::oxm_header{oxm_header};
+      if (header.oxm_class() != oxm_class()) {
+        return "invalid oxm class";
       }
-      if (((oxm_header >> 9) & 0x7f) == oxm_field()) {
-        throw std::runtime_error{"invalid oxm field"};
+      if (header.oxm_field() != oxm_field()) {
+        return "invalid oxm field";
       }
       auto const expected_length
-        = (oxm_header & 0x00000100) ? value_length() * 2 : value_length();
-      if ((oxm_header & 0xff) != expected_length) {
-        throw std::runtime_error{"invalid oxm length"};
+        = header.oxm_hasmask() ? value_length() * 2 : value_length();
+      if (header.oxm_length() != expected_length) {
+        return "invalid oxm length";
       }
+      return nullptr;
     }
 
   protected:
