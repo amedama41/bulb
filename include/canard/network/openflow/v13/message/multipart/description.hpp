@@ -36,8 +36,8 @@ namespace multipart {
         friend basic_multipart_request::base_type;
 
         explicit description_request(
-                protocol::ofp_multipart_request const& request) noexcept
-            : basic_multipart_request{request}
+                raw_ofp_type const& multipart_request) noexcept
+            : basic_multipart_request{multipart_request}
         {
         }
     };
@@ -45,7 +45,7 @@ namespace multipart {
 
     class description_reply
         : public multipart_detail::basic_multipart_reply<
-                description_reply, protocol::ofp_desc
+              description_reply, protocol::ofp_desc
           >
     {
     public:
@@ -101,9 +101,9 @@ namespace multipart {
         friend basic_multipart_reply::base_type;
 
         description_reply(
-                  protocol::ofp_multipart_reply const& reply
-                , protocol::ofp_desc const& desc) noexcept
-            : basic_multipart_reply{reply, desc}
+                  raw_ofp_type const& multipart_reply
+                , body_type const& desc) noexcept
+            : basic_multipart_reply{multipart_reply, desc}
         {
         }
 
@@ -113,11 +113,11 @@ namespace multipart {
                 , boost::string_ref sw_desc
                 , boost::string_ref serial
                 , boost::string_ref dp_desc)
-            -> protocol::ofp_desc
+            -> body_type
         {
             using boost::adaptors::sliced;
 
-            auto desc = protocol::ofp_desc{};
+            auto desc = body_type{};
 
             auto const mfr_desc_size
                 = std::min(mfr_desc.size(), sizeof(desc.mfr_desc) - 1);

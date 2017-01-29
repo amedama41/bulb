@@ -17,7 +17,7 @@ namespace multipart {
 
     class port_description_request
         : public multipart_detail::basic_multipart_request<
-                port_description_request, void
+              port_description_request, void
           >
     {
     public:
@@ -34,8 +34,8 @@ namespace multipart {
         friend basic_multipart_request::base_type;
 
         explicit port_description_request(
-                protocol::ofp_multipart_request const& request) noexcept
-            : basic_multipart_request{request}
+                raw_ofp_type const& multipart_request) noexcept
+            : basic_multipart_request{multipart_request}
         {
         }
     };
@@ -43,7 +43,7 @@ namespace multipart {
 
     class port_description_reply
         : public multipart_detail::basic_multipart_reply<
-                port_description_reply, v13::port[]
+              port_description_reply, v13::port[]
           >
     {
     public:
@@ -61,10 +61,12 @@ namespace multipart {
     private:
         friend basic_multipart_reply::base_type;
 
+        static constexpr bool is_fixed_length_element = true;
+
         port_description_reply(
-                  protocol::ofp_multipart_reply const& reply
+                  raw_ofp_type const& multipart_reply
                 , body_type&& ports)
-            : basic_multipart_reply{reply, std::move(ports)}
+            : basic_multipart_reply{multipart_reply, std::move(ports)}
         {
         }
     };

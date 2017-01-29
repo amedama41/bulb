@@ -125,11 +125,9 @@ namespace multipart {
 
     class queue_stats_request
         : public multipart_detail::basic_multipart_request<
-                queue_stats_request, protocol::ofp_queue_stats_request
+              queue_stats_request, protocol::ofp_queue_stats_request
           >
     {
-        using raw_ofp_type = protocol::ofp_queue_stats_request;
-
     public:
         static constexpr protocol::ofp_multipart_type multipart_type_value
             = protocol::OFPMP_QUEUE;
@@ -140,7 +138,7 @@ namespace multipart {
                 , std::uint32_t const xid = get_xid()) noexcept
             : basic_multipart_request{
                   0
-                , raw_ofp_type{port_no, queue_id}
+                , body_type{port_no, queue_id}
                 , xid
               }
         {
@@ -162,8 +160,8 @@ namespace multipart {
         friend basic_multipart_request::base_type;
 
         queue_stats_request(
-                  protocol::ofp_multipart_request const& multipart_request
-                , raw_ofp_type const& queue_stats_request) noexcept
+                  raw_ofp_type const& multipart_request
+                , body_type const& queue_stats_request) noexcept
             : basic_multipart_request{multipart_request, queue_stats_request}
         {
         }
@@ -172,7 +170,7 @@ namespace multipart {
 
     class queue_stats_reply
         : public multipart_detail::basic_multipart_reply<
-          queue_stats_reply, queue_stats[]
+              queue_stats_reply, queue_stats[]
           >
     {
     public:
@@ -190,8 +188,10 @@ namespace multipart {
     private:
         friend basic_multipart_reply::base_type;
 
+        static constexpr bool is_fixed_length_element = true;
+
         queue_stats_reply(
-                  protocol::ofp_multipart_reply const multipart_reply
+                  raw_ofp_type const multipart_reply
                 , body_type&& queue_stats)
             : basic_multipart_reply{multipart_reply, std::move(queue_stats)}
         {

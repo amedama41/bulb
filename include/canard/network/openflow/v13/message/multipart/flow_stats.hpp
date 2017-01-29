@@ -225,7 +225,7 @@ namespace multipart {
                 , std::uint32_t const xid = get_xid())
             : basic_multipart_request{
                   0
-                , protocol::ofp_flow_stats_request{
+                , body_type{
                       table_id
                     , { 0, 0, 0 }
                     , out_port
@@ -249,7 +249,7 @@ namespace multipart {
                 , std::uint32_t const xid = get_xid())
             : basic_multipart_request{
                   0
-                , protocol::ofp_flow_stats_request{
+                , body_type{
                       table_id
                     , { 0, 0, 0 }
                     , out_port
@@ -315,10 +315,12 @@ namespace multipart {
         friend basic_multipart_request::base_type;
 
         flow_stats_request(
-                  protocol::ofp_multipart_request const& request
-                , protocol::ofp_flow_stats_request const& stats_request
+                  raw_ofp_type const& multipart_request
+                , body_type const& flow_stats_request
                 , oxm_match&& match)
-            : basic_multipart_request{request, stats_request, std::move(match)}
+            : basic_multipart_request{
+                multipart_request, flow_stats_request, std::move(match)
+              }
         {
         }
     };
@@ -344,8 +346,10 @@ namespace multipart {
     private:
         friend basic_multipart_reply::base_type;
 
+        static constexpr bool is_fixed_length_element = false;
+
         flow_stats_reply(
-                  protocol::ofp_multipart_reply const& multipart_reply
+                  raw_ofp_type const& multipart_reply
                 , body_type&& flow_stats)
             : basic_multipart_reply{multipart_reply, std::move(flow_stats)}
         {

@@ -199,7 +199,7 @@ namespace multipart {
 
     class table_features_request
         : public multipart_detail::basic_multipart_request<
-                table_features_request, table_features[]
+              table_features_request, table_features[]
           >
     {
     public:
@@ -222,8 +222,10 @@ namespace multipart {
     private:
         friend basic_multipart_request::base_type;
 
+        static constexpr bool is_fixed_length_element = false;
+
         table_features_request(
-                  protocol::ofp_multipart_request const& multipart_request
+                  raw_ofp_type const& multipart_request
                 , body_type&& table_features)
             : basic_multipart_request{
                 multipart_request, std::move(table_features)
@@ -235,7 +237,7 @@ namespace multipart {
 
     class table_features_reply
         : public multipart_detail::basic_multipart_reply<
-                table_features_reply, table_features[]
+              table_features_reply, table_features[]
           >
     {
     public:
@@ -253,8 +255,10 @@ namespace multipart {
     private:
         friend basic_multipart_reply::base_type;
 
+        static constexpr bool is_fixed_length_element = false;
+
         table_features_reply(
-                  protocol::ofp_multipart_reply const& multipart_reply
+                  raw_ofp_type const& multipart_reply
                 , body_type&& table_features)
             : basic_multipart_reply{multipart_reply, std::move(table_features)}
         {

@@ -45,6 +45,8 @@ namespace multipart_detail {
     class basic_multipart
         : public detail::v13::basic_openflow_message<T>
     {
+        using base_t = detail::v13::basic_openflow_message<T>;
+
     public:
         static constexpr protocol::ofp_type message_type
             = multipart_message_type<MultipartType>::value;
@@ -67,14 +69,30 @@ namespace multipart_detail {
             return static_cast<T const*>(this)->multipart().flags;
         }
 
-        static void validate_multipart(MultipartType const& multipart)
+        using base_t::validate_header;
+
+        static auto validate_header(MultipartType const& multipart) noexcept
+            -> char const*
         {
             if (multipart.type != multipart_type()) {
-                throw std::runtime_error{"invalid multipart type"};
+                return "invalid multipart type";
             }
-            if (multipart.header.length < T::min_length()) {
-                throw std::runtime_error{"too small multipart length"};
+            if (!T::is_valid_multipart_length(multipart.header.length)) {
+                return "invalid multipart length";
             }
+            return nullptr;
+        }
+
+    private:
+        friend base_t;
+
+        static constexpr bool is_fixed_length_message = false;
+
+        friend constexpr auto get_min_message_length(
+                detail::v13::basic_openflow_message_tag<T>) noexcept
+            -> std::uint16_t
+        {
+            return sizeof(MultipartType);
         }
     };
 
@@ -117,6 +135,13 @@ namespace multipart_detail {
             -> MultipartType const&
         {
             return multipart_;
+        }
+
+        static constexpr auto is_valid_multipart_length(
+                std::uint16_t const length) noexcept
+            -> bool
+        {
+            return length == base_t::min_length();
         }
 
         friend typename base_t::basic_protocol_type;
@@ -191,7 +216,20 @@ namespace multipart_detail {
             return multipart_;
         }
 
+        static constexpr auto is_valid_multipart_length(
+                std::uint16_t const length) noexcept
+            -> bool
+        {
+            return length == base_t::min_length();
+        }
+
         friend typename base_t::basic_protocol_type;
+
+        friend constexpr auto get_min_length(T*) noexcept
+            -> std::uint16_t
+        {
+            return sizeof(raw_ofp_type) + sizeof(body_type);
+        }
 
         template <class Container>
         void encode_impl(Container& container) const
@@ -311,6 +349,13 @@ namespace multipart_detail {
             -> MultipartType const&
         {
             return multipart_;
+        }
+
+        static constexpr auto is_valid_multipart_length(
+                std::uint16_t const length) noexcept
+            -> bool
+        {
+            return length >= base_t::min_length();
         }
 
         friend typename base_t::basic_protocol_type;
@@ -469,12 +514,29 @@ namespace multipart_detail {
         }
 
     private:
+        static constexpr auto is_valid_body_length(
+                std::uint16_t const length) noexcept
+            -> bool
+        {
+            return T::is_fixed_length_element
+                ? length % elem_type::min_length() == 0
+                : true;
+        }
+
         friend basic_multipart<T, MultipartType>;
 
         auto multipart() const noexcept
             -> MultipartType const&
         {
             return multipart_;
+        }
+
+        static constexpr auto is_valid_multipart_length(
+                std::uint16_t const length) noexcept
+            -> bool
+        {
+            return length >= base_t::min_length()
+                && is_valid_body_length(length - base_t::min_length());
         }
 
         friend typename base_t::basic_protocol_type;
