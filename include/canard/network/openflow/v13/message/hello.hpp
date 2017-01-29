@@ -38,7 +38,7 @@ namespace messages {
             return any_cast<HelloElement>(*it);
         }
 
-        auto get_version(ofp::list<any_hello_element> const& elements)
+        inline auto get_version(ofp::list<any_hello_element> const& elements)
             -> std::uint8_t
         {
             if (auto const versionbitmap
