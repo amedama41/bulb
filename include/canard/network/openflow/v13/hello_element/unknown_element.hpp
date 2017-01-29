@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <iterator>
-#include <stdexcept>
 #include <utility>
 #include <vector>
 #include <canard/network/openflow/detail/basic_protocol_type.hpp>
@@ -24,6 +23,7 @@ namespace hello_elements {
   {
   public:
     using raw_ofp_type = protocol::ofp_hello_elem_header;
+    using ofp_header_type = protocol::ofp_hello_elem_header;
     using data_type = std::vector<unsigned char>;
 
     explicit unknown_element(std::uint16_t const type)
@@ -88,11 +88,13 @@ namespace hello_elements {
       return data;
     }
 
-    static void validate_header(protocol::ofp_hello_elem_header const& header)
+    static auto validate_header(ofp_header_type const& header) noexcept
+        -> char const*
     {
       if (header.length < sizeof(raw_ofp_type)) {
-        throw std::runtime_error{"hello_element length is too small"};
+        return "invalid hello element length";
       }
+      return nullptr;
     }
 
   private:

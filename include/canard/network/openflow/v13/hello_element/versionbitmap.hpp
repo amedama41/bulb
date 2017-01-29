@@ -32,6 +32,7 @@ namespace hello_elements {
   {
   public:
     using raw_ofp_type = protocol::ofp_hello_elem_versionbitmap;
+    using ofp_header_type = protocol::ofp_hello_elem_header;
     using bitmaps_type = std::vector<std::uint32_t>;
 
   private:
@@ -133,17 +134,19 @@ namespace hello_elements {
       return shift + std::distance(bitmaps_.begin(), it) * bitmap_bits;
     }
 
-    static void validate_header(protocol::ofp_hello_elem_header const& header)
+    static auto validate_header(ofp_header_type const& header) noexcept
+        -> char const*
     {
       if (header.type != type()) {
-        throw std::runtime_error{"type is not versionbitmap"};
+        return "invalid hello element type";
       }
       if (header.length < min_length()) {
-        throw std::runtime_error{"versionbitmap length is too small"};
+        return "invalid hello element length";
       }
       if ((header.length - min_length()) % sizeof(bitmap_type) != 0) {
-        throw std::runtime_error{"versionbitmap length is invalid"};
+        return "invalid hello element length";
       }
+      return nullptr;
     }
 
   private:
