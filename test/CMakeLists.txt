@@ -87,7 +87,8 @@ set(v13_action_srcs
     v13/action/decrement_nw_ttl_test.cpp
     v13/action/set_field_test.cpp
     v13/action/push_pbb_test.cpp
-    v13/action/pop_pbb_test.cpp)
+    v13/action/pop_pbb_test.cpp
+    v13/action/validate_header_test.cpp)
 set(v13_common_type_srcs
     v13/common_type/port_test.cpp
     v13/common_type/oxm_header_test.cpp
@@ -98,14 +99,16 @@ set(v13_decoder_srcs
     v13/decoder/meter_band_decoder_test.cpp)
 set(v13_hello_element_srcs
     v13/hello_element/versionbitmap_test.cpp
-    v13/hello_element/unknown_element_test.cpp)
+    v13/hello_element/unknown_element_test.cpp
+    v13/hello_element/validate_header_test.cpp)
 set(v13_instruction_srcs
     v13/instruction/goto_table_test.cpp
     v13/instruction/write_metadata_test.cpp
     v13/instruction/write_actions_test.cpp
     v13/instruction/apply_actions_test.cpp
     v13/instruction/clear_actions_test.cpp
-    v13/instruction/meter_test.cpp)
+    v13/instruction/meter_test.cpp
+    v13/instruction/validate_header_test.cpp)
 set(v13_message_srcs
     v13/message/hello_test.cpp
     v13/message/error_test.cpp
@@ -125,10 +128,12 @@ set(v13_message_srcs
     v13/message/meter_delete_test.cpp
     v13/message/port_mod.cpp
     v13/message/barrier_test.cpp
-    v13/message/queue_config_test.cpp)
+    v13/message/queue_config_test.cpp
+    v13/message/validate_header_test.cpp)
 set(v13_meter_band_srcs
     v13/meter_band/drop_test.cpp
-    v13/meter_band/dscp_remark_test.cpp)
+    v13/meter_band/dscp_remark_test.cpp
+    v13/meter_band/validate_header_test.cpp)
 set(v13_multipart_srcs
     v13/multipart/description_test.cpp
     v13/multipart/flow_stats_test.cpp
@@ -137,7 +142,8 @@ set(v13_multipart_srcs
     v13/multipart/port_stats_test.cpp
     v13/multipart/queue_stats_test.cpp
     v13/multipart/table_features_test.cpp
-    v13/multipart/port_description_test.cpp)
+    v13/multipart/port_description_test.cpp
+    v13/multipart/validate_header_test.cpp)
 set(v13_oxm_match_srcs
     v13/oxm_match/match_field_test.cpp
     v13/oxm_match/in_port_test.cpp
@@ -154,10 +160,12 @@ set(v13_oxm_match_srcs
     v13/oxm_match/mpls_tc_test.cpp
     v13/oxm_match/mpls_bos_test.cpp
     v13/oxm_match/pbb_isid_test.cpp
-    v13/oxm_match/ipv6_exthdr_test.cpp)
+    v13/oxm_match/ipv6_exthdr_test.cpp
+    v13/oxm_match/validate_header_test.cpp)
 set(v13_queue_property_srcs
     v13/queue_property/min_rate_test.cpp
-    v13/queue_property/max_rate_test.cpp)
+    v13/queue_property/max_rate_test.cpp
+    v13/queue_property/validate_header_test.cpp)
 set(v13_table_feature_property_srcs
     v13/table_feature_property/instructions_test.cpp
     v13/table_feature_property/next_tables_test.cpp

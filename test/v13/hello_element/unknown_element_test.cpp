@@ -26,6 +26,8 @@ struct no_data_fixture {
 };
 }
 
+static auto& random_type = ::random<std::uint16_t>;
+
 BOOST_AUTO_TEST_SUITE(hello_element_test)
 BOOST_AUTO_TEST_SUITE(unknown_element)
 
@@ -159,6 +161,43 @@ BOOST_AUTO_TEST_SUITE(unknown_element)
             , helems::unknown_element{type, { 1, 2, 4 }}));
     }
   BOOST_AUTO_TEST_SUITE_END() // function_equivalent
+
+  BOOST_AUTO_TEST_SUITE(validate_header)
+    BOOST_AUTO_TEST_CASE(
+        return_nullptr_if_length_is_equal_to_ofp_struct_size)
+    {
+      auto const header = protocol::ofp_hello_elem_header{
+        random_type(), sizeof(protocol::ofp_hello_elem_header)
+      };
+
+      auto const error_msg = helems::unknown_element::validate_header(header);
+
+      BOOST_TEST(!error_msg, "should be nullptr: " << error_msg);
+    }
+    BOOST_AUTO_TEST_CASE(
+        return_error_message_if_length_is_less_than_ofp_struct_size)
+    {
+      auto const header = protocol::ofp_hello_elem_header{
+        random_type(), sizeof(protocol::ofp_hello_elem_header) - 1
+      };
+
+      auto const error_msg = helems::unknown_element::validate_header(header);
+
+      BOOST_TEST_REQUIRE(bool(error_msg), "should not be nullptr");
+      BOOST_TEST(error_msg == "invalid hello element length"_sr);
+    }
+    BOOST_AUTO_TEST_CASE(
+        return_nullptr_if_length_is_greater_than_ofp_struct_size)
+    {
+      auto const header = protocol::ofp_hello_elem_header{
+        random_type(), sizeof(protocol::ofp_hello_elem_header) + 1
+      };
+
+      auto const error_msg = helems::unknown_element::validate_header(header);
+
+      BOOST_TEST(!error_msg, "should be nullptr: " << error_msg);
+    }
+  BOOST_AUTO_TEST_SUITE_END() // validate_header
 
   BOOST_AUTO_TEST_SUITE(encode)
     BOOST_FIXTURE_TEST_CASE(generates_binary, unknown_element_fixture)
