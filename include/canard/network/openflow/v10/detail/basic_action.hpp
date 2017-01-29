@@ -24,6 +24,7 @@ namespace actions_detail {
 
     public:
         using raw_ofp_type = OFPAction;
+        using ofp_header_type = protocol::ofp_action_header;
 
         static constexpr auto type() noexcept
             -> protocol::ofp_action_type
@@ -37,17 +38,23 @@ namespace actions_detail {
             return sizeof(raw_ofp_type);
         }
 
-        static auto validate_header(
-                protocol::ofp_action_header const& header) noexcept
+        static auto validate_header(ofp_header_type const& header) noexcept
             -> char const*
         {
             if (header.type != T::action_type) {
                 return "invalid action type";
             }
-            if (header.len != sizeof(raw_ofp_type)) {
+            if (!is_valid_action_length(header)) {
                 return "invalid action length";
             }
             return nullptr;
+        }
+
+        static constexpr auto is_valid_action_length(
+                ofp_header_type const& header) noexcept
+            -> bool
+        {
+            return header.len == T::min_length();
         }
 
     private:

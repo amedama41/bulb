@@ -46,12 +46,7 @@ namespace messages {
     private:
         friend basic_openflow_message;
 
-        static constexpr auto is_valid_message_length(
-                std::uint16_t const length) noexcept
-            -> bool
-        {
-            return length == sizeof(raw_ofp_type);
-        }
+        static constexpr bool is_fixed_length_message = true;
 
         friend basic_openflow_message::basic_protocol_type;
 
@@ -211,12 +206,14 @@ namespace messages {
     private:
         friend basic_openflow_message;
 
-        static constexpr auto is_valid_message_length(
-                std::uint16_t const length) noexcept
+        static constexpr bool is_fixed_length_message = false;
+
+        friend constexpr auto additonally_check_message_length(
+                  v10_detail::basic_openflow_message_tag<features_reply>
+                , std::uint16_t const length) noexcept
             -> bool
         {
-            return length >= sizeof(raw_ofp_type)
-                && (length - sizeof(raw_ofp_type)) % port::min_length() == 0;
+            return (length - sizeof(raw_ofp_type)) % port::min_length() == 0;
         }
 
         friend basic_openflow_message::basic_protocol_type;

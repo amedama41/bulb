@@ -2,6 +2,7 @@
 #define CANARD_NET_OFP_V10_BASIC_OPENFLOW_MESSAGE_HPP
 
 #include <cstdint>
+#include <type_traits>
 #include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
 
@@ -10,6 +11,55 @@ namespace net {
 namespace ofp {
 namespace v10 {
 namespace v10_detail {
+
+  template <class T>
+  struct basic_openflow_message_tag {};
+
+  namespace basic_openflow_message_detail {
+
+    constexpr auto is_valid_length_impl(
+          std::uint16_t const length, std::uint16_t const min_length
+        , std::true_type) noexcept
+      -> bool
+    {
+      return length == min_length;
+    }
+
+    constexpr auto is_valid_length_impl(
+          std::uint16_t const length, std::uint16_t const min_length
+        , std::false_type) noexcept
+      -> bool
+    {
+      return length >= min_length;
+    }
+
+    template <class T>
+    constexpr auto min_message_length(basic_openflow_message_tag<T>) noexcept
+      -> std::uint16_t
+    {
+      return T::min_length();
+    }
+
+    constexpr auto additonally_check_message_length(...) noexcept
+      -> bool
+    {
+      return true;
+    }
+
+    template <class T, bool IsFixedLength>
+    constexpr auto is_valid_length(std::uint16_t const length) noexcept
+      -> bool
+    {
+      return basic_openflow_message_detail::is_valid_length_impl(
+              length
+            , min_message_length(basic_openflow_message_tag<T>{})
+            , std::integral_constant<bool, IsFixedLength>{})
+          && additonally_check_message_length(
+              basic_openflow_message_tag<T>{}, length);
+    }
+
+  } // namespace basic_openflow_message_detail
+
 
   template <class T>
   class basic_openflow_message
@@ -23,6 +73,8 @@ namespace v10_detail {
     }
 
   public:
+    using ofp_header_type = protocol::ofp_header;
+
     static constexpr auto version() noexcept
       -> std::uint8_t
     {
@@ -47,7 +99,7 @@ namespace v10_detail {
       return header().xid;
     }
 
-    static auto validate_header(protocol::ofp_header const& header) noexcept
+    static auto validate_header(ofp_header_type const& header) noexcept
       -> char const*
     {
       if (header.version != version()) {
@@ -56,10 +108,18 @@ namespace v10_detail {
       if (header.type != type()) {
         return "invalid message type";
       }
-      if (!T::is_valid_message_length(header.length)) {
+      if (!is_valid_message_length(header)) {
         return "invalid message length";
       }
       return nullptr;
+    }
+
+    static constexpr auto is_valid_message_length(
+        ofp_header_type const& header) noexcept
+      -> bool
+    {
+      return basic_openflow_message_detail
+        ::is_valid_length<T, T::is_fixed_length_message>(header.length);
     }
   };
 

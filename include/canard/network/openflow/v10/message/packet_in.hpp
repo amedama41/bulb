@@ -142,12 +142,7 @@ namespace messages {
     private:
         friend basic_openflow_message;
 
-        static constexpr auto is_valid_message_length(
-                std::uint16_t const length) noexcept
-            -> bool
-        {
-            return length >= min_pkt_in_len;
-        }
+        static constexpr bool is_fixed_length_message = false;
 
         friend basic_openflow_message::basic_protocol_type;
 

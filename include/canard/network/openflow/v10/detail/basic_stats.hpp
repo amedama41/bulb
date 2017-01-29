@@ -77,20 +77,29 @@ namespace stats_detail {
             if (stats.type != stats_type()) {
                 return "invalid stats type";
             }
-            if (!T::is_valid_stats_length(stats.header.length)) {
+            if (!is_valid_stats_length(stats)) {
                 return "invalid stats length";
             }
             return nullptr;
         }
 
+        static constexpr auto is_valid_stats_length(
+                raw_ofp_type const& stats) noexcept
+            -> bool
+        {
+            return T::is_valid_stats_length_impl(stats.header.length);
+        }
+
     private:
         friend base_t;
 
-        static constexpr auto is_valid_message_length(
-                std::uint16_t const length) noexcept
-            -> bool
+        static constexpr bool is_fixed_length_message = false;
+
+        friend constexpr auto min_message_length(
+                v10_detail::basic_openflow_message_tag<T>) noexcept
+            -> std::uint16_t
         {
-            return length >= sizeof(raw_ofp_type);
+            return sizeof(raw_ofp_type);
         }
     };
 
@@ -103,13 +112,6 @@ namespace stats_detail {
 
     public:
         using raw_ofp_type = typename base_t::raw_ofp_type;
-
-        static constexpr auto is_valid_stats_length(
-                std::uint16_t const length) noexcept
-            -> bool
-        {
-            return length == sizeof(raw_ofp_type);
-        }
 
     protected:
         empty_body_stats(
@@ -162,6 +164,13 @@ namespace stats_detail {
             return stats_;
         }
 
+        static constexpr auto is_valid_stats_length_impl(
+                std::uint16_t const length) noexcept
+            -> bool
+        {
+            return length == sizeof(raw_ofp_type);
+        }
+
     private:
         raw_ofp_type stats_;
     };
@@ -176,13 +185,6 @@ namespace stats_detail {
     public:
         using raw_ofp_type = typename base_t::raw_ofp_type;
         using raw_ofp_stats_type = BodyType;
-
-        static constexpr auto is_valid_stats_length(
-                std::uint16_t const length) noexcept
-            -> bool
-        {
-            return length == sizeof(raw_ofp_type) + sizeof(raw_ofp_stats_type);
-        }
 
     protected:
         single_element_stats(
@@ -256,6 +258,13 @@ namespace stats_detail {
             return stats_;
         }
 
+        static constexpr auto is_valid_stats_length_impl(
+                std::uint16_t const length) noexcept
+            -> bool
+        {
+            return length == sizeof(raw_ofp_type) + sizeof(raw_ofp_stats_type);
+        }
+
     private:
         raw_ofp_type stats_;
         raw_ofp_stats_type body_;
@@ -286,14 +295,6 @@ namespace stats_detail {
             body.swap(body_);
             stats_.header.length = sizeof(raw_ofp_type);
             return body;
-        }
-
-        static constexpr auto is_valid_stats_length(
-                std::uint16_t const length) noexcept
-            -> bool
-        {
-            return length >= sizeof(raw_ofp_type)
-                && T::is_valid_stats_body_length(length - sizeof(raw_ofp_type));
         }
 
     protected:
@@ -381,6 +382,14 @@ namespace stats_detail {
             -> raw_ofp_type const&
         {
             return stats_;
+        }
+
+        static constexpr auto is_valid_stats_length_impl(
+                std::uint16_t const length) noexcept
+            -> bool
+        {
+            return length >= sizeof(raw_ofp_type)
+                && T::is_valid_stats_body_length(length - sizeof(raw_ofp_type));
         }
 
     private:

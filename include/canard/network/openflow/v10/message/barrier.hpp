@@ -52,12 +52,7 @@ namespace messages {
         private:
             friend base_t;
 
-            static constexpr auto is_valid_message_length(
-                    std::uint16_t const length) noexcept
-                -> bool
-            {
-                return length == sizeof(raw_ofp_type);
-            }
+            static constexpr bool is_fixed_length_message = true;
 
             friend typename base_t::basic_protocol_type;
 

@@ -20,13 +20,14 @@ namespace queue_properties {
     {
     public:
         using raw_ofp_type = protocol::ofp_queue_prop_min_rate;
+        using ofp_header_type = protocol::ofp_queue_prop_header;
 
         static constexpr protocol::ofp_queue_properties queue_property
             = protocol::OFPQT_MIN_RATE;
 
         explicit min_rate(std::uint16_t const rate) noexcept
             : min_rate_{
-                  protocol::ofp_queue_prop_header{
+                  {
                       queue_property
                     , sizeof(raw_ofp_type)
                     , { 0, 0, 0, 0 }
@@ -67,17 +68,23 @@ namespace queue_properties {
             return rate() > 1000;
         }
 
-        static auto validate_header(
-                protocol::ofp_queue_prop_header const& prop_header) noexcept
+        static auto validate_header(ofp_header_type const& prop_header) noexcept
             -> char const*
         {
             if (prop_header.property != queue_property) {
                 return "invalid queue property type";
             }
-            if (prop_header.len != sizeof(raw_ofp_type)) {
+            if (!is_valid_queue_property_length(prop_header)) {
                 return "invalid queue property length";
             }
             return nullptr;
+        }
+
+        static constexpr auto is_valid_queue_property_length(
+                ofp_header_type const& prop_header) noexcept
+            -> bool
+        {
+            return prop_header.len == min_length();
         }
 
     private:
