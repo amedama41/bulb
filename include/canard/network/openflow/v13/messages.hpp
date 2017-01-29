@@ -5,8 +5,11 @@
 #include <canard/network/openflow/v13/message/hello.hpp>
 #include <canard/network/openflow/v13/message/error.hpp>
 #include <canard/network/openflow/v13/message/echo.hpp>
+#include <canard/network/openflow/v13/message/table_mod.hpp>
 #include <canard/network/openflow/v13/message/flow_mod.hpp>
 #include <canard/network/openflow/v13/message/group_mod.hpp>
+#include <canard/network/openflow/v13/message/port_mod.hpp>
+#include <canard/network/openflow/v13/message/meter_mod.hpp>
 #include <canard/network/openflow/v13/message/switch_features.hpp>
 #include <canard/network/openflow/v13/message/switch_config.hpp>
 #include <canard/network/openflow/v13/message/multipart_messages.hpp>
