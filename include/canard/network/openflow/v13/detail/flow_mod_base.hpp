@@ -188,13 +188,16 @@ namespace flow_mod_detail {
         }
 
     private:
+        friend base_t;
+
+        static constexpr bool is_fixed_length_message = false;
+
         friend typename base_t::basic_protocol_type;
 
         friend constexpr auto get_min_length(FlowMod*) noexcept
             -> std::uint16_t
         {
-            return sizeof(protocol::ofp_flow_mod)
-                 + oxm_match::min_byte_length();
+            return sizeof(raw_ofp_type) + oxm_match::min_byte_length();
         }
 
         template <class Container>

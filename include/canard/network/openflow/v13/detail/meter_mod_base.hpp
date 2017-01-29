@@ -151,6 +151,10 @@ namespace v13 {
       return *static_cast<MeterMod const*>(this);
     }
 
+    friend base_t;
+
+    static constexpr bool is_fixed_length_message = false;
+
     friend typename base_t::basic_protocol_type;
 
     template <class Validator>

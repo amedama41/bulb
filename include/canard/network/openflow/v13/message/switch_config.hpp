@@ -68,6 +68,10 @@ namespace messages {
             }
 
         private:
+            friend base_t;
+
+            static constexpr bool is_fixed_length_message = true;
+
             friend typename base_t::basic_protocol_type;
 
             template <class Container>
@@ -121,6 +125,10 @@ namespace messages {
             : header_(header)
         {
         }
+
+        friend basic_openflow_message;
+
+        static constexpr bool is_fixed_length_message = true;
 
         friend basic_protocol_type;
 

@@ -63,6 +63,10 @@ namespace messages {
         {
         }
 
+        friend basic_openflow_message;
+
+        static constexpr bool is_fixed_length_message = true;
+
         friend basic_protocol_type;
 
         template <class Container>
@@ -185,6 +189,10 @@ namespace messages {
             , queues_(std::move(queues))
         {
         }
+
+        friend basic_openflow_message;
+
+        static constexpr bool is_fixed_length_message = false;
 
         friend basic_protocol_type;
 

@@ -139,6 +139,10 @@ namespace v13 {
     }
 
   private:
+    friend base_t;
+
+    static constexpr bool is_fixed_length_message = false;
+
     friend typename base_t::basic_protocol_type;
 
     template <class Container>

@@ -205,6 +205,10 @@ namespace messages {
         {
         }
 
+        friend basic_openflow_message;
+
+        static constexpr bool is_fixed_length_message = false;
+
         friend basic_protocol_type;
 
         friend constexpr auto get_min_length(packet_in*) noexcept

@@ -65,6 +65,10 @@ namespace messages {
         {
         }
 
+        friend basic_openflow_message;
+
+        static constexpr bool is_fixed_length_message = true;
+
         friend basic_protocol_type;
 
         template <class Container>
