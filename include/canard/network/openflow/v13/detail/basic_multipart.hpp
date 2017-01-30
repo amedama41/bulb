@@ -77,10 +77,17 @@ namespace multipart_detail {
             if (multipart.type != multipart_type()) {
                 return "invalid multipart type";
             }
-            if (!T::is_valid_multipart_length(multipart.header.length)) {
+            if (!is_valid_multipart_length(multipart)) {
                 return "invalid multipart length";
             }
             return nullptr;
+        }
+
+        static constexpr auto is_valid_multipart_length(
+                MultipartType const& multipart) noexcept
+            -> bool
+        {
+            return T::is_valid_multipart_length_impl(multipart.header.length);
         }
 
     private:
@@ -88,7 +95,7 @@ namespace multipart_detail {
 
         static constexpr bool is_fixed_length_message = false;
 
-        friend constexpr auto get_min_message_length(
+        friend constexpr auto min_message_length(
                 detail::v13::basic_openflow_message_tag<T>) noexcept
             -> std::uint16_t
         {
@@ -137,7 +144,7 @@ namespace multipart_detail {
             return multipart_;
         }
 
-        static constexpr auto is_valid_multipart_length(
+        static constexpr auto is_valid_multipart_length_impl(
                 std::uint16_t const length) noexcept
             -> bool
         {
@@ -216,7 +223,7 @@ namespace multipart_detail {
             return multipart_;
         }
 
-        static constexpr auto is_valid_multipart_length(
+        static constexpr auto is_valid_multipart_length_impl(
                 std::uint16_t const length) noexcept
             -> bool
         {
@@ -351,7 +358,7 @@ namespace multipart_detail {
             return multipart_;
         }
 
-        static constexpr auto is_valid_multipart_length(
+        static constexpr auto is_valid_multipart_length_impl(
                 std::uint16_t const length) noexcept
             -> bool
         {
@@ -531,7 +538,7 @@ namespace multipart_detail {
             return multipart_;
         }
 
-        static constexpr auto is_valid_multipart_length(
+        static constexpr auto is_valid_multipart_length_impl(
                 std::uint16_t const length) noexcept
             -> bool
         {

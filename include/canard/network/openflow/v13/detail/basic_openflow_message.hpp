@@ -17,7 +17,7 @@ namespace v13 {
 
   namespace basic_openflow_message_detail {
 
-    constexpr auto is_valid_length(
+    constexpr auto is_valid_length_impl(
           std::uint16_t const length, std::uint16_t const min_length
         , std::true_type) noexcept
       -> bool
@@ -25,7 +25,7 @@ namespace v13 {
       return length == min_length;
     }
 
-    constexpr auto is_valid_length(
+    constexpr auto is_valid_length_impl(
           std::uint16_t const length, std::uint16_t const min_length
         , std::false_type) noexcept
       -> bool
@@ -34,21 +34,24 @@ namespace v13 {
     }
 
     template <class T>
-    constexpr auto get_min_message_length(
-        basic_openflow_message_tag<T>, ...) noexcept
+    constexpr auto min_message_length(basic_openflow_message_tag<T>) noexcept
       -> std::uint16_t
     {
       return T::min_length();
     }
 
-    template <class T>
-    constexpr auto min_length() noexcept
-      -> std::uint16_t
+    template <class T, bool IsFixedLength>
+    constexpr auto is_valid_length(std::uint16_t const length) noexcept
+      -> bool
     {
-      return get_min_message_length(basic_openflow_message_tag<T>{});
+      return basic_openflow_message_detail::is_valid_length_impl(
+            length
+          , min_message_length(basic_openflow_message_tag<T>{})
+          , std::integral_constant<bool, IsFixedLength>{});
     }
 
   } // namespace basic_openflow_message_detail
+
 
   template <class T>
   class basic_openflow_message
@@ -62,6 +65,8 @@ namespace v13 {
     }
 
   public:
+    using ofp_header_type = ofp::v13::protocol::ofp_header;
+
     static constexpr auto version() noexcept
       -> std::uint8_t
     {
@@ -86,8 +91,7 @@ namespace v13 {
       return base_header().xid;
     }
 
-    static auto validate_header(
-        ofp::v13::protocol::ofp_header const& header) noexcept
+    static auto validate_header(ofp_header_type const& header) noexcept
       -> char const*
     {
       if (header.version != version()) {
@@ -96,12 +100,18 @@ namespace v13 {
       if (header.type != type()) {
         return "invalid message type";
       }
-      if (!basic_openflow_message_detail::is_valid_length(
-              header.length, basic_openflow_message_detail::min_length<T>()
-            , std::integral_constant<bool, T::is_fixed_length_message>{})) {
+      if (!is_valid_message_length(header)) {
         return "invalid message length";
       }
       return nullptr;
+    }
+
+    static constexpr auto is_valid_message_length(
+        ofp_header_type const& header) noexcept
+      -> bool
+    {
+      return basic_openflow_message_detail
+        ::is_valid_length<T, T::is_fixed_length_message>(header.length);
     }
   };
 

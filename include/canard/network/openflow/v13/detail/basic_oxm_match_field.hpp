@@ -192,19 +192,37 @@ namespace v13 {
     static auto validate_header(oxm_header_type const oxm_header) noexcept
       -> char const*
     {
-      auto const header = ofp::v13::oxm_header{oxm_header};
-      if (header.oxm_class() != oxm_class()) {
+      return validate_header(ofp::v13::oxm_header{oxm_header});
+    }
+
+    static auto validate_header(ofp::v13::oxm_header const oxm_header) noexcept
+      -> char const*
+    {
+      if (oxm_header.oxm_class() != oxm_class()) {
         return "invalid oxm class";
       }
-      if (header.oxm_field() != oxm_field()) {
+      if (oxm_header.oxm_field() != oxm_field()) {
         return "invalid oxm field";
       }
-      auto const expected_length
-        = header.oxm_hasmask() ? value_length() * 2 : value_length();
-      if (header.oxm_length() != expected_length) {
+      if (!is_valid_oxm_match_field_length(oxm_header)) {
         return "invalid oxm length";
       }
       return nullptr;
+    }
+
+    static constexpr auto is_valid_oxm_match_field_length(
+        ofp::v13::oxm_header const oxm_header) noexcept
+      -> bool
+    {
+      return oxm_header.oxm_length()
+          == (oxm_header.oxm_hasmask() ? value_length() * 2 : value_length());
+    }
+
+    static constexpr auto is_valid_oxm_match_field_length(
+        oxm_header_type const oxm_header) noexcept
+      -> bool
+    {
+      return is_valid_oxm_match_field_length(ofp::v13::oxm_header{oxm_header});
     }
 
   protected:

@@ -140,13 +140,18 @@ namespace hello_elements {
       if (header.type != type()) {
         return "invalid hello element type";
       }
-      if (header.length < min_length()) {
-        return "invalid hello element length";
-      }
-      if ((header.length - min_length()) % sizeof(bitmap_type) != 0) {
+      if (!is_valid_hello_element_length(header)) {
         return "invalid hello element length";
       }
       return nullptr;
+    }
+
+    static constexpr auto is_valid_hello_element_length(
+        ofp_header_type const& header) noexcept
+      -> bool
+    {
+      return header.length >= min_length()
+          && (header.length - min_length()) % sizeof(bitmap_type) == 0;
     }
 
   private:

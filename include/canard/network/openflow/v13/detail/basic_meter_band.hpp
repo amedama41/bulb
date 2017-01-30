@@ -53,10 +53,17 @@ namespace v13 {
       if (header.type != type()) {
         return "invalid meter band type";
       }
-      if (header.len != length()) {
+      if (!is_valid_meter_band_length(header)) {
         return "invalid meter band length";
       }
       return nullptr;
+    }
+
+    static constexpr auto is_valid_meter_band_length(
+            ofp_header_type const& header) noexcept
+        -> bool
+    {
+        return header.len == length();
     }
 
   protected:

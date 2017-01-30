@@ -91,10 +91,17 @@ namespace hello_elements {
     static auto validate_header(ofp_header_type const& header) noexcept
         -> char const*
     {
-      if (header.length < sizeof(raw_ofp_type)) {
+      if (!is_valid_hello_element_length(header)) {
         return "invalid hello element length";
       }
       return nullptr;
+    }
+
+    static constexpr auto is_valid_hello_element_length(
+            ofp_header_type const& header) noexcept
+        -> bool
+    {
+      return header.length >= sizeof(raw_ofp_type);
     }
 
   private:

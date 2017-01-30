@@ -5,7 +5,6 @@
 #include <iterator>
 #include <type_traits>
 #include <utility>
-#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
@@ -24,8 +23,9 @@ namespace v13 {
     template <class T>
     class basic_instruction_actions
         : public basic_instruction<T>
-        , public detail::basic_protocol_type<T>
     {
+        using base_t = basic_instruction<T>;
+
     public:
         using raw_ofp_type = ofp::v13::protocol::ofp_instruction_actions;
 
@@ -100,11 +100,11 @@ namespace v13 {
         }
 
     private:
-        friend basic_instruction<T>;
+        friend base_t;
 
         static constexpr bool is_fixed_length_instruction = false;
 
-        friend detail::basic_protocol_type<T>;
+        friend typename base_t::basic_protocol_type;
 
         template <class Validator>
         void validate_impl(Validator&& validator) const

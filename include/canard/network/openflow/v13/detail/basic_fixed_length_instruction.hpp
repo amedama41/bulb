@@ -2,7 +2,6 @@
 #define CANARD_NET_OFP_DETAIL_V13_BASIC_FIXED_LENGTH_INSTRUCTION_HPP
 
 #include <cstdint>
-#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
@@ -18,9 +17,8 @@ namespace v13 {
   template <class T>
   class basic_fixed_length_instruction
     : public basic_instruction<T>
-    , public detail::basic_protocol_type<T>
   {
-    using base_t = detail::basic_protocol_type<T>;
+    using base_t = basic_instruction<T>;
 
   protected:
     basic_fixed_length_instruction() = default;
@@ -29,7 +27,7 @@ namespace v13 {
     static constexpr auto length() noexcept
       -> std::uint16_t
     {
-      return base_t::min_length();
+      return T::min_length();
     }
 
   private:
@@ -39,11 +37,11 @@ namespace v13 {
       return *static_cast<T const*>(this);
     }
 
-    friend basic_instruction<T>;
+    friend base_t;
 
     static constexpr bool is_fixed_length_instruction = true;
 
-    friend base_t;
+    friend typename base_t::basic_protocol_type;
 
     template <class Validator>
     void validate_impl(Validator) const

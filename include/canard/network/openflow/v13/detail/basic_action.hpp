@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <type_traits>
+#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -34,6 +35,7 @@ namespace v13 {
 
     template <class T>
     class basic_action
+        : public detail::basic_protocol_type<T>
     {
     protected:
         basic_action() = default;
@@ -53,14 +55,21 @@ namespace v13 {
             if (header.type != type()) {
                 return "invalid action type";
             }
-            using is_fixed_length
-                = std::integral_constant<bool, T::is_fixed_length_action>;
-            if (!basic_action_detail::is_valid_length(
-                          header.len, sizeof(typename T::raw_ofp_type)
-                        , is_fixed_length{})) {
+            if (!is_valid_action_length(header)) {
                 return "invalid action length";
             }
             return nullptr;
+        }
+
+        static constexpr auto is_valid_action_length(
+                ofp_header_type const& header) noexcept
+            -> bool
+        {
+            using is_fixed_length
+                = std::integral_constant<bool, T::is_fixed_length_action>;
+            return basic_action_detail::is_valid_length(
+                      header.len, sizeof(typename T::raw_ofp_type)
+                    , is_fixed_length{});
         }
     };
 

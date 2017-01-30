@@ -49,10 +49,17 @@ namespace queue_property_detail {
             if (prop_header.property != property()) {
                 return "invalid queue property";
             }
-            if (prop_header.len != length()) {
+            if (!is_valid_queue_property_length(prop_header)) {
                 return "invalid queue property length";
             }
             return nullptr;
+        }
+
+        static constexpr auto is_valid_queue_property_length(
+                ofp_header_type const& header) noexcept
+            -> bool
+        {
+            return header.len == length();
         }
 
     private:

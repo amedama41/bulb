@@ -2,7 +2,6 @@
 #define CANARD_NET_OFP_DETAIL_V13_BASIC_FIXED_LENGTH_ACTION_HPP
 
 #include <cstdint>
-#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
@@ -18,7 +17,6 @@ namespace v13 {
   template <class T>
   class basic_fixed_length_action
     : public basic_action<T>
-    , public detail::basic_protocol_type<T>
   {
     using base_t = basic_action<T>;
 
@@ -43,7 +41,7 @@ namespace v13 {
 
     static constexpr bool is_fixed_length_action = true;
 
-    friend detail::basic_protocol_type<T>;
+    friend typename base_t::basic_protocol_type;
 
     template <class Validator>
     void validate_impl(Validator const&) const

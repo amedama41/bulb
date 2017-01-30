@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <type_traits>
+#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -34,6 +35,7 @@ namespace v13 {
 
     template <class T>
     class basic_instruction
+        : public detail::basic_protocol_type<T>
     {
     protected:
         basic_instruction() = default;
@@ -53,13 +55,20 @@ namespace v13 {
             if (instruction.type != type()) {
                 return "invalid instruction type";
             }
-            using is_fixed_length
-                = std::integral_constant<bool, T::is_fixed_length_instruction>;
-            if (!basic_instruction_detail::is_valid_length(
-                        instruction.len, T::min_length(), is_fixed_length{})) {
+            if (!is_valid_instruction_length(instruction)) {
                 return "invalid instruction length";
             }
             return nullptr;
+        }
+
+        static constexpr auto is_valid_instruction_length(
+                ofp_header_type const& header) noexcept
+            -> bool
+        {
+            using is_fixed_length
+                = std::integral_constant<bool, T::is_fixed_length_instruction>;
+            return basic_instruction_detail::is_valid_length(
+                    header.len, T::min_length(), is_fixed_length{});
         }
     };
 

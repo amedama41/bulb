@@ -7,7 +7,6 @@
 #include <stdexcept>
 #include <tuple>
 #include <utility>
-#include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/padding.hpp>
@@ -24,48 +23,22 @@ namespace ofp {
 namespace v13 {
 namespace actions {
 
-    class basic_set_field
-        : public detail::v13::basic_action<basic_set_field>
+    template <class OXMMatchField>
+    class set_field
+        : public detail::v13::basic_action<set_field<OXMMatchField>>
     {
-    protected:
-        basic_set_field() = default;
+        using base_t = detail::v13::basic_action<set_field<OXMMatchField>>;
+
+        static constexpr std::size_t base_size
+            = offsetof(protocol::ofp_action_set_field, field);
 
     public:
         using raw_ofp_type = protocol::ofp_action_set_field;
+        using oxm_match_field = OXMMatchField;
+        using value_type = typename oxm_match_field::value_type;
 
         static constexpr protocol::ofp_action_type action_type
             = protocol::OFPAT_SET_FIELD;
-
-        static constexpr auto type() noexcept
-            -> protocol::ofp_action_type
-        {
-            return action_type;
-        }
-
-        static auto extract_oxm_header(raw_ofp_type const& set_field) noexcept
-            -> v13::oxm_header
-        {
-            auto it = set_field.field;
-            return v13::oxm_header::decode(it, it + sizeof(set_field.field));
-        }
-
-    private:
-        friend basic_action;
-
-        static constexpr bool is_fixed_length_action = false;
-    };
-
-
-    template <class OXMMatchField>
-    class set_field
-        : public basic_set_field
-        , public detail::basic_protocol_type<set_field<OXMMatchField>>
-    {
-        static constexpr std::size_t base_size = offsetof(raw_ofp_type, field);
-
-    public:
-        using oxm_match_field = OXMMatchField;
-        using value_type = typename oxm_match_field::value_type;
 
         explicit set_field(value_type const& value)
             : field_{value}
@@ -99,7 +72,9 @@ namespace actions {
         static auto validate_set_field(raw_ofp_type const& set_field) noexcept
             -> char const*
         {
-            auto const oxm_header = extract_oxm_header(set_field);
+            auto it = set_field.field;
+            auto const oxm_header
+                = v13::oxm_header::decode(it, it + sizeof(set_field.field));
 
             if (auto const error_msg = oxm_match_field::validate_header(
                         oxm_header.to_ofp_type())) {
@@ -118,7 +93,11 @@ namespace actions {
         {
         }
 
-        friend detail::basic_protocol_type<set_field>;
+        friend detail::v13::basic_action<set_field>;
+
+        static constexpr bool is_fixed_length_action = false;
+
+        friend typename base_t::basic_protocol_type;
 
         friend constexpr auto get_min_length(set_field*) noexcept
             -> std::uint16_t
@@ -139,7 +118,7 @@ namespace actions {
         template <class Container>
         void encode_impl(Container& container) const
         {
-            detail::encode(container, std::uint16_t{type()});
+            detail::encode(container, std::uint16_t{base_t::type()});
             detail::encode(container, length());
             field_.encode(container);
             detail::encode_byte_array(
