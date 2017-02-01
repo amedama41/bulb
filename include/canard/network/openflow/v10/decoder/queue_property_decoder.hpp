@@ -39,6 +39,9 @@ struct queue_property_decoder
         using property ## N \
             = std::tuple_element<N, decode_type_list>::type; \
         case property ## N::queue_property: \
+            if (!property ## N::is_valid_queue_property_length(prop_header)) { \
+                throw std::runtime_error{"invalid queue property length"}; \
+            } \
             return function(property ## N::decode(first, last));
         static_assert(
                   std::tuple_size<decode_type_list>::value == 1

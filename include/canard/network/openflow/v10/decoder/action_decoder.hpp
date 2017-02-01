@@ -42,6 +42,9 @@ struct action_decoder
         using action ## N \
             = std::tuple_element<N, decode_type_list>::type; \
         case action ## N::action_type: \
+            if (!action ## N::is_valid_action_length(action_header)) { \
+                throw std::runtime_error{"invalid action length"}; \
+            } \
             return function(action ## N::decode(first, last));
         BOOST_PP_REPEAT(12, CANARD_NET_OFP_V10_ACTION_CASE, _)
 #       undef CANARD_NET_OFP_V10_ACTION_CASE
