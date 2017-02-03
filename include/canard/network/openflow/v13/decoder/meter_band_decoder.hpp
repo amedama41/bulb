@@ -42,7 +42,9 @@ namespace v13 {
       #define CANARD_NET_OFP_V13_METER_BAND_CASE(z, N, _) \
       using meter_band ## N = std::tuple_element<N, decode_type_list>::type; \
       case meter_band ## N::type(): \
-        meter_band ## N::validate_header(meter_band_header); \
+        if (!meter_band ## N::is_valid_meter_band_length(meter_band_header)) { \
+          throw std::runtime_error{"invalid meter band length"}; \
+        } \
         return function(meter_band ## N::decode(first, last));
       BOOST_PP_REPEAT(2, CANARD_NET_OFP_V13_METER_BAND_CASE, _)
       #undef CANARD_NET_OFP_V13_METER_BAND_CASE

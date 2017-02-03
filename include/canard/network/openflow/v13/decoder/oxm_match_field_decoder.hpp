@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <tuple>
 #include <boost/preprocessor/repeat.hpp>
-#include <canard/network/openflow/detail/decode.hpp>
+#include <canard/network/openflow/v13/common/oxm_header.hpp>
 #include <canard/network/openflow/v13/common/oxm_match_field.hpp>
 
 namespace canard {
@@ -25,17 +25,21 @@ struct oxm_match_field_decoder
         -> ReturnType
     {
         auto it = first;
-        auto const oxm_header = detail::decode<header_type>(it, last);
+        auto const oxm_header = v13::oxm_header::decode(it, last);
 
-        if (std::distance(it, last) < (oxm_header & 0xff)) {
-            throw std::runtime_error{"oxm length is too big"};
+        if (std::distance(it, last) < oxm_header.oxm_length()) {
+            throw std::runtime_error{"too small data size for oxm_match_field"};
         }
 
-        switch (oxm_header >> 9) {
+        switch (oxm_header.oxm_type()) {
 #       define CANARD_NET_OFP_V13_MATCH_FIELD_CASE(z, N, _) \
         using oxm_match_field ## N \
             = std::tuple_element<N, decode_type_list>::type; \
         case oxm_match_field ## N::oxm_type(): \
+            if (!oxm_match_field ## N \
+                    ::is_valid_oxm_match_field_length(oxm_header)) { \
+                throw std::runtime_error{"invalid oxm_match_field length"}; \
+            } \
             return function(oxm_match_field ## N::decode(first, last));
         static_assert(
                   std::tuple_size<decode_type_list>::value == 40

@@ -35,13 +35,16 @@ struct queue_property_decoder
         auto const prop_header = detail::decode<header_type>(it, last);
 
         if (std::distance(first, last) < prop_header.len) {
-            throw std::runtime_error{"queue property length is too big"};
+            throw std::runtime_error{"too small data size for queue property"};
         }
 
         switch (prop_header.property) {
 #       define CANARD_NET_OFP_V13_QUEUE_PROPERTY_CASE(z, N, _) \
         using property ## N = std::tuple_element<N, decode_type_list>::type; \
         case property ## N::queue_property: \
+            if (!property ## N::is_valid_queue_property_length(prop_header)) { \
+                throw std::runtime_error{"invalid queue property length"}; \
+            } \
             return function(property ## N::decode(first, last));
         BOOST_PP_REPEAT(2, CANARD_NET_OFP_V13_QUEUE_PROPERTY_CASE, _)
 #       undef  CANARD_NET_OFP_V13_QUEUE_PROPERTY_CASE

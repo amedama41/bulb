@@ -35,7 +35,7 @@ struct instruction_decoder
         auto const instruction = detail::decode<header_type>(it, last);
 
         if (std::distance(first, last) < instruction.len) {
-            throw std::runtime_error{"instruction length is too big"};
+            throw std::runtime_error{"too small data size for instruction"};
         }
 
         switch (instruction.type) {
@@ -43,6 +43,9 @@ struct instruction_decoder
         using instruction ## N \
             = std::tuple_element<N, decode_type_list>::type; \
         case instruction ## N::instruction_type: \
+            if (!instruction ## N::is_valid_instruction_length(instruction)) { \
+                throw std::runtime_error{"invalid instruction length"}; \
+            } \
             return function(instruction ## N::decode(first, last));
         BOOST_PP_REPEAT(6, CANARD_NET_OFP_V13_INSTRUCTION_CASE, _)
 #       undef CANARD_NET_OFP_V13_INSTRUCTION_CASE

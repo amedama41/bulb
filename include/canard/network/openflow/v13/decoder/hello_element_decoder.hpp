@@ -56,14 +56,16 @@ namespace v13 {
       auto const helem_header = detail::decode<header_type>(it, last);
 
       if (std::distance(first, last) < helem_header.length) {
-        throw std::runtime_error{"hello element length is too large"};
+        throw std::runtime_error{"too small data size for hello element"};
       }
 
       switch (helem_header.type) {
 #     define CANARD_NET_OFP_V13_HELLO_ELEMENT_DECODE_CASE(z, N, _) \
       using helem ## N = std::tuple_element<N, hello_element_list>::type; \
       case helem ## N::type(): \
-        helem ## N::validate_header(helem_header); \
+        if (!helem ## N::is_valid_hello_element_length(helem_header)) { \
+          throw std::runtime_error{"invalid hello element length"}; \
+        } \
         return function(helem ## N::decode(first, last));
       BOOST_PP_REPEAT(1, CANARD_NET_OFP_V13_HELLO_ELEMENT_DECODE_CASE, _)
 #     undef CANARD_NET_OFP_V13_HELLO_ELEMENT_DECODE_CASE

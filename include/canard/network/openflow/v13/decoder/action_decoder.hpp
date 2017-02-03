@@ -37,7 +37,7 @@ struct action_decoder
         auto const action_header = detail::decode<header_type>(it, last);
 
         if (std::distance(first, last) < action_header.len) {
-            throw std::runtime_error{"action length is too big"};
+            throw std::runtime_error{"too small data size for action"};
         }
 
         switch (action_header.type) {
