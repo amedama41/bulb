@@ -1,7 +1,6 @@
 #ifndef CANARD_NET_OFP_V13_SET_FIELD_DECODER_HPP
 #define CANARD_NET_OFP_V13_SET_FIELD_DECODER_HPP
 
-#include <cstddef>
 #include <cstdint>
 #include <stdexcept>
 #include <tuple>
@@ -10,6 +9,7 @@
 #include <canard/network/openflow/v13/action/set_field.hpp>
 #include <canard/network/openflow/v13/common/oxm_header.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
+#include <canard/network/openflow/v13/detail/length_utility.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -18,17 +18,26 @@ namespace ofp {
 namespace v13 {
 struct set_field_decoder
 {
+    using header_type = protocol::ofp_action_set_field;
+    using type_id = std::uint32_t;
+    using decode_type_list = default_set_field_list;
+    static constexpr std::uint16_t header_size = sizeof(header_type);
+
     template <class ReturnType, class Iterator, class Function>
     static auto decode(Iterator& first, Iterator last, Function function)
         -> ReturnType
     {
         auto it = first;
-        auto const set_field
-            = detail::decode<protocol::ofp_action_set_field>(it, last);
+        auto const set_field = detail::decode<header_type>(it, last);
 
         auto field_it = set_field.field;
         auto const oxm_header = v13::oxm_header::decode(
                 field_it, field_it + sizeof(set_field.field));
+
+        if (set_field.len != detail::v13::exact_length(
+                    header_size + oxm_header.oxm_length())) {
+            throw std::runtime_error{"invalid set_field length"};
+        }
 
         static_assert(
                   std::tuple_size<default_set_field_list>::value == 36
@@ -38,11 +47,17 @@ struct set_field_decoder
         using set_field ## N = \
             std::tuple_element<N, default_set_field_list>::type; \
         case set_field ## N::oxm_type(): \
+            if (!set_field ## N::oxm_match_field \
+                    ::is_valid_oxm_match_field_length(oxm_header)) { \
+                throw std::runtime_error{ \
+                    "invalid set_field's oxm_match_field length" \
+                }; \
+            } \
             return function(set_field ## N::decode(first, last));
         BOOST_PP_REPEAT(36, CANARD_NET_OFP_V13_SET_FIELD_CASE, _)
 #       undef CANARD_NET_OFP_V13_SET_FIELD_CASE
         default:
-            throw std::runtime_error{"unknwon set field oxm type"};
+            throw std::runtime_error{"unknwon set_field's oxm_match_field type"};
         }
     }
 };

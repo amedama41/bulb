@@ -45,10 +45,16 @@ struct action_decoder
         using action ## N \
             = std::tuple_element<N, non_set_field_action_type_list>::type; \
         case action ## N::action_type: \
+            if (!action ## N::is_valid_action_length(action_header)) { \
+                throw std::runtime_error{"invalid action length"}; \
+            } \
             return function(action ## N::decode(first, last));
         BOOST_PP_REPEAT(15, CANARD_NET_OFP_V13_ACTION_CASE, _)
 #       undef CANARD_NET_OFP_V13_ACTION_CASE
         case protocol::OFPAT_SET_FIELD:
+            if (action_header.len < set_field_decoder::header_size) {
+                throw std::runtime_error{"invalid action length"};
+            }
             return set_field_decoder::decode<ReturnType>(
                     first, last, std::move(function));
         default:
