@@ -31,7 +31,7 @@ struct queue_property_decoder
         auto const prop_header = detail::decode<header_type>(it, last);
 
         if (std::distance(first, last) < prop_header.len) {
-            throw std::runtime_error{"queue property length is too big"};
+            throw std::runtime_error{"too small data size for queue property"};
         }
 
         switch (prop_header.property) {
