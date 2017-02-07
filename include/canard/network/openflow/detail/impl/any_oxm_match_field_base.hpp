@@ -41,10 +41,10 @@ namespace detail {
   }
 
   template <class Derived>
-  auto any_oxm_match_field_base<Derived>::oxm_has_mask() const noexcept
+  auto any_oxm_match_field_base<Derived>::oxm_hasmask() const noexcept
     -> bool
   {
-    return derived().visit(detail::oxm_has_mask_visitor{});
+    return derived().visit(detail::oxm_hasmask_visitor{});
   }
 
   template <class Derived>

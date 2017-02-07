@@ -212,7 +212,7 @@ BOOST_AUTO_TEST_SUITE(oxm_header)
           (v13::oxm_header{OXM_OF_IPV4_DST}
         != v13::oxm_header{OXM_OF_IPV4_SRC}));
     }
-    BOOST_AUTO_TEST_CASE(false_if_oxm_has_mask_is_not_equal)
+    BOOST_AUTO_TEST_CASE(false_if_oxm_hasmask_is_not_equal)
     {
       BOOST_TEST(
           (v13::oxm_header{OXM_OF_IN_PORT}
@@ -247,7 +247,7 @@ BOOST_AUTO_TEST_SUITE(oxm_header)
               v13::oxm_header{OXM_OF_IPV4_DST}
             , v13::oxm_header{OXM_OF_IPV4_SRC}));
     }
-    BOOST_AUTO_TEST_CASE(false_if_oxm_has_mask_is_not_equal)
+    BOOST_AUTO_TEST_CASE(false_if_oxm_hasmask_is_not_equal)
     {
       BOOST_TEST(
           !equivalent(

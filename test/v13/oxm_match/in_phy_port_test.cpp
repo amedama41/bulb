@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_SUITE(in_phy_port_test)
 
         BOOST_TEST(sut.oxm_length() == sizeof(std::uint32_t));
         BOOST_TEST(sut.oxm_value() == value);
-        BOOST_TEST(!sut.oxm_has_mask());
+        BOOST_TEST(!sut.oxm_hasmask());
         BOOST_TEST(sut.oxm_mask() == boost::none);
         BOOST_TEST(sut.length()
                 == sizeof(std::uint32_t) + sizeof(std::uint32_t));
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_SUITE(in_phy_port_test)
 
         BOOST_TEST(sut.oxm_length() == 2 * sizeof(std::uint32_t));
         BOOST_TEST(sut.oxm_value() == value);
-        BOOST_TEST_REQUIRE(sut.oxm_has_mask());
+        BOOST_TEST_REQUIRE(sut.oxm_hasmask());
         BOOST_TEST(*sut.oxm_mask() == mask);
         BOOST_TEST(sut.length()
                 == sizeof(std::uint32_t) + 2 * sizeof(std::uint32_t));

@@ -110,7 +110,7 @@ namespace actions {
         void validate_impl(Validator validator) const
         {
             field_.validate(validator);
-            if (field_.oxm_has_mask()) {
+            if (field_.oxm_hasmask()) {
                 throw std::runtime_error{"invalid oxm_hasmask"};
             }
         }

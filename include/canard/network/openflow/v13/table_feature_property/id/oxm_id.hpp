@@ -58,7 +58,7 @@ namespace v13 {
             return (oxm_header_ >> 9);
         }
 
-        auto oxm_has_mask() const noexcept
+        auto oxm_hasmask() const noexcept
             -> bool
         {
             return oxm_header_ & 0x100;
@@ -124,13 +124,13 @@ namespace v13 {
 
         oxm_experimenter_id(
                   std::uint8_t const oxm_field
-                , bool const oxm_has_mask
+                , bool const oxm_hasmask
                 , std::uint8_t const oxm_length
                 , std::uint32_t const experimenter) noexcept
             : oxm_experimenter_header_{
                   (oxm_header_type(protocol::OFPXMC_EXPERIMENTER) << 16)
                 | (oxm_header_type(oxm_field) << 9)
-                | (oxm_header_type(oxm_has_mask) << 8)
+                | (oxm_header_type(oxm_hasmask) << 8)
                 | (oxm_header_type(oxm_length))
                 , experimenter
               }
@@ -155,7 +155,7 @@ namespace v13 {
             return (oxm_experimenter_header_.oxm_header >> 9);
         }
 
-        auto oxm_has_mask() const noexcept
+        auto oxm_hasmask() const noexcept
             -> bool
         {
             return oxm_experimenter_header_.oxm_header & 0x100;

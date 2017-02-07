@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_SUITE(ipv6_src_test)
         BOOST_TEST(sut.oxm_length() == 16);
         BOOST_TEST(sut.oxm_header() == OXM_OF_IPV6_SRC);
         BOOST_TEST(sut.oxm_value() == value);
-        BOOST_TEST(!sut.oxm_has_mask());
+        BOOST_TEST(!sut.oxm_hasmask());
         BOOST_TEST(sut.oxm_mask() == boost::none);
         BOOST_TEST(sut.length() == sizeof(std::uint32_t) + 16);
         BOOST_TEST(!sut.is_wildcard());
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_SUITE(ipv6_src_test)
         BOOST_TEST(sut.oxm_length() == 2 * 16);
         BOOST_TEST(sut.oxm_header() == OXM_OF_IPV6_SRC_W);
         BOOST_TEST(sut.oxm_value() == value);
-        BOOST_TEST_REQUIRE(sut.oxm_has_mask());
+        BOOST_TEST_REQUIRE(sut.oxm_hasmask());
         BOOST_TEST(*sut.oxm_mask() == mask);
         BOOST_TEST(sut.length() == sizeof(std::uint32_t) + 2 * 16);
         BOOST_TEST(!sut.is_wildcard());
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_SUITE(ipv6_src_test)
 
         BOOST_TEST(sut.oxm_length() == 2 * 16);
         BOOST_TEST(sut.oxm_value() == value);
-        BOOST_TEST_REQUIRE(sut.oxm_has_mask());
+        BOOST_TEST_REQUIRE(sut.oxm_hasmask());
         BOOST_TEST(*sut.oxm_mask() == mask);
         BOOST_TEST(sut.length() == sizeof(std::uint32_t) + 2 * 16);
         BOOST_TEST(sut.is_wildcard());
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_SUITE(ipv6_src_test)
 
         BOOST_TEST(sut.oxm_length() == 2 * 16);
         BOOST_TEST(sut.oxm_value() == value);
-        BOOST_TEST_REQUIRE(sut.oxm_has_mask());
+        BOOST_TEST_REQUIRE(sut.oxm_hasmask());
         BOOST_TEST(*sut.oxm_mask() == mask);
         BOOST_TEST(sut.length() == sizeof(std::uint32_t) + 2 * 16);
         BOOST_TEST(!sut.is_wildcard());
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_SUITE(ipv6_src_test)
 
         BOOST_TEST(sut.oxm_length() == 16);
         BOOST_TEST(sut.oxm_value() == value);
-        BOOST_TEST(!sut.oxm_has_mask());
+        BOOST_TEST(!sut.oxm_hasmask());
         BOOST_TEST(sut.oxm_mask() == boost::none);
         BOOST_TEST(sut.length() == sizeof(std::uint32_t) + 16);
         BOOST_TEST(!sut.is_wildcard());
@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_SUITE(ipv6_src_test)
 
         BOOST_TEST(sut.oxm_length() == 2 * 16);
         BOOST_TEST(sut.oxm_value() == value);
-        BOOST_TEST_REQUIRE(sut.oxm_has_mask());
+        BOOST_TEST_REQUIRE(sut.oxm_hasmask());
         BOOST_TEST(*sut.oxm_mask() == mask);
         BOOST_TEST(sut.length() == sizeof(std::uint32_t) + 2 * 16);
         BOOST_TEST(!sut.is_wildcard());
@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_SUITE(ipv6_src_test)
 
         BOOST_TEST(sut.oxm_length() == 2 * 16);
         BOOST_TEST(sut.oxm_value() == value);
-        BOOST_TEST_REQUIRE(sut.oxm_has_mask());
+        BOOST_TEST_REQUIRE(sut.oxm_hasmask());
         BOOST_TEST(*sut.oxm_mask() == "ffff:ffff::"_ipv6);
         BOOST_TEST(sut.length() == sizeof(std::uint32_t) + 2 * 16);
         BOOST_TEST(!sut.is_wildcard());
@@ -168,7 +168,7 @@ BOOST_AUTO_TEST_SUITE(ipv6_src_test)
 
         auto const sut = match::ipv6_src{value, prefix_length};
 
-        BOOST_TEST_REQUIRE(sut.oxm_has_mask());
+        BOOST_TEST_REQUIRE(sut.oxm_hasmask());
         BOOST_TEST(*sut.oxm_mask() == "::"_ipv6);
         BOOST_TEST(sut.length() == sizeof(std::uint32_t) + 2 * 16);
         BOOST_TEST(sut.is_wildcard());
@@ -182,7 +182,7 @@ BOOST_AUTO_TEST_SUITE(ipv6_src_test)
 
         auto const sut = match::ipv6_src{value, prefix_length};
 
-        BOOST_TEST_REQUIRE(sut.oxm_has_mask());
+        BOOST_TEST_REQUIRE(sut.oxm_hasmask());
         BOOST_TEST(*sut.oxm_mask()
                 == "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"_ipv6);
         BOOST_TEST(sut.length() == sizeof(std::uint32_t) + 2 * 16);
@@ -319,7 +319,7 @@ BOOST_AUTO_TEST_SUITE(ipv6_src_test)
 
         BOOST_TEST(sut.oxm_length() == 16);
         BOOST_TEST(sut.oxm_value() == value);
-        BOOST_TEST(!sut.oxm_has_mask());
+        BOOST_TEST(!sut.oxm_hasmask());
         BOOST_TEST(sut.oxm_mask() == boost::none);
         BOOST_TEST(sut.length() == sizeof(std::uint32_t) + 16);
         BOOST_TEST(!sut.is_wildcard());
@@ -356,7 +356,7 @@ BOOST_AUTO_TEST_SUITE(ipv6_src_test)
 
         BOOST_TEST(sut.oxm_length() == 2 * 16);
         BOOST_TEST(sut.oxm_value() == value);
-        BOOST_TEST_REQUIRE(sut.oxm_has_mask());
+        BOOST_TEST_REQUIRE(sut.oxm_hasmask());
         BOOST_TEST(*sut.oxm_mask() == mask);
         BOOST_TEST(sut.length() == sizeof(std::uint32_t) + 2 * 16);
         BOOST_TEST(!sut.is_wildcard());
@@ -389,7 +389,7 @@ BOOST_AUTO_TEST_SUITE(ipv6_src_test)
 
         BOOST_TEST((it == it_end));
         BOOST_TEST((field == sut));
-        BOOST_TEST(field.oxm_has_mask() == sut.oxm_has_mask());
+        BOOST_TEST(field.oxm_hasmask() == sut.oxm_hasmask());
         BOOST_TEST(field.oxm_length() == sut.oxm_length());
         BOOST_TEST(field.oxm_value() == sut.oxm_value());
         BOOST_TEST(field.oxm_mask() == sut.oxm_mask());
@@ -414,7 +414,7 @@ BOOST_AUTO_TEST_SUITE(ipv6_src_test)
 
         BOOST_TEST((it == it_end));
         BOOST_TEST((field == sut));
-        BOOST_TEST(field.oxm_has_mask() == sut.oxm_has_mask());
+        BOOST_TEST(field.oxm_hasmask() == sut.oxm_hasmask());
         BOOST_TEST(field.oxm_length() == sut.oxm_length());
         BOOST_TEST(field.oxm_value() == sut.oxm_value());
         BOOST_TEST(field.oxm_mask() == sut.oxm_mask());

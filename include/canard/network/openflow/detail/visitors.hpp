@@ -124,7 +124,7 @@ namespace ofp {
         DEFINE_OXM_VISITOR(oxm_field, std::uint8_t)
         DEFINE_OXM_VISITOR(oxm_type, std::uint32_t)
         DEFINE_OXM_VISITOR(oxm_header, std::uint32_t)
-        DEFINE_OXM_VISITOR(oxm_has_mask, bool)
+        DEFINE_OXM_VISITOR(oxm_hasmask, bool)
         DEFINE_OXM_VISITOR(oxm_length, std::uint8_t)
         DEFINE_OXM_VISITOR(is_wildcard, bool)
         DEFINE_OXM_VISITOR(is_exact, bool)

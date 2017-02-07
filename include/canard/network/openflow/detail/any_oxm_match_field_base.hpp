@@ -26,7 +26,7 @@ namespace detail {
     CANARD_NET_OFP_DECL auto oxm_header() const noexcept
       -> std::uint32_t;
 
-    CANARD_NET_OFP_DECL auto oxm_has_mask() const noexcept
+    CANARD_NET_OFP_DECL auto oxm_hasmask() const noexcept
       -> bool;
 
     CANARD_NET_OFP_DECL auto oxm_length() const noexcept

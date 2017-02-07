@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_SUITE(any_oxm_match_field_test)
         BOOST_TEST(sut.oxm_class() == field.oxm_class());
         BOOST_TEST(sut.oxm_field() == field.oxm_field());
         BOOST_TEST(sut.oxm_type() == field.oxm_type());
-        BOOST_TEST(sut.oxm_has_mask() == field.oxm_has_mask());
+        BOOST_TEST(sut.oxm_hasmask() == field.oxm_hasmask());
         BOOST_TEST(sut.oxm_length() == field.oxm_length());
         BOOST_TEST(sut.length() == field.length());
         BOOST_TEST(sut.byte_length() == field.byte_length());
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_SUITE(any_oxm_match_field_test)
         BOOST_TEST(sut.oxm_class() == field.oxm_class());
         BOOST_TEST(sut.oxm_field() == field.oxm_field());
         BOOST_TEST(sut.oxm_type() == field.oxm_type());
-        BOOST_TEST(sut.oxm_has_mask() == field.oxm_has_mask());
+        BOOST_TEST(sut.oxm_hasmask() == field.oxm_hasmask());
         BOOST_TEST(sut.oxm_length() == field.oxm_length());
         BOOST_TEST(sut.length() == field.length());
         BOOST_TEST(sut.byte_length() == field.byte_length());
@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_SUITE(any_oxm_match_field_test)
         BOOST_TEST(sut.oxm_class() == field2.oxm_class());
         BOOST_TEST(sut.oxm_field() == field2.oxm_field());
         BOOST_TEST(sut.oxm_type() == field2.oxm_type());
-        BOOST_TEST(sut.oxm_has_mask() == field2.oxm_has_mask());
+        BOOST_TEST(sut.oxm_hasmask() == field2.oxm_hasmask());
         BOOST_TEST(sut.oxm_length() == field2.oxm_length());
         BOOST_TEST(sut.length() == field2.length());
         BOOST_TEST(sut.byte_length() == field2.byte_length());
@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_SUITE(any_oxm_match_field_test)
         BOOST_TEST(sut.oxm_class() == field2.oxm_class());
         BOOST_TEST(sut.oxm_field() == field2.oxm_field());
         BOOST_TEST(sut.oxm_type() == field2.oxm_type());
-        BOOST_TEST(sut.oxm_has_mask() == field2.oxm_has_mask());
+        BOOST_TEST(sut.oxm_hasmask() == field2.oxm_hasmask());
         BOOST_TEST(sut.oxm_length() == field2.oxm_length());
         BOOST_TEST(sut.length() == field2.length());
         BOOST_TEST(sut.byte_length() == field2.byte_length());
@@ -189,7 +189,7 @@ BOOST_AUTO_TEST_SUITE(any_oxm_match_field_test)
         BOOST_TEST(sut.oxm_class() == field2.oxm_class());
         BOOST_TEST(sut.oxm_field() == field2.oxm_field());
         BOOST_TEST(sut.oxm_type() == field2.oxm_type());
-        BOOST_TEST(sut.oxm_has_mask() == field2.oxm_has_mask());
+        BOOST_TEST(sut.oxm_hasmask() == field2.oxm_hasmask());
         BOOST_TEST(sut.oxm_length() == field2.oxm_length());
         BOOST_TEST(sut.length() == field2.length());
         BOOST_TEST(sut.byte_length() == field2.byte_length());
@@ -211,7 +211,7 @@ BOOST_AUTO_TEST_SUITE(any_oxm_match_field_test)
         BOOST_TEST(sut.oxm_class() == field2.oxm_class());
         BOOST_TEST(sut.oxm_field() == field2.oxm_field());
         BOOST_TEST(sut.oxm_type() == field2.oxm_type());
-        BOOST_TEST(sut.oxm_has_mask() == field2.oxm_has_mask());
+        BOOST_TEST(sut.oxm_hasmask() == field2.oxm_hasmask());
         BOOST_TEST(sut.oxm_length() == field2.oxm_length());
         BOOST_TEST(sut.length() == field2.length());
         BOOST_TEST(sut.byte_length() == field2.byte_length());

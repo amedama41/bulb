@@ -129,7 +129,7 @@ namespace v13 {
       return std::uint32_t{oxm_class()} << 7 | oxm_field();
     }
 
-    auto oxm_has_mask() const noexcept
+    auto oxm_hasmask() const noexcept
       -> bool
     {
       return static_cast<bool>(oxm_mask());
@@ -138,14 +138,14 @@ namespace v13 {
     auto oxm_length() const noexcept
       -> std::uint8_t
     {
-      return oxm_has_mask() ? value_length() * 2 : value_length();
+      return oxm_hasmask() ? value_length() * 2 : value_length();
     }
 
     auto oxm_header() const noexcept
       -> oxm_header_type
     {
       return (oxm_type() << 9)
-           | (oxm_header_type{oxm_has_mask()} << 8)
+           | (oxm_header_type{oxm_hasmask()} << 8)
            | oxm_length();
     }
 
@@ -176,7 +176,7 @@ namespace v13 {
     auto is_wildcard() const noexcept
       -> bool
     {
-      return oxm_has_mask()
+      return oxm_hasmask()
            ? basic_oxm_match_field_detail::all_of(raw_mask(), 0)
            : false;
     }
@@ -184,7 +184,7 @@ namespace v13 {
     auto is_exact() const noexcept
       -> bool
     {
-      return oxm_has_mask()
+      return oxm_hasmask()
            ? basic_oxm_match_field_detail::all_of(raw_mask(), 0xff)
            : true;
     }
@@ -261,7 +261,7 @@ namespace v13 {
     void encode_value_and_mask(Container& container, std::true_type) const
     {
       detail::encode(container, raw_value());
-      if (oxm_has_mask()) {
+      if (oxm_hasmask()) {
         detail::encode(container, raw_mask());
       }
     }
@@ -273,7 +273,7 @@ namespace v13 {
         = basic_oxm_match_field_detail::to_bytes(raw_value());
       detail::encode_byte_array(
           container, value_bytes.data(), value_bytes.size());
-      if (oxm_has_mask()) {
+      if (oxm_hasmask()) {
         auto const mask_bytes
           = basic_oxm_match_field_detail::to_bytes(raw_mask());
         detail::encode_byte_array(
@@ -337,7 +337,7 @@ namespace v13 {
     void validate_impl(Validator) const
     {
       T::validate_value(oxm_value());
-      if (oxm_has_mask()) {
+      if (oxm_hasmask()) {
         basic_oxm_match_field_detail::validate_mask(raw_value(), raw_mask());
       }
     }
