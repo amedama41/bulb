@@ -13,7 +13,7 @@ namespace protocol = v13::protocol;
 namespace {
 struct parameters {
   std::uint16_t type = 3;
-  helems::unknown_element::data_type data = "\x01\x02\x03\x04\x05\x06"_bin;
+  helems::unknown_element::data_type data = "\x01\x02\x03\x04\x05\x06"_bbin;
 };
 struct unknown_element_fixture : parameters {
   helems::unknown_element sut{type, data};

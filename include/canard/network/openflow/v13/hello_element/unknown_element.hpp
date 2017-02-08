@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <iterator>
 #include <utility>
-#include <vector>
+#include <canard/network/openflow/data_type.hpp>
 #include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
@@ -24,7 +24,7 @@ namespace hello_elements {
   public:
     using raw_ofp_type = protocol::ofp_hello_elem_header;
     using ofp_header_type = protocol::ofp_hello_elem_header;
-    using data_type = std::vector<unsigned char>;
+    using data_type = ofp::data_type;
 
     explicit unknown_element(std::uint16_t const type)
       : header_{type, sizeof(raw_ofp_type)}
@@ -33,7 +33,7 @@ namespace hello_elements {
     }
 
     unknown_element(std::uint16_t const type, data_type data)
-      : header_{type, std::uint16_t(sizeof(raw_ofp_type) + data.size())}
+      : header_{type, ofp::calc_ofp_length(data, sizeof(raw_ofp_type))}
       , data_(std::move(data))
     {
     }
@@ -132,9 +132,7 @@ namespace hello_elements {
     {
       auto const header = detail::decode<raw_ofp_type>(first, last);
 
-      auto const data_length = header.length - sizeof(raw_ofp_type);
-      auto data = data_type(first, std::next(first, data_length));
-      std::advance(first, data_length);
+      auto data = ofp::decode_data(first, header.length - sizeof(raw_ofp_type));
 
       return unknown_element(header, std::move(data));
     }
