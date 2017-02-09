@@ -2,7 +2,6 @@
 #define CANARD_NET_OFP_V13_HELLO_ELEMENTS_UNKNOWN_ELEMENT_HPP
 
 #include <cstdint>
-#include <iterator>
 #include <utility>
 #include <canard/network/openflow/data_type.hpp>
 #include <canard/network/openflow/detail/basic_protocol_type.hpp>
