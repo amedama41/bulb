@@ -3,11 +3,10 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <iterator>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
-#include <vector>
+#include <canard/network/openflow/data_type.hpp>
 #include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
@@ -103,7 +102,7 @@ namespace v13 {
     {
     public:
         using raw_ofp_type = protocol::ofp_action_experimenter_header;
-        using data_type = std::vector<unsigned char>;
+        using data_type = ofp::data_type;
 
         explicit action_experimenter_id(std::uint32_t const experimenter)
             : experimenter_(experimenter)
@@ -181,9 +180,8 @@ namespace v13 {
         {
             auto const exp_header = detail::decode<raw_ofp_type>(first, last);
 
-            last = std::next(first, exp_header.len - sizeof(raw_ofp_type));
-            auto data = data_type(first, last);
-            first = last;
+            auto data = ofp::decode_data(
+                    first, exp_header.len - sizeof(raw_ofp_type));
 
             return action_experimenter_id{
                 exp_header.experimenter, std::move(data)
