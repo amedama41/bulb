@@ -9,8 +9,8 @@
 #include <limits>
 #include <stdexcept>
 #include <utility>
-#include <vector>
 #include <boost/algorithm/cxx11/all_of.hpp>
+#include <boost/container/vector.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
@@ -33,7 +33,7 @@ namespace table_feature_properties {
             = T::prop_type;
 
         using raw_ofp_type = protocol::ofp_table_feature_prop_next_tables;
-        using next_table_ids_type = std::vector<std::uint8_t>;
+        using next_table_ids_type = boost::container::vector<std::uint8_t>;
         using iterator = next_table_ids_type::iterator;
         using const_iterator = next_table_ids_type::const_iterator;
 

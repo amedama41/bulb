@@ -9,7 +9,7 @@
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
-#include <vector>
+#include <boost/container/vector.hpp>
 #include <boost/operators.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <canard/network/openflow/type_traits/is_all_constructible.hpp>
@@ -78,7 +78,7 @@ namespace ofp {
   class list
     : private boost::equality_comparable<list<ProtocolType>>
   {
-    using container_type = std::vector<ProtocolType>;
+    using container_type = boost::container::vector<ProtocolType>;
 
   public:
     // types:

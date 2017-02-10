@@ -7,8 +7,8 @@
 #include <iterator>
 #include <stdexcept>
 #include <utility>
-#include <vector>
 #include <boost/algorithm/cxx11/all_of.hpp>
+#include <boost/container/vector.hpp>
 #include <boost/endian/conversion.hpp>
 #include <boost/range/adaptor/reversed.hpp>
 #include <boost/range/algorithm/find_if.hpp>
@@ -33,7 +33,7 @@ namespace hello_elements {
   public:
     using raw_ofp_type = protocol::ofp_hello_elem_versionbitmap;
     using ofp_header_type = protocol::ofp_hello_elem_header;
-    using bitmaps_type = std::vector<std::uint32_t>;
+    using bitmaps_type = boost::container::vector<std::uint32_t>;
 
   private:
     using bitmap_type = bitmaps_type::value_type;
@@ -185,7 +185,8 @@ namespace hello_elements {
       auto const vbitmap = detail::decode<raw_ofp_type>(first, last);
 
       auto const bitmaps_length = vbitmap.length - sizeof(raw_ofp_type);
-      auto bitmaps = bitmaps_type(bitmaps_length / sizeof(bitmap_type));
+      auto bitmaps = bitmaps_type(
+          bitmaps_length / sizeof(bitmap_type), boost::container::default_init);
       std::copy_n(
             first, bitmaps_length
           , reinterpret_cast<unsigned char*>(&bitmaps[0]));

@@ -20,9 +20,9 @@ namespace {
 constexpr std::uint8_t versions[] = { 1, 3, 4, 5, 8, 13, 64, 95, 96 };
 template <std::size_t N>
 auto create_bitmaps(std::uint8_t const (&versions)[N])
-  -> std::vector<std::uint32_t>
+  -> boost::container::vector<std::uint32_t>
 {
-  auto bitmaps = std::vector<std::uint32_t>{};
+  auto bitmaps = boost::container::vector<std::uint32_t>{};
   for (auto const v : versions) {
     auto const index = v / 32U;
     auto const shift = v % 32U;
@@ -33,7 +33,7 @@ auto create_bitmaps(std::uint8_t const (&versions)[N])
 }
 struct versionbitmap_fixture
 {
-  std::vector<std::uint32_t> bitmaps = create_bitmaps(versions);
+  boost::container::vector<std::uint32_t> bitmaps = create_bitmaps(versions);
   helems::versionbitmap sut{bitmaps};
   std::vector<unsigned char> bin
     = "\x00\x01\x00\x14"
