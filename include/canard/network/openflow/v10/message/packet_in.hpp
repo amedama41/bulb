@@ -28,7 +28,8 @@ namespace messages {
             = offsetof(protocol::ofp_packet_in, pad)
             + sizeof(protocol::ofp_packet_in::pad);
 
-        friend constexpr auto get_min_length(packet_in*) noexcept
+        friend constexpr auto get_min_length(
+                detail::basic_protocol_type_tag<packet_in>) noexcept
             -> std::uint16_t
         {
             return packet_in::min_pkt_in_len;

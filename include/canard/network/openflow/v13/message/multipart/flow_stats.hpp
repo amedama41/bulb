@@ -158,7 +158,8 @@ namespace multipart {
         static constexpr std::uint16_t base_size
             = sizeof(raw_ofp_type) + oxm_match::min_byte_length();
 
-        friend constexpr auto get_min_length(flow_stats*) noexcept
+        friend constexpr auto get_min_length(
+                detail::basic_protocol_type_tag<flow_stats>) noexcept
             -> std::uint16_t
         {
             return flow_stats::base_size;

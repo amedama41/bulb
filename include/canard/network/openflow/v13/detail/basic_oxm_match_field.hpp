@@ -321,7 +321,8 @@ namespace v13 {
 
     friend detail::basic_protocol_type<T>;
 
-    friend constexpr auto get_min_length(T*) noexcept
+    friend constexpr auto get_min_length(
+        detail::basic_protocol_type_tag<T>) noexcept
       -> std::uint16_t
     {
       return sizeof(oxm_header_type) + value_length();

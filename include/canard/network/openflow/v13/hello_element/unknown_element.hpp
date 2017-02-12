@@ -112,7 +112,8 @@ namespace hello_elements {
 
     friend basic_protocol_type;
 
-    friend constexpr auto exclude_padding(unknown_element*) noexcept
+    friend constexpr auto exclude_padding(
+        detail::basic_protocol_type_tag<unknown_element>) noexcept
       -> bool
     {
       return true;

@@ -232,7 +232,8 @@ namespace multipart_detail {
 
         friend typename base_t::basic_protocol_type;
 
-        friend constexpr auto get_min_length(T*) noexcept
+        friend constexpr auto get_min_length(
+                detail::basic_protocol_type_tag<T>) noexcept
             -> std::uint16_t
         {
             return sizeof(raw_ofp_type) + sizeof(body_type);
@@ -367,7 +368,8 @@ namespace multipart_detail {
 
         friend typename base_t::basic_protocol_type;
 
-        friend constexpr auto get_min_length(T*) noexcept
+        friend constexpr auto get_min_length(
+                detail::basic_protocol_type_tag<T>) noexcept
             -> std::uint16_t
         {
             return sizeof(raw_ofp_type)

@@ -222,7 +222,8 @@ namespace stats_detail {
     private:
         friend typename base_t::basic_openflow_message::basic_protocol_type;
 
-        friend constexpr auto get_min_length(T*) noexcept
+        friend constexpr auto get_min_length(
+                detail::basic_protocol_type_tag<T>) noexcept
             -> std::uint16_t
         {
             return sizeof(raw_ofp_type) + sizeof(raw_ofp_stats_type);

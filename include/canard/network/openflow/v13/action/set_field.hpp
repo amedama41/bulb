@@ -99,7 +99,8 @@ namespace actions {
 
         friend typename base_t::basic_protocol_type;
 
-        friend constexpr auto get_min_length(set_field*) noexcept
+        friend constexpr auto get_min_length(
+                detail::basic_protocol_type_tag<set_field>) noexcept
             -> std::uint16_t
         {
             return detail::v13::exact_length(

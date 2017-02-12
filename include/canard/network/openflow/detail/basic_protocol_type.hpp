@@ -14,21 +14,17 @@ namespace net {
 namespace ofp {
 namespace detail {
 
+  template <class T>
+  struct basic_protocol_type_tag {};
+
   namespace bpt_detail {
 
     template <class T>
-    constexpr auto get_min_length(T*) noexcept
+    constexpr auto get_min_length(basic_protocol_type_tag<T>) noexcept
       -> std::uint16_t
     {
       return sizeof(typename T::raw_ofp_type);
     };
-
-    template <class T>
-    constexpr auto get_min_length_impl() noexcept
-      -> std::uint16_t
-    {
-      return get_min_length(static_cast<T*>(nullptr));
-    }
 
     constexpr auto exclude_padding(...) noexcept
       -> bool
@@ -37,8 +33,9 @@ namespace detail {
     }
 
     template <class T>
-    using does_length_exclude_padding
-      = std::integral_constant<bool, exclude_padding(static_cast<T*>(nullptr))>;
+    using does_length_exclude_padding_length = std::integral_constant<
+      bool, exclude_padding(basic_protocol_type_tag<T>{})
+    >;
 
     constexpr auto exact_length(std::uint16_t const length) noexcept
       -> std::uint16_t
@@ -71,7 +68,7 @@ namespace detail {
     void optionally_encode_padding(Container& container, T const& t)
     {
       bpt_detail::optionally_encode_padding_impl(
-          container, t, does_length_exclude_padding<T>{});
+          container, t, does_length_exclude_padding_length<T>{});
     }
 
     template <class Iterator, class T>
@@ -91,7 +88,7 @@ namespace detail {
     void optionally_decode_padding(Iterator& first, Iterator last, T const& t)
     {
       bpt_detail::optionally_decode_padding_impl(
-          first, last, t, does_length_exclude_padding<T>{});
+          first, last, t, does_length_exclude_padding_length<T>{});
     }
 
     constexpr auto calc_byte_length_impl(
@@ -113,7 +110,7 @@ namespace detail {
       -> std::uint16_t
     {
       return bpt_detail::calc_byte_length_impl(
-          length, does_length_exclude_padding<T>{});
+          length, does_length_exclude_padding_length<T>{});
     }
 
   } // namespace bpt_detail
@@ -126,7 +123,8 @@ namespace detail {
     static constexpr auto min_length() noexcept
       -> std::uint16_t
     {
-      return bpt_detail::get_min_length_impl<T>();
+      using bpt_detail::get_min_length;
+      return get_min_length(basic_protocol_type_tag<T>{});
     }
 
     static constexpr auto min_byte_length() noexcept

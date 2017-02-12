@@ -152,7 +152,8 @@ namespace table_feature_properties {
 
         friend detail::basic_protocol_type<basic_prop_next_tables>;
 
-        friend constexpr auto exclude_padding(basic_prop_next_tables*) noexcept
+        friend constexpr auto exclude_padding(
+            detail::basic_protocol_type_tag<basic_prop_next_tables>) noexcept
           -> bool
         {
           return true;

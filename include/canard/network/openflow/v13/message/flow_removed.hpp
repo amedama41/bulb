@@ -155,7 +155,8 @@ namespace messages {
 
         friend basic_protocol_type;
 
-        friend constexpr auto get_min_length(flow_removed*) noexcept
+        friend constexpr auto get_min_length(
+                detail::basic_protocol_type_tag<flow_removed>) noexcept
             -> std::uint16_t
         {
             return flow_removed::base_flow_removed_size;

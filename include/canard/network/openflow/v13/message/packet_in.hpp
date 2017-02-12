@@ -211,7 +211,8 @@ namespace messages {
 
         friend basic_protocol_type;
 
-        friend constexpr auto get_min_length(packet_in*) noexcept
+        friend constexpr auto get_min_length(
+                detail::basic_protocol_type<packet_in>) noexcept
             -> std::uint16_t
         {
             return packet_in::base_pkt_in_size;

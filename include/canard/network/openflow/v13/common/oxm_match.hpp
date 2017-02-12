@@ -159,13 +159,15 @@ namespace v13 {
     static constexpr std::uint16_t base_size
       = offsetof(oxm_match::raw_ofp_type, pad);
 
-    friend constexpr auto get_min_length(oxm_match*) noexcept
+    friend constexpr auto get_min_length(
+        detail::basic_protocol_type_tag<oxm_match>) noexcept
       -> std::uint16_t
     {
       return base_size;
     }
 
-    friend constexpr auto exclude_padding(oxm_match*) noexcept
+    friend constexpr auto exclude_padding(
+        detail::basic_protocol_type_tag<oxm_match>) noexcept
       -> bool
     {
       return true;

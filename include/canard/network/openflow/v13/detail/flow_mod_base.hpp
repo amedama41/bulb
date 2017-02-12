@@ -194,7 +194,8 @@ namespace flow_mod_detail {
 
         friend typename base_t::basic_protocol_type;
 
-        friend constexpr auto get_min_length(FlowMod*) noexcept
+        friend constexpr auto get_min_length(
+                detail::basic_protocol_type_tag<FlowMod>) noexcept
             -> std::uint16_t
         {
             return sizeof(raw_ofp_type) + oxm_match::min_byte_length();
