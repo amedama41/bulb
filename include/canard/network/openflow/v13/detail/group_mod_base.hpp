@@ -7,7 +7,7 @@
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/list.hpp>
-#include <canard/network/openflow/v13/bucket.hpp>
+#include <canard/network/openflow/v13/common/bucket.hpp>
 #include <canard/network/openflow/v13/detail/basic_openflow_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
