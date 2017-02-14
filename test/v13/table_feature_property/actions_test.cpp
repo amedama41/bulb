@@ -22,7 +22,7 @@ struct write_actions_fixture
         , v13::action_id{protocol::OFPAT_POP_VLAN}
         , v13::action_id{protocol::OFPAT_PUSH_MPLS}
         , v13::action_id{protocol::OFPAT_SET_QUEUE}
-        , v13::action_experimenter_id{0x12345678, {'A', 'B'}}
+        , v13::action_id{0x12345678, {'A', 'B'}}
     };
     std::vector<unsigned char> binary
         = "\x00\x04\x00\x26\x00\x00\x00\x04""\x00\x16\x00\x04\x00\x19\x00\x04"
@@ -92,8 +92,7 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
     {
         auto const output = v13::action_id{protocol::OFPAT_OUTPUT};
         auto const set_field = v13::action_id{protocol::OFPAT_SET_FIELD};
-        auto const experimenter
-            = v13::action_experimenter_id{0x12345678, {'A', 'B'}};
+        auto const experimenter = v13::action_id{0x12345678, {'A', 'B'}};
         auto const push_vlan = v13::action_id{protocol::OFPAT_PUSH_VLAN};
 
         auto const sut = table_feature_properties::write_actions{
@@ -160,7 +159,7 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
         auto const sut = table_feature_properties::write_actions{
             v13::action_id{protocol::OFPAT_OUTPUT}
           , v13::action_id{protocol::OFPAT_SET_FIELD}
-          , v13::action_experimenter_id{0x12345678}
+          , v13::action_id{0x12345678, {}}
         };
 
         BOOST_TEST((sut == sut));
@@ -171,12 +170,12 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
             (table_feature_properties::write_actions{
                  v13::action_id{protocol::OFPAT_OUTPUT}
                , v13::action_id{protocol::OFPAT_SET_FIELD}
-               , v13::action_experimenter_id{0x12345678}
+               , v13::action_id{0x12345678, {}}
              }
              == table_feature_properties::write_actions{
                  v13::action_id{protocol::OFPAT_OUTPUT}
                , v13::action_id{protocol::OFPAT_SET_FIELD}
-               , v13::action_experimenter_id{0x12345678}
+               , v13::action_id{0x12345678, {}}
              }));
       }
       BOOST_AUTO_TEST_CASE(true_if_both_action_ids_are_emtpy)
@@ -191,12 +190,12 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
             (table_feature_properties::write_actions{
                  v13::action_id{protocol::OFPAT_OUTPUT}
                , v13::action_id{protocol::OFPAT_SET_FIELD}
-               , v13::action_experimenter_id{0x12345678}
+               , v13::action_id{0x12345678, {}}
              }
              != table_feature_properties::write_actions{
                  v13::action_id{protocol::OFPAT_OUTPUT}
                , v13::action_id{protocol::OFPAT_SET_FIELD}
-               , v13::action_experimenter_id{0x87654321}
+               , v13::action_id{0x87654321, {}}
              }));
       }
       BOOST_AUTO_TEST_CASE(false_if_action_id_type_is_not_equal)
@@ -205,12 +204,12 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
             (table_feature_properties::write_actions{
                 v13::action_id{protocol::OFPAT_OUTPUT}
               , v13::action_id{protocol::OFPAT_SET_FIELD}
-              , v13::action_experimenter_id{0x12345678}
+              , v13::action_id{0x12345678, {}}
             }
             != table_feature_properties::write_actions{
                 v13::action_id{protocol::OFPAT_GROUP}
               , v13::action_id{protocol::OFPAT_SET_FIELD}
-              , v13::action_experimenter_id{0x12345678}
+              , v13::action_id{0x12345678, {}}
             }));
       }
       BOOST_AUTO_TEST_CASE(false_if_action_id_order_is_not_equal)
@@ -219,11 +218,11 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
            (table_feature_properties::write_actions{
                 v13::action_id{protocol::OFPAT_OUTPUT}
               , v13::action_id{protocol::OFPAT_SET_FIELD}
-              , v13::action_experimenter_id{0x12345678}
+              , v13::action_id{0x12345678, {}}
             }
             != table_feature_properties::write_actions{
                 v13::action_id{protocol::OFPAT_SET_FIELD}
-              , v13::action_experimenter_id{0x12345678}
+              , v13::action_id{0x12345678, {}}
               , v13::action_id{protocol::OFPAT_OUTPUT}
             }));
       }
@@ -233,7 +232,7 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
             (table_feature_properties::write_actions{
                 v13::action_id{protocol::OFPAT_OUTPUT}
               , v13::action_id{protocol::OFPAT_SET_FIELD}
-              , v13::action_experimenter_id{0x12345678}
+              , v13::action_id{0x12345678, {}}
             }
             != table_feature_properties::write_actions{
                 v13::action_id{protocol::OFPAT_OUTPUT}
@@ -248,7 +247,7 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
         auto const sut = table_feature_properties::write_actions{
             v13::action_id{protocol::OFPAT_OUTPUT}
           , v13::action_id{protocol::OFPAT_SET_FIELD}
-          , v13::action_experimenter_id{0x12345678}
+          , v13::action_id{0x12345678, {}}
         };
 
         BOOST_TEST(equivalent(sut, sut));
@@ -260,12 +259,12 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
                 table_feature_properties::write_actions{
                     v13::action_id{protocol::OFPAT_OUTPUT}
                   , v13::action_id{protocol::OFPAT_SET_FIELD}
-                  , v13::action_experimenter_id{0x12345678}
+                  , v13::action_id{0x12345678, {}}
                 }
               , table_feature_properties::write_actions{
                     v13::action_id{protocol::OFPAT_OUTPUT}
                   , v13::action_id{protocol::OFPAT_SET_FIELD}
-                  , v13::action_experimenter_id{0x12345678}
+                  , v13::action_id{0x12345678, {}}
                 }));
       }
       BOOST_AUTO_TEST_CASE(true_if_both_action_ids_are_emtpy)
@@ -282,12 +281,12 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
                 table_feature_properties::write_actions{
                     v13::action_id{protocol::OFPAT_OUTPUT}
                   , v13::action_id{protocol::OFPAT_SET_FIELD}
-                  , v13::action_experimenter_id{0x12345678}
+                  , v13::action_id{0x12345678, {}}
                 }
               , table_feature_properties::write_actions{
                     v13::action_id{protocol::OFPAT_OUTPUT}
                   , v13::action_id{protocol::OFPAT_SET_FIELD}
-                  , v13::action_experimenter_id{0x87654321}
+                  , v13::action_id{0x87654321, {}}
                 }));
       }
       BOOST_AUTO_TEST_CASE(false_if_action_id_type_is_not_equal)
@@ -297,12 +296,12 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
                 table_feature_properties::write_actions{
                     v13::action_id{protocol::OFPAT_OUTPUT}
                   , v13::action_id{protocol::OFPAT_SET_FIELD}
-                  , v13::action_experimenter_id{0x12345678}
+                  , v13::action_id{0x12345678, {}}
                 }
               , table_feature_properties::write_actions{
                     v13::action_id{protocol::OFPAT_GROUP}
                   , v13::action_id{protocol::OFPAT_SET_FIELD}
-                  , v13::action_experimenter_id{0x12345678}
+                  , v13::action_id{0x12345678, {}}
                 }));
       }
       BOOST_AUTO_TEST_CASE(true_if_action_id_order_is_not_equal)
@@ -312,11 +311,11 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
                table_feature_properties::write_actions{
                    v13::action_id{protocol::OFPAT_OUTPUT}
                  , v13::action_id{protocol::OFPAT_SET_FIELD}
-                 , v13::action_experimenter_id{0x12345678}
+                 , v13::action_id{0x12345678, {}}
                }
              , table_feature_properties::write_actions{
                    v13::action_id{protocol::OFPAT_SET_FIELD}
-                 , v13::action_experimenter_id{0x12345678}
+                 , v13::action_id{0x12345678, {}}
                  , v13::action_id{protocol::OFPAT_OUTPUT}
                }));
       }
@@ -327,7 +326,7 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
                 table_feature_properties::write_actions{
                     v13::action_id{protocol::OFPAT_OUTPUT}
                   , v13::action_id{protocol::OFPAT_SET_FIELD}
-                  , v13::action_experimenter_id{0x12345678}
+                  , v13::action_id{0x12345678, {}}
                 }
               , table_feature_properties::write_actions{
                     v13::action_id{protocol::OFPAT_OUTPUT}
