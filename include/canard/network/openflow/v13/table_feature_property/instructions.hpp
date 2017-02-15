@@ -12,9 +12,9 @@
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/list.hpp>
 #include <canard/network/openflow/type_traits/is_all_constructible.hpp>
-#include <canard/network/openflow/v13/any_instruction_id.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/network/openflow/v13/table_feature_property/id/instruction_id.hpp>
 
 namespace canard {
 namespace net {
@@ -28,7 +28,7 @@ namespace table_feature_properties {
     {
     public:
         using raw_ofp_type = protocol::ofp_table_feature_prop_instructions;
-        using instruction_ids_type = ofp::list<any_instruction_id>;
+        using instruction_ids_type = ofp::list<instruction_id>;
         using iterator = instruction_ids_type::iterator;
         using const_iterator = instruction_ids_type::const_iterator;
 
@@ -166,7 +166,7 @@ namespace table_feature_properties {
         {
             detail::encode(container, table_feature_prop_instructions_);
             boost::for_each(
-                    instruction_ids_, [&](any_instruction_id const& id) {
+                    instruction_ids_, [&](instruction_id const& id) {
                 id.encode(container);
             });
         }

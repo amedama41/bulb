@@ -1,8 +1,11 @@
 #ifndef CANARD_NET_OFP_V13_INSTRUCTION_ID_HPP
 #define CANARD_NET_OFP_V13_INSTRUCTION_ID_HPP
 
+#include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <stdexcept>
+#include <type_traits>
 #include <utility>
 #include <canard/network/openflow/data_type.hpp>
 #include <canard/network/openflow/detail/basic_protocol_type.hpp>
@@ -16,187 +19,170 @@ namespace net {
 namespace ofp {
 namespace v13 {
 
-    class instruction_id
-        : public detail::basic_protocol_type<instruction_id>
+  class instruction_id
+    : public detail::basic_protocol_type<instruction_id>
+  {
+    static constexpr std::uint16_t base_size
+      = sizeof(protocol::ofp_instruction);
+
+  public:
+    using raw_ofp_type = protocol::ofp_instruction;
+    using raw_ofp_exp_type = protocol::ofp_instruction_experimenter;
+    using data_type = ofp::data_type;
+
+    explicit instruction_id(std::uint16_t const type) noexcept
+      : instruction_header_{type, base_size, 0}
+      , data_{}
     {
-    public:
-        using raw_ofp_type = protocol::ofp_instruction;
+    }
 
-        explicit instruction_id(std::uint16_t const type) noexcept
-            : type_{type}
-        {
+    instruction_id(std::uint32_t const experimenter_id, data_type data) noexcept
+      : instruction_header_{
+            protocol::OFPIT_EXPERIMENTER
+          , ofp::calc_ofp_length(data, sizeof(raw_ofp_exp_type))
+          , experimenter_id
         }
-
-        auto type() const noexcept
-            -> protocol::ofp_instruction_type
-        {
-            return protocol::ofp_instruction_type(type_);
-        }
-
-        static constexpr auto length() noexcept
-            -> std::uint16_t
-        {
-            return sizeof(raw_ofp_type);
-        }
-
-        static void validate_instruction_header(
-                protocol::ofp_instruction const& instruction)
-        {
-            if (instruction.type == protocol::OFPIT_EXPERIMENTER) {
-                throw std::runtime_error{"invalid instruction type"};
-            }
-            if (instruction.len != length()) {
-                throw std::runtime_error{"instruction id length must be 4"};
-            }
-        }
-
-    private:
-        friend basic_protocol_type;
-
-        template <class Container>
-        void encode_impl(Container& container) const
-        {
-            detail::encode(
-                    container, raw_ofp_type{std::uint16_t(type()), length()});
-        }
-
-        template <class Iterator>
-        static auto decode_impl(Iterator& first, Iterator last)
-            -> instruction_id
-        {
-            auto const id = detail::decode<raw_ofp_type>(first, last);
-            return instruction_id{id.type};
-        }
-
-        auto equal_impl(instruction_id const& rhs) const noexcept
-            -> bool
-        {
-            return type_ == rhs.type_;
-        }
-
-        auto equivalent_impl(instruction_id const& rhs) const noexcept
-            -> bool
-        {
-            return type_ == rhs.type_;
-        }
-
-    private:
-        std::uint16_t type_;
-    };
-
-
-    class instruction_experimenter_id
-        : public detail::basic_protocol_type<instruction_experimenter_id>
+      , data_(std::move(data))
     {
-    public:
-        using raw_ofp_type = protocol::ofp_instruction_experimenter;
-        using data_type = ofp::data_type;
+    }
 
-        explicit instruction_experimenter_id(
-                std::uint32_t const experimenter)
-            : experimenter_(experimenter)
-            , data_{}
-        {
+    instruction_id(instruction_id const&) = default;
+
+    instruction_id(instruction_id&& other) noexcept
+      : instruction_header_(other.instruction_header_)
+      , data_(other.extract_data())
+    {
+    }
+
+    auto operator=(instruction_id const&)
+      -> instruction_id& = default;
+
+    auto operator=(instruction_id&& other) noexcept
+      -> instruction_id&
+    {
+      auto tmp = std::move(other);
+      std::swap(instruction_header_, tmp.instruction_header_);
+      data_.swap(tmp.data_);
+      return *this;
+    }
+
+    auto type() const noexcept
+      -> std::uint16_t
+    {
+      return instruction_header_.type;
+    }
+
+    auto length() const noexcept
+      -> std::uint16_t
+    {
+      return instruction_header_.len;
+    }
+
+    auto is_experimenter() const noexcept
+      -> bool
+    {
+      return type() == protocol::OFPIT_EXPERIMENTER;
+    }
+
+    auto experimenter_id() const noexcept
+      -> std::uint32_t
+    {
+      return instruction_header_.experimenter;
+    }
+
+    auto data() const noexcept
+      -> data_type const&
+    {
+      return data_;
+    }
+
+    auto extract_data() noexcept
+      -> data_type
+    {
+      auto data = data_type{};
+      data.swap(data_);
+      instruction_header_.len -= data.size();
+      return data;
+    }
+
+  private:
+    instruction_id(raw_ofp_exp_type const& header, data_type&& data) noexcept
+      : instruction_header_(header)
+      , data_(std::move(data))
+    {
+    }
+
+    friend basic_protocol_type;
+
+    template <class Container>
+    void encode_impl(Container& container) const
+    {
+      if (is_experimenter()) {
+        detail::encode(container, instruction_header_);
+      }
+      else {
+        detail::encode(
+              container, instruction_header_
+            , std::integral_constant<std::size_t, base_size>{});
+      }
+      detail::encode_byte_array(container, data_.data(), data_.size());
+    }
+
+    template <class Iterator>
+    static auto decode_impl(Iterator& first, Iterator last)
+      -> instruction_id
+    {
+      auto header = detail::decode<raw_ofp_exp_type>(
+          first, last, std::integral_constant<std::size_t, base_size>{});
+      if (header.len < base_size) {
+        throw std::runtime_error{"too small instruction_id length"};
+      }
+
+      auto rest_size = std::uint16_t(header.len - base_size);
+      if (std::distance(first, last) < rest_size) {
+        throw std::runtime_error{"too short byte length"};
+      }
+
+      if (header.type == protocol::OFPIT_EXPERIMENTER) {
+        if (rest_size < sizeof(header.experimenter)) {
+          throw std::runtime_error{"invalid instruction_id length"};
         }
+        header.experimenter = detail::decode<std::uint32_t>(first, last);
+        rest_size -= sizeof(header.experimenter);
+      }
 
-        instruction_experimenter_id(
-                std::uint32_t const experimenter, data_type data)
-            : experimenter_(experimenter)
-            , data_(std::move(data))
-        {
-        }
+      auto data = ofp::decode_data(first, rest_size);
 
-        static constexpr auto type() noexcept
-            -> protocol::ofp_instruction_type
-        {
-            return protocol::OFPIT_EXPERIMENTER;
-        }
+      return instruction_id{header, std::move(data)};
+    }
 
-        auto length() const noexcept
-            -> std::uint16_t
-        {
-            return sizeof(raw_ofp_type) + data_.size();
-        }
+    auto equal_impl(instruction_id const& rhs) const noexcept
+      -> bool
+    {
+      auto const cmp_size
+        = is_experimenter() ? sizeof(raw_ofp_exp_type) : base_size;
+      return (std::memcmp(
+            &instruction_header_, &rhs.instruction_header_, cmp_size) == 0)
+          && data_ == rhs.data_;
+    }
 
-        auto experimenter() const noexcept
-            -> std::uint32_t
-        {
-            return experimenter_;
-        }
+    auto equivalent_impl(instruction_id const& rhs) const noexcept
+      -> bool
+    {
+      if (is_experimenter()) {
+        return rhs.is_experimenter()
+            && experimenter_id() == rhs.experimenter_id()
+            && data() == rhs.data();
+      }
+      else {
+        return type() == rhs.type();
+      }
+    }
 
-        auto data() const noexcept
-            -> data_type const&
-        {
-            return data_;
-        }
-
-        auto extract_data()
-            -> data_type
-        {
-            auto data = data_type{};
-            data.swap(data_);
-            return data;
-        }
-
-        static void validate_instruction_header(
-                protocol::ofp_instruction const& instruction)
-        {
-            if (instruction.type != protocol::OFPIT_EXPERIMENTER) {
-                throw std::runtime_error{"invalid instruction type"};
-            }
-            if (instruction.len < sizeof(raw_ofp_type)) {
-                throw std::runtime_error{
-                    "instruction experimenter id length is too small"
-                };
-            }
-        }
-
-    private:
-        friend basic_protocol_type;
-
-        template <class Container>
-        void encode_impl(Container& container) const
-        {
-            auto const exp_header = raw_ofp_type{
-                std::uint16_t(type()), length(), experimenter()
-            };
-            detail::encode(container, exp_header);
-            detail::encode_byte_array(container, data_.data(), data_.size());
-        }
-
-        template <class Iterator>
-        static auto decode_impl(Iterator& first, Iterator last)
-            -> instruction_experimenter_id
-        {
-            auto const exp_header = detail::decode<raw_ofp_type>(first, last);
-
-            auto data = ofp::decode_data(
-                    first, exp_header.len - sizeof(raw_ofp_type));
-
-            return instruction_experimenter_id{
-                exp_header.experimenter, std::move(data)
-            };
-        }
-
-        auto equal_impl(instruction_experimenter_id const& rhs) const noexcept
-            -> bool
-        {
-            return experimenter_ == rhs.experimenter_
-                && data_ == rhs.data_;
-        }
-
-        auto equivalent_impl(
-                instruction_experimenter_id const& rhs) const noexcept
-            -> bool
-        {
-            return experimenter_ == rhs.experimenter_
-                && data_ == rhs.data_;
-        }
-
-    private:
-        std::uint32_t experimenter_;
-        data_type data_;
-    };
+  private:
+    raw_ofp_exp_type instruction_header_;
+    data_type data_;
+  };
 
 } // namespace v13
 } // namespace ofp
