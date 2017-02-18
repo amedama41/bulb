@@ -50,6 +50,7 @@ BOOST_AUTO_TEST_SUITE(instruction_id)
           sut.length()
        == sizeof(protocol::ofp_instruction_experimenter) + data.size());
       BOOST_TEST(sut.is_experimenter());
+      BOOST_TEST(sut.experimenter_id() == experimenter_id);
       BOOST_TEST(sut.data() == data, boost::test_tools::per_element{});
     }
     BOOST_FIXTURE_TEST_CASE(
