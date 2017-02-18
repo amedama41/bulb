@@ -14,56 +14,44 @@ namespace v13 {
 
   namespace oxm_header_ops {
 
-    using oxm_header_type = std::uint32_t;
-
     constexpr auto oxm_header(
-          std::uint32_t const oxm_class
+          std::uint16_t const oxm_class
         , std::uint8_t const oxm_field
+        , bool const oxm_hasmask
         , std::uint8_t const oxm_length) noexcept
-      -> oxm_header_type
+      -> std::uint32_t
     {
-      return std::uint32_t(oxm_class << 16)
-           | std::uint32_t(oxm_field << 9)
+      return std::uint32_t(oxm_class) << 16
+           | std::uint32_t(oxm_field) << 9
+           | std::uint32_t(oxm_hasmask) << 8
            | std::uint32_t(oxm_length);
     }
 
-    constexpr auto oxm_header_w(
-          std::uint32_t const oxm_class
-        , std::uint8_t const oxm_field
-        , std::uint8_t const oxm_length) noexcept
-      -> oxm_header_type
-    {
-      return std::uint32_t(oxm_class << 16)
-           | std::uint32_t(oxm_field << 9)
-           | std::uint32_t(0x00000100)
-           | std::uint32_t(oxm_length);
-    }
-
-    constexpr auto oxm_class(oxm_header_type const oxm_header) noexcept
+    constexpr auto oxm_class(std::uint32_t const oxm_header) noexcept
       -> std::uint16_t
     {
       return oxm_header >> 16;
     }
 
-    constexpr auto oxm_field(oxm_header_type const oxm_header) noexcept
+    constexpr auto oxm_field(std::uint32_t const oxm_header) noexcept
       -> std::uint8_t
     {
       return (oxm_header >> 9) & 0x7f;
     }
 
-    constexpr auto oxm_type(oxm_header_type const oxm_header) noexcept
+    constexpr auto oxm_type(std::uint32_t const oxm_header) noexcept
       -> std::uint32_t
     {
       return oxm_header >> 9;
     }
 
-    constexpr auto oxm_hasmask(oxm_header_type const oxm_header) noexcept
+    constexpr auto oxm_hasmask(std::uint32_t const oxm_header) noexcept
       -> bool
     {
       return oxm_header & 0x00000100;
     }
 
-    constexpr auto oxm_length(oxm_header_type const oxm_header) noexcept
+    constexpr auto oxm_length(std::uint32_t const oxm_header) noexcept
       -> std::uint8_t
     {
       return oxm_header & 0x000000ff;
@@ -76,7 +64,7 @@ namespace v13 {
     : public detail::basic_protocol_type<oxm_header>
   {
   public:
-    using raw_ofp_type = oxm_header_ops::oxm_header_type;
+    using raw_ofp_type = std::uint32_t;
 
     constexpr explicit oxm_header(std::uint32_t const oxm_header) noexcept
       : oxm_header_(oxm_header)
