@@ -22,7 +22,7 @@ struct instructions_fixture
         , v13::instruction_id{protocol::OFPIT_APPLY_ACTIONS}
         , v13::instruction_id{protocol::OFPIT_CLEAR_ACTIONS}
         , v13::instruction_id{protocol::OFPIT_METER}
-        , v13::instruction_experimenter_id{0x12345678, {'A', 'B'}}
+        , v13::instruction_id{0x12345678, {'A', 'B'}}
     };
     std::vector<unsigned char> binary
         = "\x00\x00\x00\x26\x00\x01\x00\x04""\x00\x02\x00\x04\x00\x03\x00\x04"
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_SUITE(instructions_test)
         auto const clear_actions
             = v13::instruction_id{protocol::OFPIT_CLEAR_ACTIONS};
         auto const meter = v13::instruction_id{protocol::OFPIT_METER};
-        auto const experimenter = v13::instruction_experimenter_id{32};
+        auto const experimenter = v13::instruction_id{32, {}};
 
         auto const sut = table_feature_properties::instructions{
               goto_table, write_metadata
@@ -170,7 +170,7 @@ BOOST_AUTO_TEST_SUITE(instructions_test)
         auto const sut = table_feature_properties::instructions{
             v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
           , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
-          , v13::instruction_experimenter_id{0x12345678}
+          , v13::instruction_id{0x12345678, {}}
         };
 
         BOOST_TEST((sut == sut));
@@ -181,12 +181,12 @@ BOOST_AUTO_TEST_SUITE(instructions_test)
             (table_feature_properties::instructions{
                 v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
               , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
-              , v13::instruction_experimenter_id{0x12345678}
+              , v13::instruction_id{0x12345678, {}}
              }
              == table_feature_properties::instructions{
                 v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
               , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
-              , v13::instruction_experimenter_id{0x12345678}
+              , v13::instruction_id{0x12345678, {}}
              }));
       }
       BOOST_AUTO_TEST_CASE(true_if_both_instruction_ids_are_emtpy)
@@ -201,12 +201,12 @@ BOOST_AUTO_TEST_SUITE(instructions_test)
             (table_feature_properties::instructions{
                 v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
               , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
-              , v13::instruction_experimenter_id{0x12345678}
+              , v13::instruction_id{0x12345678, {}}
              }
              != table_feature_properties::instructions{
                 v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
               , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
-              , v13::instruction_experimenter_id{0x87654321}
+              , v13::instruction_id{0x87654321, {}}
              }));
       }
       BOOST_AUTO_TEST_CASE(false_if_instruction_id_type_is_not_equal)
@@ -215,12 +215,12 @@ BOOST_AUTO_TEST_SUITE(instructions_test)
             (table_feature_properties::instructions{
                 v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
               , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
-              , v13::instruction_experimenter_id{0x12345678}
+              , v13::instruction_id{0x12345678, {}}
             }
             != table_feature_properties::instructions{
                 v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
               , v13::instruction_id{protocol::OFPIT_APPLY_ACTIONS}
-              , v13::instruction_experimenter_id{0x12345678}
+              , v13::instruction_id{0x12345678, {}}
             }));
       }
       BOOST_AUTO_TEST_CASE(false_if_instruction_id_order_is_not_equal)
@@ -229,11 +229,11 @@ BOOST_AUTO_TEST_SUITE(instructions_test)
            (table_feature_properties::instructions{
                 v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
               , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
-              , v13::instruction_experimenter_id{0x12345678}
+              , v13::instruction_id{0x12345678, {}}
             }
             != table_feature_properties::instructions{
                 v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
-              , v13::instruction_experimenter_id{0x12345678}
+              , v13::instruction_id{0x12345678, {}}
               , v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
             }));
       }
@@ -243,7 +243,7 @@ BOOST_AUTO_TEST_SUITE(instructions_test)
             (table_feature_properties::instructions{
                 v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
               , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
-              , v13::instruction_experimenter_id{0x12345678}
+              , v13::instruction_id{0x12345678, {}}
             }
             != table_feature_properties::instructions{
                 v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
@@ -258,7 +258,7 @@ BOOST_AUTO_TEST_SUITE(instructions_test)
         auto const sut = table_feature_properties::instructions{
             v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
           , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
-          , v13::instruction_experimenter_id{0x12345678}
+          , v13::instruction_id{0x12345678, {}}
         };
 
         BOOST_TEST(equivalent(sut, sut));
@@ -270,12 +270,12 @@ BOOST_AUTO_TEST_SUITE(instructions_test)
                 table_feature_properties::instructions{
                     v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
                   , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
-                  , v13::instruction_experimenter_id{0x12345678}
+                  , v13::instruction_id{0x12345678, {}}
                 }
               , table_feature_properties::instructions{
                     v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
                   , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
-                  , v13::instruction_experimenter_id{0x12345678}
+                  , v13::instruction_id{0x12345678, {}}
                 }));
       }
       BOOST_AUTO_TEST_CASE(true_if_both_instruction_ids_are_emtpy)
@@ -292,12 +292,12 @@ BOOST_AUTO_TEST_SUITE(instructions_test)
                 table_feature_properties::instructions{
                     v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
                   , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
-                  , v13::instruction_experimenter_id{0x12345678}
+                  , v13::instruction_id{0x12345678, {}}
                 }
               , table_feature_properties::instructions{
                     v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
                   , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
-                  , v13::instruction_experimenter_id{0x87654321}
+                  , v13::instruction_id{0x87654321, {}}
                 }));
       }
       BOOST_AUTO_TEST_CASE(false_if_instruction_id_type_is_not_equal)
@@ -307,12 +307,12 @@ BOOST_AUTO_TEST_SUITE(instructions_test)
                 table_feature_properties::instructions{
                     v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
                   , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
-                  , v13::instruction_experimenter_id{0x12345678}
+                  , v13::instruction_id{0x12345678, {}}
                 }
               , table_feature_properties::instructions{
                     v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
                   , v13::instruction_id{protocol::OFPIT_APPLY_ACTIONS}
-                  , v13::instruction_experimenter_id{0x12345678}
+                  , v13::instruction_id{0x12345678, {}}
                 }));
       }
       BOOST_AUTO_TEST_CASE(true_if_instruction_id_order_is_not_equal)
@@ -322,11 +322,11 @@ BOOST_AUTO_TEST_SUITE(instructions_test)
                 table_feature_properties::instructions{
                     v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
                   , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
-                  , v13::instruction_experimenter_id{0x12345678}
+                  , v13::instruction_id{0x12345678, {}}
                 }
               , table_feature_properties::instructions{
                     v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
-                  , v13::instruction_experimenter_id{0x12345678}
+                  , v13::instruction_id{0x12345678, {}}
                   , v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
                 }));
       }
@@ -337,7 +337,7 @@ BOOST_AUTO_TEST_SUITE(instructions_test)
                 table_feature_properties::instructions{
                     v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
                   , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
-                  , v13::instruction_experimenter_id{0x12345678}
+                  , v13::instruction_id{0x12345678, {}}
                 }
               , table_feature_properties::instructions{
                     v13::instruction_id{protocol::OFPIT_GOTO_TABLE}

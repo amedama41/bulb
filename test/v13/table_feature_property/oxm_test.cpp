@@ -23,7 +23,7 @@ struct match_fixture
         , v13::oxm_id{OXM_OF_IPV4_SRC_W}
         , v13::oxm_id{OXM_OF_IP_PROTO}
         , v13::oxm_id{OXM_OF_TCP_DST}
-        , v13::oxm_experimenter_id{0x12, true, 0x34, 0x12345678}
+        , v13::oxm_id{0x12, true, 0x34, 0x12345678}
     };
     std::vector<unsigned char> binary
         = "\x00\x08\x00\x24\x80\x00\x00\x04""\x80\x00\x09\x0c\x80\x00\x0a\x02"
@@ -95,8 +95,7 @@ BOOST_AUTO_TEST_SUITE(match_test)
         auto const eth_dst = v13::oxm_id{OXM_OF_ETH_DST_W};
         auto const ip_proto = v13::oxm_id{OXM_OF_IP_PROTO};
         auto const tcp_src = v13::oxm_id{OXM_OF_TCP_SRC};
-        auto const experimenter
-            = v13::oxm_experimenter_id{0x12, true, 0x04, 0x12345678};
+        auto const experimenter = v13::oxm_id{0x12, true, 0x04, 0x12345678};
 
         auto const sut = table_feature_properties::match{
             in_port, eth_dst, ip_proto, tcp_src, experimenter
@@ -159,7 +158,7 @@ BOOST_AUTO_TEST_SUITE(match_test)
         auto const sut = table_feature_properties::match{
             v13::oxm_id{OXM_OF_IN_PORT}
           , v13::oxm_id{OXM_OF_ETH_SRC_W}
-          , v13::oxm_experimenter_id{0x12, true, 0x04, 0x12345678}
+          , v13::oxm_id{0x12, true, 0x04, 0x12345678}
         };
 
         BOOST_TEST((sut == sut));
@@ -170,12 +169,12 @@ BOOST_AUTO_TEST_SUITE(match_test)
             (table_feature_properties::match{
                  v13::oxm_id{OXM_OF_IN_PORT}
                , v13::oxm_id{OXM_OF_ETH_SRC_W}
-               , v13::oxm_experimenter_id{0x12, true, 0x04, 0x12345678}
+               , v13::oxm_id{0x12, true, 0x04, 0x12345678}
              }
              == table_feature_properties::match{
                  v13::oxm_id{OXM_OF_IN_PORT}
                , v13::oxm_id{OXM_OF_ETH_SRC_W}
-               , v13::oxm_experimenter_id{0x12, true, 0x04, 0x12345678}
+               , v13::oxm_id{0x12, true, 0x04, 0x12345678}
              }));
       }
       BOOST_AUTO_TEST_CASE(true_if_both_oxm_ids_are_emtpy)
@@ -190,12 +189,12 @@ BOOST_AUTO_TEST_SUITE(match_test)
             (table_feature_properties::match{
                  v13::oxm_id{OXM_OF_IN_PORT}
                , v13::oxm_id{OXM_OF_ETH_SRC_W}
-               , v13::oxm_experimenter_id{0x12, true, 0x04, 0x12345678}
+               , v13::oxm_id{0x12, true, 0x04, 0x12345678}
              }
              != table_feature_properties::match{
                  v13::oxm_id{OXM_OF_IN_PORT}
                , v13::oxm_id{OXM_OF_ETH_SRC_W}
-               , v13::oxm_experimenter_id{0x12, true, 0x04, 0x87654321}
+               , v13::oxm_id{0x12, true, 0x04, 0x87654321}
              }));
       }
       BOOST_AUTO_TEST_CASE(false_if_oxm_id_type_is_not_equal)
@@ -204,12 +203,12 @@ BOOST_AUTO_TEST_SUITE(match_test)
             (table_feature_properties::match{
                  v13::oxm_id{OXM_OF_IN_PORT}
                , v13::oxm_id{OXM_OF_ETH_SRC_W}
-               , v13::oxm_experimenter_id{0x12, true, 0x04, 0x12345678}
+               , v13::oxm_id{0x12, true, 0x04, 0x12345678}
              }
              != table_feature_properties::match{
                  v13::oxm_id{OXM_OF_IN_PORT}
                , v13::oxm_id{OXM_OF_ETH_SRC}
-               , v13::oxm_experimenter_id{0x12, true, 0x04, 0x12345678}
+               , v13::oxm_id{0x12, true, 0x04, 0x12345678}
              }));
       }
       BOOST_AUTO_TEST_CASE(false_if_oxm_id_order_is_not_equal)
@@ -218,11 +217,11 @@ BOOST_AUTO_TEST_SUITE(match_test)
             (table_feature_properties::match{
                  v13::oxm_id{OXM_OF_IN_PORT}
                , v13::oxm_id{OXM_OF_ETH_SRC_W}
-               , v13::oxm_experimenter_id{0x12, true, 0x04, 0x12345678}
+               , v13::oxm_id{0x12, true, 0x04, 0x12345678}
              }
              != table_feature_properties::match{
                  v13::oxm_id{OXM_OF_ETH_SRC_W}
-               , v13::oxm_experimenter_id{0x12, true, 0x04, 0x12345678}
+               , v13::oxm_id{0x12, true, 0x04, 0x12345678}
                , v13::oxm_id{OXM_OF_IN_PORT}
              }));
       }
@@ -232,7 +231,7 @@ BOOST_AUTO_TEST_SUITE(match_test)
             (table_feature_properties::match{
                  v13::oxm_id{OXM_OF_IN_PORT}
                , v13::oxm_id{OXM_OF_ETH_SRC_W}
-               , v13::oxm_experimenter_id{0x12, true, 0x04, 0x12345678}
+               , v13::oxm_id{0x12, true, 0x04, 0x12345678}
              }
              != table_feature_properties::match{
                  v13::oxm_id{OXM_OF_IN_PORT}
@@ -247,7 +246,7 @@ BOOST_AUTO_TEST_SUITE(match_test)
         auto const sut = table_feature_properties::match{
             v13::oxm_id{OXM_OF_IN_PORT}
           , v13::oxm_id{OXM_OF_ETH_SRC_W}
-          , v13::oxm_experimenter_id{0x12, true, 0x04, 0x12345678}
+          , v13::oxm_id{0x12, true, 0x04, 0x12345678}
         };
 
         BOOST_TEST(equivalent(sut, sut));
@@ -259,12 +258,12 @@ BOOST_AUTO_TEST_SUITE(match_test)
                 table_feature_properties::match{
                     v13::oxm_id{OXM_OF_IN_PORT}
                   , v13::oxm_id{OXM_OF_ETH_SRC_W}
-                  , v13::oxm_experimenter_id{0x12, true, 0x04, 0x12345678}
+                  , v13::oxm_id{0x12, true, 0x04, 0x12345678}
                 }
               , table_feature_properties::match{
                     v13::oxm_id{OXM_OF_IN_PORT}
                   , v13::oxm_id{OXM_OF_ETH_SRC_W}
-                  , v13::oxm_experimenter_id{0x12, true, 0x04, 0x12345678}
+                  , v13::oxm_id{0x12, true, 0x04, 0x12345678}
                 }));
       }
       BOOST_AUTO_TEST_CASE(true_if_both_oxm_ids_are_emtpy)
@@ -281,12 +280,12 @@ BOOST_AUTO_TEST_SUITE(match_test)
                 table_feature_properties::match{
                     v13::oxm_id{OXM_OF_IN_PORT}
                   , v13::oxm_id{OXM_OF_ETH_SRC_W}
-                  , v13::oxm_experimenter_id{0x12, true, 0x04, 0x12345678}
+                  , v13::oxm_id{0x12, true, 0x04, 0x12345678}
                 }
               , table_feature_properties::match{
                     v13::oxm_id{OXM_OF_IN_PORT}
                   , v13::oxm_id{OXM_OF_ETH_SRC_W}
-                  , v13::oxm_experimenter_id{0x12, true, 0x04, 0x87654321}
+                  , v13::oxm_id{0x12, true, 0x04, 0x87654321}
                 }));
       }
       BOOST_AUTO_TEST_CASE(false_if_oxm_id_type_is_not_equal)
@@ -296,12 +295,12 @@ BOOST_AUTO_TEST_SUITE(match_test)
                 table_feature_properties::match{
                     v13::oxm_id{OXM_OF_IN_PORT}
                   , v13::oxm_id{OXM_OF_ETH_SRC_W}
-                  , v13::oxm_experimenter_id{0x12, true, 0x04, 0x12345678}
+                  , v13::oxm_id{0x12, true, 0x04, 0x12345678}
                 }
               , table_feature_properties::match{
                     v13::oxm_id{OXM_OF_IN_PORT}
                   , v13::oxm_id{OXM_OF_ETH_SRC}
-                  , v13::oxm_experimenter_id{0x12, true, 0x04, 0x12345678}
+                  , v13::oxm_id{0x12, true, 0x04, 0x12345678}
                 }));
       }
       BOOST_AUTO_TEST_CASE(true_if_oxm_id_order_is_not_equal)
@@ -311,11 +310,11 @@ BOOST_AUTO_TEST_SUITE(match_test)
                 table_feature_properties::match{
                     v13::oxm_id{OXM_OF_IN_PORT}
                   , v13::oxm_id{OXM_OF_ETH_SRC_W}
-                  , v13::oxm_experimenter_id{0x12, true, 0x04, 0x12345678}
+                  , v13::oxm_id{0x12, true, 0x04, 0x12345678}
                 }
               , table_feature_properties::match{
                     v13::oxm_id{OXM_OF_ETH_SRC_W}
-                  , v13::oxm_experimenter_id{0x12, true, 0x04, 0x12345678}
+                  , v13::oxm_id{0x12, true, 0x04, 0x12345678}
                   , v13::oxm_id{OXM_OF_IN_PORT}
                 }));
       }
@@ -326,7 +325,7 @@ BOOST_AUTO_TEST_SUITE(match_test)
                 table_feature_properties::match{
                     v13::oxm_id{OXM_OF_IN_PORT}
                   , v13::oxm_id{OXM_OF_ETH_SRC_W}
-                  , v13::oxm_experimenter_id{0x12, true, 0x04, 0x12345678}
+                  , v13::oxm_id{0x12, true, 0x04, 0x12345678}
                 }
               , table_feature_properties::match{
                     v13::oxm_id{OXM_OF_IN_PORT}

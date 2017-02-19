@@ -20,7 +20,7 @@ struct table_features_fixture {
                       instruction_id{protocol::OFPIT_GOTO_TABLE}, instruction_id{protocol::OFPIT_WRITE_METADATA}
                     , instruction_id{protocol::OFPIT_WRITE_ACTIONS}, instruction_id{protocol::OFPIT_APPLY_ACTIONS}
                     , instruction_id{protocol::OFPIT_CLEAR_ACTIONS}, instruction_id{protocol::OFPIT_METER}
-                    , instruction_experimenter_id{32, {'A', 'B'}}
+                    , instruction_id{32, {'A', 'B'}}
                   } // 4 + 4 * 6 + (8 + 2) = 38 => 40
                 , table_feature_properties::next_tables{
                     1, 2, 3, 4, 5, 6, 7
@@ -64,7 +64,7 @@ struct table_features_fixture {
                     , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_UDP_DST, false, 2}
                     , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_SCTP_SRC, false, 2}
                     , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_SCTP_DST, false, 2}
-                    , oxm_experimenter_id{0, false, 16, 32}
+                    , oxm_id{std::uint32_t{32}, 0, false, 16}
                   } // 4 + 4 * 18 + 8 = 84 => 88
                 , table_feature_properties::write_setfield{
                       oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_ETH_DST, true, 12}
