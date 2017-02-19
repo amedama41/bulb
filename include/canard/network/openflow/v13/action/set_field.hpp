@@ -76,8 +76,8 @@ namespace actions {
             auto const oxm_header
                 = v13::oxm_header::decode(it, it + sizeof(set_field.field));
 
-            if (auto const error_msg = oxm_match_field::validate_header(
-                        oxm_header.to_ofp_type())) {
+            if (auto const error_msg
+                    = oxm_match_field::validate_header(oxm_header)) {
                 return error_msg;
             }
             if (set_field.len != detail::v13::exact_length(

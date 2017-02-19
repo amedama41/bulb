@@ -295,12 +295,12 @@ namespace v13 {
 
     template <class Iterator>
     static auto decode_value_and_mask(
-          oxm_header_type const oxm_header, Iterator& first, Iterator last
+          ofp::v13::oxm_header const oxm_header, Iterator& first, Iterator last
         , std::true_type)
       -> T
     {
       auto const value = detail::decode<oxm_value_type>(first, last);
-      if (oxm_header & 0x00000100) {
+      if (oxm_header.oxm_hasmask()) {
         auto const mask = detail::decode<oxm_value_type>(first, last);
         return T{value, mask};
       }
@@ -311,13 +311,13 @@ namespace v13 {
 
     template <class Iterator>
     static auto decode_value_and_mask(
-          oxm_header_type const oxm_header, Iterator& first, Iterator last
+          ofp::v13::oxm_header const oxm_header, Iterator& first, Iterator last
         , std::false_type)
       -> T
     {
       constexpr std::size_t N = sizeof(oxm_value_type);
       auto const value_bytes = detail::decode_byte_array<N>(first, last);
-      if (oxm_header & 0x00000100) {
+      if (oxm_header.oxm_hasmask()) {
         auto const mask_bytes = detail::decode_byte_array<N>(first, last);
         return T{
             basic_oxm_match_field_detail::from_bytes<oxm_value_type>(value_bytes)
@@ -366,7 +366,7 @@ namespace v13 {
     static auto decode_impl(Iterator& first, Iterator last)
       -> T
     {
-      auto const oxm_header = detail::decode<oxm_header_type>(first, last);
+      auto const oxm_header = ofp::v13::oxm_header::decode(first, last);
       return decode_value_and_mask(oxm_header, first, last, byte_order{});
     }
 
