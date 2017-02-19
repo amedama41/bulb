@@ -144,9 +144,21 @@ namespace v13 {
     auto oxm_header() const noexcept
       -> oxm_header_type
     {
-      return (oxm_type() << 9)
-           | (oxm_header_type{oxm_hasmask()} << 8)
-           | oxm_length();
+      return oxm_hasmask() ? make_wild_header() : make_header();
+    }
+
+    static constexpr auto make_header() noexcept
+      -> oxm_header_type
+    {
+      return ofp::v13::oxm_header::make_header(
+          oxm_class(), oxm_field(), false, value_length());
+    }
+
+    static constexpr auto make_wild_header() noexcept
+      -> oxm_header_type
+    {
+      return ofp::v13::oxm_header::make_header(
+          oxm_class(), oxm_field(), true, value_length() * 2);
     }
 
     auto oxm_value() const noexcept

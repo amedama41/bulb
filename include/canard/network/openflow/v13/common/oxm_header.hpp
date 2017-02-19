@@ -113,6 +113,17 @@ namespace v13 {
       return sizeof(raw_ofp_type);
     }
 
+    constexpr static auto make_header(
+          std::uint16_t const oxm_class
+        , std::uint8_t const oxm_field
+        , bool const oxm_hasmask
+        , std::uint8_t const oxm_length) noexcept
+      -> raw_ofp_type
+    {
+      return oxm_header_ops::oxm_header(
+          oxm_class, oxm_field, oxm_hasmask, oxm_length);
+    }
+
   private:
     friend basic_protocol_type;
 
