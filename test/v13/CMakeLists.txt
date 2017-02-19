@@ -114,6 +114,9 @@ set(queue_property_srcs
     queue_property/max_rate_test.cpp
     queue_property/validate_header_test.cpp)
 set(table_feature_property_srcs
+    table_feature_property/action_id_test.cpp
+    table_feature_property/instruction_id_test.cpp
+    table_feature_property/oxm_id_test.cpp
     table_feature_property/instructions_test.cpp
     table_feature_property/next_tables_test.cpp
     table_feature_property/actions_test.cpp
