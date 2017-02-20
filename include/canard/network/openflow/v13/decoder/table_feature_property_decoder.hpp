@@ -34,8 +34,8 @@ namespace v13 {
     static auto decode(Iterator& first, Iterator last, Function function)
       -> ReturnType
     {
-      auto it = first;
-      auto const header = detail::decode<header_type>(it, last);
+      auto const header
+        = detail::decode_without_consumption<header_type>(first, last);
 
       if (std::distance(first, last) < header.length) {
         throw std::runtime_error{"too large table feature property length"};

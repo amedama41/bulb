@@ -217,9 +217,9 @@ namespace flow_mod_detail {
             last = std::next(
                     first, flow_mod.header.length - sizeof(raw_ofp_type));
 
-            auto copy_first = first;
             auto const ofp_match
-                = detail::decode<protocol::ofp_match>(copy_first, last);
+                = detail::decode_without_consumption<protocol::ofp_match>(
+                        first, last);
             oxm_match::validate_header(ofp_match);
             if (std::distance(first, last)
                     < v13_detail::exact_length(ofp_match.length)) {

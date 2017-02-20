@@ -163,6 +163,15 @@ namespace detail {
       return t;
     }
 
+    template <class Iterator>
+    static auto decode_without_consumption(Iterator first, Iterator last)
+      -> T
+    {
+      auto t = T::decode_impl(first, last);
+      bpt_detail::optionally_decode_padding(first, last, t);
+      return t;
+    }
+
     template <class... Args>
     static auto create(Args&&... args)
       -> T

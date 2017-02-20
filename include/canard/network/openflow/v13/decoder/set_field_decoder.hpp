@@ -27,12 +27,11 @@ struct set_field_decoder
     static auto decode(Iterator& first, Iterator last, Function function)
         -> ReturnType
     {
-        auto it = first;
-        auto const set_field = detail::decode<header_type>(it, last);
+        auto const set_field
+            = detail::decode_without_consumption<header_type>(first, last);
 
-        auto field_it = set_field.field;
-        auto const oxm_header = v13::oxm_header::decode(
-                field_it, field_it + sizeof(set_field.field));
+        auto const oxm_header = v13::oxm_header::decode_without_consumption(
+                set_field.field, set_field.field + sizeof(set_field.field));
 
         if (set_field.len != detail::v13::exact_length(
                     header_size + oxm_header.oxm_length())) {

@@ -179,9 +179,9 @@ namespace messages {
                 = fremoved.header.length - sizeof(raw_ofp_type);
             last = std::next(first, match_length);
 
-            auto copy_first = first;
             auto const ofp_match
-                = detail::decode<protocol::ofp_match>(copy_first, last);
+                = detail::decode_without_consumption<protocol::ofp_match>(
+                        first, last);
             oxm_match::validate_header(ofp_match);
             if (v13_detail::exact_length(ofp_match.length) != match_length) {
                 throw std::runtime_error{"invalid oxm_match length"};

@@ -42,6 +42,19 @@ namespace detail {
     return value;
   }
 
+  template <
+      class T, class Iterator
+    , std::size_t CopySize = sizeof(T)
+    , class = typename std::enable_if<std::is_trivially_copyable<T>::value>::type
+  >
+  auto decode_without_consumption(
+        Iterator first, Iterator last
+      , std::integral_constant<std::size_t, CopySize> copy_size = {})
+    -> T
+  {
+    return detail::decode<T>(first, last, copy_size);
+  }
+
 } // namespace detail
 } // namespace ofp
 } // namespace net

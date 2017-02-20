@@ -24,10 +24,11 @@ struct oxm_match_field_decoder
     static auto decode(Iterator& first, Iterator last, Function function)
         -> ReturnType
     {
-        auto it = first;
-        auto const oxm_header = v13::oxm_header::decode(it, last);
+        auto const oxm_header
+            = v13::oxm_header::decode_without_consumption(first, last);
 
-        if (std::distance(it, last) < oxm_header.oxm_length()) {
+        if (std::distance(first, last)
+                < oxm_header.length() + oxm_header.oxm_length()) {
             throw std::runtime_error{"too small data size for oxm_match_field"};
         }
 

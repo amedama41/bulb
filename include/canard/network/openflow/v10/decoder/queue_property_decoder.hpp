@@ -27,8 +27,8 @@ struct queue_property_decoder
     static auto decode(Iterator& first, Iterator last, Function function)
         -> ReturnType
     {
-        auto it = first;
-        auto const prop_header = detail::decode<header_type>(it, last);
+        auto const prop_header
+            = detail::decode_without_consumption<header_type>(first, last);
 
         if (std::distance(first, last) < prop_header.len) {
             throw std::runtime_error{"too small data size for queue property"};

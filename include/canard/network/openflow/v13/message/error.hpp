@@ -123,9 +123,8 @@ namespace messages {
         auto failed_request_header() const
             -> protocol::ofp_header
         {
-            auto it = data_.data();
-            auto const it_end = data_.data() + data_.size();
-            return detail::decode<protocol::ofp_header>(it, it_end);
+            return detail::decode_without_consumption<protocol::ofp_header>(
+                    data_.data(), data_.data() + data_.size());
         }
 
         static auto hello_failed(

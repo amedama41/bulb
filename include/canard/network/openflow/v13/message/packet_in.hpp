@@ -235,9 +235,9 @@ namespace messages {
             auto const pkt_in = detail::decode<raw_ofp_type>(first, last);
             auto const rest_size = pkt_in.header.length - sizeof(raw_ofp_type);
 
-            auto it = first;
             auto const ofp_match
-                = detail::decode<protocol::ofp_match>(it, last);
+                = detail::decode_without_consumption<protocol::ofp_match>(
+                        first, last);
             oxm_match::validate_header(ofp_match);
             auto const match_length
                 = v13_detail::exact_length(ofp_match.length);
