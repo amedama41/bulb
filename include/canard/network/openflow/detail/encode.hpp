@@ -8,6 +8,7 @@
 #include <boost/endian/conversion.hpp>
 #include <boost/range/algorithm_ext/push_back.hpp>
 #include <boost/range/iterator_range.hpp>
+#include <canard/network/openflow/detail/copy_size.hpp>
 
 namespace canard {
 namespace net {
@@ -27,8 +28,7 @@ namespace detail {
     , std::size_t CopySize = sizeof(T)
     , class = typename std::enable_if<std::is_trivially_copyable<T>::value>::type
   >
-  auto encode(Buffer& buffer, T value
-            , std::integral_constant<std::size_t, CopySize> = {})
+  auto encode(Buffer& buffer, T value, detail::copy_size<CopySize> = {})
     -> Buffer&
   {
     boost::endian::native_to_big_inplace(value);

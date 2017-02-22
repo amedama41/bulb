@@ -1,11 +1,9 @@
 #ifndef CANARD_NET_OFP_V13_INSTRUCTION_ID_HPP
 #define CANARD_NET_OFP_V13_INSTRUCTION_ID_HPP
 
-#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <stdexcept>
-#include <type_traits>
 #include <utility>
 #include <canard/network/openflow/data_type.hpp>
 #include <canard/network/openflow/detail/basic_protocol_type.hpp>
@@ -122,8 +120,7 @@ namespace v13 {
       }
       else {
         detail::encode(
-              container, instruction_header_
-            , std::integral_constant<std::size_t, base_size>{});
+            container, instruction_header_, detail::copy_size<base_size>{});
       }
       detail::encode_byte_array(container, data_.data(), data_.size());
     }
@@ -133,7 +130,7 @@ namespace v13 {
       -> instruction_id
     {
       auto header = detail::decode<raw_ofp_exp_type>(
-          first, last, std::integral_constant<std::size_t, base_size>{});
+          first, last, detail::copy_size<base_size>{});
       if (header.len < base_size) {
         throw std::runtime_error{"too small instruction_id length"};
       }

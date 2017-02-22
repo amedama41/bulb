@@ -176,8 +176,7 @@ namespace v13 {
     template <class Container>
     void encode_impl(Container& container) const
     {
-      detail::encode(
-          container, match_, std::integral_constant<std::size_t, base_size>{});
+      detail::encode(container, match_, detail::copy_size<base_size>{});
       oxm_fields_.encode(container);
     }
 
@@ -185,8 +184,8 @@ namespace v13 {
     static auto decode_impl(Iterator& first, Iterator last)
       -> oxm_match
     {
-      auto match = detail::decode<raw_ofp_type>(
-          first, last, std::integral_constant<std::size_t, base_size>{});
+      auto const match = detail::decode<raw_ofp_type>(
+          first, last, detail::copy_size<base_size>{});
       last = std::next(first, match.length - base_size);
       auto oxm_fields = oxm_fields_type::decode(first, last);
       return oxm_match{match, std::move(oxm_fields)};

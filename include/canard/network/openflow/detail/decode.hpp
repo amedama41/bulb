@@ -9,6 +9,7 @@
 #include <memory>
 #include <type_traits>
 #include <boost/endian/conversion.hpp>
+#include <canard/network/openflow/detail/copy_size.hpp>
 
 namespace canard {
 namespace net {
@@ -31,8 +32,7 @@ namespace detail {
     , std::size_t CopySize = sizeof(T)
     , class = typename std::enable_if<std::is_trivially_copyable<T>::value>::type
   >
-  auto decode(Iterator& first, Iterator last
-            , std::integral_constant<std::size_t, CopySize> = {})
+  auto decode(Iterator& first, Iterator last, detail::copy_size<CopySize> = {})
     -> T
   {
     auto const bytes = decode_byte_array<CopySize>(first, last);
@@ -48,8 +48,7 @@ namespace detail {
     , class = typename std::enable_if<std::is_trivially_copyable<T>::value>::type
   >
   auto decode_without_consumption(
-        Iterator first, Iterator last
-      , std::integral_constant<std::size_t, CopySize> copy_size = {})
+      Iterator first, Iterator last, detail::copy_size<CopySize> copy_size = {})
     -> T
   {
     return detail::decode<T>(first, last, copy_size);
