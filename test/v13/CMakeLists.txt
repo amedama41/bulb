@@ -77,6 +77,7 @@ set(message_srcs
     message/barrier_test.cpp
     message/queue_config_test.cpp
     message/role_test.cpp
+    message/async_config_test.cpp
     message/validate_header_test.cpp)
 set(meter_band_srcs
     meter_band/drop_test.cpp
