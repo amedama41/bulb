@@ -23,6 +23,11 @@ using fixed_length_message_types = std::tuple<
   , msg::features_request
   , msg::features_reply
   , msg::table_mod
+  , msg::role_request
+  , msg::role_reply
+  , msg::get_async_request
+  , msg::get_async_reply
+  , msg::set_async
 >;
 using variable_length_message_types = std::tuple<
     msg::echo_request
@@ -70,6 +75,11 @@ using all_message_types = std::tuple<
   , msg::features_request
   , msg::features_reply
   , msg::table_mod
+  , msg::role_request
+  , msg::role_reply
+  , msg::get_async_request
+  , msg::get_async_reply
+  , msg::set_async
 >;
 
 static auto& random_xid = ::random<std::uint32_t>;
