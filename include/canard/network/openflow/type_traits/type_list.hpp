@@ -1,5 +1,5 @@
-#ifndef CANARD_NET_OFP_DETAIL_TYPE_LIST_HPP
-#define CANARD_NET_OFP_DETAIL_TYPE_LIST_HPP
+#ifndef CANARD_NET_OFP_TYPE_TRAITS_TYPE_LIST_HPP
+#define CANARD_NET_OFP_TYPE_TRAITS_TYPE_LIST_HPP
 
 #include <tuple>
 #include <boost/mpl/advance_fwd.hpp>
@@ -21,7 +21,7 @@
 namespace canard {
 namespace net {
 namespace ofp {
-namespace detail {
+namespace type_traits {
 
   template <class T, class N>
   struct type_list_iterator
@@ -64,7 +64,7 @@ namespace detail {
     using type = type_list<Ts...>;
   };
 
-} // namespace detail
+} // namespace type_traits
 } // namespace ofp
 } // namespace net
 } // namespace canard
@@ -73,19 +73,21 @@ namespace boost {
 namespace mpl {
 
   template <class TypeList, class N, class M>
-  struct advance<canard::net::ofp::detail::type_list_iterator<TypeList, N>, M>
+  struct advance<
+    canard::net::ofp::type_traits::type_list_iterator<TypeList, N>, M
+  >
   {
     static_assert(TypeList::size <= N::value + M::value, "");
 
-    using type = canard::net::ofp::detail::type_list_iterator<
+    using type = canard::net::ofp::type_traits::type_list_iterator<
       TypeList, boost::mpl::size_t<N::value + M::value>
     >;
   };
 
   template <class TypeList, class N1, class N2>
   struct distance<
-      canard::net::ofp::detail::type_list_iterator<TypeList, N1>
-    , canard::net::ofp::detail::type_list_iterator<TypeList, N2>
+      canard::net::ofp::type_traits::type_list_iterator<TypeList, N1>
+    , canard::net::ofp::type_traits::type_list_iterator<TypeList, N2>
   >
     : public boost::mpl::long_<
         ((N2::value > N1::value)
@@ -95,31 +97,31 @@ namespace mpl {
   };
 
   template <>
-  struct begin_impl<canard::net::ofp::detail::type_list_tag>
+  struct begin_impl<canard::net::ofp::type_traits::type_list_tag>
   {
     template <class T>
     struct apply
     {
-      using type = canard::net::ofp::detail::type_list_iterator<
+      using type = canard::net::ofp::type_traits::type_list_iterator<
         T, boost::mpl::size_t<0>
       >;
     };
   };
 
   template <>
-  struct end_impl<canard::net::ofp::detail::type_list_tag>
+  struct end_impl<canard::net::ofp::type_traits::type_list_tag>
   {
     template <class T>
     struct apply
     {
-      using type = canard::net::ofp::detail::type_list_iterator<
+      using type = canard::net::ofp::type_traits::type_list_iterator<
         T, boost::mpl::size_t<T::size>
       >;
     };
   };
 
   template <>
-  struct size_impl<canard::net::ofp::detail::type_list_tag>
+  struct size_impl<canard::net::ofp::type_traits::type_list_tag>
   {
     template <class T>
     struct apply
@@ -129,7 +131,7 @@ namespace mpl {
   };
 
   template <>
-  struct empty_impl<canard::net::ofp::detail::type_list_tag>
+  struct empty_impl<canard::net::ofp::type_traits::type_list_tag>
   {
     template <class T>
     struct apply
@@ -139,7 +141,7 @@ namespace mpl {
   };
 
   template <>
-  struct front_impl<canard::net::ofp::detail::type_list_tag>
+  struct front_impl<canard::net::ofp::type_traits::type_list_tag>
   {
     template <class T>
     struct apply
@@ -149,7 +151,7 @@ namespace mpl {
   };
 
   template <>
-  struct back_impl<canard::net::ofp::detail::type_list_tag>
+  struct back_impl<canard::net::ofp::type_traits::type_list_tag>
   {
     template <class T>
     struct apply
@@ -159,7 +161,7 @@ namespace mpl {
   };
 
   template <>
-  struct at_impl<canard::net::ofp::detail::type_list_tag>
+  struct at_impl<canard::net::ofp::type_traits::type_list_tag>
   {
     template <class T, class N>
     struct apply
@@ -169,28 +171,28 @@ namespace mpl {
   };
 
   template <>
-  struct clear_impl<canard::net::ofp::detail::type_list_tag>
+  struct clear_impl<canard::net::ofp::type_traits::type_list_tag>
   {
     template <class T>
     struct apply
     {
-      using type = canard::net::ofp::detail::type_list<>;
+      using type = canard::net::ofp::type_traits::type_list<>;
     };
   };
 
   template <class... Ts, class T>
-  struct push_back<canard::net::ofp::detail::type_list<Ts...>, T>
+  struct push_back<canard::net::ofp::type_traits::type_list<Ts...>, T>
   {
-    using type = canard::net::ofp::detail::type_list<Ts..., T>;
+    using type = canard::net::ofp::type_traits::type_list<Ts..., T>;
   };
 
   template <class... Ts, class T>
-  struct push_front<canard::net::ofp::detail::type_list<Ts...>, T>
+  struct push_front<canard::net::ofp::type_traits::type_list<Ts...>, T>
   {
-    using type = canard::net::ofp::detail::type_list<T, Ts...>;
+    using type = canard::net::ofp::type_traits::type_list<T, Ts...>;
   };
 
 } // namespace mpl
 } // namespace boost
 
-#endif // CANARD_NET_OFP_DETAIL_TYPE_LIST_HPP
+#endif // CANARD_NET_OFP_TYPE_TRAITS_TYPE_LIST_HPP

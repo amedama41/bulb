@@ -18,8 +18,8 @@
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/get.hpp>
 #include <boost/variant/variant.hpp>
-#include <canard/network/openflow/detail/type_list.hpp>
 #include <canard/network/openflow/detail/visitors.hpp>
+#include <canard/network/openflow/type_traits/type_list.hpp>
 
 namespace canard {
 namespace net {
@@ -40,7 +40,7 @@ namespace detail {
     static constexpr std::uint16_t header_size = Decoder::header_size;
 
   private:
-    using inner_type_list = detail::to_type_list_t<type_list>;
+    using inner_type_list = type_traits::to_type_list_t<type_list>;
     template <class T>
     using containable_if_t = typename std::enable_if<
       boost::mpl::contains<inner_type_list, typename std::decay<T>::type>::value
