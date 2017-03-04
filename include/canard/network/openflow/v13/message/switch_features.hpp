@@ -5,7 +5,7 @@
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/get_xid.hpp>
-#include <canard/network/openflow/v13/detail/basic_openflow_message.hpp>
+#include <canard/network/openflow/v13/detail/basic_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -16,7 +16,7 @@ namespace v13 {
 namespace messages {
 
     class features_request
-        : public detail::v13::basic_openflow_message<features_request>
+        : public detail::v13::basic_message<features_request>
     {
     public:
         static constexpr protocol::ofp_type message_type
@@ -46,7 +46,7 @@ namespace messages {
         {
         }
 
-        friend basic_openflow_message;
+        friend basic_message;
 
         static constexpr bool is_fixed_length_message = true;
 
@@ -71,7 +71,7 @@ namespace messages {
 
 
     class features_reply
-        : public detail::v13::basic_openflow_message<features_reply>
+        : public detail::v13::basic_message<features_reply>
     {
     public:
         static constexpr protocol::ofp_type message_type
@@ -145,7 +145,7 @@ namespace messages {
         {
         }
 
-        friend basic_openflow_message;
+        friend basic_message;
 
         static constexpr bool is_fixed_length_message = true;
 

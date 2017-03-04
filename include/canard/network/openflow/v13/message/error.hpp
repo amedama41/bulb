@@ -10,7 +10,7 @@
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/get_xid.hpp>
-#include <canard/network/openflow/v13/detail/basic_openflow_message.hpp>
+#include <canard/network/openflow/v13/detail/basic_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -21,7 +21,7 @@ namespace v13 {
 namespace messages {
 
     class error
-        : public detail::v13::basic_openflow_message<error>
+        : public detail::v13::basic_message<error>
     {
     public:
         using raw_ofp_type = protocol::ofp_error_msg;
@@ -148,7 +148,7 @@ namespace messages {
         {
         }
 
-        friend basic_openflow_message;
+        friend basic_message;
 
         static constexpr bool is_fixed_length_message = false;
 

@@ -8,7 +8,7 @@
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/list.hpp>
 #include <canard/network/openflow/v13/common/bucket.hpp>
-#include <canard/network/openflow/v13/detail/basic_openflow_message.hpp>
+#include <canard/network/openflow/v13/detail/basic_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -20,9 +20,9 @@ namespace v13 {
 
   template <class GroupMod>
   class group_mod_base
-    : public detail::v13::basic_openflow_message<GroupMod>
+    : public detail::v13::basic_message<GroupMod>
   {
-    using base_t = detail::v13::basic_openflow_message<GroupMod>;
+    using base_t = detail::v13::basic_message<GroupMod>;
 
   public:
     static ofp::v13::protocol::ofp_type const message_type

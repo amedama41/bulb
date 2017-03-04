@@ -9,7 +9,7 @@
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/get_xid.hpp>
-#include <canard/network/openflow/v10/detail/basic_openflow_message.hpp>
+#include <canard/network/openflow/v10/detail/basic_message.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
 
@@ -23,9 +23,9 @@ namespace messages {
 
         template <class T>
         class echo_base
-            : public v10_detail::basic_openflow_message<T>
+            : public v10_detail::basic_message<T>
         {
-            using base_t = v10_detail::basic_openflow_message<T>;
+            using base_t = v10_detail::basic_message<T>;
 
         public:
             using raw_ofp_type = protocol::ofp_header;

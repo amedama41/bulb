@@ -7,7 +7,7 @@
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/get_xid.hpp>
-#include <canard/network/openflow/v13/detail/basic_openflow_message.hpp>
+#include <canard/network/openflow/v13/detail/basic_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -21,9 +21,9 @@ namespace messages {
 
     template <class T>
     class async_config_base
-      : public detail::v13::basic_openflow_message<T>
+      : public detail::v13::basic_message<T>
     {
-      using base_t = detail::v13::basic_openflow_message<T>;
+      using base_t = detail::v13::basic_message<T>;
 
     public:
       using raw_ofp_type = protocol::ofp_async_config;
@@ -147,7 +147,7 @@ namespace messages {
 
 
   class get_async_request
-    : public detail::v13::basic_openflow_message<get_async_request>
+    : public detail::v13::basic_message<get_async_request>
   {
   public:
     using raw_ofp_type = protocol::ofp_header;
@@ -172,7 +172,7 @@ namespace messages {
     {
     }
 
-    friend basic_openflow_message;
+    friend basic_message;
 
     static constexpr bool is_fixed_length_message = true;
 

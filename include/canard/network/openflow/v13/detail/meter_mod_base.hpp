@@ -6,7 +6,7 @@
 #include <utility>
 #include <canard/network/openflow/list.hpp>
 #include <canard/network/openflow/v13/any_meter_band.hpp>
-#include <canard/network/openflow/v13/detail/basic_openflow_message.hpp>
+#include <canard/network/openflow/v13/detail/basic_message.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -17,9 +17,9 @@ namespace v13 {
 
   template <class MeterMod>
   class meter_mod_base
-    : public ofp::detail::v13::basic_openflow_message<MeterMod>
+    : public ofp::detail::v13::basic_message<MeterMod>
   {
-    using base_t = ofp::detail::v13::basic_openflow_message<MeterMod>;
+    using base_t = ofp::detail::v13::basic_message<MeterMod>;
 
   public:
     using raw_ofp_type = ofp::v13::protocol::ofp_meter_mod;

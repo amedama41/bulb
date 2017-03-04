@@ -10,7 +10,7 @@
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/get_xid.hpp>
-#include <canard/network/openflow/v10/detail/basic_openflow_message.hpp>
+#include <canard/network/openflow/v10/detail/basic_message.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
 
@@ -21,7 +21,7 @@ namespace v10 {
 namespace messages {
 
     class packet_in
-        : public v10_detail::basic_openflow_message<packet_in>
+        : public v10_detail::basic_message<packet_in>
     {
         static constexpr std::uint16_t min_pkt_in_len
             = offsetof(protocol::ofp_packet_in, pad)
@@ -140,11 +140,11 @@ namespace messages {
         }
 
     private:
-        friend basic_openflow_message;
+        friend basic_message;
 
         static constexpr bool is_fixed_length_message = false;
 
-        friend basic_openflow_message::basic_protocol_type;
+        friend basic_message::basic_protocol_type;
 
         packet_in(raw_ofp_type const& pkt_in, data_type&& data) noexcept
             : packet_in_(pkt_in)

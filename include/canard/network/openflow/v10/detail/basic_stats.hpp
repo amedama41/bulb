@@ -10,7 +10,7 @@
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/list.hpp>
-#include <canard/network/openflow/v10/detail/basic_openflow_message.hpp>
+#include <canard/network/openflow/v10/detail/basic_message.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
 
@@ -41,9 +41,9 @@ namespace stats_detail {
 
     template <class T, class StatsType>
     class basic_stats
-        : public v10_detail::basic_openflow_message<T>
+        : public v10_detail::basic_message<T>
     {
-        using base_t = v10_detail::basic_openflow_message<T>;
+        using base_t = v10_detail::basic_message<T>;
 
     public:
         using raw_ofp_type = StatsType;
@@ -96,7 +96,7 @@ namespace stats_detail {
         static constexpr bool is_fixed_length_message = false;
 
         friend constexpr auto min_message_length(
-                v10_detail::basic_openflow_message_tag<T>) noexcept
+                v10_detail::basic_message_tag<T>) noexcept
             -> std::uint16_t
         {
             return sizeof(raw_ofp_type);
@@ -135,7 +135,7 @@ namespace stats_detail {
         }
 
     private:
-        friend typename base_t::basic_openflow_message::basic_protocol_type;
+        friend typename base_t::basic_message::basic_protocol_type;
 
         template <class Container>
         void encode_impl(Container& container) const
@@ -220,7 +220,7 @@ namespace stats_detail {
         }
 
     private:
-        friend typename base_t::basic_openflow_message::basic_protocol_type;
+        friend typename base_t::basic_message::basic_protocol_type;
 
         friend constexpr auto get_min_length(
                 detail::basic_protocol_type_tag<T>) noexcept
@@ -348,7 +348,7 @@ namespace stats_detail {
         }
 
     private:
-        friend typename base_t::basic_openflow_message::basic_protocol_type;
+        friend typename base_t::basic_message::basic_protocol_type;
 
         template <class Container>
         void encode_impl(Container& container) const

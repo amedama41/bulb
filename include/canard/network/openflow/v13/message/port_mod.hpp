@@ -7,7 +7,7 @@
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/v13/common/port.hpp>
-#include <canard/network/openflow/v13/detail/basic_openflow_message.hpp>
+#include <canard/network/openflow/v13/detail/basic_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -18,7 +18,7 @@ namespace v13 {
 namespace messages {
 
     class port_mod
-        : public detail::v13::basic_openflow_message<port_mod>
+        : public detail::v13::basic_message<port_mod>
     {
     public:
         static constexpr protocol::ofp_type message_type
@@ -110,7 +110,7 @@ namespace messages {
         {
         }
 
-        friend basic_openflow_message;
+        friend basic_message;
 
         static constexpr bool is_fixed_length_message = true;
 

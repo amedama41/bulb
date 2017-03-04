@@ -6,7 +6,7 @@
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/v13/common/port.hpp>
-#include <canard/network/openflow/v13/detail/basic_openflow_message.hpp>
+#include <canard/network/openflow/v13/detail/basic_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/detail/port_adaptor.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
@@ -18,7 +18,7 @@ namespace v13 {
 namespace messages {
 
     class port_status
-        : public detail::v13::basic_openflow_message<port_status>
+        : public detail::v13::basic_message<port_status>
         , public v13_detail::port_adaptor<port_status>
     {
     public:
@@ -86,7 +86,7 @@ namespace messages {
         {
         }
 
-        friend basic_openflow_message;
+        friend basic_message;
 
         static constexpr bool is_fixed_length_message = true;
 

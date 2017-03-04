@@ -7,7 +7,7 @@
 #include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/v10/common/match.hpp>
-#include <canard/network/openflow/v10/detail/basic_openflow_message.hpp>
+#include <canard/network/openflow/v10/detail/basic_message.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
 #include <canard/network/openflow/v10/flow_entry.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
@@ -19,7 +19,7 @@ namespace v10 {
 namespace messages {
 
     class flow_removed
-        : public v10_detail::basic_openflow_message<flow_removed>
+        : public v10_detail::basic_message<flow_removed>
     {
     public:
         using raw_ofp_type = protocol::ofp_flow_removed;
@@ -145,11 +145,11 @@ namespace messages {
         }
 
     private:
-        friend basic_openflow_message;
+        friend basic_message;
 
         static constexpr bool is_fixed_length_message = true;
 
-        friend basic_openflow_message::basic_protocol_type;
+        friend basic_message::basic_protocol_type;
 
         explicit flow_removed(raw_ofp_type const& removed) noexcept
             : flow_removed_(removed)

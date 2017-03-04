@@ -13,7 +13,7 @@
 #include <canard/network/openflow/detail/padding.hpp>
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/v13/common/oxm_match.hpp>
-#include <canard/network/openflow/v13/detail/basic_openflow_message.hpp>
+#include <canard/network/openflow/v13/detail/basic_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/detail/length_utility.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
@@ -25,7 +25,7 @@ namespace v13 {
 namespace messages {
 
     class packet_in
-        : public detail::v13::basic_openflow_message<packet_in>
+        : public detail::v13::basic_message<packet_in>
     {
         static constexpr std::uint16_t data_alignment_padding_size = 2;
         static constexpr std::uint16_t base_pkt_in_size
@@ -205,7 +205,7 @@ namespace messages {
         {
         }
 
-        friend basic_openflow_message;
+        friend basic_message;
 
         static constexpr bool is_fixed_length_message = false;
 

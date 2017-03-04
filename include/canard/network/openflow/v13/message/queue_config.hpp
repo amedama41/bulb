@@ -9,7 +9,7 @@
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/list.hpp>
 #include <canard/network/openflow/v13/common/packet_queue.hpp>
-#include <canard/network/openflow/v13/detail/basic_openflow_message.hpp>
+#include <canard/network/openflow/v13/detail/basic_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -20,7 +20,7 @@ namespace v13 {
 namespace messages {
 
     class queue_get_config_request
-        : public detail::v13::basic_openflow_message<queue_get_config_request>
+        : public detail::v13::basic_message<queue_get_config_request>
     {
     public:
         static constexpr protocol::ofp_type message_type
@@ -63,7 +63,7 @@ namespace messages {
         {
         }
 
-        friend basic_openflow_message;
+        friend basic_message;
 
         static constexpr bool is_fixed_length_message = true;
 
@@ -90,7 +90,7 @@ namespace messages {
 
 
     class queue_get_config_reply
-        : public detail::v13::basic_openflow_message<queue_get_config_reply>
+        : public detail::v13::basic_message<queue_get_config_reply>
     {
     public:
         static constexpr protocol::ofp_type message_type
@@ -190,7 +190,7 @@ namespace messages {
         {
         }
 
-        friend basic_openflow_message;
+        friend basic_message;
 
         static constexpr bool is_fixed_length_message = false;
 

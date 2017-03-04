@@ -9,7 +9,7 @@
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/list.hpp>
 #include <canard/network/openflow/v10/common/port.hpp>
-#include <canard/network/openflow/v10/detail/basic_openflow_message.hpp>
+#include <canard/network/openflow/v10/detail/basic_message.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
 
 namespace canard {
@@ -19,7 +19,7 @@ namespace v10 {
 namespace messages {
 
     class features_request
-        : public v10_detail::basic_openflow_message<features_request>
+        : public v10_detail::basic_message<features_request>
     {
     public:
         using raw_ofp_type = protocol::ofp_header;
@@ -44,11 +44,11 @@ namespace messages {
         }
 
     private:
-        friend basic_openflow_message;
+        friend basic_message;
 
         static constexpr bool is_fixed_length_message = true;
 
-        friend basic_openflow_message::basic_protocol_type;
+        friend basic_message::basic_protocol_type;
 
         explicit features_request(raw_ofp_type const& header) noexcept
             : header_(header)
@@ -81,7 +81,7 @@ namespace messages {
 
 
     class features_reply
-        : public v10_detail::basic_openflow_message<features_reply>
+        : public v10_detail::basic_message<features_reply>
     {
     public:
         using raw_ofp_type = protocol::ofp_switch_features;
@@ -204,19 +204,19 @@ namespace messages {
         }
 
     private:
-        friend basic_openflow_message;
+        friend basic_message;
 
         static constexpr bool is_fixed_length_message = false;
 
         friend constexpr auto additonally_check_message_length(
-                  v10_detail::basic_openflow_message_tag<features_reply>
+                  v10_detail::basic_message_tag<features_reply>
                 , std::uint16_t const length) noexcept
             -> bool
         {
             return (length - sizeof(raw_ofp_type)) % port::min_length() == 0;
         }
 
-        friend basic_openflow_message::basic_protocol_type;
+        friend basic_message::basic_protocol_type;
 
         features_reply(raw_ofp_type const& features, ports_type&& ports)
             : switch_features_(features)

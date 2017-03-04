@@ -9,7 +9,7 @@
 #include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/v10/action_list.hpp>
 #include <canard/network/openflow/v10/common/match.hpp>
-#include <canard/network/openflow/v10/detail/basic_openflow_message.hpp>
+#include <canard/network/openflow/v10/detail/basic_message.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
 #include <canard/network/openflow/v10/flow_entry.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
@@ -23,9 +23,9 @@ namespace flow_mod_detail {
 
     template <class FlowMod>
     class flow_mod_base
-        : public v10_detail::basic_openflow_message<FlowMod>
+        : public v10_detail::basic_message<FlowMod>
     {
-        using base_t = v10_detail::basic_openflow_message<FlowMod>;
+        using base_t = v10_detail::basic_message<FlowMod>;
 
     public:
         using raw_ofp_type = protocol::ofp_flow_mod;

@@ -11,7 +11,7 @@
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/list.hpp>
 #include <canard/network/openflow/v13/common/oxm_match.hpp>
-#include <canard/network/openflow/v13/detail/basic_openflow_message.hpp>
+#include <canard/network/openflow/v13/detail/basic_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/detail/length_utility.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
@@ -43,9 +43,9 @@ namespace multipart_detail {
 
     template <class T, class MultipartType>
     class basic_multipart
-        : public detail::v13::basic_openflow_message<T>
+        : public detail::v13::basic_message<T>
     {
-        using base_t = detail::v13::basic_openflow_message<T>;
+        using base_t = detail::v13::basic_message<T>;
 
     public:
         static constexpr protocol::ofp_type message_type
@@ -96,7 +96,7 @@ namespace multipart_detail {
         static constexpr bool is_fixed_length_message = false;
 
         friend constexpr auto min_message_length(
-                detail::v13::basic_openflow_message_tag<T>) noexcept
+                detail::v13::basic_message_tag<T>) noexcept
             -> std::uint16_t
         {
             return sizeof(MultipartType);

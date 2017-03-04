@@ -10,7 +10,7 @@
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/list.hpp>
 #include <canard/network/openflow/v10/common/packet_queue.hpp>
-#include <canard/network/openflow/v10/detail/basic_openflow_message.hpp>
+#include <canard/network/openflow/v10/detail/basic_message.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
 
@@ -21,7 +21,7 @@ namespace v10 {
 namespace messages {
 
     class queue_get_config_request
-        : public v10_detail::basic_openflow_message<queue_get_config_request>
+        : public v10_detail::basic_message<queue_get_config_request>
     {
     public:
         using raw_ofp_type = protocol::ofp_queue_get_config_request;
@@ -58,11 +58,11 @@ namespace messages {
         }
 
     private:
-        friend basic_openflow_message;
+        friend basic_message;
 
         static constexpr bool is_fixed_length_message = true;
 
-        friend basic_openflow_message::basic_protocol_type;
+        friend basic_message::basic_protocol_type;
 
         explicit queue_get_config_request(
                 raw_ofp_type const& queue_get_config_request) noexcept
@@ -98,7 +98,7 @@ namespace messages {
 
 
     class queue_get_config_reply
-        : public v10_detail::basic_openflow_message<queue_get_config_reply>
+        : public v10_detail::basic_message<queue_get_config_reply>
     {
     public:
         using raw_ofp_type = protocol::ofp_queue_get_config_reply;
@@ -176,11 +176,11 @@ namespace messages {
         }
 
     private:
-        friend basic_openflow_message;
+        friend basic_message;
 
         static constexpr bool is_fixed_length_message = false;
 
-        friend basic_openflow_message::basic_protocol_type;
+        friend basic_message::basic_protocol_type;
 
         queue_get_config_reply(
                   raw_ofp_type const& queue_get_config_reply

@@ -10,7 +10,7 @@
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/v13/common/oxm_match.hpp>
-#include <canard/network/openflow/v13/detail/basic_openflow_message.hpp>
+#include <canard/network/openflow/v13/detail/basic_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/detail/flow_entry_adaptor.hpp>
 #include <canard/network/openflow/v13/detail/length_utility.hpp>
@@ -24,7 +24,7 @@ namespace v13 {
 namespace messages {
 
     class flow_removed
-        : public detail::v13::basic_openflow_message<flow_removed>
+        : public detail::v13::basic_message<flow_removed>
         , public v13_detail::flow_entry_adaptor<
                 flow_removed, protocol::ofp_flow_removed
           >
@@ -149,7 +149,7 @@ namespace messages {
         {
         }
 
-        friend basic_openflow_message;
+        friend basic_message;
 
         static constexpr bool is_fixed_length_message = false;
 

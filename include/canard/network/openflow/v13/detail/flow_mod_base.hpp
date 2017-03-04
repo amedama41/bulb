@@ -11,7 +11,7 @@
 #include <canard/network/openflow/list.hpp>
 #include <canard/network/openflow/v13/any_instruction.hpp>
 #include <canard/network/openflow/v13/common/oxm_match.hpp>
-#include <canard/network/openflow/v13/detail/basic_openflow_message.hpp>
+#include <canard/network/openflow/v13/detail/basic_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/detail/length_utility.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
@@ -25,9 +25,9 @@ namespace flow_mod_detail {
 
     template <class FlowMod>
     class flow_mod_base
-        : public detail::v13::basic_openflow_message<FlowMod>
+        : public detail::v13::basic_message<FlowMod>
     {
-        using base_t = detail::v13::basic_openflow_message<FlowMod>;
+        using base_t = detail::v13::basic_message<FlowMod>;
 
     public:
         static constexpr protocol::ofp_type message_type
