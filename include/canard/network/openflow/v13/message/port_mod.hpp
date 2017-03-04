@@ -3,11 +3,9 @@
 
 #include <cstdint>
 #include <canard/mac_address.hpp>
-#include <canard/network/openflow/detail/decode.hpp>
-#include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/v13/common/port.hpp>
-#include <canard/network/openflow/v13/detail/basic_message.hpp>
+#include <canard/network/openflow/v13/detail/basic_fixed_length_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -18,7 +16,7 @@ namespace v13 {
 namespace messages {
 
     class port_mod
-        : public detail::v13::basic_message<port_mod>
+        : public detail::v13::basic_fixed_length_message<port_mod>
     {
     public:
         static constexpr protocol::ofp_type message_type
@@ -105,28 +103,17 @@ namespace messages {
         }
 
     private:
+        friend basic_fixed_length_message;
+
         explicit port_mod(raw_ofp_type const& port_mod) noexcept
             : port_mod_(port_mod)
         {
         }
 
-        friend basic_message;
-
-        static constexpr bool is_fixed_length_message = true;
-
-        friend basic_protocol_type;
-
-        template <class Container>
-        void encode_impl(Container& container) const
+        auto ofp_message() const noexcept
+            -> raw_ofp_type const&
         {
-            detail::encode(container, port_mod_);
-        }
-
-        template <class Iterator>
-        static auto decode_impl(Iterator& first, Iterator last)
-            -> port_mod
-        {
-            return port_mod{detail::decode<raw_ofp_type>(first, last)};
+            return port_mod_;
         }
 
     private:

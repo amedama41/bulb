@@ -2,12 +2,9 @@
 #define CANARD_NET_OFP_V10_MESSAGES_FLOW_REMOVED_HPP
 
 #include <cstdint>
-#include <canard/network/openflow/detail/decode.hpp>
-#include <canard/network/openflow/detail/encode.hpp>
-#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/v10/common/match.hpp>
-#include <canard/network/openflow/v10/detail/basic_message.hpp>
+#include <canard/network/openflow/v10/detail/basic_fixed_length_message.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
 #include <canard/network/openflow/v10/flow_entry.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
@@ -19,7 +16,7 @@ namespace v10 {
 namespace messages {
 
     class flow_removed
-        : public v10_detail::basic_message<flow_removed>
+        : public v10_detail::basic_fixed_length_message<flow_removed>
     {
     public:
         using raw_ofp_type = protocol::ofp_flow_removed;
@@ -145,34 +142,17 @@ namespace messages {
         }
 
     private:
-        friend basic_message;
-
-        static constexpr bool is_fixed_length_message = true;
-
-        friend basic_message::basic_protocol_type;
+        friend basic_fixed_length_message;
 
         explicit flow_removed(raw_ofp_type const& removed) noexcept
             : flow_removed_(removed)
         {
         }
 
-        template <class Container>
-        void encode_impl(Container& container) const
+        auto ofp_message() const noexcept
+            -> raw_ofp_type const&
         {
-            detail::encode(container, flow_removed_);
-        }
-
-        template <class Iterator>
-        static auto decode_impl(Iterator& first, Iterator last)
-            -> flow_removed
-        {
-            return flow_removed{detail::decode<raw_ofp_type>(first, last)};
-        }
-
-        auto equal_impl(flow_removed const& rhs) const noexcept
-            -> bool
-        {
-            return detail::memcmp(flow_removed_, rhs.flow_removed_);
+            return flow_removed_;
         }
 
     private:

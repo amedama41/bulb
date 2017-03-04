@@ -2,11 +2,8 @@
 #define CANARD_NET_OFP_V13_MESSAGES_ROLE_HPP
 
 #include <cstdint>
-#include <canard/network/openflow/detail/decode.hpp>
-#include <canard/network/openflow/detail/encode.hpp>
-#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/get_xid.hpp>
-#include <canard/network/openflow/v13/detail/basic_message.hpp>
+#include <canard/network/openflow/v13/detail/basic_fixed_length_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -20,9 +17,9 @@ namespace messages {
 
     template <class T>
     class role_base
-      : public detail::v13::basic_message<T>
+      : public detail::v13::basic_fixed_length_message<T>
     {
-      using base_t = detail::v13::basic_message<T>;
+      using base_t = detail::v13::basic_fixed_length_message<T>;
 
     public:
       using raw_ofp_type = protocol::ofp_role_request;
@@ -67,27 +64,10 @@ namespace messages {
     private:
       friend base_t;
 
-      static constexpr bool is_fixed_length_message = true;
-
-      friend typename base_t::basic_protocol_type;
-
-      template <class Container>
-      void encode_impl(Container& container) const
+      auto ofp_message() const noexcept
+        -> raw_ofp_type const&
       {
-        detail::encode(container, role_request_);
-      }
-
-      template <class Iterator>
-      static auto decode_impl(Iterator& first, Iterator last)
-        -> T
-      {
-        return T{detail::decode<raw_ofp_type>(first, last)};
-      }
-
-      auto equal_impl(T const& rhs) const noexcept
-        -> bool
-      {
-        return detail::memcmp(role_request_, rhs.role_request_);
+        return role_request_;
       }
 
     private:
@@ -113,7 +93,7 @@ namespace messages {
     }
 
   private:
-    friend role_base;
+    friend role_base::basic_fixed_length_message;
 
     explicit role_request(raw_ofp_type const& role_request) noexcept
       : role_base{role_request}
@@ -137,7 +117,7 @@ namespace messages {
     }
 
   private:
-    friend role_base;
+    friend role_base::basic_fixed_length_message;
 
     explicit role_reply(raw_ofp_type const& role_request) noexcept
       : role_base{role_request}

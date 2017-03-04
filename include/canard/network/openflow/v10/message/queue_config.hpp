@@ -10,6 +10,7 @@
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/list.hpp>
 #include <canard/network/openflow/v10/common/packet_queue.hpp>
+#include <canard/network/openflow/v10/detail/basic_fixed_length_message.hpp>
 #include <canard/network/openflow/v10/detail/basic_message.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
@@ -21,7 +22,7 @@ namespace v10 {
 namespace messages {
 
     class queue_get_config_request
-        : public v10_detail::basic_message<queue_get_config_request>
+        : public v10_detail::basic_fixed_length_message<queue_get_config_request>
     {
     public:
         using raw_ofp_type = protocol::ofp_queue_get_config_request;
@@ -58,11 +59,7 @@ namespace messages {
         }
 
     private:
-        friend basic_message;
-
-        static constexpr bool is_fixed_length_message = true;
-
-        friend basic_message::basic_protocol_type;
+        friend basic_fixed_length_message;
 
         explicit queue_get_config_request(
                 raw_ofp_type const& queue_get_config_request) noexcept
@@ -70,26 +67,10 @@ namespace messages {
         {
         }
 
-        template <class Container>
-        void encode_impl(Container& container) const
+        auto ofp_message() const noexcept
+            -> raw_ofp_type const&
         {
-            detail::encode(container, queue_get_config_request_);
-        }
-
-        template <class Iterator>
-        static auto decode_impl(Iterator& first, Iterator last)
-            -> queue_get_config_request
-        {
-            return queue_get_config_request{
-                detail::decode<raw_ofp_type>(first, last)
-            };
-        }
-
-        auto equal_impl(queue_get_config_request const& rhs) const noexcept
-            -> bool
-        {
-            return detail::memcmp(
-                    queue_get_config_request_, rhs.queue_get_config_request_);
+            return queue_get_config_request_;
         }
 
     private:

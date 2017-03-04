@@ -9,6 +9,7 @@
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/list.hpp>
 #include <canard/network/openflow/v10/common/port.hpp>
+#include <canard/network/openflow/v10/detail/basic_fixed_length_message.hpp>
 #include <canard/network/openflow/v10/detail/basic_message.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
 
@@ -19,7 +20,7 @@ namespace v10 {
 namespace messages {
 
     class features_request
-        : public v10_detail::basic_message<features_request>
+        : public v10_detail::basic_fixed_length_message<features_request>
     {
     public:
         using raw_ofp_type = protocol::ofp_header;
@@ -44,35 +45,17 @@ namespace messages {
         }
 
     private:
-        friend basic_message;
-
-        static constexpr bool is_fixed_length_message = true;
-
-        friend basic_message::basic_protocol_type;
+        friend basic_fixed_length_message;
 
         explicit features_request(raw_ofp_type const& header) noexcept
             : header_(header)
         {
         }
 
-        template <class Container>
-        void encode_impl(Container& container) const
+        auto ofp_message() const noexcept
+            -> raw_ofp_type const&
         {
-            detail::encode(container, header_);
-        }
-
-        template <class Iterator>
-        static auto decode_impl(Iterator& first, Iterator last)
-            -> features_request
-        {
-            auto const header = detail::decode<raw_ofp_type>(first, last);
-            return features_request{header};
-        }
-
-        auto equal_impl(features_request const& rhs) const noexcept
-            -> bool
-        {
-            return detail::memcmp(header_, rhs.header_);
+            return header_;
         }
 
     private:

@@ -2,12 +2,9 @@
 #define CANARD_NET_OFP_V10_MESSAGES_PORT_STATUS_HPP
 
 #include <cstdint>
-#include <canard/network/openflow/detail/decode.hpp>
-#include <canard/network/openflow/detail/encode.hpp>
-#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/v10/common/port.hpp>
-#include <canard/network/openflow/v10/detail/basic_message.hpp>
+#include <canard/network/openflow/v10/detail/basic_fixed_length_message.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
 #include <canard/network/openflow/v10/detail/port_adaptor.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
@@ -19,7 +16,7 @@ namespace v10 {
 namespace messages {
 
     class port_status
-        : public v10_detail::basic_message<port_status>
+        : public v10_detail::basic_fixed_length_message<port_status>
         , public v10_detail::port_adaptor<port_status>
     {
     public:
@@ -64,34 +61,17 @@ namespace messages {
         }
 
     private:
-        friend basic_message;
-
-        static constexpr bool is_fixed_length_message = true;
-
-        friend basic_message::basic_protocol_type;
+        friend basic_fixed_length_message;
 
         explicit port_status(raw_ofp_type const& status) noexcept
             : port_status_(status)
         {
         }
 
-        template <class Container>
-        void encode_impl(Container& container) const
+        auto ofp_message() const noexcept
+            -> raw_ofp_type const&
         {
-            detail::encode(container, port_status_);
-        }
-
-        template <class Iterator>
-        static auto decode_impl(Iterator& first, Iterator last)
-            -> port_status
-        {
-            return port_status{detail::decode<raw_ofp_type>(first, last)};
-        }
-
-        auto equal_impl(port_status const& rhs) const noexcept
-            -> bool
-        {
-            return detail::memcmp(port_status_, rhs.port_status_);
+            return port_status_;
         }
 
         friend port_adaptor;

@@ -2,10 +2,8 @@
 #define CANARD_NET_OFP_V13_MESSAGES_SWITCH_CONFIG_HPP
 
 #include <cstdint>
-#include <canard/network/openflow/detail/decode.hpp>
-#include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/get_xid.hpp>
-#include <canard/network/openflow/v13/detail/basic_message.hpp>
+#include <canard/network/openflow/v13/detail/basic_fixed_length_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -19,9 +17,9 @@ namespace messages {
 
         template <class T>
         class switch_config_base
-             : public detail::v13::basic_message<T>
+             : public detail::v13::basic_fixed_length_message<T>
         {
-            using base_t = detail::v13::basic_message<T>;
+            using base_t = detail::v13::basic_fixed_length_message<T>;
 
         public:
             using raw_ofp_type = protocol::ofp_switch_config;
@@ -70,21 +68,10 @@ namespace messages {
         private:
             friend base_t;
 
-            static constexpr bool is_fixed_length_message = true;
-
-            friend typename base_t::basic_protocol_type;
-
-            template <class Container>
-            void encode_impl(Container& container) const
+            auto ofp_message() const noexcept
+                -> raw_ofp_type const&
             {
-                detail::encode(container, switch_config_);
-            }
-
-            template <class Iterator>
-            static auto decode_impl(Iterator& first, Iterator last)
-                -> T
-            {
-                return T{detail::decode<raw_ofp_type>(first, last)};
+                return switch_config_;
             }
 
         private:
@@ -95,7 +82,7 @@ namespace messages {
 
 
     class get_config_request
-        : public detail::v13::basic_message<get_config_request>
+        : public detail::v13::basic_fixed_length_message<get_config_request>
     {
     public:
         using raw_ofp_type = protocol::ofp_header;
@@ -121,30 +108,17 @@ namespace messages {
         }
 
     private:
+        friend basic_fixed_length_message;
+
         explicit get_config_request(raw_ofp_type const& header) noexcept
             : header_(header)
         {
         }
 
-        friend basic_message;
-
-        static constexpr bool is_fixed_length_message = true;
-
-        friend basic_protocol_type;
-
-        template <class Container>
-        void encode_impl(Container& container) const
+        auto ofp_message() const noexcept
+            -> raw_ofp_type const&
         {
-            detail::encode(container, header_);
-        }
-
-        template <class Iterator>
-        static auto decode_impl(Iterator& first, Iterator last)
-            -> get_config_request
-        {
-            return get_config_request{
-                detail::decode<raw_ofp_type>(first, last)
-            };
+            return header_;
         }
 
     private:
@@ -176,7 +150,7 @@ namespace messages {
         }
 
     private:
-        friend switch_config_base;
+        friend switch_config_base::basic_fixed_length_message;
 
         explicit get_config_reply(
                 protocol::ofp_switch_config const& config) noexcept
@@ -201,7 +175,7 @@ namespace messages {
         }
 
     private:
-        friend switch_config_base;
+        friend switch_config_base::basic_fixed_length_message;
 
         explicit set_config(
                 protocol::ofp_switch_config const& config) noexcept

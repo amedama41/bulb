@@ -9,6 +9,7 @@
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/list.hpp>
 #include <canard/network/openflow/v13/common/packet_queue.hpp>
+#include <canard/network/openflow/v13/detail/basic_fixed_length_message.hpp>
 #include <canard/network/openflow/v13/detail/basic_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
@@ -20,7 +21,7 @@ namespace v13 {
 namespace messages {
 
     class queue_get_config_request
-        : public detail::v13::basic_message<queue_get_config_request>
+        : public detail::v13::basic_fixed_length_message<queue_get_config_request>
     {
     public:
         static constexpr protocol::ofp_type message_type
@@ -57,31 +58,18 @@ namespace messages {
         }
 
     private:
+        friend basic_fixed_length_message;
+
         explicit queue_get_config_request(
                 raw_ofp_type const& queue_get_config_request) noexcept
             : queue_get_config_request_(queue_get_config_request)
         {
         }
 
-        friend basic_message;
-
-        static constexpr bool is_fixed_length_message = true;
-
-        friend basic_protocol_type;
-
-        template <class Container>
-        void encode_impl(Container& container) const
+        auto ofp_message() const noexcept
+            -> raw_ofp_type const&
         {
-            detail::encode(container, queue_get_config_request_);
-        }
-
-        template <class Iterator>
-        static auto decode_impl(Iterator& first, Iterator last)
-            -> queue_get_config_request
-        {
-            return queue_get_config_request{
-                detail::decode<raw_ofp_type>(first, last)
-            };
+            return queue_get_config_request_;
         }
 
     private:

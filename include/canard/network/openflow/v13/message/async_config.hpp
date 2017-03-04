@@ -3,11 +3,8 @@
 
 #include <cstdint>
 #include <array>
-#include <canard/network/openflow/detail/decode.hpp>
-#include <canard/network/openflow/detail/encode.hpp>
-#include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/get_xid.hpp>
-#include <canard/network/openflow/v13/detail/basic_message.hpp>
+#include <canard/network/openflow/v13/detail/basic_fixed_length_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -21,9 +18,9 @@ namespace messages {
 
     template <class T>
     class async_config_base
-      : public detail::v13::basic_message<T>
+      : public detail::v13::basic_fixed_length_message<T>
     {
-      using base_t = detail::v13::basic_message<T>;
+      using base_t = detail::v13::basic_fixed_length_message<T>;
 
     public:
       using raw_ofp_type = protocol::ofp_async_config;
@@ -116,27 +113,10 @@ namespace messages {
     private:
       friend base_t;
 
-      static constexpr bool is_fixed_length_message = true;
-
-      friend typename base_t::basic_protocol_type;
-
-      template <class Container>
-      void encode_impl(Container& container) const
+      auto ofp_message() const noexcept
+        -> raw_ofp_type const&
       {
-        detail::encode(container, async_config_);
-      }
-
-      template <class Iterator>
-      static auto decode_impl(Iterator& first, Iterator last)
-        -> T
-      {
-        return T{detail::decode<raw_ofp_type>(first, last)};
-      }
-
-      auto equal_impl(T const& rhs) const noexcept
-        -> bool
-      {
-        return detail::memcmp(async_config_, rhs.async_config_);
+        return async_config_;
       }
 
     private:
@@ -147,7 +127,7 @@ namespace messages {
 
 
   class get_async_request
-    : public detail::v13::basic_message<get_async_request>
+    : public detail::v13::basic_fixed_length_message<get_async_request>
   {
   public:
     using raw_ofp_type = protocol::ofp_header;
@@ -167,34 +147,17 @@ namespace messages {
     }
 
   private:
+    friend basic_fixed_length_message;
+
     explicit get_async_request(raw_ofp_type const& header) noexcept
       : header_(header)
     {
     }
 
-    friend basic_message;
-
-    static constexpr bool is_fixed_length_message = true;
-
-    friend basic_protocol_type;
-
-    template <class Container>
-    void encode_impl(Container& container) const
+    auto ofp_message() const noexcept
+      -> raw_ofp_type const&
     {
-      detail::encode(container, header_);
-    }
-
-    template <class Iterator>
-    static auto decode_impl(Iterator& first, Iterator last)
-      -> get_async_request
-    {
-      return get_async_request{detail::decode<raw_ofp_type>(first, last)};
-    }
-
-    auto equal_impl(get_async_request const& rhs) const noexcept
-      -> bool
-    {
-      return detail::memcmp(header_, rhs.header_);
+      return header_;
     }
 
   private:
@@ -240,7 +203,7 @@ namespace messages {
     }
 
   private:
-    friend async_config_base;
+    friend async_config_base::basic_fixed_length_message;
 
     explicit get_async_reply(raw_ofp_type const& async_config) noexcept
       : async_config_base{async_config}
@@ -286,7 +249,7 @@ namespace messages {
     }
 
   private:
-    friend async_config_base;
+    friend async_config_base::basic_fixed_length_message;
 
     explicit set_async(raw_ofp_type const& async_config) noexcept
       : async_config_base{async_config}
