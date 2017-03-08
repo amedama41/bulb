@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_SUITE(queue_property_test)
       auto const error_msg = Property::validate_header(header);
 
       BOOST_TEST_REQUIRE(bool(error_msg), "should not be nullptr");
-      BOOST_TEST(error_msg == "invalid queue property"_sr);
+      BOOST_TEST(error_msg == "invalid queue property type"_sr);
     }
     BOOST_AUTO_TEST_CASE_TEMPLATE(
           return_error_message_if_length_is_less_than_ofp_struct_size
