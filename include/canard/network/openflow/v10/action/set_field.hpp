@@ -9,7 +9,8 @@
 #include <boost/fusion/sequence/intrinsic/value_at_key.hpp>
 #include <boost/fusion/support/pair.hpp>
 #include <canard/network/openflow/v10/common/match_fields.hpp>
-#include <canard/network/openflow/v10/detail/basic_action.hpp>
+#include <canard/network/openflow/v10/detail/basic_fixed_length_action.hpp>
+#include <canard/network/openflow/v10/detail/byteorder.hpp>
 #include <canard/network/openflow/v10/detail/fusion_adaptor.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
 
@@ -137,29 +138,24 @@ namespace actions {
     } // namespace set_field_detail
 
 
-    template <
-          class MatchField
-        , class SetFieldInfo = set_field_detail::set_field_info<MatchField>
-    >
+    template <class MatchField>
     class set_field
-        : public actions_detail::basic_action<
-                set_field<MatchField>, typename SetFieldInfo::raw_ofp_type
-          >
+        : public detail::v10::basic_fixed_length_action<set_field<MatchField>>
     {
-        using basic_action = actions_detail::basic_action<
-            set_field<MatchField>, typename SetFieldInfo::raw_ofp_type
-        >;
-        using basic_protocol_type = typename basic_action::basic_protocol_type;
+        using base_t
+            = detail::v10::basic_fixed_length_action<set_field<MatchField>>;
         using value_type = typename MatchField::value_type;
+        using set_field_info = set_field_detail::set_field_info<MatchField>;
 
     public:
-        using raw_ofp_type = typename basic_action::raw_ofp_type;
+        using raw_ofp_type = typename set_field_info::raw_ofp_type;
 
         static constexpr protocol::ofp_action_type action_type
-            = SetFieldInfo::action_type;
+            = set_field_info::action_type;
 
         explicit set_field(value_type const& value) noexcept
-            : set_field_(set_field_detail::to_ofp_action(value, SetFieldInfo{}))
+            : set_field_(
+                    set_field_detail::to_ofp_action(value, set_field_info{}))
         {
         }
 
@@ -181,8 +177,12 @@ namespace actions {
         }
 
     private:
-        friend basic_action;
-        friend basic_protocol_type;
+        friend base_t;
+
+        explicit set_field(raw_ofp_type const& action) noexcept
+            : set_field_(action)
+        {
+        }
 
         auto ofp_action() const noexcept
             -> raw_ofp_type const&
@@ -190,18 +190,12 @@ namespace actions {
             return set_field_;
         }
 
-        explicit set_field(raw_ofp_type const& action) noexcept
-            : set_field_(action)
-        {
-        }
-
-        template <class Validator>
-        void validate_impl(Validator) const
+        void validate_action() const
         {
             match_detail::validate(value(), typename MatchField::field_type{});
         }
 
-        auto equivalent_impl(set_field const& rhs) const noexcept
+        auto is_equivalent_action(set_field const& rhs) const noexcept
             -> bool
         {
             return value() == rhs.value();

@@ -4,7 +4,8 @@
 #include <cstdint>
 #include <stdexcept>
 #include <utility>
-#include <canard/network/openflow/v10/detail/basic_action.hpp>
+#include <canard/network/openflow/v10/detail/basic_fixed_length_action.hpp>
+#include <canard/network/openflow/v10/detail/byteorder.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
 
 namespace canard {
@@ -14,11 +15,11 @@ namespace v10 {
 namespace actions {
 
     class enqueue
-        : public actions_detail::basic_action<
-                enqueue, protocol::ofp_action_enqueue
-          >
+        : public detail::v10::basic_fixed_length_action<enqueue>
     {
     public:
+        using raw_ofp_type = protocol::ofp_action_enqueue;
+
         static constexpr protocol::ofp_action_type action_type
             = protocol::OFPAT_ENQUEUE;
 
@@ -47,8 +48,7 @@ namespace actions {
         }
 
     private:
-        friend basic_action;
-        friend basic_protocol_type;
+        friend basic_fixed_length_action;
 
         explicit enqueue(raw_ofp_type const& action_enqueue) noexcept
             : enqueue_(action_enqueue)
@@ -61,8 +61,7 @@ namespace actions {
             return enqueue_;
         }
 
-        template <class Validator>
-        void validate_impl(Validator) const
+        void validate_action() const
         {
             if (queue_id() == protocol::OFPQ_ALL) {
                 throw std::runtime_error{"invalid queue_id"};
@@ -74,7 +73,7 @@ namespace actions {
             }
         }
 
-        auto equivalent_impl(enqueue const& rhs) const noexcept
+        auto is_equivalent_action(enqueue const& rhs) const noexcept
             -> bool
         {
             return queue_id() == rhs.queue_id()

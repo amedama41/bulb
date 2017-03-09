@@ -5,7 +5,8 @@
 #include <limits>
 #include <stdexcept>
 #include <utility>
-#include <canard/network/openflow/v10/detail/basic_action.hpp>
+#include <canard/network/openflow/v10/detail/basic_fixed_length_action.hpp>
+#include <canard/network/openflow/v10/detail/byteorder.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
 
 namespace canard {
@@ -15,11 +16,11 @@ namespace v10 {
 namespace actions {
 
     class output
-        : public actions_detail::basic_action<
-                output, protocol::ofp_action_output
-          >
+        : public detail::v10::basic_fixed_length_action<output>
     {
     public:
+        using raw_ofp_type = protocol::ofp_action_output;
+
         static constexpr protocol::ofp_action_type action_type
             = protocol::OFPAT_OUTPUT;
 
@@ -57,8 +58,7 @@ namespace actions {
         }
 
     private:
-        friend basic_action;
-        friend basic_protocol_type;
+        friend basic_fixed_length_action;
 
         explicit output(raw_ofp_type const output) noexcept
             : action_output_(output)
@@ -71,15 +71,14 @@ namespace actions {
             return action_output_;
         }
 
-        template <class Validator>
-        void validate_impl(Validator) const
+        void validate_action() const
         {
             if (port_no() == 0 || port_no() == protocol::OFPP_NONE) {
                 throw std::runtime_error{"invalid port_no"};
             }
         }
 
-        auto equivalent_impl(output const& rhs) const noexcept
+        auto is_equivalent_action(output const& rhs) const noexcept
             -> bool
         {
             if (port_no() == protocol::OFPP_CONTROLLER) {

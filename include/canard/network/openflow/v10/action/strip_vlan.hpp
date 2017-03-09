@@ -1,7 +1,8 @@
 #ifndef CANARD_NET_OFP_V10_ACTIONS_STRIP_VLAN_HPP
 #define CANARD_NET_OFP_V10_ACTIONS_STRIP_VLAN_HPP
 
-#include <canard/network/openflow/v10/detail/basic_action.hpp>
+#include <canard/network/openflow/v10/detail/basic_fixed_length_action.hpp>
+#include <canard/network/openflow/v10/detail/byteorder.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
 
 namespace canard {
@@ -11,11 +12,11 @@ namespace v10 {
 namespace actions {
 
     class strip_vlan
-        : public actions_detail::basic_action<
-                strip_vlan, protocol::ofp_action_header
-          >
+        : public detail::v10::basic_fixed_length_action<strip_vlan>
     {
     public:
+        using raw_ofp_type = protocol::ofp_action_header;
+
         static constexpr protocol::ofp_action_type action_type
             = protocol::OFPAT_STRIP_VLAN;
 
@@ -25,8 +26,7 @@ namespace actions {
         }
 
     private:
-        friend basic_action;
-        friend basic_protocol_type;
+        friend basic_fixed_length_action;
 
         explicit strip_vlan(raw_ofp_type const& action_header) noexcept
             : strip_vlan_(action_header)
@@ -39,12 +39,11 @@ namespace actions {
             return strip_vlan_;
         }
 
-        template <class Validator>
-        void validate_impl(Validator) const
+        void validate_action() const
         {
         }
 
-        auto equivalent_impl(strip_vlan const&) const noexcept
+        auto is_equivalent_action(strip_vlan const&) const noexcept
             -> bool
         {
             return true;
