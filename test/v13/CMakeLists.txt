@@ -122,7 +122,8 @@ set(table_feature_property_srcs
     table_feature_property/instructions_test.cpp
     table_feature_property/next_tables_test.cpp
     table_feature_property/actions_test.cpp
-    table_feature_property/oxm_test.cpp)
+    table_feature_property/oxm_test.cpp
+    table_feature_property/validate_header_test.cpp)
 set(utility_srcs
     utility/any_oxm_match_field_test.cpp
     utility/any_action_test.cpp
