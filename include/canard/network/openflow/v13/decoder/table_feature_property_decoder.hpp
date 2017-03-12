@@ -45,6 +45,9 @@ namespace v13 {
 #     define CANARD_NET_OFP_V13_TABLE_FEATURE_PROPERTY_CASE(z, N, _) \
       using property ## N = std::tuple_element<N, decode_type_list>::type; \
       case property ## N::type(): \
+        if (!property ## N::is_valid_table_feature_property_length(header)) { \
+          throw std::runtime_error{"invalid table_feature_property length"}; \
+        } \
         return function(property ## N::decode(first, last));
       BOOST_PP_REPEAT(
             CANARD_NET_OFP_NUM_TABLE_FEATURE_PROPERTIES
