@@ -16,50 +16,64 @@ namespace canard {
 namespace net {
 namespace ofp {
 namespace v13 {
-struct set_field_decoder
-{
+
+  struct set_field_decoder
+  {
     using header_type = protocol::ofp_action_set_field;
     using type_id = std::uint32_t;
     using decode_type_list = default_set_field_list;
     static constexpr std::uint16_t header_size = sizeof(header_type);
 
+    static_assert(
+          std::tuple_size<default_set_field_list>::value == 36
+        , "not match to the number of set_field types");
+
     template <class ReturnType, class Iterator, class Function>
     static auto decode(Iterator& first, Iterator last, Function function)
-        -> ReturnType
+      -> ReturnType
     {
-        auto const set_field
-            = detail::decode_without_consumption<header_type>(first, last);
+      auto const set_field
+        = detail::decode_without_consumption<header_type>(first, last);
 
-        auto const oxm_header = v13::oxm_header::decode_without_consumption(
-                set_field.field, set_field.field + sizeof(set_field.field));
+      auto const oxm_header = v13::oxm_header::decode_without_consumption(
+          set_field.field, set_field.field + sizeof(set_field.field));
 
-        if (set_field.len != detail::v13::exact_length(
-                    header_size + oxm_header.oxm_length())) {
-            throw std::runtime_error{"invalid set_field length"};
-        }
+      if (set_field.len != detail::v13::exact_length(
+            header_size + oxm_header.oxm_length())) {
+        throw std::runtime_error{"invalid set_field length"};
+      }
 
-        static_assert(
-                  std::tuple_size<default_set_field_list>::value == 36
-                , "not match to the number of set_field types");
-        switch (oxm_header.oxm_type()) {
-#       define CANARD_NET_OFP_V13_SET_FIELD_CASE(z, N, _) \
-        using set_field ## N = \
+      switch (oxm_header.oxm_type()) {
+
+#     define CANARD_NET_OFP_V13_SET_FIELD_CASE(z, N, _) \
+      using set_field ## N = \
             std::tuple_element<N, default_set_field_list>::type; \
-        case set_field ## N::oxm_type(): \
-            if (!set_field ## N::oxm_match_field \
-                    ::is_valid_oxm_match_field_length(oxm_header)) { \
-                throw std::runtime_error{ \
-                    "invalid set_field's oxm_match_field length" \
-                }; \
-            } \
-            return function(set_field ## N::decode(first, last));
-        BOOST_PP_REPEAT(36, CANARD_NET_OFP_V13_SET_FIELD_CASE, _)
-#       undef CANARD_NET_OFP_V13_SET_FIELD_CASE
-        default:
-            throw std::runtime_error{"unknwon set_field's oxm_match_field type"};
-        }
+      case set_field ## N::oxm_type(): \
+        if (!set_field ## N::oxm_match_field \
+            ::is_valid_oxm_match_field_length(oxm_header)) { \
+          throw std::runtime_error{ \
+            "invalid set_field's oxm_match_field length" \
+          }; \
+        } \
+        return function(set_field ## N::decode(first, last));
+
+      BOOST_PP_REPEAT(36, CANARD_NET_OFP_V13_SET_FIELD_CASE, _)
+
+#     undef CANARD_NET_OFP_V13_SET_FIELD_CASE
+
+      default:
+        throw std::runtime_error{"unknwon set_field's oxm_match_field type"};
+      }
     }
-};
+
+    template <class ReturnType, class Iterator, class Function>
+    static auto decode_without_consumption(
+        Iterator first, Iterator last, Function function)
+      -> ReturnType
+    {
+      return decode<ReturnType>(first, last, function);
+    }
+  };
 
 } // namespace v13
 } // namespace ofp

@@ -39,18 +39,30 @@ namespace v13 {
       }
 
       switch (meter_band_header.type) {
-      #define CANARD_NET_OFP_V13_METER_BAND_CASE(z, N, _) \
+
+#     define CANARD_NET_OFP_V13_METER_BAND_CASE(z, N, _) \
       using meter_band ## N = std::tuple_element<N, decode_type_list>::type; \
       case meter_band ## N::type(): \
         if (!meter_band ## N::is_valid_meter_band_length(meter_band_header)) { \
           throw std::runtime_error{"invalid meter band length"}; \
         } \
         return function(meter_band ## N::decode(first, last));
+
       BOOST_PP_REPEAT(2, CANARD_NET_OFP_V13_METER_BAND_CASE, _)
-      #undef CANARD_NET_OFP_V13_METER_BAND_CASE
+
+#     undef CANARD_NET_OFP_V13_METER_BAND_CASE
+
       default:
         throw std::runtime_error{"unknwon meter band"};
       }
+    }
+
+    template <class ReturnType, class Iterator, class Function>
+    static auto decode_without_consumption(
+        Iterator first, Iterator last, Function function)
+      -> ReturnType
+    {
+      return decode<ReturnType>(first, last, function);
     }
   };
 

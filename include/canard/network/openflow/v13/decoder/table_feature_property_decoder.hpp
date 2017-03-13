@@ -42,6 +42,7 @@ namespace v13 {
       }
 
       switch (header.type) {
+
 #     define CANARD_NET_OFP_V13_TABLE_FEATURE_PROPERTY_CASE(z, N, _) \
       using property ## N = std::tuple_element<N, decode_type_list>::type; \
       case property ## N::type(): \
@@ -49,14 +50,25 @@ namespace v13 {
           throw std::runtime_error{"invalid table_feature_property length"}; \
         } \
         return function(property ## N::decode(first, last));
+
       BOOST_PP_REPEAT(
             CANARD_NET_OFP_NUM_TABLE_FEATURE_PROPERTIES
           , CANARD_NET_OFP_V13_TABLE_FEATURE_PROPERTY_CASE
           , _)
+
 #     undef CANARD_NET_OFP_V13_TABLE_FEATURE_PROPERTY_CASE
+
       default:
         throw std::runtime_error{"unknwon table feature property type"};
       }
+    }
+
+    template <class ReturnType, class Iterator, class Function>
+    static auto decode_without_consumption(
+        Iterator first, Iterator last, Function function)
+      -> ReturnType
+    {
+      return decode<ReturnType>(first, last, function);
     }
   };
 

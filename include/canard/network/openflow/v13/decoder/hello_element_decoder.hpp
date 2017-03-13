@@ -60,6 +60,7 @@ namespace v13 {
       }
 
       switch (helem_header.type) {
+
 #     define CANARD_NET_OFP_V13_HELLO_ELEMENT_DECODE_CASE(z, N, _) \
       using helem ## N = std::tuple_element<N, hello_element_list>::type; \
       case helem ## N::type(): \
@@ -67,12 +68,22 @@ namespace v13 {
           throw std::runtime_error{"invalid hello element length"}; \
         } \
         return function(helem ## N::decode(first, last));
+
       BOOST_PP_REPEAT(1, CANARD_NET_OFP_V13_HELLO_ELEMENT_DECODE_CASE, _)
+
 #     undef CANARD_NET_OFP_V13_HELLO_ELEMENT_DECODE_CASE
 
       default:
         return function(unknwon_type::decode(first, last));
       }
+    }
+
+    template <class ReturnType, class Iterator, class Function>
+    static auto decode_without_consumption(
+        Iterator first, Iterator last, Function function)
+      -> ReturnType
+    {
+      return decode<ReturnType>(first, last, function);
     }
   };
 
