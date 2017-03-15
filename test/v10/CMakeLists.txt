@@ -19,6 +19,8 @@ set(common_type_srcs
     common_type/match_set_test.cpp
     common_type/packet_queue_test.cpp
     common_type/port_test.cpp)
+set(decoder_srcs
+    decoder/flow_mod_decoder_test.cpp)
 set(io_srcs
     io/openflow_test.cpp)
 set(message_srcs
@@ -55,7 +57,7 @@ set(utility_srcs
     utility/flow_entry_test.cpp)
 
 set(test_modules
-    action common_type io message queue_property stats utility)
+    action common_type decoder io message queue_property stats utility)
 
 set_source_files_properties(${libbulb_srcs} PROPERTIES LANGUAGE CXX)
 add_library(v10_bulb SHARED ${libbulb_srcs})
