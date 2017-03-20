@@ -10,6 +10,7 @@
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
+#include <canard/network/openflow/exception.hpp>
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/v10/action_list.hpp>
 #include <canard/network/openflow/v10/common/match.hpp>
@@ -216,11 +217,19 @@ namespace statistics {
         {
             auto const stats = detail::decode<raw_ofp_type>(first, last);
             if (stats.length < sizeof(raw_ofp_type)) {
-                throw std::runtime_error{"flow_stats length is too small"};
+                BOOST_THROW_EXCEPTION((ofp::exception{
+                          ofp::exception::bad_stats_element
+                        , ofp::exception::bad_length
+                        , "flow_stats length is too small"
+                }));
             }
             auto const actions_length = stats.length - sizeof(raw_ofp_type);
             if (std::distance(first, last) < actions_length) {
-                throw std::runtime_error{"flow_stats length is too big"};
+                BOOST_THROW_EXCEPTION((ofp::exception{
+                          protocol::error_type::bad_request
+                        , protocol::bad_request_code::bad_len
+                        , "too small data size for flow_stats"
+                }));
             }
             last = std::next(first, actions_length);
 

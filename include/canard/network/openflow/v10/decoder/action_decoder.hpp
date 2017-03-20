@@ -7,6 +7,7 @@
 #include <tuple>
 #include <boost/preprocessor/repeat.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
+#include <canard/network/openflow/exception.hpp>
 #include <canard/network/openflow/v10/actions.hpp>
 #include <canard/network/openflow/v10/detail/byteorder.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
@@ -35,7 +36,11 @@ namespace v10 {
         = detail::decode_without_consumption<header_type>(first, last);
 
       if (std::distance(first, last) < action_header.len) {
-        throw std::runtime_error{"too small data size for action"};
+        BOOST_THROW_EXCEPTION((ofp::exception{
+              protocol::error_type::bad_request
+            , protocol::bad_request_code::bad_len
+            , "too small data size for action"
+        }));
       }
 
       switch (action_header.type) {
@@ -44,7 +49,11 @@ namespace v10 {
       using action ## N = std::tuple_element<N, decode_type_list>::type; \
       case action ## N::action_type: \
         if (!action ## N::is_valid_action_length(action_header)) { \
-          throw std::runtime_error{"invalid action length"}; \
+          BOOST_THROW_EXCEPTION((ofp::exception{ \
+                protocol::error_type::bad_action \
+              , protocol::bad_action_code::bad_len \
+              , "invalid action length" \
+          })); \
         } \
         return function(action ## N::decode(first, last));
 
@@ -53,7 +62,11 @@ namespace v10 {
 #     undef CANARD_NET_OFP_V10_ACTION_CASE
 
       default:
-        throw std::runtime_error{"unknwon action type"};
+        BOOST_THROW_EXCEPTION((ofp::exception{
+              protocol::error_type::bad_action
+            , protocol::bad_action_code::bad_type
+            , "unknwon action type"
+        }));
       }
     }
 

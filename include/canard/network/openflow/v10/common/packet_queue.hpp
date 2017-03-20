@@ -9,6 +9,7 @@
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
+#include <canard/network/openflow/exception.hpp>
 #include <canard/network/openflow/list.hpp>
 #include <canard/network/openflow/queue_id.hpp>
 #include <canard/network/openflow/v10/any_queue_property.hpp>
@@ -122,11 +123,19 @@ namespace v10 {
         {
             auto const pkt_queue = detail::decode<raw_ofp_type>(first, last);
             if (pkt_queue.len < sizeof(raw_ofp_type)) {
-                throw std::runtime_error{"packet_queue length is too small"};
+                BOOST_THROW_EXCEPTION((exception{
+                          exception::bad_packet_queue
+                        , exception::bad_length
+                        , "packet_queue length is too small"
+                }));
             }
             auto const properties_length = pkt_queue.len - sizeof(raw_ofp_type);
             if (std::distance(first, last) < properties_length) {
-                throw std::runtime_error{"packet_queue length is too big"};
+                BOOST_THROW_EXCEPTION((exception{
+                          protocol::error_type::bad_request
+                        , protocol::bad_request_code::bad_len
+                        , "too small data size for packet_queue"
+                }));
             }
             last = std::next(first, properties_length);
 

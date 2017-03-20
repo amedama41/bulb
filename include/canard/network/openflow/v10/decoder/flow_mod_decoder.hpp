@@ -6,6 +6,7 @@
 #include <tuple>
 #include <boost/preprocessor/repeat.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
+#include <canard/network/openflow/exception.hpp>
 #include <canard/network/openflow/v10/message/flow_mod.hpp>
 #include <canard/network/openflow/v10/openflow.hpp>
 
@@ -46,7 +47,11 @@ namespace v10 {
 #     undef CANARD_NET_OFP_V10_FLOW_MOD_CASE
 
       default:
-        throw std::runtime_error{"unknwon flow_mod command"};
+        BOOST_THROW_EXCEPTION((ofp::exception{
+              protocol::error_type::flow_mod_failed
+            , protocol::flow_mod_failed_code::bad_command
+            , "unknwon flow_mod command"
+        }));
       }
     }
 
