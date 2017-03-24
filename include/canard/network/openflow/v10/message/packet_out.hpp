@@ -9,7 +9,7 @@
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/detail/memcmp.hpp>
-#include <canard/network/openflow/exception.hpp>
+#include <canard/network/openflow/v10/exception.hpp>
 #include <canard/network/openflow/get_xid.hpp>
 #include <canard/network/openflow/v10/action_list.hpp>
 #include <canard/network/openflow/v10/detail/basic_message.hpp>
@@ -219,9 +219,8 @@ namespace messages {
             auto const pkt_out = detail::decode<raw_ofp_type>(first, last);
             auto const rest_size = pkt_out.header.length - sizeof(raw_ofp_type);
             if (rest_size < pkt_out.actions_len) {
-                BOOST_THROW_EXCEPTION((ofp::exception{
-                          protocol::error_type::bad_request
-                        , protocol::bad_request_code::bad_len
+                BOOST_THROW_EXCEPTION((v10::exception{
+                          protocol::OFPBRC_BAD_LEN
                         , "too small data size for actions"
                 }));
             }
