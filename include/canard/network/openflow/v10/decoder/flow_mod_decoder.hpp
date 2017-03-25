@@ -47,9 +47,9 @@ namespace v10 {
 #     undef CANARD_NET_OFP_V10_FLOW_MOD_CASE
 
       default:
-        BOOST_THROW_EXCEPTION((v10::exception{
-              protocol::OFPFMFC_BAD_COMMAND, "unknwon flow_mod command"
-        }));
+        throw v10::exception{
+          protocol::OFPFMFC_BAD_COMMAND, "unknwon flow_mod command"
+        } << CANARD_NET_OFP_ERROR_INFO();
       }
     }
 

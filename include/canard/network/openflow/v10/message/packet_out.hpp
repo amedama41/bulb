@@ -219,10 +219,9 @@ namespace messages {
             auto const pkt_out = detail::decode<raw_ofp_type>(first, last);
             auto const rest_size = pkt_out.header.length - sizeof(raw_ofp_type);
             if (rest_size < pkt_out.actions_len) {
-                BOOST_THROW_EXCEPTION((v10::exception{
-                          protocol::OFPBRC_BAD_LEN
-                        , "too small data size for actions"
-                }));
+                throw v10::exception{
+                    protocol::OFPBRC_BAD_LEN, "too small data size for actions"
+                } << CANARD_NET_OFP_ERROR_INFO();
             }
 
             auto const actions_last = std::next(first, pkt_out.actions_len);

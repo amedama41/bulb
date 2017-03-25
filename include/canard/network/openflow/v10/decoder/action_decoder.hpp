@@ -36,9 +36,9 @@ namespace v10 {
         = detail::decode_without_consumption<header_type>(first, last);
 
       if (std::distance(first, last) < action_header.len) {
-        BOOST_THROW_EXCEPTION((v10::exception{
-              protocol::OFPBRC_BAD_LEN, "too small data size for action"
-        }));
+        throw v10::exception{
+          protocol::OFPBRC_BAD_LEN, "too small data size for action"
+        } << CANARD_NET_OFP_ERROR_INFO();
       }
 
       switch (action_header.type) {
@@ -47,9 +47,9 @@ namespace v10 {
       using action ## N = std::tuple_element<N, decode_type_list>::type; \
       case action ## N::action_type: \
         if (!action ## N::is_valid_action_length(action_header)) { \
-          BOOST_THROW_EXCEPTION((v10::exception{ \
-                protocol::OFPBAC_BAD_LEN, "invalid action length" \
-          })); \
+          throw v10::exception{ \
+            protocol::OFPBAC_BAD_LEN, "invalid action length" \
+          } << CANARD_NET_OFP_ERROR_INFO(); \
         } \
         return function(action ## N::decode(first, last));
 
@@ -58,9 +58,9 @@ namespace v10 {
 #     undef CANARD_NET_OFP_V10_ACTION_CASE
 
       default:
-        BOOST_THROW_EXCEPTION((v10::exception{
-              protocol::OFPBAC_BAD_TYPE, "unknwon action type"
-        }));
+        throw v10::exception{
+          protocol::OFPBAC_BAD_TYPE, "unknwon action type"
+        } << CANARD_NET_OFP_ERROR_INFO();
       }
     }
 

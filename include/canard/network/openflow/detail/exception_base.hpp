@@ -7,8 +7,9 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <boost/current_function.hpp>
 #include <boost/exception/exception.hpp>
-#include <boost/throw_exception.hpp>
+#include <boost/exception/info.hpp>
 #include <boost/utility/string_ref.hpp>
 
 namespace canard {
@@ -40,6 +41,26 @@ namespace detail {
         return os << std::hex << std::setfill('0') << std::setw(4) << code;
       }
     }
+
+    struct error_info
+    {
+      error_info(
+          char const* const function, char const* const file, int const line)
+        : throw_function{function}, throw_file{file}, throw_line{line}
+      {
+      }
+
+      template <class E>
+      friend auto operator<<(E const& e, error_info const& info)
+        -> E const&
+      {
+        return e << info.throw_function << info.throw_file << info.throw_line;
+      }
+
+      boost::throw_function throw_function;
+      boost::throw_file throw_file;
+      boost::throw_line throw_line;
+    };
 
   } // namespace exception_base_detail
 
@@ -135,6 +156,11 @@ namespace detail {
     std::uint32_t error_type_;
     std::uint16_t error_code_;
   };
+
+# define CANARD_NET_OFP_ERROR_INFO() \
+  (::canard::net::ofp::detail::exception_base_detail::error_info{ \
+    BOOST_CURRENT_FUNCTION, __FILE__, __LINE__ \
+  })
 
 } // namespace detail
 } // namespace ofp

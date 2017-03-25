@@ -123,18 +123,18 @@ namespace v10 {
         {
             auto const pkt_queue = detail::decode<raw_ofp_type>(first, last);
             if (pkt_queue.len < sizeof(raw_ofp_type)) {
-                BOOST_THROW_EXCEPTION((v10::exception{
-                          exception::ex_error_type::bad_packet_queue
-                        , exception::ex_error_code::bad_length
-                        , "packet_queue length is too small"
-                }));
+                throw v10::exception{
+                      exception::ex_error_type::bad_packet_queue
+                    , exception::ex_error_code::bad_length
+                    , "packet_queue length is too small"
+                } << CANARD_NET_OFP_ERROR_INFO();
             }
             auto const properties_length = pkt_queue.len - sizeof(raw_ofp_type);
             if (std::distance(first, last) < properties_length) {
-                BOOST_THROW_EXCEPTION((v10::exception{
-                          protocol::OFPBRC_BAD_LEN
-                        , "too small data size for packet_queue"
-                }));
+                throw v10::exception{
+                      protocol::OFPBRC_BAD_LEN
+                    , "too small data size for packet_queue"
+                } << CANARD_NET_OFP_ERROR_INFO();
             }
             last = std::next(first, properties_length);
 

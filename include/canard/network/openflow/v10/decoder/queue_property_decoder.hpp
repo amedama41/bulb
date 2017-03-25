@@ -36,10 +36,9 @@ namespace v10 {
         = detail::decode_without_consumption<header_type>(first, last);
 
       if (std::distance(first, last) < prop_header.len) {
-        BOOST_THROW_EXCEPTION((v10::exception{
-                protocol::OFPBRC_BAD_LEN
-              , "too small data size for queue_property"
-        }));
+        throw v10::exception{
+          protocol::OFPBRC_BAD_LEN, "too small data size for queue_property"
+        } << CANARD_NET_OFP_ERROR_INFO();
       }
 
       switch (prop_header.property) {
@@ -48,11 +47,11 @@ namespace v10 {
       using property ## N = std::tuple_element<N, decode_type_list>::type; \
       case property ## N::queue_property: \
         if (!property ## N::is_valid_queue_property_length(prop_header)) { \
-          BOOST_THROW_EXCEPTION((v10::exception{ \
-                  v10::exception::ex_error_type::bad_queue_property \
-                , v10::exception::ex_error_code::bad_length \
-                , "invalid queue_property length" \
-          })); \
+          throw v10::exception{ \
+              v10::exception::ex_error_type::bad_queue_property \
+            , v10::exception::ex_error_code::bad_length \
+            , "invalid queue_property length" \
+          } << CANARD_NET_OFP_ERROR_INFO(); \
         } \
         return function(property ## N::decode(first, last));
 
@@ -61,11 +60,11 @@ namespace v10 {
 #     undef  CANARD_NET_OFP_V10_QUEUE_PROPERTY_CASE
 
       default:
-        BOOST_THROW_EXCEPTION((v10::exception{
-                v10::exception::ex_error_type::bad_queue_property
-              , v10::exception::ex_error_code::bad_type
-              , "unknwon queue_property"
-        }));
+        throw v10::exception{
+              v10::exception::ex_error_type::bad_queue_property
+            , v10::exception::ex_error_code::bad_type
+            , "unknwon queue_property"
+        } << CANARD_NET_OFP_ERROR_INFO();
       }
     }
 

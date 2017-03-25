@@ -217,18 +217,18 @@ namespace statistics {
         {
             auto const stats = detail::decode<raw_ofp_type>(first, last);
             if (stats.length < sizeof(raw_ofp_type)) {
-                BOOST_THROW_EXCEPTION((v10::exception{
-                          v10::exception::ex_error_type::bad_stats_element
-                        , v10::exception::ex_error_code::bad_length
-                        , "flow_stats length is too small"
-                }));
+                throw v10::exception{
+                      v10::exception::ex_error_type::bad_stats_element
+                    , v10::exception::ex_error_code::bad_length
+                    , "flow_stats length is too small"
+                } << CANARD_NET_OFP_ERROR_INFO();
             }
             auto const actions_length = stats.length - sizeof(raw_ofp_type);
             if (std::distance(first, last) < actions_length) {
-                BOOST_THROW_EXCEPTION((v10::exception{
-                          protocol::OFPBRC_BAD_LEN
-                        , "too small data size for flow_stats"
-                }));
+                throw v10::exception{
+                      protocol::OFPBRC_BAD_LEN
+                    , "too small data size for flow_stats"
+                } << CANARD_NET_OFP_ERROR_INFO();
             }
             last = std::next(first, actions_length);
 
