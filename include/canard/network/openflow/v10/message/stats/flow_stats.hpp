@@ -218,8 +218,8 @@ namespace statistics {
             auto const stats = detail::decode<raw_ofp_type>(first, last);
             if (stats.length < sizeof(raw_ofp_type)) {
                 BOOST_THROW_EXCEPTION((v10::exception{
-                          v10::exception::bad_stats_element
-                        , v10::exception::bad_length
+                          v10::exception::ex_error_type::bad_stats_element
+                        , v10::exception::ex_error_code::bad_length
                         , "flow_stats length is too small"
                 }));
             }

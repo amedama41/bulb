@@ -49,8 +49,8 @@ namespace v10 {
       case property ## N::queue_property: \
         if (!property ## N::is_valid_queue_property_length(prop_header)) { \
           BOOST_THROW_EXCEPTION((v10::exception{ \
-                  v10::exception::bad_queue_property \
-                , v10::exception::bad_length \
+                  v10::exception::ex_error_type::bad_queue_property \
+                , v10::exception::ex_error_code::bad_length \
                 , "invalid queue_property length" \
           })); \
         } \
@@ -62,8 +62,8 @@ namespace v10 {
 
       default:
         BOOST_THROW_EXCEPTION((v10::exception{
-                v10::exception::bad_queue_property
-              , v10::exception::bad_type
+                v10::exception::ex_error_type::bad_queue_property
+              , v10::exception::ex_error_code::bad_type
               , "unknwon queue_property"
         }));
       }

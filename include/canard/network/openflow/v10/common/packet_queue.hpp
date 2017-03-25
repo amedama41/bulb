@@ -124,8 +124,8 @@ namespace v10 {
             auto const pkt_queue = detail::decode<raw_ofp_type>(first, last);
             if (pkt_queue.len < sizeof(raw_ofp_type)) {
                 BOOST_THROW_EXCEPTION((v10::exception{
-                          exception::bad_packet_queue
-                        , exception::bad_length
+                          exception::ex_error_type::bad_packet_queue
+                        , exception::ex_error_code::bad_length
                         , "packet_queue length is too small"
                 }));
             }
