@@ -17,7 +17,8 @@ namespace v10 {
 
   namespace exception_detail {
 
-    enum ofp_ex_error_type : std::uint32_t {
+    enum ofp_ex_error_type : std::uint32_t
+    {
       bad_stats_element = 0x00010000,
       bad_multipart_element = bad_stats_element,
       bad_match_field = 0x00020000,
