@@ -135,7 +135,7 @@ namespace messages {
         {
             return error{
                   protocol::OFPET_HELLO_FAILED
-                , code
+                , std::uint16_t(code)
                 , data_type{data.begin(), data.end()}
                 , xid
             };
