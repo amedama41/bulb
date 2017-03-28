@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_SUITE(openflow)
   BOOST_AUTO_TEST_SUITE(port_no)
     BOOST_DATA_TEST_CASE(
           reserved_port_no
-        , data::make(std::vector<protocol::port_no::type>{
+        , data::make(std::vector<protocol::port_no>{
             protocol::port_no::max , protocol::port_no::in_port
           , protocol::port_no::table, protocol::port_no::normal
           , protocol::port_no::flood , protocol::port_no::all
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_SUITE(openflow)
     }
     BOOST_AUTO_TEST_CASE(physical_port_no)
     {
-      auto const sut = protocol::port_no{1};
+      auto const sut = protocol::port_no(1);
       std::ostringstream oss;
 
       oss << sut;
