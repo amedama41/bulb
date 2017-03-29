@@ -802,7 +802,7 @@ namespace protocol {
 
   namespace ofp_port_no_detail {
 
-    enum ofp_port_no // : std::uint32_t
+    enum ofp_port_no : std::uint32_t
     {
       OFPP_MAX = 4294967040,
       max = OFPP_MAX,
@@ -841,7 +841,7 @@ namespace protocol {
 
   namespace ofp_type_detail {
 
-    enum ofp_type // : std::uint8_t
+    enum ofp_type : std::uint8_t
     {
       OFPT_HELLO = 0,
       hello = OFPT_HELLO,
@@ -943,7 +943,7 @@ namespace protocol {
 
   namespace ofp_hello_elem_type_detail {
 
-    enum ofp_hello_elem_type // : std::uint16_t
+    enum ofp_hello_elem_type : std::uint16_t
     {
       OFPHET_VERSIONBITMAP = 1,
       versionbitmap = OFPHET_VERSIONBITMAP,
@@ -958,7 +958,7 @@ namespace protocol {
 
   namespace ofp_config_flags_detail {
 
-    enum ofp_config_flags // : std::uint16_t
+    enum ofp_config_flags : std::uint16_t
     {
       OFPC_FRAG_NORMAL = 0,
       normal = OFPC_FRAG_NORMAL,
@@ -982,7 +982,7 @@ namespace protocol {
 
   namespace ofp_table_config_detail {
 
-    enum ofp_table_config // : std::uint32_t
+    enum ofp_table_config : std::uint32_t
     {
       OFPTC_DEPRECATED_MASK = 3,
       deprecated_mask = OFPTC_DEPRECATED_MASK,
@@ -997,7 +997,7 @@ namespace protocol {
 
   namespace ofp_table_detail {
 
-    enum ofp_table // : std::uint8_t
+    enum ofp_table : std::uint8_t
     {
       OFPTT_MAX = 254,
       max = OFPTT_MAX,
@@ -1015,7 +1015,7 @@ namespace protocol {
 
   namespace ofp_capabilities_detail {
 
-    enum ofp_capabilities // : std::uint32_t
+    enum ofp_capabilities : std::uint32_t
     {
       OFPC_FLOW_STATS = 1,
       flow_stats = OFPC_FLOW_STATS,
@@ -1048,7 +1048,7 @@ namespace protocol {
 
   namespace ofp_port_config_detail {
 
-    enum ofp_port_config // : std::uint32_t
+    enum ofp_port_config : std::uint32_t
     {
       OFPPC_PORT_DOWN = 1,
       port_down = OFPPC_PORT_DOWN,
@@ -1072,7 +1072,7 @@ namespace protocol {
 
   namespace ofp_port_state_detail {
 
-    enum ofp_port_state // : std::uint32_t
+    enum ofp_port_state : std::uint32_t
     {
       OFPPS_LINK_DOWN = 1,
       link_down = OFPPS_LINK_DOWN,
@@ -1093,7 +1093,7 @@ namespace protocol {
 
   namespace ofp_port_features_detail {
 
-    enum ofp_port_features // : std::uint32_t
+    enum ofp_port_features : std::uint32_t
     {
       OFPPF_10MB_HD = 1,
       mode_10mb_hd = OFPPF_10MB_HD,
@@ -1153,7 +1153,7 @@ namespace protocol {
 
   namespace ofp_port_reason_detail {
 
-    enum ofp_port_reason // : std::uint8_t
+    enum ofp_port_reason : std::uint8_t
     {
       OFPPR_ADD = 0,
       by_add = OFPPR_ADD,
@@ -1174,7 +1174,7 @@ namespace protocol {
 
   namespace ofp_match_type_detail {
 
-    enum ofp_match_type // : std::uint16_t
+    enum ofp_match_type : std::uint16_t
     {
       OFPMT_STANDARD = 0,
       standard = OFPMT_STANDARD,
@@ -1192,7 +1192,7 @@ namespace protocol {
 
   namespace ofp_oxm_class_detail {
 
-    enum ofp_oxm_class // : std::uint16_t
+    enum ofp_oxm_class : std::uint16_t
     {
       OFPXMC_NXM_0 = 0,
       nxm_0 = OFPXMC_NXM_0,
@@ -1216,7 +1216,7 @@ namespace protocol {
 
   namespace oxm_ofb_match_fields_detail {
 
-    enum oxm_ofb_match_fields // : std::uint8_t
+    enum oxm_ofb_match_fields : std::uint8_t
     {
       OFPXMT_OFB_IN_PORT = 0,
       in_port = OFPXMT_OFB_IN_PORT,
@@ -1348,7 +1348,7 @@ namespace protocol {
 
   namespace ofp_vlan_id_detail {
 
-    enum ofp_vlan_id // : std::uint16_t
+    enum ofp_vlan_id : std::uint16_t
     {
       OFPVID_PRESENT = 4096,
       present = OFPVID_PRESENT,
@@ -1366,7 +1366,7 @@ namespace protocol {
 
   namespace ofp_ipv6exthdr_flags_detail {
 
-    enum ofp_ipv6exthdr_flags // : std::uint16_t
+    enum ofp_ipv6exthdr_flags : std::uint16_t
     {
       OFPIEH_NONEXT = 1,
       nonext = OFPIEH_NONEXT,
@@ -1405,7 +1405,7 @@ namespace protocol {
 
   namespace ofp_action_type_detail {
 
-    enum ofp_action_type // : std::uint16_t
+    enum ofp_action_type : std::uint16_t
     {
       OFPAT_OUTPUT = 0,
       output = OFPAT_OUTPUT,
@@ -1468,7 +1468,7 @@ namespace protocol {
 
   namespace ofp_controller_max_len_detail {
 
-    enum ofp_controller_max_len // : std::uint16_t
+    enum ofp_controller_max_len : std::uint16_t
     {
       OFPCML_MAX = 65509,
       max = OFPCML_MAX,
@@ -1486,7 +1486,7 @@ namespace protocol {
 
   namespace ofp_instruction_type_detail {
 
-    enum ofp_instruction_type // : std::uint16_t
+    enum ofp_instruction_type : std::uint16_t
     {
       OFPIT_GOTO_TABLE = 1,
       goto_table = OFPIT_GOTO_TABLE,
@@ -1519,7 +1519,7 @@ namespace protocol {
 
   namespace ofp_flow_mod_command_detail {
 
-    enum ofp_flow_mod_command // : std::uint16_t
+    enum ofp_flow_mod_command : std::uint16_t
     {
       OFPFC_ADD = 0,
       add_cmd = OFPFC_ADD,
@@ -1546,7 +1546,7 @@ namespace protocol {
 
   namespace ofp_flow_mod_flags_detail {
 
-    enum ofp_flow_mod_flags // : std::uint16_t
+    enum ofp_flow_mod_flags : std::uint16_t
     {
       OFPFF_SEND_FLOW_REM = 1,
       send_flow_rem = OFPFF_SEND_FLOW_REM,
@@ -1573,7 +1573,7 @@ namespace protocol {
 
   namespace ofp_group_detail {
 
-    enum ofp_group // : std::uint32_t
+    enum ofp_group : std::uint32_t
     {
       OFPG_MAX = 4294967040,
       max = OFPG_MAX,
@@ -1594,7 +1594,7 @@ namespace protocol {
 
   namespace ofp_group_mod_command_detail {
 
-    enum ofp_group_mod_command // : std::uint8_t
+    enum ofp_group_mod_command : std::uint8_t
     {
       OFPGC_ADD = 0,
       add_cmd = OFPGC_ADD,
@@ -1615,7 +1615,7 @@ namespace protocol {
 
   namespace ofp_group_type_detail {
 
-    enum ofp_group_type // : std::uint8_t
+    enum ofp_group_type : std::uint8_t
     {
       OFPGT_ALL = 0,
       all = OFPGT_ALL,
@@ -1639,7 +1639,7 @@ namespace protocol {
 
   namespace ofp_packet_in_reason_detail {
 
-    enum ofp_packet_in_reason // : std::uint8_t
+    enum ofp_packet_in_reason : std::uint8_t
     {
       OFPR_NO_MATCH = 0,
       no_match = OFPR_NO_MATCH,
@@ -1660,7 +1660,7 @@ namespace protocol {
 
   namespace ofp_flow_removed_reason_detail {
 
-    enum ofp_flow_removed_reason // : std::uint8_t
+    enum ofp_flow_removed_reason : std::uint8_t
     {
       OFPRR_IDLE_TIMEOUT = 0,
       by_idle_timeout = OFPRR_IDLE_TIMEOUT,
@@ -1684,7 +1684,7 @@ namespace protocol {
 
   namespace ofp_meter_detail {
 
-    enum ofp_meter // : std::uint32_t
+    enum ofp_meter : std::uint32_t
     {
       OFPM_MAX = 4294901760,
       max = OFPM_MAX,
@@ -1708,7 +1708,7 @@ namespace protocol {
 
   namespace ofp_meter_band_type_detail {
 
-    enum ofp_meter_band_type // : std::uint16_t
+    enum ofp_meter_band_type : std::uint16_t
     {
       OFPMBT_DROP = 1,
       drop = OFPMBT_DROP,
@@ -1729,7 +1729,7 @@ namespace protocol {
 
   namespace ofp_meter_mod_command_detail {
 
-    enum ofp_meter_mod_command // : std::uint16_t
+    enum ofp_meter_mod_command : std::uint16_t
     {
       OFPMC_ADD = 0,
       add_cmd = OFPMC_ADD,
@@ -1750,7 +1750,7 @@ namespace protocol {
 
   namespace ofp_meter_flags_detail {
 
-    enum ofp_meter_flags // : std::uint16_t
+    enum ofp_meter_flags : std::uint16_t
     {
       OFPMF_KBPS = 1,
       kbps = OFPMF_KBPS,
@@ -1774,7 +1774,7 @@ namespace protocol {
 
   namespace ofp_error_type_detail {
 
-    enum ofp_error_type // : std::uint16_t
+    enum ofp_error_type : std::uint16_t
     {
       OFPET_HELLO_FAILED = 0,
       hello_failed = OFPET_HELLO_FAILED,
@@ -1831,7 +1831,7 @@ namespace protocol {
 
   namespace ofp_hello_failed_code_detail {
 
-    enum ofp_hello_failed_code // : std::uint16_t
+    enum ofp_hello_failed_code : std::uint16_t
     {
       OFPHFC_INCOMPATIBLE = 0,
       incompatible = OFPHFC_INCOMPATIBLE,
@@ -1849,7 +1849,7 @@ namespace protocol {
 
   namespace ofp_bad_request_code_detail {
 
-    enum ofp_bad_request_code // : std::uint16_t
+    enum ofp_bad_request_code : std::uint16_t
     {
       OFPBRC_BAD_VERSION = 0,
       bad_version = OFPBRC_BAD_VERSION,
@@ -1903,7 +1903,7 @@ namespace protocol {
 
   namespace ofp_bad_action_code_detail {
 
-    enum ofp_bad_action_code // : std::uint16_t
+    enum ofp_bad_action_code : std::uint16_t
     {
       OFPBAC_BAD_TYPE = 0,
       bad_type = OFPBAC_BAD_TYPE,
@@ -1963,7 +1963,7 @@ namespace protocol {
 
   namespace ofp_bad_instruction_code_detail {
 
-    enum ofp_bad_instruction_code // : std::uint16_t
+    enum ofp_bad_instruction_code : std::uint16_t
     {
       OFPBIC_UNKNOWN_INST = 0,
       unknown_inst = OFPBIC_UNKNOWN_INST,
@@ -2002,7 +2002,7 @@ namespace protocol {
 
   namespace ofp_bad_match_code_detail {
 
-    enum ofp_bad_match_code // : std::uint16_t
+    enum ofp_bad_match_code : std::uint16_t
     {
       OFPBMC_BAD_TYPE = 0,
       bad_type = OFPBMC_BAD_TYPE,
@@ -2050,7 +2050,7 @@ namespace protocol {
 
   namespace ofp_flow_mod_failed_code_detail {
 
-    enum ofp_flow_mod_failed_code // : std::uint16_t
+    enum ofp_flow_mod_failed_code : std::uint16_t
     {
       OFPFMFC_UNKNOWN = 0,
       unknown = OFPFMFC_UNKNOWN,
@@ -2086,7 +2086,7 @@ namespace protocol {
 
   namespace ofp_group_mod_failed_code_detail {
 
-    enum ofp_group_mod_failed_code // : std::uint16_t
+    enum ofp_group_mod_failed_code : std::uint16_t
     {
       OFPGMFC_GROUP_EXISTS = 0,
       group_exists = OFPGMFC_GROUP_EXISTS,
@@ -2143,7 +2143,7 @@ namespace protocol {
 
   namespace ofp_port_mod_failed_code_detail {
 
-    enum ofp_port_mod_failed_code // : std::uint16_t
+    enum ofp_port_mod_failed_code : std::uint16_t
     {
       OFPPMFC_BAD_PORT = 0,
       bad_port = OFPPMFC_BAD_PORT,
@@ -2170,7 +2170,7 @@ namespace protocol {
 
   namespace ofp_table_mod_failed_code_detail {
 
-    enum ofp_table_mod_failed_code // : std::uint16_t
+    enum ofp_table_mod_failed_code : std::uint16_t
     {
       OFPTMFC_BAD_TABLE = 0,
       bad_table = OFPTMFC_BAD_TABLE,
@@ -2191,7 +2191,7 @@ namespace protocol {
 
   namespace ofp_queue_op_failed_code_detail {
 
-    enum ofp_queue_op_failed_code // : std::uint16_t
+    enum ofp_queue_op_failed_code : std::uint16_t
     {
       OFPQOFC_BAD_PORT = 0,
       bad_port = OFPQOFC_BAD_PORT,
@@ -2212,7 +2212,7 @@ namespace protocol {
 
   namespace ofp_switch_config_failed_code_detail {
 
-    enum ofp_switch_config_failed_code // : std::uint16_t
+    enum ofp_switch_config_failed_code : std::uint16_t
     {
       OFPSCFC_BAD_FLAGS = 0,
       bad_flags = OFPSCFC_BAD_FLAGS,
@@ -2233,7 +2233,7 @@ namespace protocol {
 
   namespace ofp_role_request_failed_code_detail {
 
-    enum ofp_role_request_failed_code // : std::uint16_t
+    enum ofp_role_request_failed_code : std::uint16_t
     {
       OFPRRFC_STALE = 0,
       stale = OFPRRFC_STALE,
@@ -2254,7 +2254,7 @@ namespace protocol {
 
   namespace ofp_meter_mod_failed_code_detail {
 
-    enum ofp_meter_mod_failed_code // : std::uint16_t
+    enum ofp_meter_mod_failed_code : std::uint16_t
     {
       OFPMMFC_UNKNOWN = 0,
       unknown = OFPMMFC_UNKNOWN,
@@ -2302,7 +2302,7 @@ namespace protocol {
 
   namespace ofp_table_features_failed_code_detail {
 
-    enum ofp_table_features_failed_code // : std::uint16_t
+    enum ofp_table_features_failed_code : std::uint16_t
     {
       OFPTFFC_BAD_TABLE = 0,
       bad_table = OFPTFFC_BAD_TABLE,
@@ -2332,7 +2332,7 @@ namespace protocol {
 
   namespace ofp_multipart_type_detail {
 
-    enum ofp_multipart_type // : std::uint16_t
+    enum ofp_multipart_type : std::uint16_t
     {
       OFPMP_DESC = 0,
       desc = OFPMP_DESC,
@@ -2389,7 +2389,7 @@ namespace protocol {
 
   namespace ofp_multipart_request_flags_detail {
 
-    enum ofp_multipart_request_flags // : std::uint16_t
+    enum ofp_multipart_request_flags : std::uint16_t
     {
       OFPMPF_REQ_MORE = 1,
       req_more = OFPMPF_REQ_MORE,
@@ -2404,7 +2404,7 @@ namespace protocol {
 
   namespace ofp_multipart_reply_flags_detail {
 
-    enum ofp_multipart_reply_flags // : std::uint16_t
+    enum ofp_multipart_reply_flags : std::uint16_t
     {
       OFPMPF_REPLY_MORE = 1,
       reply_more = OFPMPF_REPLY_MORE,
@@ -2419,7 +2419,7 @@ namespace protocol {
 
   namespace ofp_table_feature_prop_type_detail {
 
-    enum ofp_table_feature_prop_type // : std::uint16_t
+    enum ofp_table_feature_prop_type : std::uint16_t
     {
       OFPTFPT_INSTRUCTIONS = 0,
       instructions = OFPTFPT_INSTRUCTIONS,
@@ -2479,7 +2479,7 @@ namespace protocol {
 
   namespace ofp_group_capabilities_detail {
 
-    enum ofp_group_capabilities // : std::uint32_t
+    enum ofp_group_capabilities : std::uint32_t
     {
       OFPGFC_SELECT_WEIGHT = 1,
       select_weight = OFPGFC_SELECT_WEIGHT,
@@ -2503,7 +2503,7 @@ namespace protocol {
 
   namespace ofp_queue_properties_detail {
 
-    enum ofp_queue_properties // : std::uint16_t
+    enum ofp_queue_properties : std::uint16_t
     {
       OFPQT_MIN_RATE = 1,
       min_rate = OFPQT_MIN_RATE,
@@ -2524,7 +2524,7 @@ namespace protocol {
 
   namespace ofp_controller_role_detail {
 
-    enum ofp_controller_role // : std::uint32_t
+    enum ofp_controller_role : std::uint32_t
     {
       OFPCR_ROLE_NOCHANGE = 0,
       nochange = OFPCR_ROLE_NOCHANGE,
