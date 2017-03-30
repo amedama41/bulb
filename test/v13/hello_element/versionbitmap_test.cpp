@@ -7,6 +7,7 @@
 #include <type_traits>
 #include <boost/range/algorithm/max_element.hpp>
 #include <boost/range/adaptor/filtered.hpp>
+#include <canard/network/openflow/v13/io/openflow.hpp>
 #include "../../test_utility.hpp"
 
 namespace ofp = canard::net::ofp;

@@ -2,6 +2,7 @@
 #include <canard/network/openflow/v13/message/meter_mod.hpp>
 #include <boost/test/unit_test.hpp>
 
+#include <canard/network/openflow/v13/io/openflow.hpp>
 #include "../../test_utility.hpp"
 
 namespace ofp = canard::net::ofp;

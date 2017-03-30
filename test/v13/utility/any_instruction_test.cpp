@@ -5,6 +5,7 @@
 #include <vector>
 #include <canard/network/openflow/v13/actions.hpp>
 #include <canard/network/openflow/v13/instructions.hpp>
+#include <canard/network/openflow/v13/io/openflow.hpp>
 
 #include "../../test_utility.hpp"
 

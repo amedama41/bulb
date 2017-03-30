@@ -7,6 +7,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <vector>
+#include <canard/network/openflow/v10/io/openflow.hpp>
 
 namespace of = canard::net::ofp;
 namespace v10 = of::v10;

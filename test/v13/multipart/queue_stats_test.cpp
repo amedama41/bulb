@@ -4,6 +4,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <canard/network/openflow/v13/io/openflow.hpp>
 
 #include "../../test_utility.hpp"
 

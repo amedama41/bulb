@@ -2,6 +2,7 @@
 #include <canard/network/openflow/v13/table_feature_property/instructions.hpp>
 #include <boost/test/unit_test.hpp>
 
+#include <canard/network/openflow/v13/io/openflow.hpp>
 #include <canard/network/openflow/v13/table_feature_property/id/instruction_id.hpp>
 
 #include <type_traits>

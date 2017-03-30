@@ -6,6 +6,7 @@
 #include <vector>
 #include <boost/endian/conversion.hpp>
 
+#include <canard/network/openflow/v13/io/openflow.hpp>
 #include "../../test_utility.hpp"
 
 namespace of = canard::net::ofp;

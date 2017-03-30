@@ -8,6 +8,7 @@
 #include <type_traits>
 #include <vector>
 #include <canard/network/openflow/v13/common/oxm_match_field.hpp>
+#include <canard/network/openflow/v13/io/openflow.hpp>
 
 #include "../../test_utility.hpp"
 

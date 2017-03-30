@@ -3,6 +3,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <boost/range/algorithm_ext/push_back.hpp>
+#include <canard/network/openflow/v13/io/openflow.hpp>
 #include "../../test_utility.hpp"
 
 namespace ofp = canard::net::ofp;
