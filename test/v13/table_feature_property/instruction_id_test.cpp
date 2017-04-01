@@ -365,9 +365,13 @@ BOOST_AUTO_TEST_SUITE(instruction_id)
       --bin[3];
       auto it = bin.begin();
 
-      BOOST_CHECK_THROW(
+      BOOST_CHECK_EXCEPTION(
             v13::instruction_id::decode(it, bin.end())
-          , std::runtime_error);
+          , v13::exception
+          , [](v13::exception const& e) {
+              return e.error_type() == protocol::error_type::table_features_failed
+                  && e.error_code() == protocol::table_features_failed_code::bad_len;
+            });
       BOOST_TEST(
           std::distance(bin.begin(), it) == sizeof(protocol::ofp_instruction));
     }
@@ -380,9 +384,13 @@ BOOST_AUTO_TEST_SUITE(instruction_id)
       bin[3] = bin.size() + 1;
       auto it = bin.begin();
 
-      BOOST_CHECK_THROW(
+      BOOST_CHECK_EXCEPTION(
             v13::instruction_id::decode(it, bin.end())
-          , std::runtime_error);
+          , v13::exception
+          , [](v13::exception const& e) {
+              return e.error_type() == protocol::error_type::bad_request
+                  && e.error_code() == protocol::bad_request_code::bad_len;
+            });
       BOOST_TEST(
           std::distance(bin.begin(), it) == sizeof(protocol::ofp_instruction));
     }
@@ -393,9 +401,13 @@ BOOST_AUTO_TEST_SUITE(instruction_id)
       bin[3] = sizeof(protocol::ofp_instruction_experimenter) - 1;
       auto it = bin.begin();
 
-      BOOST_CHECK_THROW(
+      BOOST_CHECK_EXCEPTION(
             v13::instruction_id::decode(it, bin.end())
-          , std::runtime_error);
+          , v13::exception
+          , [](v13::exception const& e) {
+              return e.error_type() == protocol::error_type::bad_request
+                  && e.error_code() == protocol::bad_request_code::bad_len;
+            });
       BOOST_TEST(
           std::distance(bin.begin(), it) == sizeof(protocol::ofp_instruction));
     }

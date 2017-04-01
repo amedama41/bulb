@@ -372,8 +372,16 @@ BOOST_AUTO_TEST_SUITE(packet_out)
       no_data_bin[offsetof(protocol::ofp_packet_out, actions_len)] = 0xff;
       auto it = no_data_bin.begin();
 
-      BOOST_CHECK_THROW(
-          msg::packet_out::decode(it, no_data_bin.end()), std::runtime_error);
+      BOOST_CHECK_EXCEPTION(
+            msg::packet_out::decode(it, no_data_bin.end())
+          , v10::exception
+          , [](v10::exception const& e) {
+              return e.error_type() == protocol::error_type::bad_request
+                  && e.error_code() == protocol::bad_request_code::bad_len;
+            });
+      BOOST_TEST(
+          (it
+        == std::next(no_data_bin.begin(), sizeof(protocol::ofp_packet_out))));
     }
   BOOST_AUTO_TEST_SUITE_END() // decode
 

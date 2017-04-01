@@ -204,20 +204,50 @@ BOOST_AUTO_TEST_SUITE(any_queue_property_test)
     {
       auto const binary = "\x00\xff\x00\x08\x00\x00\x00\x00"_bin;
       auto it = binary.begin();
+      using ex_error_type = ofp::v10::exception::ex_error_type;
+      using ex_error_code = ofp::v10::exception::ex_error_code;
 
-      BOOST_CHECK_THROW(
+      BOOST_CHECK_EXCEPTION(
             ofp::v10::any_queue_property::decode(it, binary.end())
-          , std::runtime_error);
+          , ofp::v10::exception
+          , [](ofp::v10::exception const &e) {
+              return e.error_type() == ex_error_type::bad_queue_property
+                  && e.error_code() == ex_error_code::bad_type;
+            });
+      BOOST_TEST((it == binary.begin()));
     }
     BOOST_AUTO_TEST_CASE(
         throw_exception_if_length_field_is_larger_than_binary_size)
     {
       min_rate_binary.resize(min_rate_binary.size() - 1);
       auto it = min_rate_binary.begin();
+      namespace protocol = ofp::v10::protocol;
 
-      BOOST_CHECK_THROW(
+      BOOST_CHECK_EXCEPTION(
             ofp::v10::any_queue_property::decode(it, min_rate_binary.end())
-          , std::runtime_error);
+          , ofp::v10::exception
+          , [](ofp::v10::exception const& e) {
+              return e.error_type() == protocol::error_type::bad_request
+                  && e.error_code() == protocol::bad_request_code::bad_len;
+            });
+      BOOST_TEST((it == min_rate_binary.begin()));
+    }
+    BOOST_AUTO_TEST_CASE(
+        throw_exception_if_length_field_is_invalid)
+    {
+      min_rate_binary[3] = 1;
+      auto it = min_rate_binary.begin();
+      using ex_error_type = ofp::v10::exception::ex_error_type;
+      using ex_error_code = ofp::v10::exception::ex_error_code;
+
+      BOOST_CHECK_EXCEPTION(
+            ofp::v10::any_queue_property::decode(it, min_rate_binary.end())
+          , ofp::v10::exception
+          , [](ofp::v10::exception const& e) {
+              return e.error_type() == ex_error_type::bad_queue_property
+                  && e.error_code() == ex_error_code::bad_length;
+            });
+      BOOST_TEST((it == min_rate_binary.begin()));
     }
   BOOST_AUTO_TEST_SUITE_END() // decode
 

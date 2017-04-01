@@ -276,7 +276,13 @@ BOOST_AUTO_TEST_SUITE(oxm_match)
       using sut = v13::oxm_match;
       auto const match = protocol::ofp_match{ protocol::OFPMT_OXM + 1, 4 };
 
-      BOOST_CHECK_THROW(sut::validate_header(match), std::runtime_error);
+      BOOST_CHECK_EXCEPTION(
+            sut::validate_header(match)
+          , v13::exception
+          , [](v13::exception const& e) {
+              return e.error_type() == protocol::error_type::bad_match
+                  && e.error_code() == protocol::bad_match_code::bad_type;
+            });
     }
     BOOST_AUTO_TEST_CASE(
         throw_exception_if_type_is_oxm_but_length_is_smaller_than_4)
@@ -284,7 +290,13 @@ BOOST_AUTO_TEST_SUITE(oxm_match)
       using sut = v13::oxm_match;
       auto const match = protocol::ofp_match{ protocol::OFPMT_OXM, 3 };
 
-      BOOST_CHECK_THROW(sut::validate_header(match), std::runtime_error);
+      BOOST_CHECK_EXCEPTION(
+            sut::validate_header(match)
+          , v13::exception
+          , [](v13::exception const& e) {
+              return e.error_type() == protocol::error_type::bad_match
+                  && e.error_code() == protocol::bad_match_code::bad_len;
+            });
     }
   BOOST_AUTO_TEST_SUITE_END() // validate_header
 

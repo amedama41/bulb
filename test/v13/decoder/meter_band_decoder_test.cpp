@@ -91,18 +91,27 @@ BOOST_AUTO_TEST_SUITE(meter_band_decoder)
       drop_bin.resize(drop_bin.size() - 1);
       auto it = drop_bin.begin();
 
-      BOOST_CHECK_THROW(
+      BOOST_CHECK_EXCEPTION(
             v13::meter_band_decoder::decode<void>(it, drop_bin.end(), discard{})
-          , std::runtime_error);
+          , v13::exception
+          , [](v13::exception const& e) {
+              return e.error_type() == v13::protocol::error_type::bad_request
+                  && e.error_code() == v13::protocol::bad_request_code::bad_len;
+            });
     }
     BOOST_AUTO_TEST_CASE(throw_exception_if_meter_band_type_is_unknown)
     {
       drop_bin[0] = 0x12;
       auto it = drop_bin.begin();
 
-      BOOST_CHECK_THROW(
+      BOOST_CHECK_EXCEPTION(
             v13::meter_band_decoder::decode<void>(it, drop_bin.end(), discard{})
-          , std::runtime_error);
+          , v13::exception
+          , [](v13::exception const& e) {
+              return e.error_type() == v13::protocol::error_type::meter_mod_failed
+                  && e.error_code()
+                    == v13::protocol::meter_mod_failed_code::unknown_meter;
+            });
     }
   BOOST_AUTO_TEST_SUITE_END() // decode
 BOOST_AUTO_TEST_SUITE_END() // meter_band_decoder

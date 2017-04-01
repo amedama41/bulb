@@ -368,17 +368,33 @@ BOOST_AUTO_TEST_SUITE(flow_stats)
     {
       bin[1] = sizeof(protocol::ofp_flow_stats) - 1;
       auto it = bin.begin();
+      using ex_error_type = v10::exception::ex_error_type;
+      using ex_error_code = v10::exception::ex_error_code;
 
-      BOOST_CHECK_THROW(
-          stats::flow_stats::decode(it, bin.end()), std::runtime_error);
+      BOOST_CHECK_EXCEPTION(
+            stats::flow_stats::decode(it, bin.end())
+          , v10::exception
+          , [](v10::exception const& e) {
+              return e.error_type() == ex_error_type::bad_stats_element
+                  && e.error_code() == ex_error_code::bad_length;
+            });
+      BOOST_TEST(
+          (it == std::next(bin.begin(), sizeof(protocol::ofp_flow_stats))));
     }
     BOOST_AUTO_TEST_CASE(throws_exception_if_length_is_too_large)
     {
       bin[1] = bin.size() + 1;
       auto it = bin.begin();
 
-      BOOST_CHECK_THROW(
-          stats::flow_stats::decode(it, bin.end()), std::runtime_error);
+      BOOST_CHECK_EXCEPTION(
+            stats::flow_stats::decode(it, bin.end())
+          , v10::exception
+          , [](v10::exception const& e) {
+              return e.error_type() == protocol::error_type::bad_request
+                  && e.error_code() == protocol::bad_request_code::bad_len;
+            });
+      BOOST_TEST(
+          (it == std::next(bin.begin(), sizeof(protocol::ofp_flow_stats))));
     }
   BOOST_AUTO_TEST_SUITE_END() // decode
 

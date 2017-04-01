@@ -472,9 +472,13 @@ BOOST_AUTO_TEST_SUITE(oxm_id)
       bin.resize(bin.size() - 1);
       auto it = bin.begin();
 
-      BOOST_CHECK_THROW(
+      BOOST_CHECK_EXCEPTION(
             v13::oxm_id::decode(it, bin.end())
-          , std::runtime_error);
+          , v13::exception
+          , [](v13::exception const& e) {
+              return e.error_type() == protocol::error_type::bad_request
+                  && e.error_code() == protocol::bad_request_code::bad_len;
+            });
       BOOST_TEST(std::distance(bin.begin(), it) == sizeof(std::uint32_t));
     }
   BOOST_AUTO_TEST_SUITE_END() // encode

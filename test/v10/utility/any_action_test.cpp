@@ -412,9 +412,16 @@ BOOST_AUTO_TEST_SUITE(any_action_test)
     {
       auto const binary = "\xff\x00\x00\x08\x00\x00\x00\x00"_bin;
       auto it = binary.begin();
+      namespace protocol = ofp::v10::protocol;
 
-      BOOST_CHECK_THROW(
-          ofp::v10::any_action::decode(it, binary.end()), std::runtime_error);
+      BOOST_CHECK_EXCEPTION(
+            ofp::v10::any_action::decode(it, binary.end())
+          , ofp::v10::exception
+          , [](ofp::v10::exception const& e) {
+              return e.error_type() == protocol::error_type::bad_action
+                  && e.error_code() == protocol::bad_action_code::bad_type;
+            });
+      BOOST_TEST((it == binary.begin()));
     }
   BOOST_AUTO_TEST_SUITE_END() // decode
 

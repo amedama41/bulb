@@ -384,8 +384,13 @@ BOOST_AUTO_TEST_SUITE(any_action_test)
       auto const binary = "\xff\x00\x00\x08\x00\x00\x00\x00"_bin;
       auto it = binary.begin();
 
-      BOOST_CHECK_THROW(
-          v13::any_action::decode(it, binary.end()), std::runtime_error);
+      BOOST_CHECK_EXCEPTION(
+            v13::any_action::decode(it, binary.end())
+          , v13::exception
+          , [](v13::exception const& e) {
+              return e.error_type() == v13::protocol::error_type::bad_action
+                  && e.error_code() == v13::protocol::bad_action_code::bad_type;
+            });
     }
     // TODO
   BOOST_AUTO_TEST_SUITE_END() // function_decode

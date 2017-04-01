@@ -231,10 +231,14 @@ BOOST_AUTO_TEST_SUITE(flow_mod_decoder)
     {
       flow_add_bin[56] = 0xff;
 
-      BOOST_CHECK_THROW(
+      BOOST_CHECK_EXCEPTION(
             v10::flow_mod_decoder::decode_without_consumption<void>(
               flow_add_bin.begin(), flow_add_bin.end(), discard{})
-          , std::runtime_error);
+          , v10::exception
+          , [](v10::exception const& e) {
+              return e.error_type() == protocol::error_type::flow_mod_failed
+                  && e.error_code() == protocol::flow_mod_failed_code::bad_command;
+            });
     }
   BOOST_AUTO_TEST_SUITE_END() // decode
 
