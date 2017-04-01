@@ -9,6 +9,7 @@
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/v13/table_feature_properties.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
+#include <canard/network/openflow/v13/exception.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 #define CANARD_NET_OFP_NUM_TABLE_FEATURE_PROPERTIES 14
@@ -38,7 +39,10 @@ namespace v13 {
         = detail::decode_without_consumption<header_type>(first, last);
 
       if (std::distance(first, last) < header.length) {
-        throw std::runtime_error{"too large table feature property length"};
+        throw exception{
+            protocol::bad_request_code::bad_len
+          , "too small data size for table_feature_property"
+        } << CANARD_NET_OFP_ERROR_INFO();
       }
 
       switch (header.type) {
@@ -47,7 +51,10 @@ namespace v13 {
       using property ## N = std::tuple_element<N, decode_type_list>::type; \
       case property ## N::type(): \
         if (!property ## N::is_valid_table_feature_property_length(header)) { \
-          throw std::runtime_error{"invalid table_feature_property length"}; \
+          throw exception{ \
+              protocol::table_features_failed_code::bad_len \
+            , "invalid table_feature_property length" \
+          } << CANARD_NET_OFP_ERROR_INFO(); \
         } \
         return function(property ## N::decode(first, last));
 
@@ -59,7 +66,10 @@ namespace v13 {
 #     undef CANARD_NET_OFP_V13_TABLE_FEATURE_PROPERTY_CASE
 
       default:
-        throw std::runtime_error{"unknwon table feature property type"};
+        throw exception{
+            protocol::table_features_failed_code::bad_type
+          , "unknwon table feature property type"
+        } << CANARD_NET_OFP_ERROR_INFO();
       }
     }
 

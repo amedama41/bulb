@@ -11,6 +11,7 @@
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
+#include <canard/network/openflow/v13/exception.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -140,17 +141,26 @@ namespace v13 {
       auto header = detail::decode<raw_ofp_exp_type>(
           first, last, detail::copy_size<base_size>{});
       if (header.len < base_size) {
-        throw std::runtime_error{"too small action_id length"};
+        throw exception{
+            protocol::table_features_failed_code::bad_len
+          , "too small action_id length"
+        } << CANARD_NET_OFP_ERROR_INFO();
       }
 
       auto rest_size = std::uint16_t(header.len - base_size);
       if (std::distance(first, last) < rest_size) {
-        throw std::runtime_error{"too short byte length"};
+        throw exception{
+            protocol::bad_request_code::bad_len
+          , "too small data size for action_id"
+        } << CANARD_NET_OFP_ERROR_INFO();
       }
 
       if (header.type == protocol::OFPAT_EXPERIMENTER) {
         if (rest_size < sizeof(header.experimenter)) {
-          throw std::runtime_error{"invalid action_id length"};
+          throw exception{
+              protocol::bad_request_code::bad_len
+            , "too small data size for action_id with experimenter id"
+          } << CANARD_NET_OFP_ERROR_INFO();
         }
         header.experimenter = detail::decode<std::uint32_t>(first, last);
         rest_size -= sizeof(header.experimenter);

@@ -400,7 +400,10 @@ namespace multipart_detail {
             oxm_match::validate_header(ofp_match);
             if (std::distance(first, last)
                     != v13_detail::exact_length(ofp_match.length)) {
-                throw std::runtime_error{"invalid oxm_match length"};
+                throw exception{
+                      protocol::bad_request_code::bad_len
+                    , "too small data size for oxm_match"
+                } << CANARD_NET_OFP_ERROR_INFO();
             }
             auto match = oxm_match::decode(first, last);
 

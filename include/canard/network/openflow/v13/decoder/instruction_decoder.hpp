@@ -8,6 +8,7 @@
 #include <boost/preprocessor/repeat.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
+#include <canard/network/openflow/v13/exception.hpp>
 #include <canard/network/openflow/v13/instructions.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -35,7 +36,10 @@ namespace v13 {
         = detail::decode_without_consumption<header_type>(first, last);
 
       if (std::distance(first, last) < instruction.len) {
-        throw std::runtime_error{"too small data size for instruction"};
+        throw exception{
+            protocol::bad_request_code::bad_len
+          , "too small data size for instruction"
+        } << CANARD_NET_OFP_ERROR_INFO();
       }
 
       switch (instruction.type) {
@@ -44,7 +48,10 @@ namespace v13 {
       using instruction ## N = std::tuple_element<N, decode_type_list>::type; \
       case instruction ## N::instruction_type: \
         if (!instruction ## N::is_valid_instruction_length(instruction)) { \
-          throw std::runtime_error{"invalid instruction length"}; \
+          throw exception{ \
+              protocol::bad_instruction_code::bad_len \
+            , "invalid instruction length" \
+          } << CANARD_NET_OFP_ERROR_INFO(); \
         } \
         return function(instruction ## N::decode(first, last));
 
@@ -53,7 +60,9 @@ namespace v13 {
 #     undef CANARD_NET_OFP_V13_INSTRUCTION_CASE
 
       default:
-          throw std::runtime_error{"unknown instruction type"};
+          throw exception{
+            protocol::bad_instruction_code::unknown_inst, "unknown instruction"
+          } << CANARD_NET_OFP_ERROR_INFO();
       }
     }
 

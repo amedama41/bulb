@@ -10,6 +10,7 @@
 #include <canard/network/openflow/v13/actions.hpp>
 #include <canard/network/openflow/v13/decoder/set_field_decoder.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
+#include <canard/network/openflow/v13/exception.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -37,7 +38,9 @@ namespace v13 {
         = detail::decode_without_consumption<header_type>(first, last);
 
       if (std::distance(first, last) < action_header.len) {
-        throw std::runtime_error{"too small data size for action"};
+        throw exception{
+          protocol::bad_request_code::bad_len, "too small data size for action"
+        } << CANARD_NET_OFP_ERROR_INFO();
       }
 
       switch (action_header.type) {
@@ -47,7 +50,9 @@ namespace v13 {
         = std::tuple_element<N, non_set_field_action_type_list>::type; \
       case action ## N::action_type: \
         if (!action ## N::is_valid_action_length(action_header)) { \
-          throw std::runtime_error{"invalid action length"}; \
+          throw exception{ \
+            protocol::bad_action_code::bad_len, "invalid action length" \
+          } << CANARD_NET_OFP_ERROR_INFO(); \
         } \
         return function(action ## N::decode(first, last));
 
@@ -57,12 +62,16 @@ namespace v13 {
 
       case protocol::OFPAT_SET_FIELD:
         if (action_header.len < set_field_decoder::header_size) {
-          throw std::runtime_error{"invalid action length"};
+          throw exception{
+            protocol::bad_action_code::bad_len, "invalid action length"
+          } << CANARD_NET_OFP_ERROR_INFO();
         }
         return set_field_decoder::decode<ReturnType>(
             first, last, std::move(function));
       default:
-        throw std::runtime_error{"unknwon action type"};
+        throw exception{
+          protocol::bad_action_code::bad_type, "unknown action"
+        } << CANARD_NET_OFP_ERROR_INFO();
       }
     }
 

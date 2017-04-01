@@ -11,6 +11,7 @@
 #include <canard/network/openflow/detail/encode.hpp>
 #include <canard/network/openflow/v13/action_list.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
+#include <canard/network/openflow/v13/exception.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 #include <canard/network/openflow/v13/utility/action_set.hpp>
 
@@ -199,11 +200,18 @@ namespace v13 {
             auto const bkt = detail::decode<raw_ofp_type>(first, last);
 
             if (bkt.len < sizeof(raw_ofp_type)) {
-                throw std::runtime_error{"bucket length is too small"};
+                throw exception{
+                      exception::ex_error_type::bad_bucket
+                    , exception::ex_error_code::bad_length
+                    , "too small bucket length"
+                } << CANARD_NET_OFP_ERROR_INFO();
             }
             auto const actions_length = bkt.len - sizeof(raw_ofp_type);
             if (std::distance(first, last) < actions_length) {
-                throw std::runtime_error{"bucket length is too big"};
+                throw exception{
+                      protocol::bad_request_code::bad_len
+                    , "too small data size for bucket"
+                } << CANARD_NET_OFP_ERROR_INFO();
             }
 
             last = std::next(first, actions_length);

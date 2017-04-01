@@ -16,6 +16,7 @@
 #include <canard/network/openflow/list.hpp>
 #include <canard/network/openflow/v13/detail/basic_multipart.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
+#include <canard/network/openflow/v13/exception.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 #include <canard/network/openflow/v13/utility/table_feature_property_set.hpp>
 
@@ -179,11 +180,18 @@ namespace multipart {
         {
             auto const features = detail::decode<raw_ofp_type>(first, last);
             if (features.length < min_length()) {
-                throw std::runtime_error{"table_features length is too small"};
+                throw exception{
+                      exception::ex_error_type::bad_multipart_element
+                    , exception::ex_error_code::bad_length
+                    , "too small table_features length"
+                } << CANARD_NET_OFP_ERROR_INFO();
             }
             auto const prop_length = features.length - sizeof(raw_ofp_type);
             if (std::distance(first, last) < prop_length) {
-                throw std::runtime_error{"table_features length is too big"};
+                throw exception{
+                      protocol::bad_request_code::bad_len
+                    , "too small data size for table_features"
+                } << CANARD_NET_OFP_ERROR_INFO();
             }
 
             last = std::next(first, prop_length);

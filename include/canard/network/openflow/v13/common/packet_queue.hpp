@@ -14,6 +14,7 @@
 #include <canard/network/openflow/queue_id.hpp>
 #include <canard/network/openflow/v13/any_queue_property.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
+#include <canard/network/openflow/v13/exception.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -139,11 +140,18 @@ namespace v13 {
         {
             auto const pkt_queue = detail::decode<raw_ofp_type>(first, last);
             if (pkt_queue.len < sizeof(raw_ofp_type)) {
-                throw std::runtime_error{"packet_queue length is too small"};
+                throw exception{
+                      exception::ex_error_type::bad_packet_queue
+                    , exception::ex_error_code::bad_length
+                    , "too small packet_queue length"
+                } << CANARD_NET_OFP_ERROR_INFO();
             }
             auto const properties_length = pkt_queue.len - sizeof(raw_ofp_type);
             if (std::distance(first, last) < properties_length) {
-                throw std::runtime_error{"packet_queue length is too big"};
+                throw exception{
+                      protocol::bad_request_code::bad_len
+                    , "too small data size for packet_queue"
+                } << CANARD_NET_OFP_ERROR_INFO();
             }
             last = std::next(first, properties_length);
 

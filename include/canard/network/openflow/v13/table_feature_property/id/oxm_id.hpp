@@ -10,6 +10,7 @@
 #include <canard/network/openflow/detail/memcmp.hpp>
 #include <canard/network/openflow/v13/common/oxm_header.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
+#include <canard/network/openflow/v13/exception.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -136,7 +137,10 @@ namespace v13 {
       auto experimenter_id = std::uint32_t{0};
       if (oxm_header_ops::oxm_class(header) == protocol::OFPXMC_EXPERIMENTER) {
         if (std::distance(first, last) < sizeof(experimenter_id)) {
-          throw std::runtime_error{"too small byte length"};
+          throw exception{
+              protocol::bad_request_code::bad_len
+            , "too small data size for oxm_id with experimenter id"
+          } << CANARD_NET_OFP_ERROR_INFO();
         }
         experimenter_id = detail::decode<std::uint32_t>(first, last);
       }

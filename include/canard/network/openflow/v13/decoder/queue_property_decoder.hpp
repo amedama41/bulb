@@ -8,6 +8,7 @@
 #include <boost/preprocessor/repeat.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
+#include <canard/network/openflow/v13/exception.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 #include <canard/network/openflow/v13/queue_properties.hpp>
 
@@ -35,7 +36,10 @@ namespace v13 {
         = detail::decode_without_consumption<header_type>(first, last);
 
       if (std::distance(first, last) < prop_header.len) {
-        throw std::runtime_error{"too small data size for queue property"};
+        throw exception{
+            protocol::bad_request_code::bad_len
+          , "too small data size for queue_property"
+        } << CANARD_NET_OFP_ERROR_INFO();
       }
 
       switch (prop_header.property) {
@@ -44,7 +48,11 @@ namespace v13 {
       using property ## N = std::tuple_element<N, decode_type_list>::type; \
       case property ## N::queue_property: \
         if (!property ## N::is_valid_queue_property_length(prop_header)) { \
-          throw std::runtime_error{"invalid queue property length"}; \
+          throw exception{ \
+              exception::ex_error_type::bad_queue_property \
+            , exception::ex_error_code::bad_length \
+            , "invalid queue_property length" \
+          } << CANARD_NET_OFP_ERROR_INFO(); \
         } \
         return function(property ## N::decode(first, last));
 
@@ -53,7 +61,11 @@ namespace v13 {
 #     undef  CANARD_NET_OFP_V13_QUEUE_PROPERTY_CASE
 
       default:
-        throw std::runtime_error{"unknwon queue property"};
+        throw exception{
+            exception::ex_error_type::bad_queue_property
+          , exception::ex_error_code::bad_length
+          , "unknwon queue_property"
+        } << CANARD_NET_OFP_ERROR_INFO();
       }
     }
 

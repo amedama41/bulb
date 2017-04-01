@@ -9,6 +9,7 @@
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/v13/common/oxm_header.hpp>
 #include <canard/network/openflow/v13/common/oxm_match_field.hpp>
+#include <canard/network/openflow/v13/exception.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -36,7 +37,10 @@ namespace v13 {
 
       if (std::distance(first, last)
           < oxm_header.length() + oxm_header.oxm_length()) {
-        throw std::runtime_error{"too small data size for oxm_match_field"};
+        throw exception{
+            protocol::bad_request_code::bad_len
+          , "too small data size for oxm_match_field"
+        } << CANARD_NET_OFP_ERROR_INFO();
       }
 
       switch (oxm_header.oxm_type()) {
@@ -45,7 +49,10 @@ namespace v13 {
       using field ## N = std::tuple_element<N, decode_type_list>::type; \
       case field ## N::oxm_type(): \
         if (!field ## N::is_valid_oxm_match_field_length(oxm_header)) { \
-          throw std::runtime_error{"invalid oxm_match_field length"}; \
+          throw exception{ \
+              protocol::bad_match_code::bad_len \
+            , "invalid oxm_match_field length" \
+          } << CANARD_NET_OFP_ERROR_INFO(); \
         } \
         return function(field ## N::decode(first, last));
 
@@ -54,7 +61,9 @@ namespace v13 {
 #     undef CANARD_NET_OFP_V13_MATCH_FIELD_CASE
 
       default:
-        throw std::runtime_error{"unknwon oxm type"};
+        throw exception{
+          protocol::bad_match_code::bad_field, "unknown oxm_match_field"
+        } << CANARD_NET_OFP_ERROR_INFO();
       }
     }
 

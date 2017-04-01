@@ -8,6 +8,7 @@
 #include <boost/preprocessor/repeat.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
+#include <canard/network/openflow/v13/exception.hpp>
 #include <canard/network/openflow/v13/meter_bands.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -35,7 +36,10 @@ namespace v13 {
         = detail::decode_without_consumption<header_type>(first, last);
 
       if (std::distance(first, last) < meter_band_header.len) {
-        throw std::runtime_error{"too small data size for meter band"};
+        throw exception{
+            protocol::bad_request_code::bad_len
+          , "too small data size for meter_band"
+        } << CANARD_NET_OFP_ERROR_INFO();
       }
 
       switch (meter_band_header.type) {
@@ -44,7 +48,10 @@ namespace v13 {
       using meter_band ## N = std::tuple_element<N, decode_type_list>::type; \
       case meter_band ## N::type(): \
         if (!meter_band ## N::is_valid_meter_band_length(meter_band_header)) { \
-          throw std::runtime_error{"invalid meter band length"}; \
+          throw exception{ \
+              protocol::meter_mod_failed_code::invalid_meter \
+            , "invalid meter_band length" \
+          } << CANARD_NET_OFP_ERROR_INFO(); \
         } \
         return function(meter_band ## N::decode(first, last));
 
@@ -53,7 +60,9 @@ namespace v13 {
 #     undef CANARD_NET_OFP_V13_METER_BAND_CASE
 
       default:
-        throw std::runtime_error{"unknwon meter band"};
+        throw exception{
+          protocol::meter_mod_failed_code::unknown_meter, "unknown meter_band"
+        } << CANARD_NET_OFP_ERROR_INFO();
       }
     }
 

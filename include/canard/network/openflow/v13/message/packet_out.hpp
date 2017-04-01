@@ -12,6 +12,7 @@
 #include <canard/network/openflow/v13/action_list.hpp>
 #include <canard/network/openflow/v13/detail/basic_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
+#include <canard/network/openflow/v13/exception.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -200,7 +201,10 @@ namespace messages {
             auto const pkt_out = detail::decode<raw_ofp_type>(first, last);
             auto const rest_size = pkt_out.header.length - sizeof(raw_ofp_type);
             if (rest_size < pkt_out.actions_len) {
-                throw std::runtime_error{"invalid actions length"};
+                throw exception{
+                      protocol::bad_request_code::bad_len
+                    , "too small data size for actions"
+                } << CANARD_NET_OFP_ERROR_INFO();
             }
 
             auto const actions_last = std::next(first, pkt_out.actions_len);

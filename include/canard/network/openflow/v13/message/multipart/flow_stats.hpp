@@ -17,6 +17,7 @@
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/detail/flow_entry_adaptor.hpp>
 #include <canard/network/openflow/v13/detail/length_utility.hpp>
+#include <canard/network/openflow/v13/exception.hpp>
 #include <canard/network/openflow/v13/flow_entry.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -179,11 +180,18 @@ namespace multipart {
         {
             auto const stats = detail::decode<raw_ofp_type>(first, last);
             if (stats.length < base_size) {
-                throw std::runtime_error{"flow_stats length is too small"};
+                throw exception{
+                      exception::ex_error_type::bad_multipart_element
+                    , exception::ex_error_code::bad_length
+                    , "too small flow_stats length"
+                } << CANARD_NET_OFP_ERROR_INFO();
             }
             auto const rest_length = stats.length - sizeof(raw_ofp_type);
             if (std::distance(first, last) < rest_length) {
-                throw std::runtime_error{"flow_stats length is too big"};
+                throw exception{
+                      protocol::bad_request_code::bad_len
+                    , "too small data size for flow_stats"
+                } << CANARD_NET_OFP_ERROR_INFO();
             }
             last = std::next(first, rest_length);
 
@@ -193,7 +201,10 @@ namespace multipart {
             oxm_match::validate_header(ofp_match);
             if (std::distance(first, last)
                     < v13_detail::exact_length(ofp_match.length)) {
-                throw std::runtime_error{"invalid oxm_match length"};
+                throw exception{
+                      protocol::bad_request_code::bad_len
+                    , "too small data size for oxm_match"
+                } << CANARD_NET_OFP_ERROR_INFO();
             }
             auto match = oxm_match::decode(first, last);
 

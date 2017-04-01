@@ -8,6 +8,7 @@
 #include <boost/preprocessor/repeat.hpp>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
+#include <canard/network/openflow/v13/exception.hpp>
 #include <canard/network/openflow/v13/hello_elements.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
@@ -56,7 +57,10 @@ namespace v13 {
         = detail::decode_without_consumption<header_type>(first, last);
 
       if (std::distance(first, last) < helem_header.length) {
-        throw std::runtime_error{"too small data size for hello element"};
+        throw exception{
+            protocol::bad_request_code::bad_len
+          , "too small data size for hello_element"
+        } << CANARD_NET_OFP_ERROR_INFO();
       }
 
       switch (helem_header.type) {
@@ -65,7 +69,11 @@ namespace v13 {
       using helem ## N = std::tuple_element<N, hello_element_list>::type; \
       case helem ## N::type(): \
         if (!helem ## N::is_valid_hello_element_length(helem_header)) { \
-          throw std::runtime_error{"invalid hello element length"}; \
+          throw exception{ \
+              exception::ex_error_type::bad_hello_element \
+            , exception::ex_error_code::bad_length \
+            , "invalid hello_element length" \
+          } << CANARD_NET_OFP_ERROR_INFO(); \
         } \
         return function(helem ## N::decode(first, last));
 

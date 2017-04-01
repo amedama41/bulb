@@ -10,6 +10,7 @@
 #include <canard/network/openflow/v13/common/oxm_header.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/detail/length_utility.hpp>
+#include <canard/network/openflow/v13/exception.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -40,7 +41,9 @@ namespace v13 {
 
       if (set_field.len != detail::v13::exact_length(
             header_size + oxm_header.oxm_length())) {
-        throw std::runtime_error{"invalid set_field length"};
+        throw exception{
+          protocol::bad_action_code::bad_set_len, "invalid set_field length"
+        } << CANARD_NET_OFP_ERROR_INFO();
       }
 
       switch (oxm_header.oxm_type()) {
@@ -51,9 +54,10 @@ namespace v13 {
       case set_field ## N::oxm_type(): \
         if (!set_field ## N::oxm_match_field \
             ::is_valid_oxm_match_field_length(oxm_header)) { \
-          throw std::runtime_error{ \
-            "invalid set_field's oxm_match_field length" \
-          }; \
+          throw exception{ \
+              protocol::bad_action_code::bad_set_len \
+            , "invalid set_field's oxm_match_field length" \
+          } << CANARD_NET_OFP_ERROR_INFO(); \
         } \
         return function(set_field ## N::decode(first, last));
 
@@ -62,7 +66,10 @@ namespace v13 {
 #     undef CANARD_NET_OFP_V13_SET_FIELD_CASE
 
       default:
-        throw std::runtime_error{"unknwon set_field's oxm_match_field type"};
+        throw exception{
+            protocol::bad_action_code::bad_set_type
+          , "unknwon set_field's oxm_match_field type"
+        } << CANARD_NET_OFP_ERROR_INFO();
       }
     }
 

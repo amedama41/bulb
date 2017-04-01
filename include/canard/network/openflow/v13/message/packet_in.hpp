@@ -16,6 +16,7 @@
 #include <canard/network/openflow/v13/detail/basic_message.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
 #include <canard/network/openflow/v13/detail/length_utility.hpp>
+#include <canard/network/openflow/v13/exception.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 
 namespace canard {
@@ -242,7 +243,10 @@ namespace messages {
             auto const match_length
                 = v13_detail::exact_length(ofp_match.length);
             if (rest_size - data_alignment_padding_size < match_length) {
-                throw std::runtime_error{"oxm_match length is too big"};
+                throw exception{
+                      protocol::bad_request_code::bad_len
+                    , "too small data size for oxm_match"
+                } << CANARD_NET_OFP_ERROR_INFO();
             }
 
             auto match = oxm_match::decode(first, last);

@@ -18,6 +18,7 @@
 #include <canard/network/openflow/type_traits/is_all_constructible.hpp>
 #include <canard/network/openflow/v13/any_oxm_match_field.hpp>
 #include <canard/network/openflow/v13/detail/byteorder.hpp>
+#include <canard/network/openflow/v13/exception.hpp>
 #include <canard/network/openflow/v13/openflow.hpp>
 #include <canard/network/openflow/v13/utility/oxm_match_field_set.hpp>
 
@@ -140,10 +141,14 @@ namespace v13 {
     static void validate_header(protocol::ofp_match const& match)
     {
       if (match.type != match_type) {
-        throw std::runtime_error{"match type is not OFPMT_OXM"};
+        throw exception{
+          protocol::bad_match_code::bad_type, "invalid match type"
+        } << CANARD_NET_OFP_ERROR_INFO();
       }
       if (match.length < base_size) {
-        throw std::runtime_error{"too small match length"};
+        throw exception{
+          protocol::bad_match_code::bad_len, "too small match length"
+        } << CANARD_NET_OFP_ERROR_INFO();
       }
     }
 
