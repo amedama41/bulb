@@ -11,6 +11,7 @@
 #include <boost/exception/exception.hpp>
 #include <boost/exception/info.hpp>
 #include <boost/utility/string_ref.hpp>
+#include <canard/network/openflow/exception.hpp>
 
 namespace canard {
 namespace net {
@@ -68,6 +69,7 @@ namespace detail {
   class exception_base
     : public std::runtime_error
     , virtual public boost::exception
+    , virtual public ofp::exception
   {
   public:
     using ex_error_code = exception_base_detail::ofp_ex_error_code;
