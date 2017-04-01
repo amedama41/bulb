@@ -1,15 +1,15 @@
 #ifndef CANARD_NET_OFP_SET_BASE_HPP
 #define CANARD_NET_OFP_SET_BASE_HPP
 
-#include <canard/network/openflow/detail/config.hpp>
+#include <canard/net/ofp/detail/config.hpp>
 
 #include <cstdint>
 #include <type_traits>
 #include <utility>
 #include <boost/operators.hpp>
 #include <boost/optional/optional.hpp>
-#include <canard/network/openflow/list.hpp>
-#include <canard/network/openflow/type_traits/is_all_constructible.hpp>
+#include <canard/net/ofp/list.hpp>
+#include <canard/net/ofp/type_traits/is_all_constructible.hpp>
 
 namespace canard {
 namespace net {
@@ -257,7 +257,7 @@ namespace detail {
 } // namespace canard
 
 #if defined(CANARD_NET_OFP_HEADER_ONLY) || !defined(CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
-# include <canard/network/openflow/detail/impl/set_base.hpp>
+# include <canard/net/ofp/detail/impl/set_base.hpp>
 #endif
 
 #endif // CANARD_NET_OFP_SET_BASE_HPP

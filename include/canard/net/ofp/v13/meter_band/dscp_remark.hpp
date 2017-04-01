@@ -2,9 +2,9 @@
 #define CANARD_NET_OFP_V13_METER_BANDS_DSCP_REMARK_HPP
 
 #include <cstdint>
-#include <canard/network/openflow/v13/detail/basic_meter_band.hpp>
-#include <canard/network/openflow/v13/detail/byteorder.hpp>
-#include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/net/ofp/v13/detail/basic_meter_band.hpp>
+#include <canard/net/ofp/v13/detail/byteorder.hpp>
+#include <canard/net/ofp/v13/openflow.hpp>
 
 namespace canard {
 namespace net {

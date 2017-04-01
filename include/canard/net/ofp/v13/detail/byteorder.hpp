@@ -3,8 +3,8 @@
 
 #include <boost/endian/conversion.hpp>
 #include <boost/fusion/algorithm/iteration/for_each.hpp>
-#include <canard/network/openflow/v13/detail/fusion_adaptor.hpp>
-#include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/net/ofp/v13/detail/fusion_adaptor.hpp>
+#include <canard/net/ofp/v13/openflow.hpp>
 
 namespace canard {
 namespace net {

@@ -3,12 +3,12 @@
 
 #include <cstdint>
 #include <utility>
-#include <canard/network/openflow/get_xid.hpp>
-#include <canard/network/openflow/v10/action_list.hpp>
-#include <canard/network/openflow/v10/common/match.hpp>
-#include <canard/network/openflow/v10/detail/flow_mod_base.hpp>
-#include <canard/network/openflow/v10/flow_entry.hpp>
-#include <canard/network/openflow/v10/openflow.hpp>
+#include <canard/net/ofp/get_xid.hpp>
+#include <canard/net/ofp/v10/action_list.hpp>
+#include <canard/net/ofp/v10/common/match.hpp>
+#include <canard/net/ofp/v10/detail/flow_mod_base.hpp>
+#include <canard/net/ofp/v10/flow_entry.hpp>
+#include <canard/net/ofp/v10/openflow.hpp>
 
 namespace canard {
 namespace net {

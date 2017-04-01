@@ -2,7 +2,7 @@
 #define CANARD_NET_OFP_TYPE_TRAITS_IS_ALL_CONSTRUCTIBLE_HPP
 
 #include <type_traits>
-#include <canard/network/openflow/type_traits/conjuction.hpp>
+#include <canard/net/ofp/type_traits/conjuction.hpp>
 
 namespace canard {
 namespace net {

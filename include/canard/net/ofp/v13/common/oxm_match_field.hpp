@@ -12,8 +12,8 @@
 #include <boost/fusion/sequence/intrinsic/value_at_key.hpp>
 #include <boost/fusion/support/pair.hpp>
 #include <canard/mac_address.hpp>
-#include <canard/network/openflow/v13/detail/basic_oxm_match_field.hpp>
-#include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/net/ofp/v13/detail/basic_oxm_match_field.hpp>
+#include <canard/net/ofp/v13/openflow.hpp>
 
 namespace canard {
 namespace net {

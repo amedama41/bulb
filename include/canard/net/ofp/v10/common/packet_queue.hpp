@@ -5,15 +5,15 @@
 #include <iterator>
 #include <utility>
 #include <boost/range/algorithm/equal.hpp>
-#include <canard/network/openflow/detail/decode.hpp>
-#include <canard/network/openflow/detail/encode.hpp>
-#include <canard/network/openflow/detail/memcmp.hpp>
-#include <canard/network/openflow/v10/exception.hpp>
-#include <canard/network/openflow/list.hpp>
-#include <canard/network/openflow/queue_id.hpp>
-#include <canard/network/openflow/v10/any_queue_property.hpp>
-#include <canard/network/openflow/v10/detail/byteorder.hpp>
-#include <canard/network/openflow/v10/openflow.hpp>
+#include <canard/net/ofp/detail/decode.hpp>
+#include <canard/net/ofp/detail/encode.hpp>
+#include <canard/net/ofp/detail/memcmp.hpp>
+#include <canard/net/ofp/v10/exception.hpp>
+#include <canard/net/ofp/list.hpp>
+#include <canard/net/ofp/queue_id.hpp>
+#include <canard/net/ofp/v10/any_queue_property.hpp>
+#include <canard/net/ofp/v10/detail/byteorder.hpp>
+#include <canard/net/ofp/v10/openflow.hpp>
 
 namespace canard {
 namespace net {

@@ -14,12 +14,12 @@
 #include <boost/range/algorithm/find_if.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/algorithm/mismatch.hpp>
-#include <canard/network/openflow/detail/basic_protocol_type.hpp>
-#include <canard/network/openflow/detail/decode.hpp>
-#include <canard/network/openflow/detail/encode.hpp>
-#include <canard/network/openflow/detail/memcmp.hpp>
-#include <canard/network/openflow/v13/detail/byteorder.hpp>
-#include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/net/ofp/detail/basic_protocol_type.hpp>
+#include <canard/net/ofp/detail/decode.hpp>
+#include <canard/net/ofp/detail/encode.hpp>
+#include <canard/net/ofp/detail/memcmp.hpp>
+#include <canard/net/ofp/v13/detail/byteorder.hpp>
+#include <canard/net/ofp/v13/openflow.hpp>
 
 namespace canard {
 namespace net {

@@ -1,13 +1,13 @@
 #ifndef CANARD_NET_OFP_V13_IMPL_ACTION_LIST_IPP
 #define CANARD_NET_OFP_V13_IMPL_ACTION_LIST_IPP
 
-#include <canard/network/openflow/detail/config.hpp>
-#include <canard/network/openflow/v13/action_list.hpp>
+#include <canard/net/ofp/detail/config.hpp>
+#include <canard/net/ofp/v13/action_list.hpp>
 
 #if !defined(CANARD_NET_OFP_HEADER_ONLY)
 # if defined(CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
 
-#  include <canard/network/openflow/detail/impl/list.hpp>
+#  include <canard/net/ofp/detail/impl/list.hpp>
 
 namespace canard {
 namespace net {

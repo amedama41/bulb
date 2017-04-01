@@ -11,7 +11,7 @@
 #include <boost/exception/exception.hpp>
 #include <boost/exception/info.hpp>
 #include <boost/utility/string_ref.hpp>
-#include <canard/network/openflow/exception.hpp>
+#include <canard/net/ofp/exception.hpp>
 
 namespace canard {
 namespace net {

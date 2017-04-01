@@ -1,10 +1,10 @@
 #ifndef CANARD_NET_OFP_V10_ANY_ACTION_HPP
 #define CANARD_NET_OFP_V10_ANY_ACTION_HPP
 
-#include <canard/network/openflow/detail/config.hpp>
+#include <canard/net/ofp/detail/config.hpp>
 
-#include <canard/network/openflow/detail/any_type.hpp>
-#include <canard/network/openflow/v10/decoder/action_decoder.hpp>
+#include <canard/net/ofp/detail/any_type.hpp>
+#include <canard/net/ofp/v10/decoder/action_decoder.hpp>
 
 namespace canard {
 namespace net {

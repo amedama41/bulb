@@ -1,7 +1,7 @@
 #ifndef CANARD_NET_OFP_LIST_HPP
 #define CANARD_NET_OFP_LIST_HPP
 
-#include <canard/network/openflow/detail/config.hpp>
+#include <canard/net/ofp/detail/config.hpp>
 
 #include <cstdint>
 #include <initializer_list>
@@ -12,8 +12,8 @@
 #include <boost/container/vector.hpp>
 #include <boost/operators.hpp>
 #include <boost/range/algorithm/for_each.hpp>
-#include <canard/network/openflow/type_traits/is_all_constructible.hpp>
-#include <canard/network/openflow/type_traits/is_iterator.hpp>
+#include <canard/net/ofp/type_traits/is_all_constructible.hpp>
+#include <canard/net/ofp/type_traits/is_iterator.hpp>
 
 namespace canard {
 namespace net {
@@ -376,6 +376,6 @@ namespace ofp {
 } // namespace net
 } // namespace canard
 
-#include <canard/network/openflow/detail/impl/list.hpp>
+#include <canard/net/ofp/detail/impl/list.hpp>
 
 #endif // CANARD_NET_OFP_LIST_HPP

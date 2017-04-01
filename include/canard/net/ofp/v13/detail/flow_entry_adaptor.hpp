@@ -2,7 +2,7 @@
 #define CANARD_NET_OFP_V13_FLOW_ENTRY_ADAPTOR_HPP
 
 #include <cstdint>
-#include <canard/network/openflow/v13/flow_entry.hpp>
+#include <canard/net/ofp/v13/flow_entry.hpp>
 
 namespace canard {
 namespace net {

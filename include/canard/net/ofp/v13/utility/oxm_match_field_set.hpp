@@ -1,15 +1,15 @@
 #ifndef CANARD_NET_OFP_V13_OXM_MATCH_FIELD_SET_HPP
 #define CANARD_NET_OFP_V13_OXM_MATCH_FIELD_SET_HPP
 
-#include <canard/network/openflow/detail/config.hpp>
+#include <canard/net/ofp/detail/config.hpp>
 
 #include <cstdint>
 #include <boost/container/flat_map.hpp>
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/adaptor/map.hpp>
 #include <boost/range/algorithm/equal.hpp>
-#include <canard/network/openflow/detail/set_base.hpp>
-#include <canard/network/openflow/v13/any_oxm_match_field.hpp>
+#include <canard/net/ofp/detail/set_base.hpp>
+#include <canard/net/ofp/v13/any_oxm_match_field.hpp>
 
 namespace canard {
 namespace net {
@@ -118,7 +118,7 @@ namespace ofp {
 } // namespace net
 } // namespace canard
 #else
-# include <canard/network/openflow/v13/impl/oxm_match_field_set.ipp>
+# include <canard/net/ofp/v13/impl/oxm_match_field_set.ipp>
 #endif
 
 #endif // CANARD_NET_OFP_V13_OXM_MATCH_FIELD_SET_HPP

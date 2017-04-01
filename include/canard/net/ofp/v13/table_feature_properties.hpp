@@ -2,10 +2,10 @@
 #define CANARD_NET_OFP_V13_TABLE_FEATURE_PROPERTIES_HPP
 
 #include <tuple>
-#include <canard/network/openflow/v13/table_feature_property/actions.hpp>
-#include <canard/network/openflow/v13/table_feature_property/instructions.hpp>
-#include <canard/network/openflow/v13/table_feature_property/next_tables.hpp>
-#include <canard/network/openflow/v13/table_feature_property/oxm.hpp>
+#include <canard/net/ofp/v13/table_feature_property/actions.hpp>
+#include <canard/net/ofp/v13/table_feature_property/instructions.hpp>
+#include <canard/net/ofp/v13/table_feature_property/next_tables.hpp>
+#include <canard/net/ofp/v13/table_feature_property/oxm.hpp>
 
 namespace canard {
 namespace net {

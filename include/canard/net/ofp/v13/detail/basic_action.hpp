@@ -1,8 +1,8 @@
 #ifndef CANARD_NET_OFP_DETAIL_V13_BASIC_ACTION_HPP
 #define CANARD_NET_OFP_DETAIL_V13_BASIC_ACTION_HPP
 
-#include <canard/network/openflow/detail/basic_action.hpp>
-#include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/net/ofp/detail/basic_action.hpp>
+#include <canard/net/ofp/v13/openflow.hpp>
 
 namespace canard {
 namespace net {

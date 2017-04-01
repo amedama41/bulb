@@ -1,13 +1,13 @@
 #ifndef CANARD_NET_OFP_V13_ANY_ACTION_HPP
 #define CANARD_NET_OFP_V13_ANY_ACTION_HPP
 
-#include <canard/network/openflow/detail/config.hpp>
+#include <canard/net/ofp/detail/config.hpp>
 
 #include <cstdint>
-#include <canard/network/openflow/detail/any_type.hpp>
-#include <canard/network/openflow/v13/action_order.hpp>
-#include <canard/network/openflow/v13/decoder/action_decoder.hpp>
-#include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/net/ofp/detail/any_type.hpp>
+#include <canard/net/ofp/v13/action_order.hpp>
+#include <canard/net/ofp/v13/decoder/action_decoder.hpp>
+#include <canard/net/ofp/v13/openflow.hpp>
 
 namespace canard {
 namespace net {
@@ -58,7 +58,7 @@ namespace v13 {
 
 #if defined(CANARD_NET_OFP_HEADER_ONLY)
 
-#include <canard/network/openflow/v13/impl/any_action.ipp>
+#include <canard/net/ofp/v13/impl/any_action.ipp>
 
 #elif defined(CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
 

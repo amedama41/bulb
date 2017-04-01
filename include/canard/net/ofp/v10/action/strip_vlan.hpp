@@ -1,9 +1,9 @@
 #ifndef CANARD_NET_OFP_V10_ACTIONS_STRIP_VLAN_HPP
 #define CANARD_NET_OFP_V10_ACTIONS_STRIP_VLAN_HPP
 
-#include <canard/network/openflow/v10/detail/basic_fixed_length_action.hpp>
-#include <canard/network/openflow/v10/detail/byteorder.hpp>
-#include <canard/network/openflow/v10/openflow.hpp>
+#include <canard/net/ofp/v10/detail/basic_fixed_length_action.hpp>
+#include <canard/net/ofp/v10/detail/byteorder.hpp>
+#include <canard/net/ofp/v10/openflow.hpp>
 
 namespace canard {
 namespace net {

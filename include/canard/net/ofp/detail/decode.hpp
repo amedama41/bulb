@@ -9,7 +9,7 @@
 #include <memory>
 #include <type_traits>
 #include <boost/endian/conversion.hpp>
-#include <canard/network/openflow/detail/copy_size.hpp>
+#include <canard/net/ofp/detail/copy_size.hpp>
 
 namespace canard {
 namespace net {

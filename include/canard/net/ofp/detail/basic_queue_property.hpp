@@ -2,10 +2,10 @@
 #define CANARD_NET_OFP_DETAIL_BAISC_QUEUE_PROPERTY_HPP
 
 #include <cstdint>
-#include <canard/network/openflow/detail/basic_protocol_type.hpp>
-#include <canard/network/openflow/detail/decode.hpp>
-#include <canard/network/openflow/detail/encode.hpp>
-#include <canard/network/openflow/detail/memcmp.hpp>
+#include <canard/net/ofp/detail/basic_protocol_type.hpp>
+#include <canard/net/ofp/detail/decode.hpp>
+#include <canard/net/ofp/detail/encode.hpp>
+#include <canard/net/ofp/detail/memcmp.hpp>
 
 namespace canard {
 namespace net {

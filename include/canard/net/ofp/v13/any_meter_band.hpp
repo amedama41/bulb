@@ -1,8 +1,8 @@
 #ifndef CANARD_NET_OFP_V13_ANY_METER_BAND_HPP
 #define CANARD_NET_OFP_V13_ANY_METER_BAND_HPP
 
-#include <canard/network/openflow/detail/any_type.hpp>
-#include <canard/network/openflow/v13/decoder/meter_band_decoder.hpp>
+#include <canard/net/ofp/detail/any_type.hpp>
+#include <canard/net/ofp/v13/decoder/meter_band_decoder.hpp>
 
 #include <cstdint>
 #include <boost/variant/static_visitor.hpp>
@@ -107,7 +107,7 @@ namespace v13 {
 
 #if defined(CANARD_NET_OFP_HEADER_ONLY)
 
-#include <canard/network/openflow/v13/impl/any_meter_band.ipp>
+#include <canard/net/ofp/v13/impl/any_meter_band.ipp>
 
 #elif defined(CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
 

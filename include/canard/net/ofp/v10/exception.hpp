@@ -5,10 +5,10 @@
 #include <iomanip>
 #include <ostream>
 #include <boost/utility/string_ref.hpp>
-#include <canard/network/openflow/detail/exception_base.hpp>
-#include <canard/network/openflow/v10/dispatcher/error_type_dispatcher.hpp>
-#include <canard/network/openflow/v10/error_code.hpp>
-#include <canard/network/openflow/v10/io/openflow.hpp>
+#include <canard/net/ofp/detail/exception_base.hpp>
+#include <canard/net/ofp/v10/dispatcher/error_type_dispatcher.hpp>
+#include <canard/net/ofp/v10/error_code.hpp>
+#include <canard/net/ofp/v10/io/openflow.hpp>
 
 namespace canard {
 namespace net {

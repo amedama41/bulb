@@ -4,15 +4,15 @@
 #include <cstdint>
 #include <iterator>
 #include <utility>
-#include <canard/network/openflow/detail/decode.hpp>
-#include <canard/network/openflow/detail/encode.hpp>
-#include <canard/network/openflow/detail/memcmp.hpp>
-#include <canard/network/openflow/v10/action_list.hpp>
-#include <canard/network/openflow/v10/common/match.hpp>
-#include <canard/network/openflow/v10/detail/basic_message.hpp>
-#include <canard/network/openflow/v10/detail/byteorder.hpp>
-#include <canard/network/openflow/v10/flow_entry.hpp>
-#include <canard/network/openflow/v10/openflow.hpp>
+#include <canard/net/ofp/detail/decode.hpp>
+#include <canard/net/ofp/detail/encode.hpp>
+#include <canard/net/ofp/detail/memcmp.hpp>
+#include <canard/net/ofp/v10/action_list.hpp>
+#include <canard/net/ofp/v10/common/match.hpp>
+#include <canard/net/ofp/v10/detail/basic_message.hpp>
+#include <canard/net/ofp/v10/detail/byteorder.hpp>
+#include <canard/net/ofp/v10/flow_entry.hpp>
+#include <canard/net/ofp/v10/openflow.hpp>
 
 namespace canard {
 namespace net {

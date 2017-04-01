@@ -2,25 +2,25 @@
 #define CANARD_NET_OFP_V13_MESSAGES_HPP
 
 #include <tuple>
-#include <canard/network/openflow/v13/message/hello.hpp>
-#include <canard/network/openflow/v13/message/error.hpp>
-#include <canard/network/openflow/v13/message/echo.hpp>
-#include <canard/network/openflow/v13/message/table_mod.hpp>
-#include <canard/network/openflow/v13/message/flow_mod.hpp>
-#include <canard/network/openflow/v13/message/group_mod.hpp>
-#include <canard/network/openflow/v13/message/port_mod.hpp>
-#include <canard/network/openflow/v13/message/meter_mod.hpp>
-#include <canard/network/openflow/v13/message/switch_features.hpp>
-#include <canard/network/openflow/v13/message/switch_config.hpp>
-#include <canard/network/openflow/v13/message/multipart_messages.hpp>
-#include <canard/network/openflow/v13/message/packet_out.hpp>
-#include <canard/network/openflow/v13/message/barrier.hpp>
-#include <canard/network/openflow/v13/message/queue_config.hpp>
-#include <canard/network/openflow/v13/message/role.hpp>
-#include <canard/network/openflow/v13/message/async_config.hpp>
-#include <canard/network/openflow/v13/message/packet_in.hpp>
-#include <canard/network/openflow/v13/message/flow_removed.hpp>
-#include <canard/network/openflow/v13/message/port_status.hpp>
+#include <canard/net/ofp/v13/message/hello.hpp>
+#include <canard/net/ofp/v13/message/error.hpp>
+#include <canard/net/ofp/v13/message/echo.hpp>
+#include <canard/net/ofp/v13/message/table_mod.hpp>
+#include <canard/net/ofp/v13/message/flow_mod.hpp>
+#include <canard/net/ofp/v13/message/group_mod.hpp>
+#include <canard/net/ofp/v13/message/port_mod.hpp>
+#include <canard/net/ofp/v13/message/meter_mod.hpp>
+#include <canard/net/ofp/v13/message/switch_features.hpp>
+#include <canard/net/ofp/v13/message/switch_config.hpp>
+#include <canard/net/ofp/v13/message/multipart_messages.hpp>
+#include <canard/net/ofp/v13/message/packet_out.hpp>
+#include <canard/net/ofp/v13/message/barrier.hpp>
+#include <canard/net/ofp/v13/message/queue_config.hpp>
+#include <canard/net/ofp/v13/message/role.hpp>
+#include <canard/net/ofp/v13/message/async_config.hpp>
+#include <canard/net/ofp/v13/message/packet_in.hpp>
+#include <canard/net/ofp/v13/message/flow_removed.hpp>
+#include <canard/net/ofp/v13/message/port_status.hpp>
 
 namespace canard {
 namespace net {

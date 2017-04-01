@@ -3,8 +3,8 @@
 
 #include <cstdint>
 #include <type_traits>
-#include <canard/network/openflow/detail/basic_protocol_type.hpp>
-#include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/net/ofp/detail/basic_protocol_type.hpp>
+#include <canard/net/ofp/v13/openflow.hpp>
 
 namespace canard {
 namespace net {

@@ -3,10 +3,10 @@
 
 #include <cstdint>
 #include <array>
-#include <canard/network/openflow/get_xid.hpp>
-#include <canard/network/openflow/v13/detail/basic_fixed_length_message.hpp>
-#include <canard/network/openflow/v13/detail/byteorder.hpp>
-#include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/net/ofp/get_xid.hpp>
+#include <canard/net/ofp/v13/detail/basic_fixed_length_message.hpp>
+#include <canard/net/ofp/v13/detail/byteorder.hpp>
+#include <canard/net/ofp/v13/openflow.hpp>
 
 namespace canard {
 namespace net {

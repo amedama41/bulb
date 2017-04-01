@@ -4,8 +4,8 @@
 #include <tuple>
 #include <boost/mpl/identity.hpp>
 #include <boost/preprocessor/repeat.hpp>
-#include <canard/network/openflow/v13/error_code.hpp>
-#include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/net/ofp/v13/error_code.hpp>
+#include <canard/net/ofp/v13/openflow.hpp>
 
 namespace canard {
 namespace net {

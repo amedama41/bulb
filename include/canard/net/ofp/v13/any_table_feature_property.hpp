@@ -1,8 +1,8 @@
 #ifndef CANARD_NET_OFP_V13_ANY_TABLE_FEATURE_PROPERTY_HPP
 #define CANARD_NET_OFP_V13_ANY_TABLE_FEATURE_PROPERTY_HPP
 
-#include <canard/network/openflow/detail/any_type.hpp>
-#include <canard/network/openflow/v13/decoder/table_feature_property_decoder.hpp>
+#include <canard/net/ofp/detail/any_type.hpp>
+#include <canard/net/ofp/v13/decoder/table_feature_property_decoder.hpp>
 
 namespace canard {
 namespace net {
@@ -47,7 +47,7 @@ namespace v13 {
 
 #if defined(CANARD_NET_OFP_HEADER_ONLY)
 
-#include <canard/network/openflow/v13/impl/any_table_feature_property.ipp>
+#include <canard/net/ofp/v13/impl/any_table_feature_property.ipp>
 
 #elif defined(CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
 

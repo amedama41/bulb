@@ -1,12 +1,12 @@
 #ifndef CANARD_NET_OFP_V13_INSTRUCTION_SET_HPP
 #define CANARD_NET_OFP_V13_INSTRUCTION_SET_HPP
 
-#include <canard/network/openflow/detail/config.hpp>
+#include <canard/net/ofp/detail/config.hpp>
 
 #include <cstdint>
-#include <canard/network/openflow/detail/set_base.hpp>
-#include <canard/network/openflow/v13/any_instruction.hpp>
-#include <canard/network/openflow/v13/instruction_order.hpp>
+#include <canard/net/ofp/detail/set_base.hpp>
+#include <canard/net/ofp/v13/any_instruction.hpp>
+#include <canard/net/ofp/v13/instruction_order.hpp>
 
 namespace canard {
 namespace net {
@@ -64,7 +64,7 @@ namespace ofp {
 } // namespace net
 } // namespace canard
 #else
-# include <canard/network/openflow/v13/impl/instruction_set.ipp>
+# include <canard/net/ofp/v13/impl/instruction_set.ipp>
 #endif
 
 #endif // CANARD_NET_OFP_V13_INSTRUCTION_SET_HPP

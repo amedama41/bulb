@@ -3,8 +3,8 @@
 
 #include <cstdint>
 #include <stdexcept>
-#include <canard/network/openflow/v13/detail/basic_fixed_length_instruction.hpp>
-#include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/net/ofp/v13/detail/basic_fixed_length_instruction.hpp>
+#include <canard/net/ofp/v13/openflow.hpp>
 
 namespace canard {
 namespace net {

@@ -1,8 +1,8 @@
 #ifndef CANARD_NET_OFP_DETAIL_IMPL_LIST_HPP
 #define CANARD_NET_OFP_DETAIL_IMPL_LIST_HPP
 
-#include <canard/network/openflow/detail/config.hpp>
-#include <canard/network/openflow/list.hpp>
+#include <canard/net/ofp/detail/config.hpp>
+#include <canard/net/ofp/list.hpp>
 
 #include <cstddef>
 #include <cstdint>

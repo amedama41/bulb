@@ -8,11 +8,11 @@
 #include <boost/fusion/sequence/intrinsic/value_at.hpp>
 #include <boost/fusion/sequence/intrinsic/value_at_key.hpp>
 #include <boost/fusion/support/pair.hpp>
-#include <canard/network/openflow/v10/common/match_fields.hpp>
-#include <canard/network/openflow/v10/detail/basic_fixed_length_action.hpp>
-#include <canard/network/openflow/v10/detail/byteorder.hpp>
-#include <canard/network/openflow/v10/detail/fusion_adaptor.hpp>
-#include <canard/network/openflow/v10/openflow.hpp>
+#include <canard/net/ofp/v10/common/match_fields.hpp>
+#include <canard/net/ofp/v10/detail/basic_fixed_length_action.hpp>
+#include <canard/net/ofp/v10/detail/byteorder.hpp>
+#include <canard/net/ofp/v10/detail/fusion_adaptor.hpp>
+#include <canard/net/ofp/v10/openflow.hpp>
 
 namespace canard {
 namespace net {

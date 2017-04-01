@@ -2,26 +2,26 @@
 #define CANARD_NET_OFP_V10_MESSAGES_HPP
 
 #include <tuple>
-#include <canard/network/openflow/v10/message/barrier.hpp>
-#include <canard/network/openflow/v10/message/echo.hpp>
-#include <canard/network/openflow/v10/message/error.hpp>
-#include <canard/network/openflow/v10/message/flow_add.hpp>
-#include <canard/network/openflow/v10/message/flow_modify.hpp>
-#include <canard/network/openflow/v10/message/flow_delete.hpp>
-#include <canard/network/openflow/v10/message/flow_removed.hpp>
-#include <canard/network/openflow/v10/message/packet_in.hpp>
-#include <canard/network/openflow/v10/message/packet_out.hpp>
-#include <canard/network/openflow/v10/message/port_mod.hpp>
-#include <canard/network/openflow/v10/message/port_status.hpp>
-#include <canard/network/openflow/v10/message/queue_config.hpp>
-#include <canard/network/openflow/v10/message/stats/aggregate_stats.hpp>
-#include <canard/network/openflow/v10/message/stats/description.hpp>
-#include <canard/network/openflow/v10/message/stats/flow_stats.hpp>
-#include <canard/network/openflow/v10/message/stats/port_stats.hpp>
-#include <canard/network/openflow/v10/message/stats/queue_stats.hpp>
-#include <canard/network/openflow/v10/message/stats/table_stats.hpp>
-#include <canard/network/openflow/v10/message/switch_config.hpp>
-#include <canard/network/openflow/v10/message/switch_features.hpp>
+#include <canard/net/ofp/v10/message/barrier.hpp>
+#include <canard/net/ofp/v10/message/echo.hpp>
+#include <canard/net/ofp/v10/message/error.hpp>
+#include <canard/net/ofp/v10/message/flow_add.hpp>
+#include <canard/net/ofp/v10/message/flow_modify.hpp>
+#include <canard/net/ofp/v10/message/flow_delete.hpp>
+#include <canard/net/ofp/v10/message/flow_removed.hpp>
+#include <canard/net/ofp/v10/message/packet_in.hpp>
+#include <canard/net/ofp/v10/message/packet_out.hpp>
+#include <canard/net/ofp/v10/message/port_mod.hpp>
+#include <canard/net/ofp/v10/message/port_status.hpp>
+#include <canard/net/ofp/v10/message/queue_config.hpp>
+#include <canard/net/ofp/v10/message/stats/aggregate_stats.hpp>
+#include <canard/net/ofp/v10/message/stats/description.hpp>
+#include <canard/net/ofp/v10/message/stats/flow_stats.hpp>
+#include <canard/net/ofp/v10/message/stats/port_stats.hpp>
+#include <canard/net/ofp/v10/message/stats/queue_stats.hpp>
+#include <canard/net/ofp/v10/message/stats/table_stats.hpp>
+#include <canard/net/ofp/v10/message/switch_config.hpp>
+#include <canard/net/ofp/v10/message/switch_features.hpp>
 
 namespace canard {
 namespace net {

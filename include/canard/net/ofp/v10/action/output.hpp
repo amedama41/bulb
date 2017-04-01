@@ -5,9 +5,9 @@
 #include <limits>
 #include <stdexcept>
 #include <utility>
-#include <canard/network/openflow/v10/detail/basic_fixed_length_action.hpp>
-#include <canard/network/openflow/v10/detail/byteorder.hpp>
-#include <canard/network/openflow/v10/openflow.hpp>
+#include <canard/net/ofp/v10/detail/basic_fixed_length_action.hpp>
+#include <canard/net/ofp/v10/detail/byteorder.hpp>
+#include <canard/net/ofp/v10/openflow.hpp>
 
 namespace canard {
 namespace net {

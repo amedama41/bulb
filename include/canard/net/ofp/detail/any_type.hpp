@@ -1,7 +1,7 @@
 #ifndef CANARD_NET_OFP_DETAIL_ANY_TYPE_HPP
 #define CANARD_NET_OFP_DETAIL_ANY_TYPE_HPP
 
-#include <canard/network/openflow/detail/config.hpp>
+#include <canard/net/ofp/detail/config.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -18,8 +18,8 @@
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/get.hpp>
 #include <boost/variant/variant.hpp>
-#include <canard/network/openflow/detail/visitors.hpp>
-#include <canard/network/openflow/type_traits/type_list.hpp>
+#include <canard/net/ofp/detail/visitors.hpp>
+#include <canard/net/ofp/type_traits/type_list.hpp>
 
 namespace canard {
 namespace net {
@@ -298,7 +298,7 @@ namespace detail {
 } // namespace canard
 
 #if defined(CANARD_NET_OFP_HEADER_ONLY) || !defined(CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
-#   include <canard/network/openflow/detail/impl/any_type.hpp>
+#   include <canard/net/ofp/detail/impl/any_type.hpp>
 #endif
 
 #endif // CANARD_NET_OFP_DETAIL_ANY_TYPE_HPP

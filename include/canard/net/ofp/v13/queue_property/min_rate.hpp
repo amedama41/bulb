@@ -2,9 +2,9 @@
 #define CANARD_NET_OFP_V13_QUEUE_PROPERTIES_MIN_RATE_HPP
 
 #include <cstdint>
-#include <canard/network/openflow/v13/detail/byteorder.hpp>
-#include <canard/network/openflow/v13/detail/basic_queue_property.hpp>
-#include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/net/ofp/v13/detail/byteorder.hpp>
+#include <canard/net/ofp/v13/detail/basic_queue_property.hpp>
+#include <canard/net/ofp/v13/openflow.hpp>
 
 namespace canard {
 namespace net {

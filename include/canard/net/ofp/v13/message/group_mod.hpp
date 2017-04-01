@@ -1,9 +1,9 @@
 #ifndef CANARD_NET_OFP_V13_GROUP_MOD_HPP
 #define CANARD_NET_OFP_V13_GROUP_MOD_HPP
 
-#include <canard/network/openflow/v13/message/group_add.hpp>
-#include <canard/network/openflow/v13/message/group_delete.hpp>
-#include <canard/network/openflow/v13/message/group_modify.hpp>
+#include <canard/net/ofp/v13/message/group_add.hpp>
+#include <canard/net/ofp/v13/message/group_delete.hpp>
+#include <canard/net/ofp/v13/message/group_modify.hpp>
 
 namespace canard {
 namespace net {

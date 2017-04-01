@@ -4,13 +4,13 @@
 #include <cstdint>
 #include <cstring>
 #include <utility>
-#include <canard/network/openflow/data_type.hpp>
-#include <canard/network/openflow/detail/basic_protocol_type.hpp>
-#include <canard/network/openflow/detail/decode.hpp>
-#include <canard/network/openflow/detail/encode.hpp>
-#include <canard/network/openflow/v13/detail/byteorder.hpp>
-#include <canard/network/openflow/v13/exception.hpp>
-#include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/net/ofp/data_type.hpp>
+#include <canard/net/ofp/detail/basic_protocol_type.hpp>
+#include <canard/net/ofp/detail/decode.hpp>
+#include <canard/net/ofp/detail/encode.hpp>
+#include <canard/net/ofp/v13/detail/byteorder.hpp>
+#include <canard/net/ofp/v13/exception.hpp>
+#include <canard/net/ofp/v13/openflow.hpp>
 
 namespace canard {
 namespace net {

@@ -8,13 +8,13 @@
 #include <boost/fusion/adapted/std_tuple.hpp>
 #include <boost/fusion/algorithm/query/all.hpp>
 #include <boost/optional/optional.hpp>
-#include <canard/network/openflow/detail/basic_protocol_type.hpp>
-#include <canard/network/openflow/detail/decode.hpp>
-#include <canard/network/openflow/detail/encode.hpp>
-#include <canard/network/openflow/detail/memcmp.hpp>
-#include <canard/network/openflow/type_traits/conjuction.hpp>
-#include <canard/network/openflow/v10/common/match_fields.hpp>
-#include <canard/network/openflow/v10/openflow.hpp>
+#include <canard/net/ofp/detail/basic_protocol_type.hpp>
+#include <canard/net/ofp/detail/decode.hpp>
+#include <canard/net/ofp/detail/encode.hpp>
+#include <canard/net/ofp/detail/memcmp.hpp>
+#include <canard/net/ofp/type_traits/conjuction.hpp>
+#include <canard/net/ofp/v10/common/match_fields.hpp>
+#include <canard/net/ofp/v10/openflow.hpp>
 
 namespace canard {
 namespace net {

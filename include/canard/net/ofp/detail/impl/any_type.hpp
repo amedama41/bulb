@@ -1,13 +1,13 @@
 #ifndef CANARD_NET_OFP_DETAIL_IMPL_ANY_TYPE_HPP
 #define CANARD_NET_OFP_DETAIL_IMPL_ANY_TYPE_HPP
 
-#include <canard/network/openflow/detail/config.hpp>
-#include <canard/network/openflow/detail/any_type.hpp>
+#include <canard/net/ofp/detail/config.hpp>
+#include <canard/net/ofp/detail/any_type.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <boost/variant/apply_visitor.hpp>
-#include <canard/network/openflow/detail/visitors.hpp>
+#include <canard/net/ofp/detail/visitors.hpp>
 
 namespace canard {
 namespace net {

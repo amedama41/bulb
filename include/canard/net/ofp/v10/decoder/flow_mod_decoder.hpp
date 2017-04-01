@@ -4,10 +4,10 @@
 #include <cstdint>
 #include <tuple>
 #include <boost/preprocessor/repeat.hpp>
-#include <canard/network/openflow/detail/decode.hpp>
-#include <canard/network/openflow/v10/exception.hpp>
-#include <canard/network/openflow/v10/message/flow_mod.hpp>
-#include <canard/network/openflow/v10/openflow.hpp>
+#include <canard/net/ofp/detail/decode.hpp>
+#include <canard/net/ofp/v10/exception.hpp>
+#include <canard/net/ofp/v10/message/flow_mod.hpp>
+#include <canard/net/ofp/v10/openflow.hpp>
 
 namespace canard {
 namespace net {

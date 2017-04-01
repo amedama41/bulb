@@ -1,8 +1,8 @@
 #ifndef CANARD_NET_OFP_DETAIL_V10_BASIC_FIXED_LENGTH_ACTION_HPP
 #define CANARD_NET_OFP_DETAIL_V10_BASIC_FIXED_LENGTH_ACTION_HPP
 
-#include <canard/network/openflow/detail/basic_fixed_length_action.hpp>
-#include <canard/network/openflow/v10/openflow.hpp>
+#include <canard/net/ofp/detail/basic_fixed_length_action.hpp>
+#include <canard/net/ofp/v10/openflow.hpp>
 
 namespace canard {
 namespace net {

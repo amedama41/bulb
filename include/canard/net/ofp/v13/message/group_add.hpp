@@ -3,9 +3,9 @@
 
 #include <cstdint>
 #include <utility>
-#include <canard/network/openflow/get_xid.hpp>
-#include <canard/network/openflow/v13/detail/group_mod_base.hpp>
-#include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/net/ofp/get_xid.hpp>
+#include <canard/net/ofp/v13/detail/group_mod_base.hpp>
+#include <canard/net/ofp/v13/openflow.hpp>
 
 namespace canard {
 namespace net {

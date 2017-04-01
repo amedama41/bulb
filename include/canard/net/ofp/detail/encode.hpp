@@ -8,7 +8,7 @@
 #include <boost/endian/conversion.hpp>
 #include <boost/range/algorithm_ext/push_back.hpp>
 #include <boost/range/iterator_range.hpp>
-#include <canard/network/openflow/detail/copy_size.hpp>
+#include <canard/net/ofp/detail/copy_size.hpp>
 
 namespace canard {
 namespace net {

@@ -15,9 +15,9 @@
 #include <boost/mpl/int.hpp>
 #include <boost/operators.hpp>
 #include <canard/mac_address.hpp>
-#include <canard/network/openflow/validator.hpp>
-#include <canard/network/openflow/v10/detail/fusion_adaptor.hpp>
-#include <canard/network/openflow/v10/openflow.hpp>
+#include <canard/net/ofp/validator.hpp>
+#include <canard/net/ofp/v10/detail/fusion_adaptor.hpp>
+#include <canard/net/ofp/v10/openflow.hpp>
 
 namespace canard {
 namespace net {

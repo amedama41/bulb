@@ -6,8 +6,8 @@
 #include <type_traits>
 #include <utility>
 #include <boost/operators.hpp>
-#include <canard/network/openflow/detail/encode.hpp>
-#include <canard/network/openflow/validator.hpp>
+#include <canard/net/ofp/detail/encode.hpp>
+#include <canard/net/ofp/validator.hpp>
 
 namespace canard {
 namespace net {

@@ -1,10 +1,10 @@
 #ifndef CANARD_NET_OFP_V13_IMPL_METER_BAND_SET_HPP
 #define CANARD_NET_OFP_V13_IMPL_METER_BAND_SET_HPP
 
-#include <canard/network/openflow/detail/config.hpp>
-#include <canard/network/openflow/v13/utility/meter_band_set.hpp>
+#include <canard/net/ofp/detail/config.hpp>
+#include <canard/net/ofp/v13/utility/meter_band_set.hpp>
 
-#include <canard/network/openflow/detail/impl/set_base.hpp>
+#include <canard/net/ofp/detail/impl/set_base.hpp>
 
 #if !defined(CANARD_NET_OFP_HEADER_ONLY) && defined(CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
 namespace canard {

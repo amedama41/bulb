@@ -2,8 +2,8 @@
 #define CANARD_NET_OFP_V13_HELLO_ELEMENTS_HPP
 
 #include <tuple>
-#include <canard/network/openflow/v13/hello_element/unknown_element.hpp>
-#include <canard/network/openflow/v13/hello_element/versionbitmap.hpp>
+#include <canard/net/ofp/v13/hello_element/unknown_element.hpp>
+#include <canard/net/ofp/v13/hello_element/versionbitmap.hpp>
 
 namespace canard {
 namespace net {

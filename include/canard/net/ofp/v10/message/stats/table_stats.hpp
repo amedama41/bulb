@@ -8,14 +8,14 @@
 #include <boost/range/adaptor/sliced.hpp>
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/utility/string_ref.hpp>
-#include <canard/network/openflow/detail/basic_protocol_type.hpp>
-#include <canard/network/openflow/detail/decode.hpp>
-#include <canard/network/openflow/detail/encode.hpp>
-#include <canard/network/openflow/detail/memcmp.hpp>
-#include <canard/network/openflow/get_xid.hpp>
-#include <canard/network/openflow/v10/detail/basic_stats.hpp>
-#include <canard/network/openflow/v10/detail/byteorder.hpp>
-#include <canard/network/openflow/v10/openflow.hpp>
+#include <canard/net/ofp/detail/basic_protocol_type.hpp>
+#include <canard/net/ofp/detail/decode.hpp>
+#include <canard/net/ofp/detail/encode.hpp>
+#include <canard/net/ofp/detail/memcmp.hpp>
+#include <canard/net/ofp/get_xid.hpp>
+#include <canard/net/ofp/v10/detail/basic_stats.hpp>
+#include <canard/net/ofp/v10/detail/byteorder.hpp>
+#include <canard/net/ofp/v10/openflow.hpp>
 
 namespace canard {
 namespace net {

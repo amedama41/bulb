@@ -1,7 +1,7 @@
 #ifndef CANARD_NET_OFP_V13_OXM_MATCH_HPP
 #define CANARD_NET_OFP_V13_OXM_MATCH_HPP
 
-#include <canard/network/openflow/detail/config.hpp>
+#include <canard/net/ofp/detail/config.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -10,17 +10,17 @@
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
-#include <canard/network/openflow/detail/basic_protocol_type.hpp>
-#include <canard/network/openflow/detail/decode.hpp>
-#include <canard/network/openflow/detail/encode.hpp>
-#include <canard/network/openflow/detail/memcmp.hpp>
-#include <canard/network/openflow/list.hpp>
-#include <canard/network/openflow/type_traits/is_all_constructible.hpp>
-#include <canard/network/openflow/v13/any_oxm_match_field.hpp>
-#include <canard/network/openflow/v13/detail/byteorder.hpp>
-#include <canard/network/openflow/v13/exception.hpp>
-#include <canard/network/openflow/v13/openflow.hpp>
-#include <canard/network/openflow/v13/utility/oxm_match_field_set.hpp>
+#include <canard/net/ofp/detail/basic_protocol_type.hpp>
+#include <canard/net/ofp/detail/decode.hpp>
+#include <canard/net/ofp/detail/encode.hpp>
+#include <canard/net/ofp/detail/memcmp.hpp>
+#include <canard/net/ofp/list.hpp>
+#include <canard/net/ofp/type_traits/is_all_constructible.hpp>
+#include <canard/net/ofp/v13/any_oxm_match_field.hpp>
+#include <canard/net/ofp/v13/detail/byteorder.hpp>
+#include <canard/net/ofp/v13/exception.hpp>
+#include <canard/net/ofp/v13/openflow.hpp>
+#include <canard/net/ofp/v13/utility/oxm_match_field_set.hpp>
 
 namespace canard {
 namespace net {

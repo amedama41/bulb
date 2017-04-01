@@ -7,14 +7,14 @@
 #include <utility>
 #include <boost/optional/optional.hpp>
 #include <boost/range/algorithm/find_if.hpp>
-#include <canard/network/openflow/detail/basic_protocol_type.hpp>
-#include <canard/network/openflow/detail/decode.hpp>
-#include <canard/network/openflow/detail/encode.hpp>
-#include <canard/network/openflow/get_xid.hpp>
-#include <canard/network/openflow/list.hpp>
-#include <canard/network/openflow/v13/any_hello_element.hpp>
-#include <canard/network/openflow/v13/hello_element/versionbitmap.hpp>
-#include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/net/ofp/detail/basic_protocol_type.hpp>
+#include <canard/net/ofp/detail/decode.hpp>
+#include <canard/net/ofp/detail/encode.hpp>
+#include <canard/net/ofp/get_xid.hpp>
+#include <canard/net/ofp/list.hpp>
+#include <canard/net/ofp/v13/any_hello_element.hpp>
+#include <canard/net/ofp/v13/hello_element/versionbitmap.hpp>
+#include <canard/net/ofp/v13/openflow.hpp>
 
 namespace canard {
 namespace net {

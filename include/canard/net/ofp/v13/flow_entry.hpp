@@ -3,10 +3,10 @@
 
 #include <cstdint>
 #include <utility>
-#include <canard/network/openflow/list.hpp>
-#include <canard/network/openflow/v13/any_instruction.hpp>
-#include <canard/network/openflow/v13/common/oxm_match.hpp>
-#include <canard/network/openflow/v13/utility/instruction_set.hpp>
+#include <canard/net/ofp/list.hpp>
+#include <canard/net/ofp/v13/any_instruction.hpp>
+#include <canard/net/ofp/v13/common/oxm_match.hpp>
+#include <canard/net/ofp/v13/utility/instruction_set.hpp>
 
 namespace canard {
 namespace net {

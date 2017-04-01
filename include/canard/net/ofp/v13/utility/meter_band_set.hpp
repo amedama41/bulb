@@ -1,11 +1,11 @@
 #ifndef CANARD_NET_OFP_V13_METER_BAND_SET_HPP
 #define CANARD_NET_OFP_V13_METER_BAND_SET_HPP
 
-#include <canard/network/openflow/detail/config.hpp>
+#include <canard/net/ofp/detail/config.hpp>
 
 #include <cstdint>
-#include <canard/network/openflow/detail/set_base.hpp>
-#include <canard/network/openflow/v13/any_meter_band.hpp>
+#include <canard/net/ofp/detail/set_base.hpp>
+#include <canard/net/ofp/v13/any_meter_band.hpp>
 
 namespace canard {
 namespace net {
@@ -56,7 +56,7 @@ namespace ofp {
 } // namespace net
 } // namespace canard
 #else
-# include <canard/network/openflow/v13/impl/meter_band_set.ipp>
+# include <canard/net/ofp/v13/impl/meter_band_set.ipp>
 #endif
 
 #endif // CANARD_NET_OFP_V13_METER_BAND_SET_HPP

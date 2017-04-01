@@ -2,8 +2,8 @@
 #define CANARD_NET_OFP_V13_QUEUE_PROPERTIES_HPP
 
 #include <tuple>
-#include <canard/network/openflow/v13/queue_property/max_rate.hpp>
-#include <canard/network/openflow/v13/queue_property/min_rate.hpp>
+#include <canard/net/ofp/v13/queue_property/max_rate.hpp>
+#include <canard/net/ofp/v13/queue_property/min_rate.hpp>
 
 namespace canard {
 namespace net {

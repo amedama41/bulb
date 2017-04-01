@@ -1,10 +1,10 @@
 #ifndef CANARD_NET_OFP_HELLO_HPP
 #define CANARD_NET_OFP_HELLO_HPP
 
-#include <canard/network/openflow/v13/hello_elements.hpp>
-#include <canard/network/openflow/v13/openflow.hpp>
-#include <canard/network/openflow/v13/message/hello.hpp>
-#include <canard/network/openflow/v13/detail/byteorder.hpp>
+#include <canard/net/ofp/v13/hello_elements.hpp>
+#include <canard/net/ofp/v13/openflow.hpp>
+#include <canard/net/ofp/v13/message/hello.hpp>
+#include <canard/net/ofp/v13/detail/byteorder.hpp>
 
 namespace canard {
 namespace net {

@@ -4,10 +4,10 @@
 #include <cstdint>
 #include <iterator>
 #include <utility>
-#include <canard/network/openflow/list.hpp>
-#include <canard/network/openflow/v13/any_meter_band.hpp>
-#include <canard/network/openflow/v13/detail/basic_message.hpp>
-#include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/net/ofp/list.hpp>
+#include <canard/net/ofp/v13/any_meter_band.hpp>
+#include <canard/net/ofp/v13/detail/basic_message.hpp>
+#include <canard/net/ofp/v13/openflow.hpp>
 
 namespace canard {
 namespace net {

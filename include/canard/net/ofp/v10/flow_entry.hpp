@@ -4,8 +4,8 @@
 #include <cstdint>
 #include <utility>
 #include <boost/operators.hpp>
-#include <canard/network/openflow/v10/action_list.hpp>
-#include <canard/network/openflow/v10/common/match.hpp>
+#include <canard/net/ofp/v10/action_list.hpp>
+#include <canard/net/ofp/v10/common/match.hpp>
 
 namespace canard {
 namespace net {

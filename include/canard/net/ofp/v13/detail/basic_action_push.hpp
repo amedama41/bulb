@@ -2,8 +2,8 @@
 #define CANARD_NET_OFP_DETAIL_V13_BASIC_ACTION_PUSH_HPP
 
 #include <cstdint>
-#include <canard/network/openflow/v13/detail/basic_fixed_length_action.hpp>
-#include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/net/ofp/v13/detail/basic_fixed_length_action.hpp>
+#include <canard/net/ofp/v13/openflow.hpp>
 
 namespace canard {
 namespace net {

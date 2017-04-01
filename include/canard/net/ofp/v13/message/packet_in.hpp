@@ -5,18 +5,18 @@
 #include <iterator>
 #include <utility>
 #include <boost/range/algorithm/find_if.hpp>
-#include <canard/network/openflow/data_type.hpp>
-#include <canard/network/openflow/detail/decode.hpp>
-#include <canard/network/openflow/detail/decode.hpp>
-#include <canard/network/openflow/detail/encode.hpp>
-#include <canard/network/openflow/detail/padding.hpp>
-#include <canard/network/openflow/get_xid.hpp>
-#include <canard/network/openflow/v13/common/oxm_match.hpp>
-#include <canard/network/openflow/v13/detail/basic_message.hpp>
-#include <canard/network/openflow/v13/detail/byteorder.hpp>
-#include <canard/network/openflow/v13/detail/length_utility.hpp>
-#include <canard/network/openflow/v13/exception.hpp>
-#include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/net/ofp/data_type.hpp>
+#include <canard/net/ofp/detail/decode.hpp>
+#include <canard/net/ofp/detail/decode.hpp>
+#include <canard/net/ofp/detail/encode.hpp>
+#include <canard/net/ofp/detail/padding.hpp>
+#include <canard/net/ofp/get_xid.hpp>
+#include <canard/net/ofp/v13/common/oxm_match.hpp>
+#include <canard/net/ofp/v13/detail/basic_message.hpp>
+#include <canard/net/ofp/v13/detail/byteorder.hpp>
+#include <canard/net/ofp/v13/detail/length_utility.hpp>
+#include <canard/net/ofp/v13/exception.hpp>
+#include <canard/net/ofp/v13/openflow.hpp>
 
 namespace canard {
 namespace net {

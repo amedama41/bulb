@@ -2,8 +2,8 @@
 #define CANARD_NET_OFP_V13_METER_BANDS_HPP
 
 #include <tuple>
-#include <canard/network/openflow/v13/meter_band/dscp_remark.hpp>
-#include <canard/network/openflow/v13/meter_band/drop.hpp>
+#include <canard/net/ofp/v13/meter_band/dscp_remark.hpp>
+#include <canard/net/ofp/v13/meter_band/drop.hpp>
 
 namespace canard {
 namespace net {

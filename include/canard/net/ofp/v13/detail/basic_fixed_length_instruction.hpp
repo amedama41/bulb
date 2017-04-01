@@ -2,11 +2,11 @@
 #define CANARD_NET_OFP_DETAIL_V13_BASIC_FIXED_LENGTH_INSTRUCTION_HPP
 
 #include <cstdint>
-#include <canard/network/openflow/detail/decode.hpp>
-#include <canard/network/openflow/detail/encode.hpp>
-#include <canard/network/openflow/detail/memcmp.hpp>
-#include <canard/network/openflow/v13/detail/basic_instruction.hpp>
-#include <canard/network/openflow/v13/detail/byteorder.hpp>
+#include <canard/net/ofp/detail/decode.hpp>
+#include <canard/net/ofp/detail/encode.hpp>
+#include <canard/net/ofp/detail/memcmp.hpp>
+#include <canard/net/ofp/v13/detail/basic_instruction.hpp>
+#include <canard/net/ofp/v13/detail/byteorder.hpp>
 
 namespace canard {
 namespace net {

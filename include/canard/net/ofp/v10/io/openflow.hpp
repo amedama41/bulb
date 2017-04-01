@@ -3,7 +3,7 @@
 
 #include <cstdint>
 #include <ostream>
-#include <canard/network/openflow/v10/openflow.hpp>
+#include <canard/net/ofp/v10/openflow.hpp>
 
 namespace canard {
 namespace net {

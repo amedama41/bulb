@@ -1,8 +1,8 @@
 #ifndef CANARD_NET_OFP_DETAIL_V10_BASIC_QUEUE_PROPERTY_HPP
 #define CANARD_NET_OFP_DETAIL_V10_BASIC_QUEUE_PROPERTY_HPP
 
-#include <canard/network/openflow/detail/basic_queue_property.hpp>
-#include <canard/network/openflow/v10/openflow.hpp>
+#include <canard/net/ofp/detail/basic_queue_property.hpp>
+#include <canard/net/ofp/v10/openflow.hpp>
 
 namespace canard {
 namespace net {

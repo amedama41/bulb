@@ -2,12 +2,12 @@
 #define CANARD_NET_OFP_V10_MESSAGES_PORT_STATUS_HPP
 
 #include <cstdint>
-#include <canard/network/openflow/get_xid.hpp>
-#include <canard/network/openflow/v10/common/port.hpp>
-#include <canard/network/openflow/v10/detail/basic_fixed_length_message.hpp>
-#include <canard/network/openflow/v10/detail/byteorder.hpp>
-#include <canard/network/openflow/v10/detail/port_adaptor.hpp>
-#include <canard/network/openflow/v10/openflow.hpp>
+#include <canard/net/ofp/get_xid.hpp>
+#include <canard/net/ofp/v10/common/port.hpp>
+#include <canard/net/ofp/v10/detail/basic_fixed_length_message.hpp>
+#include <canard/net/ofp/v10/detail/byteorder.hpp>
+#include <canard/net/ofp/v10/detail/port_adaptor.hpp>
+#include <canard/net/ofp/v10/openflow.hpp>
 
 namespace canard {
 namespace net {

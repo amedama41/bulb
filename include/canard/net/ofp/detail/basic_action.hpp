@@ -3,7 +3,7 @@
 
 #include <cstdint>
 #include <type_traits>
-#include <canard/network/openflow/detail/basic_protocol_type.hpp>
+#include <canard/net/ofp/detail/basic_protocol_type.hpp>
 
 namespace canard {
 namespace net {
