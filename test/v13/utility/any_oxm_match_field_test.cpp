@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v13/any_oxm_match_field.hpp>
+#include <canard/net/ofp/v13/any_oxm_match_field.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
@@ -11,8 +11,8 @@
 #include <boost/asio/ip/address_v4.hpp>
 #include <boost/asio/ip/address_v6.hpp>
 #include <canard/mac_address.hpp>
-#include <canard/network/openflow/v13/common/oxm_match_field.hpp>
-#include <canard/network/openflow/v13/io/openflow.hpp>
+#include <canard/net/ofp/v13/common/oxm_match_field.hpp>
+#include <canard/net/ofp/v13/io/openflow.hpp>
 
 #include "../../test_utility.hpp"
 

@@ -1,8 +1,8 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v13/detail/byteorder.hpp>
+#include <canard/net/ofp/v13/detail/byteorder.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/endian/conversion.hpp>
-#include <canard/network/openflow/v13/openflow.hpp>
+#include <canard/net/ofp/v13/openflow.hpp>
 
 namespace canard {
 namespace net {

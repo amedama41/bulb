@@ -1,8 +1,8 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v13/message/multipart/table_features.hpp>
+#include <canard/net/ofp/v13/message/multipart/table_features.hpp>
 #include <boost/test/unit_test.hpp>
 
-#include <canard/network/openflow/v13/io/openflow.hpp>
+#include <canard/net/ofp/v13/io/openflow.hpp>
 
 namespace canard {
 namespace net {

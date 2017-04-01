@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v13/instructions.hpp>
+#include <canard/net/ofp/v13/instructions.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <tuple>

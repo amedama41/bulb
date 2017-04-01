@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v13/table_feature_properties.hpp>
+#include <canard/net/ofp/v13/table_feature_properties.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <tuple>

@@ -1,9 +1,9 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v13/table_feature_property/next_tables.hpp>
+#include <canard/net/ofp/v13/table_feature_property/next_tables.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <type_traits>
-#include <canard/network/openflow/v13/io/openflow.hpp>
+#include <canard/net/ofp/v13/io/openflow.hpp>
 #include "../../test_utility.hpp"
 
 namespace of = canard::net::ofp;

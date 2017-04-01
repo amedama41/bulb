@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v13/utility/meter_band_set.hpp>
+#include <canard/net/ofp/v13/utility/meter_band_set.hpp>
 #include <boost/test/unit_test.hpp>
 
 namespace ofp = canard::net::ofp;

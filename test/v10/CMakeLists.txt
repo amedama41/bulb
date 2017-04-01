@@ -5,9 +5,9 @@ project(v10_bulb_test LANGUAGES CXX)
 find_package(Boost 1.59 REQUIRED COMPONENTS system unit_test_framework)
 
 set(libbulb_srcs
-    ../../include/canard/network/openflow/v10/impl/action_list.ipp
-    ../../include/canard/network/openflow/v10/impl/any_action.ipp
-    ../../include/canard/network/openflow/v10/impl/any_queue_property.ipp)
+    ../../include/canard/net/ofp/v10/impl/action_list.ipp
+    ../../include/canard/net/ofp/v10/impl/any_action.ipp
+    ../../include/canard/net/ofp/v10/impl/any_queue_property.ipp)
 set(action_srcs
     action/output_test.cpp
     action/set_field_test.cpp

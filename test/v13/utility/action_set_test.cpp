@@ -1,8 +1,8 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v13/utility/action_set.hpp>
+#include <canard/net/ofp/v13/utility/action_set.hpp>
 #include <boost/test/unit_test.hpp>
-#include <canard/network/openflow/v13/action_order.hpp>
-#include <canard/network/openflow/v13/actions.hpp>
+#include <canard/net/ofp/v13/action_order.hpp>
+#include <canard/net/ofp/v13/actions.hpp>
 
 #include "../../test_utility.hpp"
 

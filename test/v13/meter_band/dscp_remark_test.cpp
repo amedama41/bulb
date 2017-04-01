@@ -1,9 +1,9 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v13/meter_band/dscp_remark.hpp>
+#include <canard/net/ofp/v13/meter_band/dscp_remark.hpp>
 #include <boost/test/unit_test.hpp>
 #include <utility>
 
-#include <canard/network/openflow/v13/io/openflow.hpp>
+#include <canard/net/ofp/v13/io/openflow.hpp>
 #include "../../test_utility.hpp"
 
 namespace ofp = canard::net::ofp;

@@ -1,11 +1,11 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v10/message/error.hpp>
+#include <canard/net/ofp/v10/message/error.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include "../../test_utility.hpp"
 #include "../fixture.hpp"
-#include <canard/network/openflow/v10/message/flow_add.hpp>
-#include <canard/network/openflow/v10/message/packet_out.hpp>
+#include <canard/net/ofp/v10/message/flow_add.hpp>
+#include <canard/net/ofp/v10/message/packet_out.hpp>
 
 namespace ofp = canard::net::ofp;
 namespace v10 = ofp::v10;

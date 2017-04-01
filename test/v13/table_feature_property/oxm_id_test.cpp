@@ -1,10 +1,10 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v13/table_feature_property/id/oxm_id.hpp>
+#include <canard/net/ofp/v13/table_feature_property/id/oxm_id.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <boost/range/algorithm_ext/push_back.hpp>
-#include <canard/network/openflow/v13/common/oxm_match_field.hpp>
-#include <canard/network/openflow/v13/io/openflow.hpp>
+#include <canard/net/ofp/v13/common/oxm_match_field.hpp>
+#include <canard/net/ofp/v13/io/openflow.hpp>
 #include "../../test_utility.hpp"
 
 namespace ofp = canard::net::ofp;

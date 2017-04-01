@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v10/message/port_status.hpp>
+#include <canard/net/ofp/v10/message/port_status.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include "../../test_utility.hpp"

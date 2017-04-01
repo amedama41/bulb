@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v10/action/set_field.hpp>
+#include <canard/net/ofp/v10/action/set_field.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
@@ -10,7 +10,7 @@
 #include <vector>
 #include <boost/asio/ip/address_v4.hpp>
 #include <canard/mac_address.hpp>
-#include <canard/network/openflow/v10/io/openflow.hpp>
+#include <canard/net/ofp/v10/io/openflow.hpp>
 #include "../../test_utility.hpp"
 
 namespace of = canard::net::ofp;

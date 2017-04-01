@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v13/common/oxm_match.hpp>
+#include <canard/net/ofp/v13/common/oxm_match.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <cstdint>
@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
-#include <canard/network/openflow/v13/io/openflow.hpp>
+#include <canard/net/ofp/v13/io/openflow.hpp>
 #include "../../test_utility.hpp"
 
 namespace ofp = canard::net::ofp;

@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v13/message/flow_removed.hpp>
+#include <canard/net/ofp/v13/message/flow_removed.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <cstdint>

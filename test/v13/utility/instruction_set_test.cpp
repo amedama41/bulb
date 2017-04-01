@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v13/utility/instruction_set.hpp>
+#include <canard/net/ofp/v13/utility/instruction_set.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <cstdint>
@@ -9,8 +9,8 @@
 #include <utility>
 #include <vector>
 #include <boost/endian/conversion.hpp>
-#include <canard/network/openflow/v13/actions.hpp>
-#include <canard/network/openflow/v13/instructions.hpp>
+#include <canard/net/ofp/v13/actions.hpp>
+#include <canard/net/ofp/v13/instructions.hpp>
 
 #include "../../test_utility.hpp"
 

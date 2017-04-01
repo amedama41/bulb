@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v13/hello_elements.hpp>
+#include <canard/net/ofp/v13/hello_elements.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/monomorphic.hpp>
 #include <boost/test/data/test_case.hpp>

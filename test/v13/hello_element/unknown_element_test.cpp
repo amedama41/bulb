@@ -1,9 +1,9 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v13/hello_element/unknown_element.hpp>
+#include <canard/net/ofp/v13/hello_element/unknown_element.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <type_traits>
-#include <canard/network/openflow/v13/io/openflow.hpp>
+#include <canard/net/ofp/v13/io/openflow.hpp>
 #include "../../test_utility.hpp"
 
 namespace ofp = canard::net::ofp;

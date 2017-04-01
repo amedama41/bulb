@@ -1,11 +1,11 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v10/action/strip_vlan.hpp>
+#include <canard/net/ofp/v10/action/strip_vlan.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <vector>
-#include <canard/network/openflow/v10/io/openflow.hpp>
+#include <canard/net/ofp/v10/io/openflow.hpp>
 
 namespace of = canard::net::ofp;
 namespace v10 = of::v10;

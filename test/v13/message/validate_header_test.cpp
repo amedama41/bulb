@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v13/messages.hpp>
+#include <canard/net/ofp/v13/messages.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <cstdint>

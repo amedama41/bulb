@@ -1,9 +1,9 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v10/message/switch_config.hpp>
+#include <canard/net/ofp/v10/message/switch_config.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <numeric>
-#include <canard/network/openflow/v10/io/openflow.hpp>
+#include <canard/net/ofp/v10/io/openflow.hpp>
 #include "../../test_utility.hpp"
 
 namespace ofp = canard::net::ofp;

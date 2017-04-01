@@ -1,10 +1,10 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v13/queue_property/min_rate.hpp>
+#include <canard/net/ofp/v13/queue_property/min_rate.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <cstdint>
 #include <vector>
-#include <canard/network/openflow/v13/io/openflow.hpp>
+#include <canard/net/ofp/v13/io/openflow.hpp>
 
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;

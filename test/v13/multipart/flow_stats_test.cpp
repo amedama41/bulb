@@ -1,12 +1,12 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v13/message/multipart/flow_stats.hpp>
+#include <canard/net/ofp/v13/message/multipart/flow_stats.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <cstdint>
 #include <vector>
-#include <canard/network/openflow/v13/instructions.hpp>
-#include <canard/network/openflow/v13/io/openflow.hpp>
-#include <canard/network/openflow/v13/common/oxm_match.hpp>
+#include <canard/net/ofp/v13/instructions.hpp>
+#include <canard/net/ofp/v13/io/openflow.hpp>
+#include <canard/net/ofp/v13/common/oxm_match.hpp>
 
 #include "../../test_utility.hpp"
 

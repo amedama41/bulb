@@ -5,19 +5,19 @@ project(v13_bulb_test LANGUAGES CXX)
 find_package(Boost 1.59 REQUIRED COMPONENTS system unit_test_framework)
 
 set(libbulb_srcs
-    ../../include/canard/network/openflow/v13/impl/any_action.ipp
-    ../../include/canard/network/openflow/v13/impl/any_instruction.ipp
-    ../../include/canard/network/openflow/v13/impl/any_oxm_match_field.ipp
-    ../../include/canard/network/openflow/v13/impl/any_queue_property.ipp
-    ../../include/canard/network/openflow/v13/impl/any_hello_element.ipp
-    ../../include/canard/network/openflow/v13/impl/any_table_feature_property.ipp
-    ../../include/canard/network/openflow/v13/impl/any_meter_band.ipp
-    ../../include/canard/network/openflow/v13/impl/action_list.ipp
-    ../../include/canard/network/openflow/v13/impl/action_set.ipp
-    ../../include/canard/network/openflow/v13/impl/instruction_set.ipp
-    ../../include/canard/network/openflow/v13/impl/oxm_match_field_set.ipp
-    ../../include/canard/network/openflow/v13/impl/meter_band_set.ipp
-    ../../include/canard/network/openflow/v13/impl/table_feature_property_set.ipp)
+    ../../include/canard/net/ofp/v13/impl/any_action.ipp
+    ../../include/canard/net/ofp/v13/impl/any_instruction.ipp
+    ../../include/canard/net/ofp/v13/impl/any_oxm_match_field.ipp
+    ../../include/canard/net/ofp/v13/impl/any_queue_property.ipp
+    ../../include/canard/net/ofp/v13/impl/any_hello_element.ipp
+    ../../include/canard/net/ofp/v13/impl/any_table_feature_property.ipp
+    ../../include/canard/net/ofp/v13/impl/any_meter_band.ipp
+    ../../include/canard/net/ofp/v13/impl/action_list.ipp
+    ../../include/canard/net/ofp/v13/impl/action_set.ipp
+    ../../include/canard/net/ofp/v13/impl/instruction_set.ipp
+    ../../include/canard/net/ofp/v13/impl/oxm_match_field_set.ipp
+    ../../include/canard/net/ofp/v13/impl/meter_band_set.ipp
+    ../../include/canard/net/ofp/v13/impl/table_feature_property_set.ipp)
 set(action_srcs
     action/output_test.cpp
     action/copy_ttl_out_test.cpp

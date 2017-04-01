@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v10/queue_properties.hpp>
+#include <canard/net/ofp/v10/queue_properties.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <cstdint>

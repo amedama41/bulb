@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v13/hello_element/versionbitmap.hpp>
+#include <canard/net/ofp/v13/hello_element/versionbitmap.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
@@ -7,7 +7,7 @@
 #include <type_traits>
 #include <boost/range/algorithm/max_element.hpp>
 #include <boost/range/adaptor/filtered.hpp>
-#include <canard/network/openflow/v13/io/openflow.hpp>
+#include <canard/net/ofp/v13/io/openflow.hpp>
 #include "../../test_utility.hpp"
 
 namespace ofp = canard::net::ofp;

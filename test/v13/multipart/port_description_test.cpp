@@ -1,11 +1,11 @@
 #define BOOST_TEST_DYN_LINK
-#include <canard/network/openflow/v13/message/multipart/port_description.hpp>
+#include <canard/net/ofp/v13/message/multipart/port_description.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <vector>
-#include <canard/network/openflow/v13/io/openflow.hpp>
+#include <canard/net/ofp/v13/io/openflow.hpp>
 
 #include "../../test_utility.hpp"
 
