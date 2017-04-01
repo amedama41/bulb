@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <algorithm>
 #include <iterator>
-#include <stdexcept>
 #include <utility>
 #include <boost/range/adaptor/sliced.hpp>
 #include <boost/range/algorithm/copy.hpp>

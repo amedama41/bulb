@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <iterator>
 #include <limits>
-#include <stdexcept>
 #include <utility>
 #include <canard/network/openflow/detail/basic_protocol_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>

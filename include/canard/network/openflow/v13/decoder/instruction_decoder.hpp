@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <iterator>
-#include <stdexcept>
 #include <tuple>
 #include <boost/preprocessor/repeat.hpp>
 #include <canard/network/openflow/detail/decode.hpp>

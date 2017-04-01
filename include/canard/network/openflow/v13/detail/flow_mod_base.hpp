@@ -4,7 +4,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
-#include <stdexcept>
 #include <utility>
 #include <canard/network/openflow/detail/decode.hpp>
 #include <canard/network/openflow/detail/encode.hpp>

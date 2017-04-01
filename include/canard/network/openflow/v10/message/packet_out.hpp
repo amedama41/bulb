@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <iterator>
-#include <stdexcept>
 #include <utility>
 #include <canard/network/openflow/data_type.hpp>
 #include <canard/network/openflow/detail/decode.hpp>

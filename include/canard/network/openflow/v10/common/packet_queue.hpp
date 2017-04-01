@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <iterator>
-#include <stdexcept>
 #include <utility>
 #include <boost/range/algorithm/equal.hpp>
 #include <canard/network/openflow/detail/decode.hpp>

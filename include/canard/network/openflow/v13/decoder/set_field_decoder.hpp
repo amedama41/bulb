@@ -2,7 +2,6 @@
 #define CANARD_NET_OFP_V13_SET_FIELD_DECODER_HPP
 
 #include <cstdint>
-#include <stdexcept>
 #include <tuple>
 #include <boost/preprocessor/repeat.hpp>
 #include <canard/network/openflow/detail/decode.hpp>

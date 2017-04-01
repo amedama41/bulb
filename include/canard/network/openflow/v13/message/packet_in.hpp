@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <iterator>
-#include <stdexcept>
 #include <utility>
 #include <boost/range/algorithm/find_if.hpp>
 #include <canard/network/openflow/data_type.hpp>
