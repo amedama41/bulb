@@ -9,9 +9,9 @@ namespace net {
 namespace ofp {
 namespace v10 {
 
-    using default_queue_property_list = std::tuple<
-        queue_properties::min_rate
-    >;
+  using default_queue_property_list = std::tuple<
+      queue_properties::min_rate
+  >;
 
 } // namespace v10
 } // namespace ofp

@@ -12,20 +12,20 @@ namespace net {
 namespace ofp {
 namespace v10 {
 
-    using default_action_list = std::tuple<
-          actions::output
-        , actions::set_vlan_vid
-        , actions::set_vlan_pcp
-        , actions::strip_vlan
-        , actions::set_eth_src
-        , actions::set_eth_dst
-        , actions::set_ip_dscp
-        , actions::set_ipv4_src
-        , actions::set_ipv4_dst
-        , actions::set_tcp_dst
-        , actions::set_tcp_src
-        , actions::enqueue
-    >;
+  using default_action_list = std::tuple<
+      actions::output
+    , actions::set_vlan_vid
+    , actions::set_vlan_pcp
+    , actions::strip_vlan
+    , actions::set_eth_src
+    , actions::set_eth_dst
+    , actions::set_ip_dscp
+    , actions::set_ipv4_src
+    , actions::set_ipv4_dst
+    , actions::set_tcp_dst
+    , actions::set_tcp_src
+    , actions::enqueue
+  >;
 
 } // namespace v10
 } // namespace ofp

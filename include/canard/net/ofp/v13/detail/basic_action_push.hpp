@@ -11,55 +11,50 @@ namespace ofp {
 namespace detail {
 namespace v13 {
 
-    template <class T>
-    class basic_action_push
-        : public basic_fixed_length_action<T>
+  template <class T>
+  class basic_action_push
+    : public basic_fixed_length_action<T>
+  {
+    using base_t = basic_fixed_length_action<T>;
+
+  public:
+    using raw_ofp_type = ofp::v13::protocol::ofp_action_push;
+
+    auto ethertype() const noexcept
+      -> std::uint16_t
     {
-        using base_t = basic_fixed_length_action<T>;
+      return action_push_.ethertype;
+    }
 
-    public:
-        using raw_ofp_type = ofp::v13::protocol::ofp_action_push;
+  protected:
+    explicit basic_action_push(std::uint16_t const ethertype) noexcept
+      : action_push_{T::action_type, base_t::length(), ethertype, { 0, 0 }}
+    {
+    }
 
-        auto ethertype() const noexcept
-            -> std::uint16_t
-        {
-            return action_push_.ethertype;
-        }
+    explicit basic_action_push(raw_ofp_type const& action_push) noexcept
+      : action_push_(action_push)
+    {
+    }
 
-    protected:
-        explicit basic_action_push(std::uint16_t const ethertype) noexcept
-            : action_push_{
-                  T::action_type
-                , base_t::length()
-                , ethertype
-                , { 0, 0 }
-              }
-        {
-        }
+  private:
+    friend base_t;
 
-        explicit basic_action_push(raw_ofp_type const& action_push) noexcept
-            : action_push_(action_push)
-        {
-        }
+    auto ofp_action() const noexcept
+      -> raw_ofp_type const&
+    {
+      return action_push_;
+    }
 
-    private:
-        friend base_t;
+    auto is_equivalent_action(T const& rhs) const noexcept
+      -> bool
+    {
+      return ethertype() == rhs.ethertype();
+    }
 
-        auto ofp_action() const noexcept
-            -> raw_ofp_type const&
-        {
-            return action_push_;
-        }
-
-        auto is_equivalent_action(T const& rhs) const noexcept
-            -> bool
-        {
-            return ethertype() == rhs.ethertype();
-        }
-
-    private:
-        raw_ofp_type action_push_;
-    };
+  private:
+    raw_ofp_type action_push_;
+  };
 
 } // namespace v13
 } // namespace detail

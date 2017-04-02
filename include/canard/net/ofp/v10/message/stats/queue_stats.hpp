@@ -20,174 +20,171 @@ namespace v10 {
 namespace messages {
 namespace statistics {
 
-    class queue_stats
-        : public detail::basic_protocol_type<queue_stats>
+  class queue_stats
+    : public detail::basic_protocol_type<queue_stats>
+  {
+  public:
+    using raw_ofp_type = protocol::ofp_queue_stats;
+
+    queue_stats(
+          std::uint32_t const queue_id
+        , std::uint16_t const port_no
+        , std::uint64_t const tx_packets
+        , std::uint64_t const tx_bytes
+        , std::uint64_t const tx_errors) noexcept
+      : queue_stats_{
+            port_no
+          , { 0, 0 }
+          , queue_id
+          , tx_bytes
+          , tx_packets
+          , tx_errors
+        }
     {
-    public:
-        using raw_ofp_type = protocol::ofp_queue_stats;
+    }
 
-        queue_stats(std::uint32_t const queue_id
-                  , std::uint16_t const port_no
-                  , std::uint64_t const tx_packets
-                  , std::uint64_t const tx_bytes
-                  , std::uint64_t const tx_errors) noexcept
-            : queue_stats_{
-                  port_no
-                , { 0, 0 }
-                , queue_id
-                , tx_bytes
-                , tx_packets
-                , tx_errors
-              }
-        {
-        }
-
-        static constexpr auto length() noexcept
-            -> std::uint16_t
-        {
-            return sizeof(raw_ofp_type);
-        }
-
-        auto queue_id() const noexcept
-            -> std::uint32_t
-        {
-            return queue_stats_.queue_id;
-        }
-
-        auto port_no() const noexcept
-            -> std::uint16_t
-        {
-            return queue_stats_.port_no;
-        }
-
-        auto tx_packets() const noexcept
-            -> std::uint64_t
-        {
-            return queue_stats_.tx_packets;
-        }
-
-        auto tx_bytes() const noexcept
-            -> std::uint64_t
-        {
-            return queue_stats_.tx_bytes;
-        }
-
-        auto tx_errors() const noexcept
-            -> std::uint64_t
-        {
-            return queue_stats_.tx_errors;
-        }
-
-    private:
-        explicit queue_stats(raw_ofp_type const& queue_stats) noexcept
-            : queue_stats_(queue_stats)
-        {
-        }
-
-        friend basic_protocol_type;
-
-        template <class Container>
-        void encode_impl(Container& container) const
-        {
-            detail::encode(container, queue_stats_);
-        }
-
-        template <class Iterator>
-        static auto decode_impl(Iterator& first, Iterator last)
-            -> queue_stats
-        {
-            return queue_stats{detail::decode<raw_ofp_type>(first, last)};
-        }
-
-        auto equal_impl(queue_stats const& rhs) const noexcept
-            -> bool
-        {
-            return detail::memcmp(queue_stats_, rhs.queue_stats_);
-        }
-
-    private:
-        raw_ofp_type queue_stats_;
-    };
-
-
-    class queue_stats_request
-        : public stats_detail::basic_stats_request<
-                queue_stats_request, protocol::ofp_queue_stats_request
-          >
+    static constexpr auto length() noexcept
+      -> std::uint16_t
     {
-    public:
-        static constexpr protocol::ofp_stats_types stats_type_value
-            = protocol::OFPST_QUEUE;
+      return sizeof(raw_ofp_type);
+    }
 
-        explicit queue_stats_request(
-                  std::uint32_t const queue_id
-                , std::uint16_t const port_no
-                , std::uint32_t const xid = get_xid()) noexcept
-            : basic_stats_request{
-                  0
-                , raw_ofp_stats_type{port_no, { 0, 0 }, queue_id}
-                , xid
-              }
-        {
-        }
-
-        auto queue_id() const noexcept
-            -> std::uint32_t
-        {
-            return body().queue_id;
-        }
-
-        auto port_no() const noexcept
-            -> std::uint16_t
-        {
-            return body().port_no;
-        }
-
-    private:
-        friend basic_stats_request::base_type;
-
-        queue_stats_request(
-                  raw_ofp_type const& stats_request
-                , raw_ofp_stats_type const& queue_stats_request) noexcept
-            : basic_stats_request{stats_request, queue_stats_request}
-        {
-        }
-    };
-
-
-    class queue_stats_reply
-        : public stats_detail::basic_stats_reply<
-                queue_stats_reply, queue_stats[]
-          >
+    auto queue_id() const noexcept
+      -> std::uint32_t
     {
-    public:
-        static constexpr protocol::ofp_stats_types stats_type_value
-            = protocol::OFPST_QUEUE;
+      return queue_stats_.queue_id;
+    }
 
-        queue_stats_reply(
-                  body_type queue_stats
-                , std::uint16_t const flags = 0
-                , std::uint32_t const xid = get_xid())
-            : basic_stats_reply{flags, std::move(queue_stats), xid}
-        {
+    auto port_no() const noexcept
+      -> std::uint16_t
+    {
+      return queue_stats_.port_no;
+    }
+
+    auto tx_packets() const noexcept
+      -> std::uint64_t
+    {
+      return queue_stats_.tx_packets;
+    }
+
+    auto tx_bytes() const noexcept
+      -> std::uint64_t
+    {
+      return queue_stats_.tx_bytes;
+    }
+
+    auto tx_errors() const noexcept
+      -> std::uint64_t
+    {
+      return queue_stats_.tx_errors;
+    }
+
+  private:
+    explicit queue_stats(raw_ofp_type const& queue_stats) noexcept
+      : queue_stats_(queue_stats)
+    {
+    }
+
+    friend basic_protocol_type;
+
+    template <class Container>
+    void encode_impl(Container& container) const
+    {
+      detail::encode(container, queue_stats_);
+    }
+
+    template <class Iterator>
+    static auto decode_impl(Iterator& first, Iterator last)
+      -> queue_stats
+    {
+      return queue_stats{detail::decode<raw_ofp_type>(first, last)};
+    }
+
+    auto equal_impl(queue_stats const& rhs) const noexcept
+      -> bool
+    {
+      return detail::memcmp(queue_stats_, rhs.queue_stats_);
+    }
+
+  private:
+    raw_ofp_type queue_stats_;
+  };
+
+
+  class queue_stats_request
+    : public stats_detail::basic_stats_request<
+        queue_stats_request, protocol::ofp_queue_stats_request
+      >
+  {
+  public:
+    static constexpr protocol::ofp_stats_types stats_type_value
+      = protocol::OFPST_QUEUE;
+
+    explicit queue_stats_request(
+          std::uint32_t const queue_id
+        , std::uint16_t const port_no
+        , std::uint32_t const xid = get_xid()) noexcept
+      : basic_stats_request{
+          0, raw_ofp_stats_type{port_no, { 0, 0 }, queue_id}, xid
         }
+    {
+    }
 
-    private:
-        friend basic_stats_reply::base_type;
+    auto queue_id() const noexcept
+      -> std::uint32_t
+    {
+      return body().queue_id;
+    }
 
-        queue_stats_reply(
-                raw_ofp_type const& stats_reply, body_type&& queue_stats)
-            : basic_stats_reply{stats_reply, std::move(queue_stats)}
-        {
-        }
+    auto port_no() const noexcept
+      -> std::uint16_t
+    {
+      return body().port_no;
+    }
 
-        static constexpr auto is_valid_stats_body_length(
-                std::uint16_t const length) noexcept
-            -> bool
-        {
-            return length % body_type::value_type::min_length() == 0;
-        }
-    };
+  private:
+    friend basic_stats_request::base_type;
+
+    queue_stats_request(
+          raw_ofp_type const& stats_request
+        , raw_ofp_stats_type const& queue_stats_request) noexcept
+      : basic_stats_request{stats_request, queue_stats_request}
+    {
+    }
+  };
+
+
+  class queue_stats_reply
+    : public stats_detail::basic_stats_reply<queue_stats_reply, queue_stats[]>
+  {
+  public:
+    static constexpr protocol::ofp_stats_types stats_type_value
+      = protocol::OFPST_QUEUE;
+
+    queue_stats_reply(
+          body_type queue_stats
+        , std::uint16_t const flags = 0
+        , std::uint32_t const xid = get_xid())
+      : basic_stats_reply{flags, std::move(queue_stats), xid}
+    {
+    }
+
+  private:
+    friend basic_stats_reply::base_type;
+
+    queue_stats_reply(
+        raw_ofp_type const& stats_reply, body_type&& queue_stats)
+      : basic_stats_reply{stats_reply, std::move(queue_stats)}
+    {
+    }
+
+    static constexpr auto is_valid_stats_body_length(
+        std::uint16_t const length) noexcept
+      -> bool
+    {
+      return length % body_type::value_type::min_length() == 0;
+    }
+  };
 
 } // namespace statistics
 } // namespace messages

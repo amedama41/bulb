@@ -10,23 +10,23 @@ namespace ofp {
 namespace v13 {
 namespace actions {
 
-    class copy_ttl_out
-        : public detail::v13::basic_generic_action<copy_ttl_out>
+  class copy_ttl_out
+    : public detail::v13::basic_generic_action<copy_ttl_out>
+  {
+  public:
+    static constexpr protocol::ofp_action_type action_type
+      = protocol::OFPAT_COPY_TTL_OUT;
+
+    copy_ttl_out() = default;
+
+  private:
+    friend basic_generic_action::basic_fixed_length_action;
+
+    explicit copy_ttl_out(raw_ofp_type const& ofp_action) noexcept
+      : basic_generic_action{ofp_action}
     {
-    public:
-        static constexpr protocol::ofp_action_type action_type
-            = protocol::OFPAT_COPY_TTL_OUT;
-
-        copy_ttl_out() = default;
-
-    private:
-        friend basic_generic_action::basic_fixed_length_action;
-
-        explicit copy_ttl_out(raw_ofp_type const& ofp_action) noexcept
-            : basic_generic_action{ofp_action}
-        {
-        }
-    };
+    }
+  };
 
 } // namespace actions
 } // namespace v13

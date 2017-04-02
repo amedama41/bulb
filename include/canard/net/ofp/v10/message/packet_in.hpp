@@ -20,172 +20,172 @@ namespace ofp {
 namespace v10 {
 namespace messages {
 
-    class packet_in
-        : public v10_detail::basic_message<packet_in>
+  class packet_in
+    : public v10_detail::basic_message<packet_in>
+  {
+    static constexpr std::uint16_t min_pkt_in_len
+      = offsetof(protocol::ofp_packet_in, pad)
+      + sizeof(protocol::ofp_packet_in::pad);
+
+    friend constexpr auto get_min_length(
+        detail::basic_protocol_type_tag<packet_in>) noexcept
+      -> std::uint16_t
     {
-        static constexpr std::uint16_t min_pkt_in_len
-            = offsetof(protocol::ofp_packet_in, pad)
-            + sizeof(protocol::ofp_packet_in::pad);
+      return packet_in::min_pkt_in_len;
+    }
 
-        friend constexpr auto get_min_length(
-                detail::basic_protocol_type_tag<packet_in>) noexcept
-            -> std::uint16_t
-        {
-            return packet_in::min_pkt_in_len;
+  public:
+    using raw_ofp_type = protocol::ofp_packet_in;
+    using data_type = ofp::data_type;
+
+    static constexpr protocol::ofp_type message_type
+      = protocol::OFPT_PACKET_IN;
+
+    packet_in(
+          data_type data
+        , std::uint16_t const total_len
+        , std::uint16_t const in_port
+        , protocol::ofp_packet_in_reason const reason
+        , std::uint32_t const buffer_id
+        , std::uint32_t const xid = get_xid()) noexcept
+      : packet_in_{
+            protocol::ofp_header{
+                protocol::OFP_VERSION
+              , message_type
+              , ofp::calc_ofp_length(data, min_pkt_in_len)
+              , xid
+            }
+          , buffer_id
+          , total_len
+          , in_port
+          , std::uint8_t(reason)
+          , 0
         }
+      , data_(std::move(data))
+    {
+    }
 
-    public:
-        using raw_ofp_type = protocol::ofp_packet_in;
-        using data_type = ofp::data_type;
+    packet_in(packet_in const&) = default;
 
-        static constexpr protocol::ofp_type message_type
-            = protocol::OFPT_PACKET_IN;
+    packet_in(packet_in&& other) noexcept
+      : packet_in_(other.packet_in_)
+      , data_(std::move(other).data_)
+    {
+      other.packet_in_.header.length = min_pkt_in_len;
+    }
 
-        packet_in(data_type data
-                , std::uint16_t const total_len
-                , std::uint16_t const in_port
-                , protocol::ofp_packet_in_reason const reason
-                , std::uint32_t const buffer_id
-                , std::uint32_t const xid = get_xid()) noexcept
-            : packet_in_{
-                  protocol::ofp_header{
-                      protocol::OFP_VERSION
-                    , message_type
-                    , ofp::calc_ofp_length(data, min_pkt_in_len)
-                    , xid
-                  }
-                , buffer_id
-                , total_len
-                , in_port
-                , std::uint8_t(reason)
-                , 0
-              }
-            , data_(std::move(data))
-        {
-        }
+    auto operator=(packet_in const& other)
+      -> packet_in&
+    {
+      return operator=(packet_in{other});
+    }
 
-        packet_in(packet_in const&) = default;
+    auto operator=(packet_in&& other) noexcept
+      -> packet_in&
+    {
+      auto pkt_in = std::move(other);
+      std::swap(packet_in_, pkt_in.packet_in_);
+      data_.swap(pkt_in.data_);
+      return *this;
+    }
 
-        packet_in(packet_in&& other) noexcept
-            : packet_in_(other.packet_in_)
-            , data_(std::move(other).data_)
-        {
-            other.packet_in_.header.length = min_pkt_in_len;
-        }
+    auto header() const noexcept
+      -> protocol::ofp_header const&
+    {
+      return packet_in_.header;
+    }
 
-        auto operator=(packet_in const& other)
-            -> packet_in&
-        {
-            return operator=(packet_in{other});
-        }
+    auto buffer_id() const noexcept
+      -> std::uint32_t
+    {
+      return packet_in_.buffer_id;
+    }
 
-        auto operator=(packet_in&& other) noexcept
-            -> packet_in&
-        {
-            auto pkt_in = std::move(other);
-            std::swap(packet_in_, pkt_in.packet_in_);
-            data_.swap(pkt_in.data_);
-            return *this;
-        }
+    auto total_length() const noexcept
+      -> std::uint16_t
+    {
+      return packet_in_.total_len;
+    }
 
-        auto header() const noexcept
-            -> protocol::ofp_header const&
-        {
-            return packet_in_.header;
-        }
+    auto in_port() const noexcept
+      -> std::uint16_t
+    {
+      return packet_in_.in_port;
+    }
 
-        auto buffer_id() const noexcept
-            -> std::uint32_t
-        {
-            return packet_in_.buffer_id;
-        }
+    auto reason() const noexcept
+      -> protocol::ofp_packet_in_reason
+    {
+      return protocol::ofp_packet_in_reason(packet_in_.reason);
+    }
 
-        auto total_length() const noexcept
-            -> std::uint16_t
-        {
-            return packet_in_.total_len;
-        }
+    auto frame() const noexcept
+      -> data_type const&
+    {
+      return data_;
+    }
 
-        auto in_port() const noexcept
-            -> std::uint16_t
-        {
-            return packet_in_.in_port;
-        }
+    auto frame_length() const noexcept
+      -> std::uint16_t
+    {
+      return data_.size();
+    }
 
-        auto reason() const noexcept
-            -> protocol::ofp_packet_in_reason
-        {
-            return protocol::ofp_packet_in_reason(packet_in_.reason);
-        }
+    auto extract_frame() noexcept
+      -> data_type
+    {
+      auto data = data_type{};
+      data.swap(data_);
+      packet_in_.header.length = min_pkt_in_len;
+      return data;
+    }
 
-        auto frame() const noexcept
-            -> data_type const&
-        {
-            return data_;
-        }
+  private:
+    friend basic_message;
 
-        auto frame_length() const noexcept
-            -> std::uint16_t
-        {
-            return data_.size();
-        }
+    static constexpr bool is_fixed_length_message = false;
 
-        auto extract_frame() noexcept
-            -> data_type
-        {
-            auto data = data_type{};
-            data.swap(data_);
-            packet_in_.header.length = min_pkt_in_len;
-            return data;
-        }
+    friend basic_message::basic_protocol_type;
 
-    private:
-        friend basic_message;
+    packet_in(raw_ofp_type const& pkt_in, data_type&& data) noexcept
+      : packet_in_(pkt_in)
+      , data_(std::move(data))
+    {
+    }
 
-        static constexpr bool is_fixed_length_message = false;
+    template <class Container>
+    void encode_impl(Container& container) const
+    {
+      detail::encode(
+          container, packet_in_, detail::copy_size<min_pkt_in_len>{});
+      detail::encode_byte_array(container, data_.data(), data_.size());
+    }
 
-        friend basic_message::basic_protocol_type;
+    template <class Iterator>
+    static auto decode_impl(Iterator& first, Iterator last)
+      -> packet_in
+    {
+      auto const pkt_in = detail::decode<raw_ofp_type>(
+          first, last, detail::copy_size<min_pkt_in_len>{});
 
-        packet_in(raw_ofp_type const& pkt_in, data_type&& data) noexcept
-            : packet_in_(pkt_in)
-            , data_(std::move(data))
-        {
-        }
+      auto const data_length
+        = std::uint16_t(pkt_in.header.length - min_pkt_in_len);
+      auto data = ofp::decode_data(first, data_length);
 
-        template <class Container>
-        void encode_impl(Container& container) const
-        {
-            detail::encode(
-                    container, packet_in_, detail::copy_size<min_pkt_in_len>{});
-            detail::encode_byte_array(container, data_.data(), data_.size());
-        }
+      return packet_in{pkt_in, std::move(data)};
+    }
 
-        template <class Iterator>
-        static auto decode_impl(Iterator& first, Iterator last)
-            -> packet_in
-        {
-            auto const pkt_in = detail::decode<raw_ofp_type>(
-                    first, last, detail::copy_size<min_pkt_in_len>{});
+    auto equal_impl(packet_in const& rhs) const noexcept
+      -> bool
+    {
+      return std::memcmp(&packet_in_, &rhs.packet_in_, min_pkt_in_len) == 0
+          && frame() == rhs.frame();
+    }
 
-            auto const data_length
-                = std::uint16_t(pkt_in.header.length - min_pkt_in_len);
-            auto data = ofp::decode_data(first, data_length);
-
-            return packet_in{pkt_in, std::move(data)};
-        }
-
-        auto equal_impl(packet_in const& rhs) const noexcept
-            -> bool
-        {
-            return std::memcmp(
-                    &packet_in_, &rhs.packet_in_, min_pkt_in_len) == 0
-                && frame() == rhs.frame();
-        }
-
-    public:
-        raw_ofp_type packet_in_;
-        data_type data_;
-    };
+  public:
+    raw_ofp_type packet_in_;
+    data_type data_;
+  };
 
 } // namespace message
 } // namespace v10

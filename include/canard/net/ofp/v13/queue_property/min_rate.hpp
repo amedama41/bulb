@@ -12,69 +12,67 @@ namespace ofp {
 namespace v13 {
 namespace queue_properties {
 
-    class min_rate
-        : public queue_property_detail::basic_queue_property<min_rate>
+  class min_rate
+    : public queue_property_detail::basic_queue_property<min_rate>
+  {
+  public:
+    using raw_ofp_type = protocol::ofp_queue_prop_min_rate;
+
+    static constexpr protocol::ofp_queue_properties queue_property
+      = protocol::OFPQT_MIN_RATE;
+
+    explicit min_rate(std::uint16_t const rate) noexcept
+      : min_rate_{
+            protocol::ofp_queue_prop_header{
+              queue_property, sizeof(raw_ofp_type), { 0, 0, 0, 0 }
+            }
+          , rate
+          , { 0, 0, 0, 0, 0, 0 }
+        }
     {
-    public:
-        using raw_ofp_type = protocol::ofp_queue_prop_min_rate;
+    }
 
-        static constexpr protocol::ofp_queue_properties queue_property
-            = protocol::OFPQT_MIN_RATE;
+    auto rate() const noexcept
+      -> std::uint16_t
+    {
+      return min_rate_.rate;
+    }
 
-        explicit min_rate(std::uint16_t const rate) noexcept
-            : min_rate_{
-                  protocol::ofp_queue_prop_header{
-                      queue_property
-                    , sizeof(raw_ofp_type)
-                    , { 0, 0, 0, 0 }
-                  }
-                , rate
-                , { 0, 0, 0, 0, 0, 0 }
-              }
-        {
-        }
+    auto is_configurable() const noexcept
+      -> bool
+    {
+      return rate() != protocol::OFPQ_MIN_RATE_UNCFG;
+    }
 
-        auto rate() const noexcept
-            -> std::uint16_t
-        {
-            return min_rate_.rate;
-        }
+    auto is_disabled() const noexcept
+      -> bool
+    {
+      return rate() > 1000 && is_configurable();
+    }
 
-        auto is_configurable() const noexcept
-            -> bool
-        {
-            return rate() != protocol::OFPQ_MIN_RATE_UNCFG;
-        }
+  private:
+    friend basic_queue_property;
 
-        auto is_disabled() const noexcept
-            -> bool
-        {
-            return rate() > 1000 && is_configurable();
-        }
+    explicit min_rate(raw_ofp_type const& min_rate) noexcept
+      : min_rate_(min_rate)
+    {
+    }
 
-    private:
-        friend basic_queue_property;
+    auto ofp_queue_property() const noexcept
+      -> raw_ofp_type const&
+    {
+      return min_rate_;
+    }
 
-        explicit min_rate(raw_ofp_type const& min_rate) noexcept
-            : min_rate_(min_rate)
-        {
-        }
+    auto is_equivalent_property(min_rate const& rhs) const noexcept
+      -> bool
+    {
+      return rate() == rhs.rate() || (is_disabled() && rhs.is_disabled());
+    }
 
-        auto ofp_queue_property() const noexcept
-            -> raw_ofp_type const&
-        {
-            return min_rate_;
-        }
-
-        auto is_equivalent_property(min_rate const& rhs) const noexcept
-            -> bool
-        {
-            return rate() == rhs.rate() || (is_disabled() && rhs.is_disabled());
-        }
-
-    private:
-        raw_ofp_type min_rate_;
-    };
+  private:
+    raw_ofp_type min_rate_;
+  };
 
 } // namespace queue_properties
 } // namespace v13

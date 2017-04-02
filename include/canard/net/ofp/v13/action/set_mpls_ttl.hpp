@@ -11,58 +11,53 @@ namespace ofp {
 namespace v13 {
 namespace actions {
 
-    class set_mpls_ttl
-        : public detail::v13::basic_fixed_length_action<set_mpls_ttl>
+  class set_mpls_ttl
+    : public detail::v13::basic_fixed_length_action<set_mpls_ttl>
+  {
+  public:
+    using raw_ofp_type = protocol::ofp_action_mpls_ttl;
+
+    static constexpr protocol::ofp_action_type action_type
+      = protocol::OFPAT_SET_MPLS_TTL;
+
+    explicit set_mpls_ttl(std::uint8_t const mpls_ttl) noexcept
+      : action_mpls_ttl_{action_type, length(), mpls_ttl, { 0, 0, 0 }}
     {
-    public:
-        using raw_ofp_type = protocol::ofp_action_mpls_ttl;
+    }
 
-        static constexpr protocol::ofp_action_type action_type
-            = protocol::OFPAT_SET_MPLS_TTL;
+    auto ttl() const noexcept
+      -> std::uint8_t
+    {
+      return action_mpls_ttl_.mpls_ttl;
+    }
 
-        explicit set_mpls_ttl(std::uint8_t const mpls_ttl) noexcept
-            : action_mpls_ttl_{
-                  action_type
-                , length()
-                , mpls_ttl
-                , { 0, 0, 0 }
-              }
-        {
-        }
+  private:
+    friend basic_fixed_length_action;
 
-        auto ttl() const noexcept
-            -> std::uint8_t
-        {
-            return action_mpls_ttl_.mpls_ttl;
-        }
+    explicit set_mpls_ttl(raw_ofp_type const& action_mpls_ttl) noexcept
+      : action_mpls_ttl_(action_mpls_ttl)
+    {
+    }
 
-    private:
-        friend basic_fixed_length_action;
+    auto ofp_action() const noexcept
+      -> raw_ofp_type const&
+    {
+      return action_mpls_ttl_;
+    }
 
-        explicit set_mpls_ttl(raw_ofp_type const& action_mpls_ttl) noexcept
-            : action_mpls_ttl_(action_mpls_ttl)
-        {
-        }
+    void validate_action() const
+    {
+    }
 
-        auto ofp_action() const noexcept
-            -> raw_ofp_type const&
-        {
-            return action_mpls_ttl_;
-        }
+    auto is_equivalent_action(set_mpls_ttl const& rhs) const noexcept
+      -> bool
+    {
+      return ttl() == rhs.ttl();
+    }
 
-        void validate_action() const
-        {
-        }
-
-        auto is_equivalent_action(set_mpls_ttl const& rhs) const noexcept
-            -> bool
-        {
-            return ttl() == rhs.ttl();
-        }
-
-    private:
-        raw_ofp_type action_mpls_ttl_;
-    };
+  private:
+    raw_ofp_type action_mpls_ttl_;
+  };
 
 } // namespace actions
 } // namespace v13

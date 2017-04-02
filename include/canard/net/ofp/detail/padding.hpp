@@ -6,9 +6,7 @@ namespace net {
 namespace ofp {
 namespace detail {
 
-    constexpr uint8_t const padding[] = {
-        0, 0, 0, 0, 0, 0, 0, 0
-    };
+  constexpr uint8_t const padding[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
 } // namespace detail
 } // namespace ofp

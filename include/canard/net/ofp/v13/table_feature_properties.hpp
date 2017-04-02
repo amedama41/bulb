@@ -12,22 +12,22 @@ namespace net {
 namespace ofp {
 namespace v13 {
 
-    using default_table_feature_property_list = std::tuple<
-          table_feature_properties::instructions
-        , table_feature_properties::instructions_miss
-        , table_feature_properties::next_tables
-        , table_feature_properties::next_tables_miss
-        , table_feature_properties::write_actions
-        , table_feature_properties::write_actions_miss
-        , table_feature_properties::apply_actions
-        , table_feature_properties::apply_actions_miss
-        , table_feature_properties::match
-        , table_feature_properties::wildcards
-        , table_feature_properties::write_setfield
-        , table_feature_properties::write_setfield_miss
-        , table_feature_properties::apply_setfield
-        , table_feature_properties::apply_setfield_miss
-    >;
+  using default_table_feature_property_list = std::tuple<
+      table_feature_properties::instructions
+    , table_feature_properties::instructions_miss
+    , table_feature_properties::next_tables
+    , table_feature_properties::next_tables_miss
+    , table_feature_properties::write_actions
+    , table_feature_properties::write_actions_miss
+    , table_feature_properties::apply_actions
+    , table_feature_properties::apply_actions_miss
+    , table_feature_properties::match
+    , table_feature_properties::wildcards
+    , table_feature_properties::write_setfield
+    , table_feature_properties::write_setfield_miss
+    , table_feature_properties::apply_setfield
+    , table_feature_properties::apply_setfield_miss
+  >;
 
 } // namespace v13
 } // namespace ofp

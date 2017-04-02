@@ -10,9 +10,9 @@ namespace net {
 namespace ofp {
 namespace v13 {
 
-    using default_hello_element_list = std::tuple<
-        hello_elements::versionbitmap
-    >;
+  using default_hello_element_list = std::tuple<
+    hello_elements::versionbitmap
+  >;
 
 } // namespace v13
 } // namespace ofp

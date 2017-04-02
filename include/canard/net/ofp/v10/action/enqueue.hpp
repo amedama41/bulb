@@ -14,75 +14,74 @@ namespace ofp {
 namespace v10 {
 namespace actions {
 
-    class enqueue
-        : public detail::v10::basic_fixed_length_action<enqueue>
+  class enqueue
+    : public detail::v10::basic_fixed_length_action<enqueue>
+  {
+  public:
+    using raw_ofp_type = protocol::ofp_action_enqueue;
+
+    static constexpr protocol::ofp_action_type action_type
+      = protocol::OFPAT_ENQUEUE;
+
+    enqueue(std::uint32_t const queue_id, std::uint16_t const port_no) noexcept
+      : enqueue_{
+            action_type
+          , sizeof(raw_ofp_type)
+          , port_no
+          , { 0, 0, 0, 0, 0, 0 }
+          , queue_id
+        }
     {
-    public:
-        using raw_ofp_type = protocol::ofp_action_enqueue;
+    }
 
-        static constexpr protocol::ofp_action_type action_type
-            = protocol::OFPAT_ENQUEUE;
+    auto queue_id() const noexcept
+      -> std::uint32_t
+    {
+      return enqueue_.queue_id;
+    }
 
-        enqueue(std::uint32_t const queue_id
-              , std::uint16_t const port_no) noexcept
-            : enqueue_{
-                  action_type
-                , sizeof(raw_ofp_type)
-                , port_no
-                , { 0, 0, 0, 0, 0, 0 }
-                , queue_id
-              }
-        {
-        }
+    auto port_no() const noexcept
+      -> std::uint16_t
+    {
+      return enqueue_.port;
+    }
 
-        auto queue_id() const noexcept
-            -> std::uint32_t
-        {
-            return enqueue_.queue_id;
-        }
+  private:
+    friend basic_fixed_length_action;
 
-        auto port_no() const noexcept
-            -> std::uint16_t
-        {
-            return enqueue_.port;
-        }
+    explicit enqueue(raw_ofp_type const& action_enqueue) noexcept
+      : enqueue_(action_enqueue)
+    {
+    }
 
-    private:
-        friend basic_fixed_length_action;
+    auto ofp_action() const noexcept
+      -> raw_ofp_type const&
+    {
+      return enqueue_;
+    }
 
-        explicit enqueue(raw_ofp_type const& action_enqueue) noexcept
-            : enqueue_(action_enqueue)
-        {
-        }
+    void validate_action() const
+    {
+      if (queue_id() == protocol::OFPQ_ALL) {
+        throw std::runtime_error{"invalid queue_id"};
+      }
+      if (port_no() == 0
+          || (port_no() > protocol::OFPP_MAX
+            && port_no() != protocol::OFPP_IN_PORT)) {
+        throw std::runtime_error{"invalid port_no"};
+      }
+    }
 
-        auto ofp_action() const noexcept
-            -> raw_ofp_type const&
-        {
-            return enqueue_;
-        }
+    auto is_equivalent_action(enqueue const& rhs) const noexcept
+      -> bool
+    {
+      return queue_id() == rhs.queue_id()
+          && port_no() == rhs.port_no();
+    }
 
-        void validate_action() const
-        {
-            if (queue_id() == protocol::OFPQ_ALL) {
-                throw std::runtime_error{"invalid queue_id"};
-            }
-            if (port_no() == 0
-                    || (port_no() > protocol::OFPP_MAX
-                        && port_no() != protocol::OFPP_IN_PORT)) {
-                throw std::runtime_error{"invalid port_no"};
-            }
-        }
-
-        auto is_equivalent_action(enqueue const& rhs) const noexcept
-            -> bool
-        {
-            return queue_id() == rhs.queue_id()
-                && port_no() == rhs.port_no();
-        }
-
-    private:
-        raw_ofp_type enqueue_;
-    };
+  private:
+    raw_ofp_type enqueue_;
+  };
 
 } // namespace actions
 } // namespace v10

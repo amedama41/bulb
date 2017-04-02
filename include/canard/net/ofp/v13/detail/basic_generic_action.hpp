@@ -10,53 +10,48 @@ namespace ofp {
 namespace detail {
 namespace v13 {
 
-    template <class T>
-    class basic_generic_action
-        : public basic_fixed_length_action<T>
+  template <class T>
+  class basic_generic_action
+    : public basic_fixed_length_action<T>
+  {
+    using base_t = basic_fixed_length_action<T>;
+
+  public:
+    using raw_ofp_type = ofp::v13::protocol::ofp_action_header;
+
+  protected:
+    basic_generic_action() noexcept
+      : action_header_{T::action_type, base_t::length(), { 0, 0, 0, 0 }}
     {
-        using base_t = basic_fixed_length_action<T>;
+    }
 
-    public:
-        using raw_ofp_type = ofp::v13::protocol::ofp_action_header;
+    explicit basic_generic_action(raw_ofp_type const& action_header) noexcept
+      : action_header_(action_header)
+    {
+    }
 
-    protected:
-        basic_generic_action() noexcept
-            : action_header_{
-                  T::action_type
-                , base_t::length()
-                , { 0, 0, 0, 0 }
-              }
-        {
-        }
+  private:
+    friend base_t;
 
-        explicit basic_generic_action(
-                raw_ofp_type const& action_header) noexcept
-            : action_header_(action_header)
-        {
-        }
+    auto ofp_action() const noexcept
+      -> raw_ofp_type const&
+    {
+      return action_header_;
+    }
 
-    private:
-        friend base_t;
+    void validate_action() const
+    {
+    }
 
-        auto ofp_action() const noexcept
-            -> raw_ofp_type const&
-        {
-            return action_header_;
-        }
+    auto is_equivalent_action(T const&) const noexcept
+      -> bool
+    {
+      return true;
+    }
 
-        void validate_action() const
-        {
-        }
-
-        auto is_equivalent_action(T const&) const noexcept
-            -> bool
-        {
-            return true;
-        }
-
-    private:
-        raw_ofp_type action_header_;
-    };
+  private:
+    raw_ofp_type action_header_;
+  };
 
 } // namespace v13
 } // namespace detail

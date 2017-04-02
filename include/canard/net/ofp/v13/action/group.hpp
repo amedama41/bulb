@@ -12,60 +12,56 @@ namespace ofp {
 namespace v13 {
 namespace actions {
 
-    class group
-        : public detail::v13::basic_fixed_length_action<group>
+  class group
+    : public detail::v13::basic_fixed_length_action<group>
+  {
+  public:
+    using raw_ofp_type = protocol::ofp_action_group;
+
+    static constexpr protocol::ofp_action_type action_type
+      = protocol::OFPAT_GROUP;
+
+    explicit group(std::uint32_t const group_id) noexcept
+      : action_group_{action_type, length(), group_id}
     {
-    public:
-        using raw_ofp_type = protocol::ofp_action_group;
-
-        static constexpr protocol::ofp_action_type action_type
-            = protocol::OFPAT_GROUP;
-
-        explicit group(std::uint32_t const group_id) noexcept
-            : action_group_{
-                  action_type
-                , length()
-                , group_id
-              }
-        {
-        };
-
-        auto group_id() const noexcept
-            -> std::uint32_t
-        {
-            return action_group_.group_id;
-        }
-
-    private:
-        friend basic_fixed_length_action;
-
-        explicit group(raw_ofp_type const& action_group) noexcept
-            : action_group_(action_group)
-        {
-        }
-
-        auto ofp_action() const noexcept
-            -> raw_ofp_type const&
-        {
-            return action_group_;
-        }
-
-        void validate_action() const
-        {
-            if (group_id() > protocol::OFPG_MAX) {
-                throw std::runtime_error{"invalid group_id"};
-            }
-        }
-
-        auto is_equivalent_action(group const& rhs) const noexcept
-            -> bool
-        {
-            return group_id() == rhs.group_id();
-        }
-
-    private:
-        raw_ofp_type action_group_;
     };
+
+    auto group_id() const noexcept
+      -> std::uint32_t
+    {
+      return action_group_.group_id;
+    }
+
+  private:
+    friend basic_fixed_length_action;
+
+    explicit group(raw_ofp_type const& action_group) noexcept
+      : action_group_(action_group)
+    {
+    }
+
+    auto ofp_action() const noexcept
+      -> raw_ofp_type const&
+    {
+      return action_group_;
+    }
+
+    void validate_action() const
+    {
+      if (group_id() > protocol::OFPG_MAX) {
+        throw std::runtime_error{"invalid group_id"};
+      }
+    }
+
+    auto is_equivalent_action(group const& rhs) const noexcept
+      -> bool
+    {
+      return group_id() == rhs.group_id();
+    }
+
+  private:
+    raw_ofp_type action_group_;
+  };
 
 } // namespace actions
 } // namespace v13

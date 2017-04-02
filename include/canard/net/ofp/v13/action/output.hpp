@@ -12,86 +12,80 @@ namespace ofp {
 namespace v13 {
 namespace actions {
 
-    class output
-        : public detail::v13::basic_fixed_length_action<output>
+  class output
+    : public detail::v13::basic_fixed_length_action<output>
+  {
+  public:
+    using raw_ofp_type = protocol::ofp_action_output;
+
+    static constexpr protocol::ofp_action_type action_type
+      = protocol::OFPAT_OUTPUT;
+
+    explicit output(
+          std::uint32_t const port_no
+        , std::uint16_t const max_length = protocol::OFPCML_NO_BUFFER) noexcept
+      : action_output_{
+          action_type, length(), port_no, max_length, { 0, 0, 0, 0, 0, 0 }
+        }
     {
-    public:
-        using raw_ofp_type = protocol::ofp_action_output;
+    }
 
-        static constexpr protocol::ofp_action_type action_type
-            = protocol::OFPAT_OUTPUT;
+    auto port_no() const noexcept
+      -> std::uint32_t
+    {
+      return action_output_.port;
+    }
 
-        explicit output(
-                  std::uint32_t const port_no
-                , std::uint16_t const max_length
-                    = protocol::OFPCML_NO_BUFFER) noexcept
-            : action_output_{
-                  action_type
-                , length()
-                , port_no
-                , max_length
-                , { 0, 0, 0, 0, 0, 0 }
-              }
-        {
-        }
+    auto max_length() const noexcept
+      -> std::uint16_t
+    {
+      return action_output_.max_len;
+    }
 
-        auto port_no() const noexcept
-            -> std::uint32_t
-        {
-            return action_output_.port;
-        }
+    static auto to_controller(
+        std::uint16_t const max_length = protocol::OFPCML_NO_BUFFER) noexcept
+      -> output
+    {
+      return output{protocol::OFPP_CONTROLLER, max_length};
+    }
 
-        auto max_length() const noexcept
-            -> std::uint16_t
-        {
-            return action_output_.max_len;
-        }
+  private:
+    friend basic_fixed_length_action;
 
-        static auto to_controller(
-                std::uint16_t const max_length
-                    = protocol::OFPCML_NO_BUFFER) noexcept
-            -> output
-        {
-            return output{protocol::OFPP_CONTROLLER, max_length};
-        }
+    explicit output(raw_ofp_type const& action_output) noexcept
+      : action_output_(action_output)
+    {
+    }
 
-    private:
-        friend basic_fixed_length_action;
+    auto ofp_action() const noexcept
+      -> raw_ofp_type const&
+    {
+      return action_output_;
+    }
 
-        explicit output(raw_ofp_type const& action_output) noexcept
-            : action_output_(action_output)
-        {
-        }
+    void validate_action() const
+    {
+      if (port_no() == 0 || port_no() == protocol::OFPP_ANY) {
+        throw std::runtime_error{"invalid port_no"};
+      }
+      if (max_length() > protocol::OFPCML_MAX
+          && max_length() != protocol::OFPCML_NO_BUFFER) {
+        throw std::runtime_error{"invalid max_length"};
+      }
+    }
 
-        auto ofp_action() const noexcept
-            -> raw_ofp_type const&
-        {
-            return action_output_;
-        }
+    auto is_equivalent_action(output const& rhs) const noexcept
+      -> bool
+    {
+      return port_no() == protocol::OFPP_CONTROLLER
+        ? (rhs.port_no() == protocol::OFPP_CONTROLLER
+            && max_length() == rhs.max_length())
+        : port_no() == rhs.port_no();
+    }
 
-        void validate_action() const
-        {
-            if (port_no() == 0 || port_no() == protocol::OFPP_ANY) {
-                throw std::runtime_error{"invalid port_no"};
-            }
-            if (max_length() > protocol::OFPCML_MAX
-                    && max_length() != protocol::OFPCML_NO_BUFFER) {
-                throw std::runtime_error{"invalid max_length"};
-            }
-        }
-
-        auto is_equivalent_action(output const& rhs) const noexcept
-            -> bool
-        {
-            return port_no() == protocol::OFPP_CONTROLLER
-                ? (rhs.port_no() == protocol::OFPP_CONTROLLER
-                        && max_length() == rhs.max_length())
-                : port_no() == rhs.port_no();
-        }
-
-    private:
-        raw_ofp_type action_output_;
-    };
+  private:
+    raw_ofp_type action_output_;
+  };
 
 } // namespace actions
 } // namespace v13

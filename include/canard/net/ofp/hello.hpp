@@ -10,9 +10,9 @@ namespace canard {
 namespace net {
 namespace ofp {
 
-    using hello = v13::hello;
-    using ofp_header = v13::protocol::ofp_header;
-    namespace hello_elements = v13::hello_elements;
+  using hello = v13::hello;
+  using ofp_header = v13::protocol::ofp_header;
+  namespace hello_elements = v13::hello_elements;
 
 } // namespace ofp
 } // namespace net

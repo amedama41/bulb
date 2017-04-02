@@ -28,42 +28,42 @@ namespace net {
 namespace ofp {
 namespace v10 {
 
-    using default_reply_list = std::tuple<
-          messages::echo_reply
-        , messages::features_reply
-        , messages::get_config_reply
-        , messages::barrier_reply
-        , messages::queue_get_config_reply
-    >;
+  using default_reply_list = std::tuple<
+      messages::echo_reply
+    , messages::features_reply
+    , messages::get_config_reply
+    , messages::barrier_reply
+    , messages::queue_get_config_reply
+  >;
 
-    using default_async_list = std::tuple<
-          messages::error
-        , messages::packet_in
-        , messages::flow_removed
-        , messages::port_status
-    >;
+  using default_async_list = std::tuple<
+      messages::error
+    , messages::packet_in
+    , messages::flow_removed
+    , messages::port_status
+  >;
 
-    using default_switch_message_list = std::tuple<
-          messages::error
-        , messages::echo_request
-        , messages::echo_reply
-        , messages::features_reply
-        , messages::get_config_reply
-        , messages::packet_in
-        , messages::flow_removed
-        , messages::port_status
-        , messages::barrier_reply
-        , messages::queue_get_config_reply
-    >;
+  using default_switch_message_list = std::tuple<
+      messages::error
+    , messages::echo_request
+    , messages::echo_reply
+    , messages::features_reply
+    , messages::get_config_reply
+    , messages::packet_in
+    , messages::flow_removed
+    , messages::port_status
+    , messages::barrier_reply
+    , messages::queue_get_config_reply
+  >;
 
-    using default_stats_reply_list = std::tuple<
-          messages::statistics::description_reply
-        , messages::statistics::flow_stats_reply
-        , messages::statistics::aggregate_stats_reply
-        , messages::statistics::table_stats_reply
-        , messages::statistics::port_stats_reply
-        , messages::statistics::queue_stats_reply
-    >;
+  using default_stats_reply_list = std::tuple<
+      messages::statistics::description_reply
+    , messages::statistics::flow_stats_reply
+    , messages::statistics::aggregate_stats_reply
+    , messages::statistics::table_stats_reply
+    , messages::statistics::port_stats_reply
+    , messages::statistics::queue_stats_reply
+  >;
 
 } // namespace v10
 } // namespace ofp

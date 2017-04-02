@@ -12,45 +12,45 @@ namespace ofp {
 namespace v13 {
 namespace actions {
 
-    class push_mpls
-        : public detail::v13::basic_action_push<push_mpls>
+  class push_mpls
+    : public detail::v13::basic_action_push<push_mpls>
+  {
+  public:
+    static constexpr protocol::ofp_action_type action_type
+      = protocol::OFPAT_PUSH_MPLS;
+
+    explicit push_mpls(std::uint16_t const ethertype) noexcept
+      : basic_action_push{ethertype}
     {
-    public:
-        static constexpr protocol::ofp_action_type action_type
-            = protocol::OFPAT_PUSH_MPLS;
+    }
 
-        explicit push_mpls(std::uint16_t const ethertype) noexcept
-            : basic_action_push{ethertype}
-        {
-        }
+    static auto unicast() noexcept
+      -> push_mpls
+    {
+      return push_mpls{0x8847};
+    }
 
-        static auto unicast() noexcept
-            -> push_mpls
-        {
-            return push_mpls{0x8847};
-        }
+    static auto multicast() noexcept
+      -> push_mpls
+    {
+      return push_mpls{0x8848};
+    }
 
-        static auto multicast() noexcept
-            -> push_mpls
-        {
-            return push_mpls{0x8848};
-        }
+  private:
+    friend basic_action_push::basic_fixed_length_action;
 
-    private:
-        friend basic_action_push::basic_fixed_length_action;
+    explicit push_mpls(raw_ofp_type const& ofp_action) noexcept
+      : basic_action_push{ofp_action}
+    {
+    }
 
-        explicit push_mpls(raw_ofp_type const& ofp_action) noexcept
-            : basic_action_push{ofp_action}
-        {
-        }
-
-        void validate_action() const
-        {
-            if (ethertype() != 0x8847 && ethertype() != 0x8848) {
-                throw std::runtime_error{"invalid ethertype"};
-            }
-        }
-    };
+    void validate_action() const
+    {
+      if (ethertype() != 0x8847 && ethertype() != 0x8848) {
+        throw std::runtime_error{"invalid ethertype"};
+      }
+    }
+  };
 
 } // namespace actions
 } // namespace v13

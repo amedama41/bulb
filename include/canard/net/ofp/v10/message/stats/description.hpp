@@ -17,129 +17,125 @@ namespace v10 {
 namespace messages {
 namespace statistics {
 
-    class description_request
-        : public stats_detail::basic_stats_request<description_request, void>
+  class description_request
+    : public stats_detail::basic_stats_request<description_request, void>
+  {
+  public:
+    static constexpr protocol::ofp_stats_types stats_type_value
+      = protocol::OFPST_DESC;
+
+    explicit description_request(std::uint32_t const xid = get_xid()) noexcept
+      : basic_stats_request{0, xid}
     {
-    public:
-        static constexpr protocol::ofp_stats_types stats_type_value
-            = protocol::OFPST_DESC;
+    }
 
-        explicit description_request(
-                std::uint32_t const xid = get_xid()) noexcept
-            : basic_stats_request{0, xid}
-        {
-        }
+  private:
+    friend basic_stats_request::base_type;
 
-    private:
-        friend basic_stats_request::base_type;
-
-        explicit description_request(
-                raw_ofp_type const& stats_request) noexcept
-            : basic_stats_request{stats_request}
-        {
-        }
-    };
-
-
-    class description_reply
-        : public stats_detail::basic_stats_reply<
-                description_reply, protocol::ofp_desc_stats
-          >
+    explicit description_request(raw_ofp_type const& stats_request) noexcept
+      : basic_stats_request{stats_request}
     {
-    public:
-        static constexpr protocol::ofp_stats_types stats_type_value
-            = protocol::OFPST_DESC;
+    }
+  };
 
-        description_reply(
-                  boost::string_ref mfr_desc
-                , boost::string_ref hw_desc
-                , boost::string_ref sw_desc
-                , boost::string_ref serial_num
-                , boost::string_ref dp_desc
-                , std::uint32_t const xid = get_xid())
-            : basic_stats_reply{
-                  0
-                , create_desc(mfr_desc, hw_desc, sw_desc, serial_num, dp_desc)
-                , xid
-              }
-        {
+
+  class description_reply
+    : public stats_detail::basic_stats_reply<
+        description_reply, protocol::ofp_desc_stats
+      >
+  {
+  public:
+    static constexpr protocol::ofp_stats_types stats_type_value
+      = protocol::OFPST_DESC;
+
+    description_reply(
+          boost::string_ref mfr_desc
+        , boost::string_ref hw_desc
+        , boost::string_ref sw_desc
+        , boost::string_ref serial_num
+        , boost::string_ref dp_desc
+        , std::uint32_t const xid = get_xid())
+      : basic_stats_reply{
+          0, create_desc(mfr_desc, hw_desc, sw_desc, serial_num, dp_desc), xid
         }
+    {
+    }
 
-        auto manufacture_desc() const
-            -> boost::string_ref
-        {
-            return body().mfr_desc;
-        }
+    auto manufacture_desc() const
+      -> boost::string_ref
+    {
+      return body().mfr_desc;
+    }
 
-        auto hardware_desc() const
-            -> boost::string_ref
-        {
-            return body().hw_desc;
-        }
+    auto hardware_desc() const
+      -> boost::string_ref
+    {
+      return body().hw_desc;
+    }
 
-        auto software_desc() const
-            -> boost::string_ref
-        {
-            return body().sw_desc;
-        }
+    auto software_desc() const
+      -> boost::string_ref
+    {
+      return body().sw_desc;
+    }
 
-        auto serial_number() const
-            -> boost::string_ref
-        {
-            return body().serial_num;
-        }
+    auto serial_number() const
+      -> boost::string_ref
+    {
+      return body().serial_num;
+    }
 
-        auto datapath_desc() const
-            -> boost::string_ref
-        {
-            return body().dp_desc;
-        }
+    auto datapath_desc() const
+      -> boost::string_ref
+    {
+      return body().dp_desc;
+    }
 
-    private:
-        friend basic_stats_reply::base_type;
+  private:
+    friend basic_stats_reply::base_type;
 
-        description_reply(
-                  raw_ofp_type const& stats_reply
-                , raw_ofp_stats_type const& desc_stats) noexcept
-            : basic_stats_reply{stats_reply, desc_stats}
-        {
-        }
+    description_reply(
+          raw_ofp_type const& stats_reply
+        , raw_ofp_stats_type const& desc_stats) noexcept
+      : basic_stats_reply{stats_reply, desc_stats}
+    {
+    }
 
-        static auto create_desc(
-                  boost::string_ref mfr_desc
-                , boost::string_ref hw_desc
-                , boost::string_ref sw_desc
-                , boost::string_ref serial
-                , boost::string_ref dp_desc)
-            -> raw_ofp_stats_type
-        {
-            using boost::adaptors::sliced;
+    static auto create_desc(
+          boost::string_ref mfr_desc
+        , boost::string_ref hw_desc
+        , boost::string_ref sw_desc
+        , boost::string_ref serial
+        , boost::string_ref dp_desc)
+      -> raw_ofp_stats_type
+    {
+      using boost::adaptors::sliced;
 
-            auto desc = raw_ofp_stats_type{};
+      auto desc = raw_ofp_stats_type{};
 
-            auto const mfr_desc_size
-                = std::min(mfr_desc.size(), sizeof(desc.mfr_desc) - 1);
-            boost::copy(mfr_desc | sliced(0, mfr_desc_size), desc.mfr_desc);
+      auto const mfr_desc_size
+        = std::min(mfr_desc.size(), sizeof(desc.mfr_desc) - 1);
+      boost::copy(mfr_desc | sliced(0, mfr_desc_size), desc.mfr_desc);
 
-            auto const hw_desc_size
-                = std::min(hw_desc.size(), sizeof(desc.hw_desc) - 1);
-            boost::copy(hw_desc | sliced(0, hw_desc_size), desc.hw_desc);
+      auto const hw_desc_size
+        = std::min(hw_desc.size(), sizeof(desc.hw_desc) - 1);
+      boost::copy(hw_desc | sliced(0, hw_desc_size), desc.hw_desc);
 
-            auto const sw_desc_size
-                = std::min(sw_desc.size(), sizeof(desc.sw_desc) - 1);
-            boost::copy(sw_desc | sliced(0, sw_desc_size), desc.sw_desc);
+      auto const sw_desc_size
+        = std::min(sw_desc.size(), sizeof(desc.sw_desc) - 1);
+      boost::copy(sw_desc | sliced(0, sw_desc_size), desc.sw_desc);
 
-            auto const serial_size
-                = std::min(serial.size(), sizeof(desc.serial_num) - 1);
-            boost::copy(serial | sliced(0, serial_size), desc.serial_num);
+      auto const serial_size
+        = std::min(serial.size(), sizeof(desc.serial_num) - 1);
+      boost::copy(serial | sliced(0, serial_size), desc.serial_num);
 
-            auto const dp_desc_size
-                = std::min(dp_desc.size(), sizeof(desc.dp_desc) - 1);
-            boost::copy(dp_desc | sliced(0, dp_desc_size), desc.dp_desc);
+      auto const dp_desc_size
+        = std::min(dp_desc.size(), sizeof(desc.dp_desc) - 1);
+      boost::copy(dp_desc | sliced(0, dp_desc_size), desc.dp_desc);
 
-            return desc;
-        }
-    };
+      return desc;
+    }
+  };
 
 } // namespace statistics
 } // namespace messages

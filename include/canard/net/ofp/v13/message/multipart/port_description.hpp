@@ -15,61 +15,60 @@ namespace v13 {
 namespace messages {
 namespace multipart {
 
-    class port_description_request
-        : public multipart_detail::basic_multipart_request<
-              port_description_request, void
-          >
+  class port_description_request
+    : public multipart_detail::basic_multipart_request<
+        port_description_request, void
+      >
+  {
+  public:
+    static constexpr protocol::ofp_multipart_type multipart_type_value
+      = protocol::OFPMP_PORT_DESC;
+
+    explicit port_description_request(
+        std::uint32_t const xid = get_xid()) noexcept
+      : basic_multipart_request{0, xid}
     {
-    public:
-        static constexpr protocol::ofp_multipart_type multipart_type_value
-            = protocol::OFPMP_PORT_DESC;
+    }
 
-        explicit port_description_request(
-                std::uint32_t const xid = get_xid()) noexcept
-            : basic_multipart_request{0, xid}
-        {
-        }
+  private:
+    friend basic_multipart_request::base_type;
 
-    private:
-        friend basic_multipart_request::base_type;
-
-        explicit port_description_request(
-                raw_ofp_type const& multipart_request) noexcept
-            : basic_multipart_request{multipart_request}
-        {
-        }
-    };
-
-
-    class port_description_reply
-        : public multipart_detail::basic_multipart_reply<
-              port_description_reply, v13::port[]
-          >
+    explicit port_description_request(
+        raw_ofp_type const& multipart_request) noexcept
+      : basic_multipart_request{multipart_request}
     {
-    public:
-        static constexpr protocol::ofp_multipart_type multipart_type_value
-            = protocol::OFPMP_PORT_DESC;
+    }
+  };
 
-        port_description_reply(
-                  body_type ports
-                , std::uint16_t const flags = 0
-                , std::uint32_t const xid = get_xid())
-            : basic_multipart_reply{flags, std::move(ports), xid}
-        {
-        }
 
-    private:
-        friend basic_multipart_reply::base_type;
+  class port_description_reply
+    : public multipart_detail::basic_multipart_reply<
+        port_description_reply, v13::port[]
+      >
+  {
+  public:
+    static constexpr protocol::ofp_multipart_type multipart_type_value
+      = protocol::OFPMP_PORT_DESC;
 
-        static constexpr bool is_fixed_length_element = true;
+    port_description_reply(
+          body_type ports
+        , std::uint16_t const flags = 0
+        , std::uint32_t const xid = get_xid())
+      : basic_multipart_reply{flags, std::move(ports), xid}
+    {
+    }
 
-        port_description_reply(
-                  raw_ofp_type const& multipart_reply
-                , body_type&& ports)
-            : basic_multipart_reply{multipart_reply, std::move(ports)}
-        {
-        }
-    };
+  private:
+    friend basic_multipart_reply::base_type;
+
+    static constexpr bool is_fixed_length_element = true;
+
+    port_description_reply(
+        raw_ofp_type const& multipart_reply, body_type&& ports)
+      : basic_multipart_reply{multipart_reply, std::move(ports)}
+    {
+    }
+  };
 
 } // namespace multipart
 } // namespace messages

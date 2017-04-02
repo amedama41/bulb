@@ -11,49 +11,49 @@ namespace ofp {
 namespace v10 {
 namespace actions {
 
-    class strip_vlan
-        : public detail::v10::basic_fixed_length_action<strip_vlan>
+  class strip_vlan
+    : public detail::v10::basic_fixed_length_action<strip_vlan>
+  {
+  public:
+    using raw_ofp_type = protocol::ofp_action_header;
+
+    static constexpr protocol::ofp_action_type action_type
+      = protocol::OFPAT_STRIP_VLAN;
+
+    strip_vlan() noexcept
+      : strip_vlan_{action_type, sizeof(raw_ofp_type), { 0, 0, 0, 0 }}
     {
-    public:
-        using raw_ofp_type = protocol::ofp_action_header;
+    }
 
-        static constexpr protocol::ofp_action_type action_type
-            = protocol::OFPAT_STRIP_VLAN;
+  private:
+    friend basic_fixed_length_action;
 
-        strip_vlan() noexcept
-            : strip_vlan_{action_type, sizeof(raw_ofp_type), { 0, 0, 0, 0 }}
-        {
-        }
+    explicit strip_vlan(raw_ofp_type const& action_header) noexcept
+      : strip_vlan_(action_header)
+    {
+    }
 
-    private:
-        friend basic_fixed_length_action;
+    auto ofp_action() const noexcept
+      -> raw_ofp_type const&
+    {
+      return strip_vlan_;
+    }
 
-        explicit strip_vlan(raw_ofp_type const& action_header) noexcept
-            : strip_vlan_(action_header)
-        {
-        }
+    void validate_action() const
+    {
+    }
 
-        auto ofp_action() const noexcept
-            -> raw_ofp_type const&
-        {
-            return strip_vlan_;
-        }
+    auto is_equivalent_action(strip_vlan const&) const noexcept
+      -> bool
+    {
+      return true;
+    }
 
-        void validate_action() const
-        {
-        }
+  private:
+    raw_ofp_type strip_vlan_;
+  };
 
-        auto is_equivalent_action(strip_vlan const&) const noexcept
-            -> bool
-        {
-            return true;
-        }
-
-    private:
-        raw_ofp_type strip_vlan_;
-    };
-
-    using pop_vlan = strip_vlan;
+  using pop_vlan = strip_vlan;
 
 } // namespace actions
 } // namespace v10

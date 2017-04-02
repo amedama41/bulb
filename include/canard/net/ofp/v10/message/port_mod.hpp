@@ -15,108 +15,108 @@ namespace ofp {
 namespace v10 {
 namespace messages {
 
-    class port_mod
-        : public v10_detail::basic_fixed_length_message<port_mod>
+  class port_mod
+    : public v10_detail::basic_fixed_length_message<port_mod>
+  {
+  public:
+    using raw_ofp_type = protocol::ofp_port_mod;
+
+    static constexpr protocol::ofp_type message_type
+      = protocol::OFPT_PORT_MOD;
+
+    port_mod(
+          std::uint16_t const port_no
+        , canard::mac_address const& macaddr
+        , std::uint32_t const config
+        , std::uint32_t const mask
+        , std::uint32_t const advertise
+        , std::uint32_t const xid = get_xid()) noexcept
+      : port_mod_{
+            protocol::ofp_header{
+                protocol::OFP_VERSION
+              , message_type
+              , sizeof(raw_ofp_type)
+              , xid
+            }
+          , port_no
+          , {
+                macaddr.to_bytes()[0], macaddr.to_bytes()[1]
+              , macaddr.to_bytes()[2], macaddr.to_bytes()[3]
+              , macaddr.to_bytes()[4], macaddr.to_bytes()[5]
+            }
+          , config
+          , mask
+          , advertise
+          , { 0, 0, 0, 0 }
+        }
     {
-    public:
-        using raw_ofp_type = protocol::ofp_port_mod;
+    }
 
-        static constexpr protocol::ofp_type message_type
-            = protocol::OFPT_PORT_MOD;
-
-        port_mod(std::uint16_t const port_no
-               , canard::mac_address const& macaddr
-               , std::uint32_t const config
-               , std::uint32_t const mask
-               , std::uint32_t const advertise
-               , std::uint32_t const xid = get_xid()) noexcept
-            : port_mod_{
-                  protocol::ofp_header{
-                      protocol::OFP_VERSION
-                    , message_type
-                    , sizeof(raw_ofp_type)
-                    , xid
-                  }
-                , port_no
-                , {
-                      macaddr.to_bytes()[0], macaddr.to_bytes()[1]
-                    , macaddr.to_bytes()[2], macaddr.to_bytes()[3]
-                    , macaddr.to_bytes()[4], macaddr.to_bytes()[5]
-                  }
-                , config
-                , mask
-                , advertise
-                , { 0, 0, 0, 0 }
-              }
-        {
+    port_mod(
+          port const& port
+        , std::uint32_t const config
+        , std::uint32_t const mask
+        , std::uint32_t const advertise
+        , std::uint32_t const xid = get_xid()) noexcept
+      : port_mod{
+          port.port_no(), port.hardware_address(), config, mask, advertise, xid
         }
+    {
+    }
 
-        port_mod(port const& port
-               , std::uint32_t const config
-               , std::uint32_t const mask
-               , std::uint32_t const advertise
-               , std::uint32_t const xid = get_xid()) noexcept
-            : port_mod{
-                  port.port_no()
-                , port.hardware_address()
-                , config, mask, advertise, xid
-              }
-        {
-        }
+    auto header() const noexcept
+      -> protocol::ofp_header const&
+    {
+      return port_mod_.header;
+    }
 
-        auto header() const noexcept
-            -> protocol::ofp_header const&
-        {
-            return port_mod_.header;
-        }
+    auto port_no() const noexcept
+      -> std::uint16_t
+    {
+      return port_mod_.port_no;
+    }
 
-        auto port_no() const noexcept
-            -> std::uint16_t
-        {
-            return port_mod_.port_no;
-        }
+    auto hardware_address() const noexcept
+      -> canard::mac_address
+    {
+      return canard::mac_address{port_mod_.hw_addr};
+    }
 
-        auto hardware_address() const noexcept
-            -> canard::mac_address
-        {
-            return canard::mac_address{port_mod_.hw_addr};
-        }
+    auto config() const noexcept
+      -> std::uint32_t
+    {
+      return port_mod_.config;
+    }
 
-        auto config() const noexcept
-            -> std::uint32_t
-        {
-            return port_mod_.config;
-        }
+    auto mask() const noexcept
+      -> std::uint32_t
+    {
+      return port_mod_.mask;
+    }
 
-        auto mask() const noexcept
-            -> std::uint32_t
-        {
-            return port_mod_.mask;
-        }
+    auto advertised_features() const noexcept
+      -> std::uint32_t
+    {
+      return port_mod_.advertise;
+    }
 
-        auto advertised_features() const noexcept
-            -> std::uint32_t
-        {
-            return port_mod_.advertise;
-        }
+  private:
+    friend basic_fixed_length_message;
 
-    private:
-        friend basic_fixed_length_message;
+    explicit port_mod(raw_ofp_type const& port_mod) noexcept
+      : port_mod_(port_mod)
+    {
+    }
 
-        explicit port_mod(raw_ofp_type const& port_mod) noexcept
-            : port_mod_(port_mod)
-        {
-        }
+    auto ofp_message() const noexcept
+      -> raw_ofp_type const&
+    {
+      return port_mod_;
+    }
 
-        auto ofp_message() const noexcept
-            -> raw_ofp_type const&
-        {
-            return port_mod_;
-        }
-
-    private:
-        raw_ofp_type port_mod_;
-    };
+  private:
+    raw_ofp_type port_mod_;
+  };
 
 } // namespace messages
 } // namespace v10

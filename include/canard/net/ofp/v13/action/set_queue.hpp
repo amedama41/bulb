@@ -12,60 +12,56 @@ namespace ofp {
 namespace v13 {
 namespace actions {
 
-    class set_queue
-        : public detail::v13::basic_fixed_length_action<set_queue>
+  class set_queue
+    : public detail::v13::basic_fixed_length_action<set_queue>
+  {
+  public:
+    using raw_ofp_type = protocol::ofp_action_set_queue;
+
+    static constexpr protocol::ofp_action_type action_type
+      = protocol::OFPAT_SET_QUEUE;
+
+    explicit set_queue(std::uint32_t const queue_id) noexcept
+      : action_set_queue_{action_type, length(), queue_id}
     {
-    public:
-        using raw_ofp_type = protocol::ofp_action_set_queue;
+    }
 
-        static constexpr protocol::ofp_action_type action_type
-            = protocol::OFPAT_SET_QUEUE;
+    auto queue_id() const noexcept
+      -> std::uint32_t
+    {
+      return action_set_queue_.queue_id;
+    }
 
-        explicit set_queue(std::uint32_t const queue_id) noexcept
-            : action_set_queue_{
-                  action_type
-                , length()
-                , queue_id
-              }
-        {
-        }
+  private:
+    friend basic_fixed_length_action;
 
-        auto queue_id() const noexcept
-            -> std::uint32_t
-        {
-            return action_set_queue_.queue_id;
-        }
+    explicit set_queue(raw_ofp_type const& action_set_queue) noexcept
+      : action_set_queue_(action_set_queue)
+    {
+    }
 
-    private:
-        friend basic_fixed_length_action;
+    auto ofp_action() const noexcept
+      -> raw_ofp_type const&
+    {
+      return action_set_queue_;
+    }
 
-        explicit set_queue(raw_ofp_type const& action_set_queue) noexcept
-            : action_set_queue_(action_set_queue)
-        {
-        }
+    void validate_action() const
+    {
+      if (queue_id() == protocol::OFPQ_ALL) {
+        throw std::runtime_error{"invalid queue_id"};
+      }
+    }
 
-        auto ofp_action() const noexcept
-            -> raw_ofp_type const&
-        {
-            return action_set_queue_;
-        }
+    auto is_equivalent_action(set_queue const& rhs) const noexcept
+      -> bool
+    {
+      return queue_id() == rhs.queue_id();
+    }
 
-        void validate_action() const
-        {
-            if (queue_id() == protocol::OFPQ_ALL) {
-                throw std::runtime_error{"invalid queue_id"};
-            }
-        }
-
-        auto is_equivalent_action(set_queue const& rhs) const noexcept
-            -> bool
-        {
-            return queue_id() == rhs.queue_id();
-        }
-
-    private:
-        raw_ofp_type action_set_queue_;
-    };
+  private:
+    raw_ofp_type action_set_queue_;
+  };
 
 } // namespace actions
 } // namespace v13

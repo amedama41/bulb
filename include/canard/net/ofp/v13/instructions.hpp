@@ -14,14 +14,14 @@ namespace net {
 namespace ofp {
 namespace v13 {
 
-    using default_instruction_list = std::tuple<
-          instructions::goto_table
-        , instructions::write_metadata
-        , instructions::write_actions
-        , instructions::apply_actions
-        , instructions::clear_actions
-        , instructions::meter
-    >;
+  using default_instruction_list = std::tuple<
+      instructions::goto_table
+    , instructions::write_metadata
+    , instructions::write_actions
+    , instructions::apply_actions
+    , instructions::clear_actions
+    , instructions::meter
+  >;
 
 } // namespace v13
 } // namespace ofp

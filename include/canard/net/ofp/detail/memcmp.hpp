@@ -9,13 +9,13 @@ namespace net {
 namespace ofp {
 namespace detail {
 
-    template <class T>
-    auto memcmp(T const& lhs, T const& rhs) noexcept
-        -> bool
-    {
-        return std::memcmp(
-                std::addressof(lhs), std::addressof(rhs), sizeof(T)) == 0;
-    }
+  template <class T>
+  auto memcmp(T const& lhs, T const& rhs) noexcept
+    -> bool
+  {
+    return std::memcmp(
+        std::addressof(lhs), std::addressof(rhs), sizeof(T)) == 0;
+  }
 
 } // namespace detail
 } // namespace ofp

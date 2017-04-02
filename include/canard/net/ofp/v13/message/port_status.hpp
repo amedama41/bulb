@@ -15,94 +15,90 @@ namespace ofp {
 namespace v13 {
 namespace messages {
 
-    class port_status
-        : public detail::v13::basic_fixed_length_message<port_status>
-        , public v13_detail::port_adaptor<port_status>
+  class port_status
+    : public detail::v13::basic_fixed_length_message<port_status>
+    , public v13_detail::port_adaptor<port_status>
+  {
+  public:
+    static constexpr protocol::ofp_type message_type
+      = protocol::OFPT_PORT_STATUS;
+
+    using raw_ofp_type = protocol::ofp_port_status;
+
+    port_status(
+          v13::protocol::ofp_port_reason const reason
+        , v13::port const& port
+        , std::uint32_t const xid = get_xid()) noexcept
+      : port_status_{
+            protocol::ofp_header{version(), type(), sizeof(raw_ofp_type), xid}
+          , std::uint8_t(reason)
+          , { 0, 0, 0, 0, 0, 0, 0 }
+          , port.ofp_port()
+        }
     {
-    public:
-        static constexpr protocol::ofp_type message_type
-            = protocol::OFPT_PORT_STATUS;
+    }
 
-        using raw_ofp_type = protocol::ofp_port_status;
+    auto header() const noexcept
+      -> protocol::ofp_header const&
+    {
+      return port_status_.header;
+    }
 
-        port_status(v13::protocol::ofp_port_reason const reason
-                  , v13::port const& port
-                  , std::uint32_t const xid = get_xid()) noexcept
-            : port_status_{
-                  protocol::ofp_header{
-                      version()
-                    , type()
-                    , sizeof(raw_ofp_type)
-                    , xid
-                  }
-                , std::uint8_t(reason)
-                , { 0, 0, 0, 0, 0, 0, 0 }
-                , port.ofp_port()
-              }
-        {
-        }
+    auto reason() const noexcept
+      -> protocol::ofp_port_reason
+    {
+      return protocol::ofp_port_reason(port_status_.reason);
+    }
 
-        auto header() const noexcept
-            -> protocol::ofp_header const&
-        {
-            return port_status_.header;
-        }
+    auto port() const noexcept
+      -> v13::port
+    {
+      return v13::port::from_ofp_port(port_status_.desc);
+    }
 
-        auto reason() const noexcept
-            -> protocol::ofp_port_reason
-        {
-            return protocol::ofp_port_reason(port_status_.reason);
-        }
+    auto is_added() const noexcept
+      -> bool
+    {
+      return reason() == protocol::OFPPR_ADD;
+    }
 
-        auto port() const noexcept
-            -> v13::port
-        {
-            return v13::port::from_ofp_port(port_status_.desc);
-        }
+    auto is_deleted() const noexcept
+      -> bool
+    {
+      return reason() == protocol::OFPPR_DELETE;
+    }
 
-        auto is_added() const noexcept
-            -> bool
-        {
-            return reason() == protocol::OFPPR_ADD;
-        }
+    auto is_modified() const noexcept
+      -> bool
+    {
+      return reason() == protocol::OFPPR_MODIFY;
+    }
 
-        auto is_deleted() const noexcept
-            -> bool
-        {
-            return reason() == protocol::OFPPR_DELETE;
-        }
+  private:
+    friend basic_fixed_length_message;
 
-        auto is_modified() const noexcept
-            -> bool
-        {
-            return reason() == protocol::OFPPR_MODIFY;
-        }
+    explicit port_status(raw_ofp_type const& status) noexcept
+      : port_status_(status)
+    {
+    }
 
-    private:
-        friend basic_fixed_length_message;
+    auto ofp_message() const noexcept
+      -> raw_ofp_type const&
+    {
+      return port_status_;
+    }
 
-        explicit port_status(raw_ofp_type const& status) noexcept
-            : port_status_(status)
-        {
-        }
+    friend port_adaptor;
 
-        auto ofp_message() const noexcept
-            -> raw_ofp_type const&
-        {
-            return port_status_;
-        }
+    auto ofp_port() const noexcept
+      -> protocol::ofp_port const&
+    {
+      return port_status_.desc;
+    }
 
-        friend port_adaptor;
-
-        auto ofp_port() const noexcept
-            -> protocol::ofp_port const&
-        {
-            return port_status_.desc;
-        }
-
-    private:
-        raw_ofp_type port_status_;
-    };
+  private:
+    raw_ofp_type port_status_;
+  };
 
 } // namespace messages
 } // namespace v13

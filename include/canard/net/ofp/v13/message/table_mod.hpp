@@ -13,67 +13,63 @@ namespace ofp {
 namespace v13 {
 namespace messages {
 
-    class table_mod
-        : public detail::v13::basic_fixed_length_message<table_mod>
+  class table_mod
+    : public detail::v13::basic_fixed_length_message<table_mod>
+  {
+  public:
+    static constexpr protocol::ofp_type message_type
+      = protocol::OFPT_TABLE_MOD;
+
+    using raw_ofp_type = protocol::ofp_table_mod;
+
+    table_mod(
+          std::uint8_t const table_id
+        , std::uint32_t const config
+        , std::uint32_t const xid = get_xid())
+      : table_mod_{
+            protocol::ofp_header{version(), type(), sizeof(raw_ofp_type), xid}
+          , table_id
+          , { 0, 0, 0 }
+          , config
+        }
     {
-    public:
-        static constexpr protocol::ofp_type message_type
-            = protocol::OFPT_TABLE_MOD;
+    }
 
-        using raw_ofp_type = protocol::ofp_table_mod;
+    auto header() const noexcept
+      -> protocol::ofp_header const&
+    {
+      return table_mod_.header;
+    }
 
-        table_mod(std::uint8_t const table_id
-                , std::uint32_t const config
-                , std::uint32_t const xid = get_xid())
-            : table_mod_{
-                  protocol::ofp_header{
-                      version()
-                    , type()
-                    , sizeof(raw_ofp_type)
-                    , xid
-                  }
-                , table_id
-                , { 0, 0, 0 }
-                , config
-              }
-        {
-        }
+    auto table_id() const noexcept
+      -> std::uint8_t
+    {
+      return table_mod_.table_id;
+    }
 
-        auto header() const noexcept
-            -> protocol::ofp_header const&
-        {
-            return table_mod_.header;
-        }
+    auto config() const noexcept
+      -> std::uint32_t
+    {
+      return table_mod_.config;
+    }
 
-        auto table_id() const noexcept
-            -> std::uint8_t
-        {
-            return table_mod_.table_id;
-        }
+  private:
+    friend basic_fixed_length_message;
 
-        auto config() const noexcept
-            -> std::uint32_t
-        {
-            return table_mod_.config;
-        }
+    explicit table_mod(raw_ofp_type const& table_mod) noexcept
+      : table_mod_(table_mod)
+    {
+    }
 
-    private:
-        friend basic_fixed_length_message;
+    auto ofp_message() const noexcept
+      -> raw_ofp_type const&
+    {
+      return table_mod_;
+    }
 
-        explicit table_mod(raw_ofp_type const& table_mod) noexcept
-            : table_mod_(table_mod)
-        {
-        }
-
-        auto ofp_message() const noexcept
-            -> raw_ofp_type const&
-        {
-            return table_mod_;
-        }
-
-    private:
-        raw_ofp_type table_mod_;
-    };
+  private:
+    raw_ofp_type table_mod_;
+  };
 
 } // namespace messages
 } // namespace v13
