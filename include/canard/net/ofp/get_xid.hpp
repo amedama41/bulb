@@ -8,7 +8,7 @@ namespace canard {
 namespace net {
 namespace ofp {
 
-  inline auto get_xid()
+  inline auto get_xid() noexcept
     -> std::uint32_t
   {
     static std::atomic<std::uint32_t> xid{0};
