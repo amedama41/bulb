@@ -2,6 +2,7 @@
 #define CANARD_NET_OFP_DETAIL_VISITORS_HPP
 
 #include <cstdint>
+#include <memory>
 #include <boost/variant/static_visitor.hpp>
 
 namespace canard {
@@ -14,8 +15,8 @@ namespace detail {
     : public boost::static_visitor<Container&>
   {
   public:
-    encoding_visitor(Container& container)
-      : container_{&container}
+    explicit encoding_visitor(Container& container) noexcept
+      : container_{std::addressof(container)}
     {
     }
 
@@ -56,7 +57,7 @@ namespace detail {
   {
   public:
     template <class T>
-    auto operator()(T const& t) const
+    auto operator()(T const& t) const noexcept
       -> Type
     {
       return t.type();
@@ -68,7 +69,7 @@ namespace detail {
   {
   public:
     template <class T>
-    auto operator()(T const& t) const
+    auto operator()(T const& t) const noexcept
       -> std::uint16_t
     {
       return t.length();
@@ -80,7 +81,7 @@ namespace detail {
   {
   public:
     template <class T>
-    auto operator()(T const& t) const
+    auto operator()(T const& t) const noexcept
       -> std::uint16_t
     {
       return t.byte_length();
@@ -92,7 +93,8 @@ namespace detail {
   {
   public:
     template <class T>
-    auto operator()(T const& lhs, T const& rhs) const noexcept
+    auto operator()(T const& lhs, T const& rhs) const
+        noexcept(noexcept(equivalent(lhs, rhs)))
       -> bool
     {
       return equivalent(lhs, rhs);
