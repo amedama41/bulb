@@ -2,22 +2,8 @@ cmake_minimum_required(VERSION 3.5)
 
 project(v13_bulb_test LANGUAGES CXX)
 
-find_package(Boost 1.59 REQUIRED COMPONENTS system unit_test_framework)
+find_package(Boost 1.59 REQUIRED COMPONENTS unit_test_framework)
 
-set(libbulb_srcs
-    ../../include/canard/net/ofp/v13/impl/any_action.ipp
-    ../../include/canard/net/ofp/v13/impl/any_instruction.ipp
-    ../../include/canard/net/ofp/v13/impl/any_oxm_match_field.ipp
-    ../../include/canard/net/ofp/v13/impl/any_queue_property.ipp
-    ../../include/canard/net/ofp/v13/impl/any_hello_element.ipp
-    ../../include/canard/net/ofp/v13/impl/any_table_feature_property.ipp
-    ../../include/canard/net/ofp/v13/impl/any_meter_band.ipp
-    ../../include/canard/net/ofp/v13/impl/action_list.ipp
-    ../../include/canard/net/ofp/v13/impl/action_set.ipp
-    ../../include/canard/net/ofp/v13/impl/instruction_set.ipp
-    ../../include/canard/net/ofp/v13/impl/oxm_match_field_set.ipp
-    ../../include/canard/net/ofp/v13/impl/meter_band_set.ipp
-    ../../include/canard/net/ofp/v13/impl/table_feature_property_set.ipp)
 set(action_srcs
     action/output_test.cpp
     action/copy_ttl_out_test.cpp
@@ -142,25 +128,15 @@ set(test_modules
     action common_type decoder instruction
     table_feature_property message multipart utility)
 
-set_source_files_properties(${libbulb_srcs} PROPERTIES LANGUAGE CXX)
-add_library(v13_bulb SHARED ${libbulb_srcs})
-set_target_properties(v13_bulb PROPERTIES LINKER_LANGUAGE CXX)
-target_include_directories(v13_bulb PUBLIC "../../include")
-target_compile_options(v13_bulb PRIVATE "-x" "c++")
-target_compile_definitions(v13_bulb
-    PUBLIC CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
-target_link_libraries(v13_bulb PUBLIC Boost::system PRIVATE bulb_test)
-add_library(bulb::v13::libbulb ALIAS v13_bulb)
-
 add_executable(v13_test $<TARGET_OBJECTS:bulb::driver>)
-target_link_libraries(v13_test PRIVATE bulb_test)
+target_link_libraries(v13_test PRIVATE bulb_base)
 add_executable(bulb::v13::test ALIAS v13_test)
 
 foreach(module IN LISTS test_modules)
     add_library(v13_${module} SHARED ${${module}_srcs})
     target_link_libraries(v13_${module}
-        PUBLIC Boost::unit_test_framework bulb::v13::libbulb
-        PRIVATE bulb_test)
+        PUBLIC Boost::unit_test_framework bulb::libbulb
+        PRIVATE bulb_base)
     add_library(bulb::v13::${module} ALIAS v13_${module})
 
     target_link_libraries(v13_test PRIVATE bulb::v13::${module})

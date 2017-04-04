@@ -2,12 +2,8 @@ cmake_minimum_required(VERSION 3.5)
 
 project(v10_bulb_test LANGUAGES CXX)
 
-find_package(Boost 1.59 REQUIRED COMPONENTS system unit_test_framework)
+find_package(Boost 1.59 REQUIRED COMPONENTS unit_test_framework)
 
-set(libbulb_srcs
-    ../../include/canard/net/ofp/v10/impl/action_list.ipp
-    ../../include/canard/net/ofp/v10/impl/any_action.ipp
-    ../../include/canard/net/ofp/v10/impl/any_queue_property.ipp)
 set(action_srcs
     action/output_test.cpp
     action/set_field_test.cpp
@@ -59,25 +55,15 @@ set(utility_srcs
 set(test_modules
     action common_type decoder io message queue_property stats utility)
 
-set_source_files_properties(${libbulb_srcs} PROPERTIES LANGUAGE CXX)
-add_library(v10_bulb SHARED ${libbulb_srcs})
-set_target_properties(v10_bulb PROPERTIES LINKER_LANGUAGE CXX)
-target_include_directories(v10_bulb PUBLIC "../../include")
-target_compile_options(v10_bulb PRIVATE "-x" "c++")
-target_compile_definitions(v10_bulb
-    PUBLIC CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
-target_link_libraries(v10_bulb PUBLIC Boost::system PRIVATE bulb_test)
-add_library(bulb::v10::libbulb ALIAS v10_bulb)
-
 add_executable(v10_test $<TARGET_OBJECTS:bulb::driver>)
-target_link_libraries(v10_test PRIVATE bulb_test)
+target_link_libraries(v10_test PRIVATE bulb_base)
 add_executable(bulb::v10::test ALIAS v10_test)
 
 foreach(module IN LISTS test_modules)
     add_library(v10_${module} SHARED ${${module}_srcs})
     target_link_libraries(v10_${module}
-        PUBLIC Boost::unit_test_framework bulb::v10::libbulb
-        PRIVATE bulb_test)
+        PUBLIC Boost::unit_test_framework bulb::libbulb
+        PRIVATE bulb_base)
     add_library(bulb::v10::${module} ALIAS v10_${module})
 
     target_link_libraries(v10_test PRIVATE bulb::v10::${module})
