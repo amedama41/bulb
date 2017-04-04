@@ -152,18 +152,6 @@ namespace messages {
       return queues;
     }
 
-    auto begin() const noexcept
-      -> const_iterator
-    {
-      return queues_.begin();
-    }
-
-    auto end() const noexcept
-      -> const_iterator
-    {
-      return queues_.end();
-    }
-
   private:
     queue_get_config_reply(
         raw_ofp_type const& queue_get_config_reply, queues_type&& queues)

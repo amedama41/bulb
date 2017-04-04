@@ -35,8 +35,6 @@ namespace table_feature_properties {
     public:
       using raw_ofp_type = protocol::ofp_table_feature_prop_next_tables;
       using next_table_ids_type = boost::container::vector<std::uint8_t>;
-      using iterator = next_table_ids_type::iterator;
-      using const_iterator = next_table_ids_type::const_iterator;
 
       basic_prop_next_tables()
         : table_feature_prop_next_tables_{
@@ -106,30 +104,6 @@ namespace table_feature_properties {
         next_table_ids.swap(next_table_ids_);
         table_feature_prop_next_tables_.length = sizeof(raw_ofp_type);
         return next_table_ids;
-      }
-
-      auto begin() noexcept
-        -> iterator
-      {
-        return next_table_ids_.begin();
-      }
-
-      auto begin() const noexcept
-        -> const_iterator
-      {
-        return next_table_ids_.begin();
-      }
-
-      auto end() noexcept
-        -> iterator
-      {
-        return next_table_ids_.end();
-      }
-
-      auto end() const noexcept
-        -> const_iterator
-      {
-        return next_table_ids_.end();
       }
 
     protected:

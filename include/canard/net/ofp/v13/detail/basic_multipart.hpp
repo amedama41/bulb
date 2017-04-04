@@ -444,30 +444,6 @@ namespace multipart_detail {
       return body_.size();
     }
 
-    auto begin() noexcept
-      -> iterator
-    {
-      return body_.begin();
-    }
-
-    auto begin() const noexcept
-      -> const_iterator
-    {
-      return body_.begin();
-    }
-
-    auto end() noexcept
-      -> iterator
-    {
-      return body_.end();
-    }
-
-    auto end() const noexcept
-      -> const_iterator
-    {
-      return body_.end();
-    }
-
   protected:
     array_body_multipart(
         std::uint16_t const flags, body_type&& body, std::uint32_t const xid)

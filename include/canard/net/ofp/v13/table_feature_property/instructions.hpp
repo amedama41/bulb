@@ -33,8 +33,6 @@ namespace table_feature_properties {
     public:
       using raw_ofp_type = protocol::ofp_table_feature_prop_instructions;
       using instruction_ids_type = ofp::list<instruction_id>;
-      using iterator = instruction_ids_type::iterator;
-      using const_iterator = instruction_ids_type::const_iterator;
 
     private:
       template <class... InstructionIDs>
@@ -112,30 +110,6 @@ namespace table_feature_properties {
         instruction_ids.swap(instruction_ids_);
         table_feature_prop_instructions_.length = sizeof(raw_ofp_type);
         return instruction_ids;
-      }
-
-      auto begin() noexcept
-        -> iterator
-      {
-        return instruction_ids_.begin();
-      }
-
-      auto begin() const noexcept
-        -> const_iterator
-      {
-        return instruction_ids_.begin();
-      }
-
-      auto end() noexcept
-        -> iterator
-      {
-        return instruction_ids_.end();
-      }
-
-      auto end() const noexcept
-        -> const_iterator
-      {
-        return instruction_ids_.end();
       }
 
     protected:

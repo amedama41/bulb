@@ -26,8 +26,6 @@ namespace v10 {
   public:
     using raw_ofp_type = protocol::ofp_packet_queue;
     using properties_type = list<any_queue_property>;
-    using iterator = properties_type::const_iterator;
-    using const_iterator = properties_type::const_iterator;
 
     packet_queue(std::uint32_t const queue_id, properties_type properties)
       : packet_queue_{
@@ -84,18 +82,6 @@ namespace v10 {
       -> properties_type const&
     {
       return properties_;
-    }
-
-    auto begin() const noexcept
-      -> const_iterator
-    {
-      return properties_.begin();
-    }
-
-    auto end() const noexcept
-      -> const_iterator
-    {
-      return properties_.end();
     }
 
   private:

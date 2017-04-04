@@ -33,8 +33,6 @@ namespace table_feature_properties {
     public:
       using raw_ofp_type = protocol::ofp_table_feature_prop_oxm;
       using oxm_ids_type = ofp::list<oxm_id>;
-      using iterator = oxm_ids_type::iterator;
-      using const_iterator = oxm_ids_type::const_iterator;
 
     private:
       template <class... OXMIDs>
@@ -105,30 +103,6 @@ namespace table_feature_properties {
         oxm_ids.swap(oxm_ids_);
         table_feature_prop_oxm_.length = sizeof(raw_ofp_type);
         return oxm_ids;
-      }
-
-      auto begin() noexcept
-        -> iterator
-      {
-        return oxm_ids_.begin();
-      }
-
-      auto begin() const noexcept
-        -> const_iterator
-      {
-        return oxm_ids_.begin();
-      }
-
-      auto end() noexcept
-        -> iterator
-      {
-        return oxm_ids_.end();
-      }
-
-      auto end() const noexcept
-        -> const_iterator
-      {
-        return oxm_ids_.end();
       }
 
     protected:
