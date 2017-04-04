@@ -71,7 +71,6 @@ BOOST_AUTO_TEST_SUITE(instructions_test)
 
         BOOST_TEST(sut.length()
                 == sizeof(protocol::ofp_table_feature_prop_instructions));
-        BOOST_TEST((sut.begin() == sut.end()));
         BOOST_TEST(sut.instruction_ids().empty());
     }
 
@@ -84,9 +83,8 @@ BOOST_AUTO_TEST_SUITE(instructions_test)
         BOOST_TEST_REQUIRE(goto_table.length() == 4);
         BOOST_TEST(sut.length()
                ==  sizeof(protocol::ofp_table_feature_prop_instructions) + 4);
-        BOOST_TEST((sut.begin() != sut.end()));
         BOOST_TEST(sut.instruction_ids().size() == 1);
-        BOOST_TEST((*sut.begin() == goto_table));
+        BOOST_TEST((sut.instruction_ids().front() == goto_table));
     }
 
     BOOST_AUTO_TEST_CASE(construct_from_multiple_ids_test)
@@ -111,9 +109,8 @@ BOOST_AUTO_TEST_SUITE(instructions_test)
 
         BOOST_TEST(sut.length()
                ==  sizeof(protocol::ofp_table_feature_prop_instructions) + 4 * 6 + 8);
-        BOOST_TEST((sut.begin() != sut.end()));
         BOOST_TEST_REQUIRE(sut.instruction_ids().size() == 7);
-        auto it = sut.begin();
+        auto it = sut.instruction_ids().begin();
         BOOST_TEST((*it++ == goto_table));
         BOOST_TEST((*it++ == write_metadata));
         BOOST_TEST((*it++ == write_actions));
@@ -121,7 +118,7 @@ BOOST_AUTO_TEST_SUITE(instructions_test)
         BOOST_TEST((*it++ == clear_actions));
         BOOST_TEST((*it++ == meter));
         BOOST_TEST((*it++ == experimenter));
-        BOOST_TEST((it == sut.end()));
+        BOOST_TEST((it == sut.instruction_ids().end()));
     }
 
     BOOST_FIXTURE_TEST_CASE(copy_construct_test, instructions_fixture)

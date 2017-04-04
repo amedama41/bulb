@@ -62,7 +62,6 @@ BOOST_AUTO_TEST_SUITE(next_tables_test)
 
         BOOST_TEST(sut.length()
                 == sizeof(protocol::ofp_table_feature_prop_next_tables));
-        BOOST_TEST((sut.begin() == sut.end()));
         BOOST_TEST(sut.next_table_ids().empty());
     }
 
@@ -75,10 +74,10 @@ BOOST_AUTO_TEST_SUITE(next_tables_test)
         BOOST_TEST(sut.length()
                 == sizeof(protocol::ofp_table_feature_prop_next_tables) + 1);
         BOOST_TEST(sut.next_table_ids().size() == 1);
-        auto it = sut.begin();
-        BOOST_TEST_REQUIRE((it != sut.end()));
+        auto it = sut.next_table_ids().begin();
+        BOOST_TEST_REQUIRE((it != sut.next_table_ids().end()));
         BOOST_TEST((*it++ == table_id));
-        BOOST_TEST((it == sut.end()));
+        BOOST_TEST((it == sut.next_table_ids().end()));
     }
 
     BOOST_AUTO_TEST_CASE(construct_from_multiple_ids_test)
@@ -94,12 +93,12 @@ BOOST_AUTO_TEST_SUITE(next_tables_test)
         BOOST_TEST(sut.length()
                 == sizeof(protocol::ofp_table_feature_prop_next_tables) + 1 * 3);
         BOOST_TEST(sut.next_table_ids().size() == 3);
-        auto it = sut.begin();
-        BOOST_TEST_REQUIRE((it != sut.end()));
+        auto it = sut.next_table_ids().begin();
+        BOOST_TEST_REQUIRE((it != sut.next_table_ids().end()));
         BOOST_TEST((*it++ == table_id1));
         BOOST_TEST((*it++ == table_id2));
         BOOST_TEST((*it++ == table_id3));
-        BOOST_TEST((it == sut.end()));
+        BOOST_TEST((it == sut.next_table_ids().end()));
     }
 
     BOOST_FIXTURE_TEST_CASE(copy_construct_test, next_tables_fixture)

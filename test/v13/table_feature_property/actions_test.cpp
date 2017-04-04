@@ -71,7 +71,6 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
 
         BOOST_TEST(sut.length()
                 == sizeof(protocol::ofp_table_feature_prop_actions));
-        BOOST_TEST((sut.begin() == sut.end()));
         BOOST_TEST(sut.action_ids().empty());
     }
 
@@ -84,9 +83,8 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
         BOOST_TEST_REQUIRE(output.length() == 4);
         BOOST_TEST(sut.length()
                 == sizeof(protocol::ofp_table_feature_prop_actions) + 4);
-        BOOST_TEST((sut.begin() != sut.end()));
         BOOST_TEST(sut.action_ids().size() == 1);
-        BOOST_TEST((*sut.begin() == output));
+        BOOST_TEST((sut.action_ids().front() == output));
     }
 
     BOOST_AUTO_TEST_CASE(construct_from_multiple_ids_test)
@@ -103,14 +101,13 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
         BOOST_TEST(sut.length()
                 == sizeof(protocol::ofp_table_feature_prop_actions)
                  + 4 * 3 + experimenter.length());
-        BOOST_TEST((sut.begin() != sut.end()));
         BOOST_TEST_REQUIRE(sut.action_ids().size() == 4);
-        auto it = sut.begin();
+        auto it = sut.action_ids().begin();
         BOOST_TEST((*it++ == output));
         BOOST_TEST((*it++ == set_field));
         BOOST_TEST((*it++ == experimenter));
         BOOST_TEST((*it++ == push_vlan));
-        BOOST_TEST((it == sut.end()));
+        BOOST_TEST((it == sut.action_ids().end()));
     }
 
     BOOST_FIXTURE_TEST_CASE(copy_construct_test, write_actions_fixture)
@@ -129,7 +126,7 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
         BOOST_TEST((copy == sut));
         BOOST_TEST(src.length()
                 == sizeof(protocol::ofp_table_feature_prop_actions));
-        BOOST_TEST((src.begin() == src.end()));
+        BOOST_TEST((src.action_ids().empty()));
     }
 
     BOOST_FIXTURE_TEST_CASE(copy_assignment_test, write_actions_fixture)
@@ -151,7 +148,7 @@ BOOST_AUTO_TEST_SUITE(write_actions_test)
         BOOST_TEST((copy == sut));
         BOOST_TEST(src.length()
                 == sizeof(protocol::ofp_table_feature_prop_actions));
-        BOOST_TEST((src.begin() == src.end()));
+        BOOST_TEST((src.action_ids().empty()));
     }
 
     BOOST_AUTO_TEST_SUITE(equality)
