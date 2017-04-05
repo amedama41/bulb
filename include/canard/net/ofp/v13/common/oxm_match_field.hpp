@@ -79,52 +79,57 @@ namespace oxm_match_fields {
     };
 
     template <std::uint8_t OXMField>
-    using basic_oxm_class = oxm_type<protocol::OFPXMC_OPENFLOW_BASIC, OXMField>;
+    using basic_oxm_class
+      = oxm_type<protocol::ofp_oxm_class::openflow_basic, OXMField>;
 
-    using boost::fusion::pair;
+    using protocol::oxm_ofb_match_fields;
+
+    template <oxm_ofb_match_fields OXMField, class T>
+    using pair = boost::fusion::pair<basic_oxm_class<OXMField>, T>;
+
     using boost::endian::big_uint24_t;
 
     using oxm_type_info_table = boost::fusion::map<
-        pair<basic_oxm_class<protocol::OFPXMT_OFB_IN_PORT>        , generic_type<std::uint32_t>>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_IN_PHY_PORT>    , generic_type<std::uint32_t>>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_METADATA>       , generic_type<std::uint64_t>>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_ETH_DST>        , mac_address_type>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_ETH_SRC>        , mac_address_type>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_ETH_TYPE>       , generic_type<std::uint16_t>>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_VLAN_VID>       , generic_type<std::uint16_t>>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_VLAN_PCP>       , generic_type<std::uint8_t>>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_IP_DSCP>        , generic_type<std::uint8_t>>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_IP_ECN>         , generic_type<std::uint8_t>>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_IP_PROTO>       , generic_type<std::uint8_t>>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV4_SRC>       , address_v4_type>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV4_DST>       , address_v4_type>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_TCP_SRC>        , generic_type<std::uint16_t>>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_TCP_DST>        , generic_type<std::uint16_t>>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_UDP_SRC>        , generic_type<std::uint16_t>>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_UDP_DST>        , generic_type<std::uint16_t>>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_SCTP_SRC>       , generic_type<std::uint16_t>>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_SCTP_DST>       , generic_type<std::uint16_t>>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_ICMPV4_TYPE>    , generic_type<std::uint8_t>>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_ICMPV4_CODE>    , generic_type<std::uint8_t>>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_ARP_OP>         , generic_type<std::uint16_t>>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_ARP_SPA>        , address_v4_type>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_ARP_TPA>        , address_v4_type>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_ARP_SHA>        , mac_address_type>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_ARP_THA>        , mac_address_type>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV6_SRC>       , address_v6_type>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV6_DST>       , address_v6_type>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV6_FLABEL>    , generic_type<std::uint32_t>>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_ICMPV6_TYPE>    , generic_type<std::uint8_t>>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_ICMPV6_CODE>    , generic_type<std::uint8_t>>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV6_ND_TARGET> , address_v6_type>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV6_ND_SLL>    , mac_address_type>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV6_ND_TLL>    , mac_address_type>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_MPLS_LABEL>     , generic_type<std::uint32_t>>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_MPLS_TC>        , generic_type<std::uint8_t>>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_MPLS_BOS>       , generic_type<std::uint8_t>>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_PBB_ISID>       , generic_type<big_uint24_t, false>>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_TUNNEL_ID>      , generic_type<std::uint64_t>>
-      , pair<basic_oxm_class<protocol::OFPXMT_OFB_IPV6_EXTHDR>    , generic_type<std::uint16_t>>
+        pair<oxm_ofb_match_fields::in_port        , generic_type<std::uint32_t>>
+      , pair<oxm_ofb_match_fields::in_phy_port    , generic_type<std::uint32_t>>
+      , pair<oxm_ofb_match_fields::metadata       , generic_type<std::uint64_t>>
+      , pair<oxm_ofb_match_fields::eth_dst        , mac_address_type>
+      , pair<oxm_ofb_match_fields::eth_src        , mac_address_type>
+      , pair<oxm_ofb_match_fields::eth_type       , generic_type<std::uint16_t>>
+      , pair<oxm_ofb_match_fields::vlan_vid       , generic_type<std::uint16_t>>
+      , pair<oxm_ofb_match_fields::vlan_pcp       , generic_type<std::uint8_t>>
+      , pair<oxm_ofb_match_fields::ip_dscp        , generic_type<std::uint8_t>>
+      , pair<oxm_ofb_match_fields::ip_ecn         , generic_type<std::uint8_t>>
+      , pair<oxm_ofb_match_fields::ip_proto       , generic_type<std::uint8_t>>
+      , pair<oxm_ofb_match_fields::ipv4_src       , address_v4_type>
+      , pair<oxm_ofb_match_fields::ipv4_dst       , address_v4_type>
+      , pair<oxm_ofb_match_fields::tcp_src        , generic_type<std::uint16_t>>
+      , pair<oxm_ofb_match_fields::tcp_dst        , generic_type<std::uint16_t>>
+      , pair<oxm_ofb_match_fields::udp_src        , generic_type<std::uint16_t>>
+      , pair<oxm_ofb_match_fields::udp_dst        , generic_type<std::uint16_t>>
+      , pair<oxm_ofb_match_fields::sctp_src       , generic_type<std::uint16_t>>
+      , pair<oxm_ofb_match_fields::sctp_dst       , generic_type<std::uint16_t>>
+      , pair<oxm_ofb_match_fields::icmpv4_type    , generic_type<std::uint8_t>>
+      , pair<oxm_ofb_match_fields::icmpv4_code    , generic_type<std::uint8_t>>
+      , pair<oxm_ofb_match_fields::arp_op         , generic_type<std::uint16_t>>
+      , pair<oxm_ofb_match_fields::arp_spa        , address_v4_type>
+      , pair<oxm_ofb_match_fields::arp_tpa        , address_v4_type>
+      , pair<oxm_ofb_match_fields::arp_sha        , mac_address_type>
+      , pair<oxm_ofb_match_fields::arp_tha        , mac_address_type>
+      , pair<oxm_ofb_match_fields::ipv6_src       , address_v6_type>
+      , pair<oxm_ofb_match_fields::ipv6_dst       , address_v6_type>
+      , pair<oxm_ofb_match_fields::ipv6_flabel    , generic_type<std::uint32_t>>
+      , pair<oxm_ofb_match_fields::icmpv6_type    , generic_type<std::uint8_t>>
+      , pair<oxm_ofb_match_fields::icmpv6_code    , generic_type<std::uint8_t>>
+      , pair<oxm_ofb_match_fields::ipv6_nd_target , address_v6_type>
+      , pair<oxm_ofb_match_fields::ipv6_nd_sll    , mac_address_type>
+      , pair<oxm_ofb_match_fields::ipv6_nd_tll    , mac_address_type>
+      , pair<oxm_ofb_match_fields::mpls_label     , generic_type<std::uint32_t>>
+      , pair<oxm_ofb_match_fields::mpls_tc        , generic_type<std::uint8_t>>
+      , pair<oxm_ofb_match_fields::mpls_bos       , generic_type<std::uint8_t>>
+      , pair<oxm_ofb_match_fields::pbb_isid       , generic_type<big_uint24_t, false>>
+      , pair<oxm_ofb_match_fields::tunnel_id      , generic_type<std::uint64_t>>
+      , pair<oxm_ofb_match_fields::ipv6_exthdr    , generic_type<std::uint16_t>>
     >;
 
     template <class T, class OXMTypeInfo>
@@ -134,7 +139,7 @@ namespace oxm_match_fields {
 
     inline void validate_value(
           std::uint32_t const port_no
-        , basic_oxm_class<protocol::OFPXMT_OFB_IN_PORT>)
+        , basic_oxm_class<oxm_ofb_match_fields::in_port>)
     {
       if (port_no == 0) {
         throw std::runtime_error{"port no zero is invalid"};
@@ -148,7 +153,7 @@ namespace oxm_match_fields {
 
     inline void validate_value(
           std::uint32_t const port_no
-        , basic_oxm_class<protocol::OFPXMT_OFB_IN_PHY_PORT>)
+        , basic_oxm_class<oxm_ofb_match_fields::in_phy_port>)
     {
       if (port_no == 0) {
         throw std::runtime_error{"in physical port no zero is invalid"};
@@ -160,7 +165,7 @@ namespace oxm_match_fields {
 
     inline void validate_value(
           std::uint16_t const vid
-        , basic_oxm_class<protocol::OFPXMT_OFB_VLAN_VID>)
+        , basic_oxm_class<oxm_ofb_match_fields::vlan_vid>)
     {
       if (vid > (0x0fff | protocol::OFPVID_PRESENT)) {
         throw std::runtime_error{"invalid vlan vid"};
@@ -172,7 +177,7 @@ namespace oxm_match_fields {
 
     inline void validate_value(
           std::uint8_t const pcp
-        , basic_oxm_class<protocol::OFPXMT_OFB_VLAN_PCP>)
+        , basic_oxm_class<oxm_ofb_match_fields::vlan_pcp>)
     {
       if (pcp > 0x07) {
         throw std::runtime_error{"invalid vlan pcp"};
@@ -181,7 +186,7 @@ namespace oxm_match_fields {
 
     inline void validate_value(
           std::uint8_t const dscp
-        , basic_oxm_class<protocol::OFPXMT_OFB_IP_DSCP>)
+        , basic_oxm_class<oxm_ofb_match_fields::ip_dscp>)
     {
       if (dscp > 0x3f) {
         throw std::runtime_error{"invalid ip dscp"};
@@ -190,7 +195,7 @@ namespace oxm_match_fields {
 
     inline void validate_value(
           std::uint8_t const ecn
-        , basic_oxm_class<protocol::OFPXMT_OFB_IP_ECN>)
+        , basic_oxm_class<oxm_ofb_match_fields::ip_ecn>)
     {
       if (ecn > 0x03) {
         throw std::runtime_error{"invalid ip ecn"};
@@ -199,7 +204,7 @@ namespace oxm_match_fields {
 
     inline void validate_value(
           std::uint32_t const flow_label
-        , basic_oxm_class<protocol::OFPXMT_OFB_IPV6_FLABEL>)
+        , basic_oxm_class<oxm_ofb_match_fields::ipv6_flabel>)
     {
       if (flow_label > 0x000fffff) {
         throw std::runtime_error{"invalid ipv6 flow label"};
@@ -208,7 +213,7 @@ namespace oxm_match_fields {
 
     inline void validate_value(
           std::uint32_t const mpls_label
-        , basic_oxm_class<protocol::OFPXMT_OFB_MPLS_LABEL>)
+        , basic_oxm_class<oxm_ofb_match_fields::mpls_label>)
     {
       if (mpls_label > 0x000fffff) {
         throw std::runtime_error{"invalid mpls label"};
@@ -217,7 +222,7 @@ namespace oxm_match_fields {
 
     inline void validate_value(
           std::uint8_t const mpls_tc
-        , basic_oxm_class<protocol::OFPXMT_OFB_MPLS_TC>)
+        , basic_oxm_class<oxm_ofb_match_fields::mpls_tc>)
     {
       if (mpls_tc > 0x07) {
         throw std::runtime_error{"invalid mpls tc"};
@@ -226,7 +231,7 @@ namespace oxm_match_fields {
 
     inline void validate_value(
           std::uint8_t const mpls_bos
-        , basic_oxm_class<protocol::OFPXMT_OFB_MPLS_BOS>)
+        , basic_oxm_class<oxm_ofb_match_fields::mpls_bos>)
     {
       if (mpls_bos > 0x01) {
         throw std::runtime_error{"invalid mpls bos"};
@@ -235,7 +240,7 @@ namespace oxm_match_fields {
 
     inline void validate_value(
           std::uint16_t const ipv6_exthdr_flags
-        , basic_oxm_class<protocol::OFPXMT_OFB_IPV6_EXTHDR>)
+        , basic_oxm_class<oxm_ofb_match_fields::ipv6_exthdr>)
     {
       if (ipv6_exthdr_flags > 0x01ff) {
         throw std::runtime_error{"invalid ipv6 extension header flags"};
@@ -495,46 +500,50 @@ namespace oxm_match_fields {
     }
   };
 
-  using in_port        = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IN_PORT>;
-  using in_phy_port    = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IN_PHY_PORT>;
-  using metadata       = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_METADATA>;
-  using eth_dst        = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_ETH_DST>;
-  using eth_src        = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_ETH_SRC>;
-  using eth_type       = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_ETH_TYPE>;
-  using vlan_vid       = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_VLAN_VID>;
-  using vlan_pcp       = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_VLAN_PCP>;
-  using ip_dscp        = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IP_DSCP>;
-  using ip_ecn         = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IP_ECN>;
-  using ip_proto       = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IP_PROTO>;
-  using ipv4_src       = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IPV4_SRC>;
-  using ipv4_dst       = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IPV4_DST>;
-  using tcp_src        = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_TCP_SRC>;
-  using tcp_dst        = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_TCP_DST>;
-  using udp_src        = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_UDP_SRC>;
-  using udp_dst        = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_UDP_DST>;
-  using sctp_src       = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_SCTP_SRC>;
-  using sctp_dst       = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_SCTP_DST>;
-  using icmpv4_type    = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_ICMPV4_TYPE>;
-  using icmpv4_code    = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_ICMPV4_CODE>;
-  using arp_op         = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_ARP_OP>;
-  using arp_spa        = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_ARP_SPA>;
-  using arp_tpa        = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_ARP_TPA>;
-  using arp_sha        = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_ARP_SHA>;
-  using arp_tha        = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_ARP_THA>;
-  using ipv6_src       = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IPV6_SRC>;
-  using ipv6_dst       = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IPV6_DST>;
-  using ipv6_flabel    = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IPV6_FLABEL>;
-  using icmpv6_type    = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_ICMPV6_TYPE>;
-  using icmpv6_code    = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_ICMPV6_CODE>;
-  using ipv6_nd_target = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IPV6_ND_TARGET>;
-  using ipv6_nd_sll    = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IPV6_ND_SLL>;
-  using ipv6_nd_tll    = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IPV6_ND_TLL>;
-  using mpls_label     = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_MPLS_LABEL>;
-  using mpls_tc        = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_MPLS_TC>;
-  using mpls_bos       = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_MPLS_BOS>;
-  using pbb_isid       = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_PBB_ISID>;
-  using tunnel_id      = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_TUNNEL_ID>;
-  using ipv6_exthdr    = oxm_match_field<protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IPV6_EXTHDR>;
+  template <protocol::oxm_ofb_match_fields OXMField>
+  using openflow_basic_match_field
+    = oxm_match_field<protocol::ofp_oxm_class::openflow_basic, OXMField>;
+
+  using in_port        = openflow_basic_match_field<protocol::oxm_ofb_match_fields::in_port>;
+  using in_phy_port    = openflow_basic_match_field<protocol::oxm_ofb_match_fields::in_phy_port>;
+  using metadata       = openflow_basic_match_field<protocol::oxm_ofb_match_fields::metadata>;
+  using eth_dst        = openflow_basic_match_field<protocol::oxm_ofb_match_fields::eth_dst>;
+  using eth_src        = openflow_basic_match_field<protocol::oxm_ofb_match_fields::eth_src>;
+  using eth_type       = openflow_basic_match_field<protocol::oxm_ofb_match_fields::eth_type>;
+  using vlan_vid       = openflow_basic_match_field<protocol::oxm_ofb_match_fields::vlan_vid>;
+  using vlan_pcp       = openflow_basic_match_field<protocol::oxm_ofb_match_fields::vlan_pcp>;
+  using ip_dscp        = openflow_basic_match_field<protocol::oxm_ofb_match_fields::ip_dscp>;
+  using ip_ecn         = openflow_basic_match_field<protocol::oxm_ofb_match_fields::ip_ecn>;
+  using ip_proto       = openflow_basic_match_field<protocol::oxm_ofb_match_fields::ip_proto>;
+  using ipv4_src       = openflow_basic_match_field<protocol::oxm_ofb_match_fields::ipv4_src>;
+  using ipv4_dst       = openflow_basic_match_field<protocol::oxm_ofb_match_fields::ipv4_dst>;
+  using tcp_src        = openflow_basic_match_field<protocol::oxm_ofb_match_fields::tcp_src>;
+  using tcp_dst        = openflow_basic_match_field<protocol::oxm_ofb_match_fields::tcp_dst>;
+  using udp_src        = openflow_basic_match_field<protocol::oxm_ofb_match_fields::udp_src>;
+  using udp_dst        = openflow_basic_match_field<protocol::oxm_ofb_match_fields::udp_dst>;
+  using sctp_src       = openflow_basic_match_field<protocol::oxm_ofb_match_fields::sctp_src>;
+  using sctp_dst       = openflow_basic_match_field<protocol::oxm_ofb_match_fields::sctp_dst>;
+  using icmpv4_type    = openflow_basic_match_field<protocol::oxm_ofb_match_fields::icmpv4_type>;
+  using icmpv4_code    = openflow_basic_match_field<protocol::oxm_ofb_match_fields::icmpv4_code>;
+  using arp_op         = openflow_basic_match_field<protocol::oxm_ofb_match_fields::arp_op>;
+  using arp_spa        = openflow_basic_match_field<protocol::oxm_ofb_match_fields::arp_spa>;
+  using arp_tpa        = openflow_basic_match_field<protocol::oxm_ofb_match_fields::arp_tpa>;
+  using arp_sha        = openflow_basic_match_field<protocol::oxm_ofb_match_fields::arp_sha>;
+  using arp_tha        = openflow_basic_match_field<protocol::oxm_ofb_match_fields::arp_tha>;
+  using ipv6_src       = openflow_basic_match_field<protocol::oxm_ofb_match_fields::ipv6_src>;
+  using ipv6_dst       = openflow_basic_match_field<protocol::oxm_ofb_match_fields::ipv6_dst>;
+  using ipv6_flabel    = openflow_basic_match_field<protocol::oxm_ofb_match_fields::ipv6_flabel>;
+  using icmpv6_type    = openflow_basic_match_field<protocol::oxm_ofb_match_fields::icmpv6_type>;
+  using icmpv6_code    = openflow_basic_match_field<protocol::oxm_ofb_match_fields::icmpv6_code>;
+  using ipv6_nd_target = openflow_basic_match_field<protocol::oxm_ofb_match_fields::ipv6_nd_target>;
+  using ipv6_nd_sll    = openflow_basic_match_field<protocol::oxm_ofb_match_fields::ipv6_nd_sll>;
+  using ipv6_nd_tll    = openflow_basic_match_field<protocol::oxm_ofb_match_fields::ipv6_nd_tll>;
+  using mpls_label     = openflow_basic_match_field<protocol::oxm_ofb_match_fields::mpls_label>;
+  using mpls_tc        = openflow_basic_match_field<protocol::oxm_ofb_match_fields::mpls_tc>;
+  using mpls_bos       = openflow_basic_match_field<protocol::oxm_ofb_match_fields::mpls_bos>;
+  using pbb_isid       = openflow_basic_match_field<protocol::oxm_ofb_match_fields::pbb_isid>;
+  using tunnel_id      = openflow_basic_match_field<protocol::oxm_ofb_match_fields::tunnel_id>;
+  using ipv6_exthdr    = openflow_basic_match_field<protocol::oxm_ofb_match_fields::ipv6_exthdr>;
 
 } // namespace oxm_match_fields
 
