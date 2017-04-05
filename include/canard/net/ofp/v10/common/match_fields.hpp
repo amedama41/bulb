@@ -26,42 +26,53 @@ namespace v10 {
 
   namespace match_detail {
 
-    template <std::uint32_t Field>
-    using field_type = std::integral_constant<std::uint32_t, Field>;
+    using protocol::flow_wildcards;
+
+    template <flow_wildcards Field>
+    using field_type = std::integral_constant<flow_wildcards, Field>;
+
+    template <flow_wildcards Field, int MemberIndex>
+    using pair
+      = boost::fusion::pair<field_type<Field>, boost::mpl::int_<MemberIndex>>;
 
     using match_field_index_table = boost::fusion::map<
-    //  ofp_match field type                                          ofp_match member index
-    //+-------------------------------------------------------------+------------------------+
-        boost::fusion::pair<field_type<protocol::OFPFW_IN_PORT>     , boost::mpl::int_<1>>
-      , boost::fusion::pair<field_type<protocol::OFPFW_DL_SRC>      , boost::mpl::int_<2>>
-      , boost::fusion::pair<field_type<protocol::OFPFW_DL_DST>      , boost::mpl::int_<3>>
-      , boost::fusion::pair<field_type<protocol::OFPFW_DL_VLAN>     , boost::mpl::int_<4>>
-      , boost::fusion::pair<field_type<protocol::OFPFW_DL_VLAN_PCP> , boost::mpl::int_<5>>
-      , boost::fusion::pair<field_type<protocol::OFPFW_DL_TYPE>     , boost::mpl::int_<7>>
-      , boost::fusion::pair<field_type<protocol::OFPFW_NW_TOS>      , boost::mpl::int_<8>>
-      , boost::fusion::pair<field_type<protocol::OFPFW_NW_PROTO>    , boost::mpl::int_<9>>
-      , boost::fusion::pair<field_type<protocol::OFPFW_NW_SRC_ALL>  , boost::mpl::int_<11>>
-      , boost::fusion::pair<field_type<protocol::OFPFW_NW_DST_ALL>  , boost::mpl::int_<12>>
-      , boost::fusion::pair<field_type<protocol::OFPFW_TP_SRC>      , boost::mpl::int_<13>>
-      , boost::fusion::pair<field_type<protocol::OFPFW_TP_DST>      , boost::mpl::int_<14>>
-    //+-------------------------------------------------------------+------------------------+
+    //  ofp_match field type               ofp_match member index
+    //+----------------------------------+------------------------+
+        pair<flow_wildcards::in_port     , 1>
+      , pair<flow_wildcards::dl_src      , 2>
+      , pair<flow_wildcards::dl_dst      , 3>
+      , pair<flow_wildcards::dl_vlan     , 4>
+      , pair<flow_wildcards::dl_vlan_pcp , 5>
+      , pair<flow_wildcards::dl_type     , 7>
+      , pair<flow_wildcards::nw_tos      , 8>
+      , pair<flow_wildcards::nw_proto    , 9>
+      , pair<flow_wildcards::nw_src_all  , 11>
+      , pair<flow_wildcards::nw_dst_all  , 12>
+      , pair<flow_wildcards::tp_src      , 13>
+      , pair<flow_wildcards::tp_dst      , 14>
+    //+----------------------------------+------------------------+
     >;
 
-    template <class T>
+    template <flow_wildcards Field>
+    using member_index = typename boost::fusion::result_of::value_at_key<
+      match_field_index_table, field_type<Field>
+    >::type;
+
+    template <flow_wildcards>
     struct mask_info;
 
     template <>
-    struct mask_info<field_type<protocol::OFPFW_NW_SRC_ALL>>
+    struct mask_info<flow_wildcards::nw_src_all>
     {
-      static constexpr std::uint32_t shift = protocol::OFPFW_NW_SRC_SHIFT;
-      static constexpr std::uint32_t mask = protocol::OFPFW_NW_SRC_MASK;
+      static constexpr std::uint32_t shift = flow_wildcards::nw_src_shift;
+      static constexpr std::uint32_t mask = flow_wildcards::nw_src_mask;
     };
 
     template <>
-    struct mask_info<field_type<protocol::OFPFW_NW_DST_ALL>>
+    struct mask_info<flow_wildcards::nw_dst_all>
     {
-      static constexpr std::uint32_t shift = protocol::OFPFW_NW_DST_SHIFT;
-      static constexpr std::uint32_t mask = protocol::OFPFW_NW_DST_MASK;
+      static constexpr std::uint32_t shift = flow_wildcards::nw_dst_shift;
+      static constexpr std::uint32_t mask = flow_wildcards::nw_dst_mask;
     };
 
     template <class T, class FieldType>
@@ -70,7 +81,7 @@ namespace v10 {
     }
 
     inline void validate(
-        std::uint16_t const in_port, field_type<protocol::OFPFW_IN_PORT>)
+        std::uint16_t const in_port, field_type<flow_wildcards::in_port>)
     {
       if (in_port == 0) {
         throw std::runtime_error{"in_port zero is invalid"};
@@ -83,7 +94,7 @@ namespace v10 {
     }
 
     inline void validate(
-        std::uint16_t const vlan_vid, field_type<protocol::OFPFW_DL_VLAN>)
+        std::uint16_t const vlan_vid, field_type<flow_wildcards::dl_vlan>)
     {
       if (vlan_vid > 0x0fff && vlan_vid != protocol::OFP_VLAN_NONE) {
         throw std::runtime_error{"invalid vlan vid"};
@@ -91,7 +102,7 @@ namespace v10 {
     }
 
     inline void validate(
-        std::uint8_t const vlan_pcp, field_type<protocol::OFPFW_DL_VLAN_PCP>)
+        std::uint8_t const vlan_pcp, field_type<flow_wildcards::dl_vlan_pcp>)
     {
       if (vlan_pcp > 0x07) {
         throw std::runtime_error{"invalid vlan pcp"};
@@ -100,7 +111,7 @@ namespace v10 {
 
     inline auto get_dl_addr(
           protocol::ofp_match& match
-        , field_type<protocol::OFPFW_DL_DST>) noexcept
+        , field_type<flow_wildcards::dl_dst>) noexcept
       -> std::uint8_t(&)[protocol::OFP_ETH_ALEN]
     {
       return match.dl_dst;
@@ -108,7 +119,7 @@ namespace v10 {
 
     inline auto get_dl_addr(
           protocol::ofp_match const& match
-        , field_type<protocol::OFPFW_DL_DST>) noexcept
+        , field_type<flow_wildcards::dl_dst>) noexcept
       -> std::uint8_t const(&)[protocol::OFP_ETH_ALEN]
     {
       return match.dl_dst;
@@ -116,7 +127,7 @@ namespace v10 {
 
     inline auto get_dl_addr(
           protocol::ofp_match& match
-        , field_type<protocol::OFPFW_DL_SRC>) noexcept
+        , field_type<flow_wildcards::dl_src>) noexcept
       -> std::uint8_t(&)[protocol::OFP_ETH_ALEN]
     {
       return match.dl_src;
@@ -124,7 +135,7 @@ namespace v10 {
 
     inline auto get_dl_addr(
           protocol::ofp_match const& match
-        , field_type<protocol::OFPFW_DL_SRC>) noexcept
+        , field_type<flow_wildcards::dl_src>) noexcept
       -> std::uint8_t const(&)[protocol::OFP_ETH_ALEN]
     {
       return match.dl_src;
@@ -138,16 +149,14 @@ namespace v10 {
 
   namespace match_fields {
 
-    template <class FieldType>
+    template <protocol::flow_wildcards Field>
     class match_field
-      : private boost::equality_comparable<match_field<FieldType>>
+      : private boost::equality_comparable<match_field<Field>>
     {
-      using member_index = typename boost::fusion::result_of::value_at_key<
-        match_detail::match_field_index_table, FieldType
-      >::type;
+      using member_index = match_detail::member_index<Field>;
 
     public:
-      using field_type = FieldType;
+      using field_type = match_detail::field_type<Field>;
       using value_type = typename boost::fusion::result_of::value_at<
         protocol::ofp_match, member_index
       >::type;
@@ -166,7 +175,7 @@ namespace v10 {
       template <class Validator>
       void validate(Validator) const
       {
-        match_detail::validate(value(), FieldType{});
+        match_detail::validate(value(), field_type{});
       }
 
       static auto create(value_type const value)
@@ -175,10 +184,9 @@ namespace v10 {
         return validation::validate(match_field{value});
       }
 
-      template <class FieldType2>
+      template <protocol::flow_wildcards Field2>
       friend auto operator==(
-            match_field<FieldType2> const&
-          , match_field<FieldType2> const&) noexcept
+          match_field<Field2> const&, match_field<Field2> const&) noexcept
         -> bool;
 
     private:
@@ -198,13 +206,13 @@ namespace v10 {
       void set_value(protocol::ofp_match& match) const noexcept
       {
         boost::fusion::at<member_index>(match) = value_;
-        match.wildcards &= ~FieldType::value;
+        match.wildcards &= ~field_type::value;
       }
 
       static auto is_wildcard(protocol::ofp_match const& match) noexcept
         -> bool
       {
-        return match.wildcards & FieldType::value;
+        return match.wildcards & field_type::value;
       }
 
       static auto create_from_match(protocol::ofp_match const& match) noexcept
@@ -216,7 +224,7 @@ namespace v10 {
       static void erase_from_match(protocol::ofp_match& match) noexcept
       {
         boost::fusion::at<member_index>(match) = 0;
-        match.wildcards |= FieldType::value;
+        match.wildcards |= field_type::value;
       }
 
     private:
@@ -224,47 +232,43 @@ namespace v10 {
     };
 
     template <>
-    inline
-    match_field<match_detail::field_type<protocol::OFPFW_NW_TOS>>
-    ::match_field(value_type dscp) noexcept
+    inline match_field<protocol::flow_wildcards::nw_tos>::match_field(
+        value_type dscp) noexcept
       : value_(std::uint32_t{dscp} << 2)
     {
     }
 
     template <>
     inline auto
-    match_field<match_detail::field_type<protocol::OFPFW_NW_TOS>>
-    ::value() const noexcept
+    match_field<protocol::flow_wildcards::nw_tos>::value() const noexcept
       -> value_type
     {
       return std::uint32_t{value_} >> 2;
     }
 
-    template <class FieldType>
+    template <protocol::flow_wildcards Field>
     auto operator==(
-          match_field<FieldType> const& lhs
-        , match_field<FieldType> const& rhs) noexcept
+        match_field<Field> const& lhs, match_field<Field> const& rhs) noexcept
       -> bool
     {
       return lhs.equal_impl(rhs);
     }
 
-    template <class FieldType>
+    template <protocol::flow_wildcards Field>
     auto equivalent(
-          match_field<FieldType> const& lhs
-        , match_field<FieldType> const& rhs) noexcept
+        match_field<Field> const& lhs, match_field<Field> const& rhs) noexcept
       -> bool
     {
       return lhs.value() == rhs.value();
     }
 
 
-    template <class FieldType>
+    template <protocol::flow_wildcards Field>
     class dl_addr_match_field
-      : private boost::equality_comparable<dl_addr_match_field<FieldType>>
+      : private boost::equality_comparable<dl_addr_match_field<Field>>
     {
     public:
-      using field_type = FieldType;
+      using field_type = match_detail::field_type<Field>;
       using value_type = canard::mac_address;
 
       explicit dl_addr_match_field(value_type const value)
@@ -295,16 +299,16 @@ namespace v10 {
       void set_value(protocol::ofp_match& match) const noexcept
       {
         std::memcpy(
-              match_detail::get_dl_addr(match, FieldType{})
+              match_detail::get_dl_addr(match, field_type{})
             , value().to_bytes().data()
             , value().to_bytes().size());
-        match.wildcards &= ~FieldType::value;
+        match.wildcards &= ~field_type::value;
       }
 
       static auto is_wildcard(protocol::ofp_match const& match) noexcept
         -> bool
       {
-        return match.wildcards & FieldType::value;
+        return match.wildcards & field_type::value;
       }
 
 
@@ -313,53 +317,50 @@ namespace v10 {
         -> dl_addr_match_field
       {
         return dl_addr_match_field{
-          value_type{match_detail::get_dl_addr(match, FieldType{})}
+          value_type{match_detail::get_dl_addr(match, field_type{})}
         };
       }
 
       static void erase_from_match(protocol::ofp_match& match) noexcept
       {
         std::memset(
-              match_detail::get_dl_addr(match, FieldType{})
+              match_detail::get_dl_addr(match, field_type{})
             , 0, protocol::OFP_ETH_ALEN);
-        match.wildcards |= FieldType::value;
+        match.wildcards |= field_type::value;
       }
 
     private:
       value_type value_;
     };
 
-    template <class FieldType>
+    template <protocol::flow_wildcards Field>
     auto operator==(
-          dl_addr_match_field<FieldType> const& lhs
-        , dl_addr_match_field<FieldType> const& rhs) noexcept
+          dl_addr_match_field<Field> const& lhs
+        , dl_addr_match_field<Field> const& rhs) noexcept
       -> bool
     {
       return lhs.value() == rhs.value();
     }
 
-    template <class FieldType>
+    template <protocol::flow_wildcards Field>
     auto equivalent(
-          dl_addr_match_field<FieldType> const& lhs
-        , dl_addr_match_field<FieldType> const& rhs) noexcept
+          dl_addr_match_field<Field> const& lhs
+        , dl_addr_match_field<Field> const& rhs) noexcept
       -> bool
     {
       return lhs == rhs;
     }
 
 
-    template <class FieldType>
+    template <protocol::flow_wildcards Field>
     class nw_addr_match_field
-      : private boost::equality_comparable<nw_addr_match_field<FieldType>>
+      : private boost::equality_comparable<nw_addr_match_field<Field>>
     {
-      using member_index = typename boost::fusion::result_of::value_at_key<
-        match_detail::match_field_index_table, FieldType
-      >::type;
-
-      using mask_info = match_detail::mask_info<FieldType>;
+      using member_index = match_detail::member_index<Field>;
+      using mask_info = match_detail::mask_info<Field>;
 
     public:
-      using field_type = FieldType;
+      using field_type = match_detail::field_type<Field>;
       using value_type = boost::asio::ip::address_v4;
 
       static constexpr std::uint8_t max_prefix_length = 32;
@@ -440,7 +441,7 @@ namespace v10 {
       static auto is_wildcard(protocol::ofp_match const& match) noexcept
         -> bool
       {
-        return match.wildcards & FieldType::value;
+        return match.wildcards & field_type::value;
       }
 
       static auto create_from_match(protocol::ofp_match const& match)
@@ -452,7 +453,7 @@ namespace v10 {
       static void erase_from_match(protocol::ofp_match& match) noexcept
       {
         boost::fusion::at<member_index>(match) = 0;
-        match.wildcards |= FieldType::value;
+        match.wildcards |= field_type::value;
       }
 
     private:
@@ -460,20 +461,20 @@ namespace v10 {
       std::uint8_t wildcard_bit_count_;
     };
 
-    template <class FieldType>
+    template <protocol::flow_wildcards Field>
     auto operator==(
-          nw_addr_match_field<FieldType> const& lhs
-        , nw_addr_match_field<FieldType> const& rhs) noexcept
+          nw_addr_match_field<Field> const& lhs
+        , nw_addr_match_field<Field> const& rhs) noexcept
       -> bool
     {
       return lhs.wildcard_bit_count() == rhs.wildcard_bit_count()
           && lhs.value() == rhs.value();
     }
 
-    template <class FieldType>
+    template <protocol::flow_wildcards Field>
     auto equivalent(
-          nw_addr_match_field<FieldType> const& lhs
-        , nw_addr_match_field<FieldType> const& rhs) noexcept
+          nw_addr_match_field<Field> const& lhs
+        , nw_addr_match_field<Field> const& rhs) noexcept
       -> bool
     {
       return lhs.wildcard_bit_count() == rhs.wildcard_bit_count()
@@ -482,24 +483,24 @@ namespace v10 {
     }
 
 
-    using in_port = match_field<match_detail::field_type<protocol::OFPFW_IN_PORT>>;
-    using eth_src = dl_addr_match_field<match_detail::field_type<protocol::OFPFW_DL_SRC>>;
-    using eth_dst = dl_addr_match_field<match_detail::field_type<protocol::OFPFW_DL_DST>>;
-    using vlan_vid = match_field<match_detail::field_type<protocol::OFPFW_DL_VLAN>>;
-    using vlan_pcp = match_field<match_detail::field_type<protocol::OFPFW_DL_VLAN_PCP>>;
-    using eth_type = match_field<match_detail::field_type<protocol::OFPFW_DL_TYPE>>;
-    using ip_dscp = match_field<match_detail::field_type<protocol::OFPFW_NW_TOS>>;
-    using ip_proto = match_field<match_detail::field_type<protocol::OFPFW_NW_PROTO>>;
-    using ipv4_src = nw_addr_match_field<match_detail::field_type<protocol::OFPFW_NW_SRC_ALL>>;
-    using ipv4_dst = nw_addr_match_field<match_detail::field_type<protocol::OFPFW_NW_DST_ALL>>;
-    using arp_spa = nw_addr_match_field<match_detail::field_type<protocol::OFPFW_NW_SRC_ALL>>;
-    using arp_tpa = nw_addr_match_field<match_detail::field_type<protocol::OFPFW_NW_DST_ALL>>;
-    using tcp_src = match_field<match_detail::field_type<protocol::OFPFW_TP_SRC>>;
-    using tcp_dst = match_field<match_detail::field_type<protocol::OFPFW_TP_DST>>;
-    using udp_src = match_field<match_detail::field_type<protocol::OFPFW_TP_SRC>>;
-    using udp_dst = match_field<match_detail::field_type<protocol::OFPFW_TP_DST>>;
-    using icmpv4_type = match_field<match_detail::field_type<protocol::OFPFW_TP_SRC>>;
-    using icmpv4_code = match_field<match_detail::field_type<protocol::OFPFW_TP_DST>>;
+    using in_port = match_field<protocol::flow_wildcards::in_port>;
+    using eth_src = dl_addr_match_field<protocol::flow_wildcards::dl_src>;
+    using eth_dst = dl_addr_match_field<protocol::flow_wildcards::dl_dst>;
+    using vlan_vid = match_field<protocol::flow_wildcards::dl_vlan>;
+    using vlan_pcp = match_field<protocol::flow_wildcards::dl_vlan_pcp>;
+    using eth_type = match_field<protocol::flow_wildcards::dl_type>;
+    using ip_dscp = match_field<protocol::flow_wildcards::nw_tos>;
+    using ip_proto = match_field<protocol::flow_wildcards::nw_proto>;
+    using ipv4_src = nw_addr_match_field<protocol::flow_wildcards::nw_src_all>;
+    using ipv4_dst = nw_addr_match_field<protocol::flow_wildcards::nw_dst_all>;
+    using arp_spa = nw_addr_match_field<protocol::flow_wildcards::nw_src_all>;
+    using arp_tpa = nw_addr_match_field<protocol::flow_wildcards::nw_dst_all>;
+    using tcp_src = match_field<protocol::flow_wildcards::tp_src>;
+    using tcp_dst = match_field<protocol::flow_wildcards::tp_dst>;
+    using udp_src = match_field<protocol::flow_wildcards::tp_src>;
+    using udp_dst = match_field<protocol::flow_wildcards::tp_dst>;
+    using icmpv4_type = match_field<protocol::flow_wildcards::tp_src>;
+    using icmpv4_code = match_field<protocol::flow_wildcards::tp_dst>;
 
   } // namespace match_fields
 

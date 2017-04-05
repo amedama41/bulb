@@ -23,19 +23,18 @@ namespace v10 {
 
   namespace match_detail {
 
-    template <class FieldType>
-    auto is_match_field_impl(
-        match_fields::match_field<FieldType> const&) noexcept
+    template <protocol::flow_wildcards Field>
+    auto is_match_field_impl(match_fields::match_field<Field> const&) noexcept
       -> std::true_type;
 
-    template <class FieldType>
+    template <protocol::flow_wildcards Field>
     auto is_match_field_impl(
-        match_fields::dl_addr_match_field<FieldType> const&) noexcept
+        match_fields::dl_addr_match_field<Field> const&) noexcept
       -> std::true_type;
 
-    template <class FieldType>
+    template <protocol::flow_wildcards Field>
     auto is_match_field_impl(
-        match_fields::nw_addr_match_field<FieldType> const&) noexcept
+        match_fields::nw_addr_match_field<Field> const&) noexcept
       -> std::true_type;
 
     auto is_match_field_impl(...) noexcept -> std::false_type;
