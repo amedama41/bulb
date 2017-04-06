@@ -22,23 +22,29 @@ namespace actions {
 
   namespace set_field_detail {
 
-    template <protocol::ofp_action_type ActionType, class OFPAction>
+    using protocol::action_type;
+
+    template <action_type ActionType, class OFPAction>
     struct ofp_action_info
     {
-      static constexpr protocol::ofp_action_type action_type = ActionType;
+      static constexpr protocol::action_type action_type = ActionType;
       using raw_ofp_type = OFPAction;
     };
 
+    template <class MatchField, action_type ActionType, class OFPAction>
+    using pair
+      = boost::fusion::pair<MatchField, ofp_action_info<ActionType, OFPAction>>;
+
     using set_field_info_table = boost::fusion::map<
-        boost::fusion::pair<match_fields::eth_src  , ofp_action_info<protocol::OFPAT_SET_DL_SRC   , protocol::ofp_action_dl_addr  > >
-      , boost::fusion::pair<match_fields::eth_dst  , ofp_action_info<protocol::OFPAT_SET_DL_DST   , protocol::ofp_action_dl_addr  > >
-      , boost::fusion::pair<match_fields::vlan_vid , ofp_action_info<protocol::OFPAT_SET_VLAN_VID , protocol::ofp_action_vlan_vid > >
-      , boost::fusion::pair<match_fields::vlan_pcp , ofp_action_info<protocol::OFPAT_SET_VLAN_PCP , protocol::ofp_action_vlan_pcp > >
-      , boost::fusion::pair<match_fields::ip_dscp  , ofp_action_info<protocol::OFPAT_SET_NW_TOS   , protocol::ofp_action_nw_tos   > >
-      , boost::fusion::pair<match_fields::ipv4_src , ofp_action_info<protocol::OFPAT_SET_NW_SRC   , protocol::ofp_action_nw_addr  > >
-      , boost::fusion::pair<match_fields::ipv4_dst , ofp_action_info<protocol::OFPAT_SET_NW_DST   , protocol::ofp_action_nw_addr  > >
-      , boost::fusion::pair<match_fields::tcp_src  , ofp_action_info<protocol::OFPAT_SET_TP_SRC   , protocol::ofp_action_tp_port  > >
-      , boost::fusion::pair<match_fields::tcp_dst  , ofp_action_info<protocol::OFPAT_SET_TP_DST   , protocol::ofp_action_tp_port  > >
+        pair<match_fields::eth_src  , action_type::set_dl_src   , protocol::ofp_action_dl_addr>
+      , pair<match_fields::eth_dst  , action_type::set_dl_dst   , protocol::ofp_action_dl_addr>
+      , pair<match_fields::vlan_vid , action_type::set_vlan_vid , protocol::ofp_action_vlan_vid>
+      , pair<match_fields::vlan_pcp , action_type::set_vlan_pcp , protocol::ofp_action_vlan_pcp>
+      , pair<match_fields::ip_dscp  , action_type::set_nw_tos   , protocol::ofp_action_nw_tos>
+      , pair<match_fields::ipv4_src , action_type::set_nw_src   , protocol::ofp_action_nw_addr>
+      , pair<match_fields::ipv4_dst , action_type::set_nw_dst   , protocol::ofp_action_nw_addr>
+      , pair<match_fields::tcp_src  , action_type::set_tp_src   , protocol::ofp_action_tp_port>
+      , pair<match_fields::tcp_dst  , action_type::set_tp_dst   , protocol::ofp_action_tp_port>
     >;
 
     template <class MatchField>
@@ -48,7 +54,7 @@ namespace actions {
         set_field_info_table, MatchField
       >::type;
 
-      static constexpr protocol::ofp_action_type action_type
+      static constexpr protocol::action_type action_type
         = ofp_action_info::action_type;
 
       using raw_ofp_type = typename ofp_action_info::raw_ofp_type;
@@ -149,7 +155,7 @@ namespace actions {
   public:
     using raw_ofp_type = typename set_field_info::raw_ofp_type;
 
-    static constexpr protocol::ofp_action_type action_type
+    static constexpr protocol::action_type action_type
       = set_field_info::action_type;
 
     explicit set_field(value_type const& value) noexcept
