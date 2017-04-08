@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_SUITE(packet_in_test)
         BOOST_TEST(sut.version() == protocol::OFP_VERSION);
         BOOST_TEST(sut.type() == protocol::OFPT_PACKET_IN);
         BOOST_TEST(sut.length() == sizeof(protocol::ofp_packet_in)
-                                 + v13::v13_detail::exact_length(match.length())
+                                 + of::detail::v13::exact_length(match.length())
                                  + data_padding_size + data.size());
         BOOST_TEST(sut.buffer_id() == buffer_id);
         BOOST_TEST(sut.total_length() == total_len);
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_SUITE(packet_in_test)
         };
 
         BOOST_TEST(sut.length() == sizeof(protocol::ofp_packet_in)
-                                 + v13::v13_detail::exact_length(match.length())
+                                 + of::detail::v13::exact_length(match.length())
                                  + data_padding_size);
         BOOST_TEST(sut.buffer_id() == buffer_id);
         BOOST_TEST(sut.total_length() == total_len);

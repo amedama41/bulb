@@ -392,7 +392,7 @@ namespace multipart_detail {
         = detail::decode_without_consumption<protocol::ofp_match>(first, last);
       oxm_match::validate_header(ofp_match);
       if (std::distance(first, last)
-          != v13_detail::exact_length(ofp_match.length)) {
+          != detail::v13::exact_length(ofp_match.length)) {
         throw exception{
             protocol::bad_request_code::bad_len
           , "too small data size for oxm_match"

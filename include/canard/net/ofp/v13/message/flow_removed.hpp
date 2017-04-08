@@ -180,7 +180,7 @@ namespace messages {
       auto const ofp_match
         = detail::decode_without_consumption<protocol::ofp_match>(first, last);
       oxm_match::validate_header(ofp_match);
-      if (v13_detail::exact_length(ofp_match.length) != match_length) {
+      if (detail::v13::exact_length(ofp_match.length) != match_length) {
         throw exception{
             protocol::bad_request_code::bad_len
           , "too small data size for oxm_match"

@@ -237,7 +237,7 @@ namespace messages {
       auto const ofp_match
         = detail::decode_without_consumption<protocol::ofp_match>(first, last);
       oxm_match::validate_header(ofp_match);
-      auto const match_length = v13_detail::exact_length(ofp_match.length);
+      auto const match_length = detail::v13::exact_length(ofp_match.length);
       if (rest_size - data_alignment_padding_size < match_length) {
         throw exception{
             protocol::bad_request_code::bad_len

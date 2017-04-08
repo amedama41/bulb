@@ -1,5 +1,5 @@
-#ifndef CANARD_NET_OFP_V13_LENGTH_UTILITY_HPP
-#define CANARD_NET_OFP_V13_LENGTH_UTILITY_HPP
+#ifndef CANARD_NET_OFP_V13_DETAIL_LENGTH_UTILITY_HPP
+#define CANARD_NET_OFP_V13_DETAIL_LENGTH_UTILITY_HPP
 
 #include <cstdint>
 
@@ -23,17 +23,8 @@ namespace v13 {
 
 } // namespace v13
 } // namespace detail
-
-namespace v13 {
-namespace v13_detail {
-
-  using detail::v13::exact_length;
-  using detail::v13::padding_length;
-
-} // namespace v13_detail
-} // namespace v13
 } // namespace ofp
 } // namespace net
 } // namespace canard
 
-#endif // CANARD_NET_OFP_V13_LENGTH_UTILITY_HPP
+#endif // CANARD_NET_OFP_V13_DETAIL_LENGTH_UTILITY_HPP
