@@ -15,21 +15,21 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 set(libbulb_srcs
-    include/canard/net/ofp/v10/impl/action_list.ipp
     include/canard/net/ofp/v10/impl/any_action.ipp
+    include/canard/net/ofp/v10/impl/action_list.ipp
     include/canard/net/ofp/v10/impl/any_queue_property.ipp
-    include/canard/net/ofp/v13/impl/any_action.ipp
-    include/canard/net/ofp/v13/impl/any_instruction.ipp
     include/canard/net/ofp/v13/impl/any_oxm_match_field.ipp
-    include/canard/net/ofp/v13/impl/any_queue_property.ipp
-    include/canard/net/ofp/v13/impl/any_hello_element.ipp
-    include/canard/net/ofp/v13/impl/any_table_feature_property.ipp
-    include/canard/net/ofp/v13/impl/any_meter_band.ipp
+    include/canard/net/ofp/v13/impl/oxm_match_field_set.ipp
+    include/canard/net/ofp/v13/impl/any_action.ipp
     include/canard/net/ofp/v13/impl/action_list.ipp
     include/canard/net/ofp/v13/impl/action_set.ipp
+    include/canard/net/ofp/v13/impl/any_instruction.ipp
     include/canard/net/ofp/v13/impl/instruction_set.ipp
-    include/canard/net/ofp/v13/impl/oxm_match_field_set.ipp
+    include/canard/net/ofp/v13/impl/any_queue_property.ipp
+    include/canard/net/ofp/v13/impl/any_hello_element.ipp
+    include/canard/net/ofp/v13/impl/any_meter_band.ipp
     include/canard/net/ofp/v13/impl/meter_band_set.ipp
+    include/canard/net/ofp/v13/impl/any_table_feature_property.ipp
     include/canard/net/ofp/v13/impl/table_feature_property_set.ipp)
 set_source_files_properties(${libbulb_srcs} PROPERTIES LANGUAGE CXX)
 
