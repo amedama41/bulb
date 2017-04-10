@@ -6,6 +6,9 @@ find_package(Boost 1.59 REQUIRED COMPONENTS system)
 
 enable_testing()
 
+option(BULB_USE_EXPLICIT_INSTANTIATION
+    "use explicit instantiation for building libbulb" ON)
+
 add_library(bulb_base INTERFACE)
 target_compile_options(bulb_base INTERFACE "-Wall" "-pedantic" "-std=c++11")
 message(STATUS "target compiler is \"${CMAKE_CXX_COMPILER_ID}\"")
@@ -37,8 +40,10 @@ add_library(bulb SHARED ${libbulb_srcs})
 set_target_properties(bulb PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(bulb PUBLIC "include")
 target_compile_options(bulb PRIVATE "-x" "c++")
-target_compile_definitions(bulb
-    PUBLIC CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
+if(BULB_USE_EXPLICIT_INSTANTIATION)
+    target_compile_definitions(bulb
+        PUBLIC CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
+endif()
 target_link_libraries(bulb PUBLIC Boost::system PRIVATE bulb_base)
 add_library(bulb::libbulb ALIAS bulb)
 
