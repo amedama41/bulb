@@ -5,11 +5,13 @@
 #include <iterator>
 #include <limits>
 #include <utility>
+#include <type_traits>
 #include <canard/net/ofp/data_type.hpp>
 #include <canard/net/ofp/detail/decode.hpp>
 #include <canard/net/ofp/detail/encode.hpp>
 #include <canard/net/ofp/detail/memcmp.hpp>
 #include <canard/net/ofp/get_xid.hpp>
+#include <canard/net/ofp/type_traits/is_message.hpp>
 #include <canard/net/ofp/v10/detail/basic_message.hpp>
 #include <canard/net/ofp/v10/detail/byteorder.hpp>
 #include <canard/net/ofp/v10/openflow.hpp>
@@ -29,7 +31,16 @@ namespace messages {
 
     static constexpr protocol::ofp_type message_type = protocol::OFPT_ERROR;
 
-    error(protocol::ofp_error_type const type
+  private:
+    static constexpr std::uint16_t max_data_size
+      = std::numeric_limits<std::uint16_t>::max() - sizeof(raw_ofp_type);
+
+    template <class Message>
+    using enable_if_is_message
+      = typename std::enable_if<type_traits::is_message<Message>::value>::type;
+
+  public:
+    error(protocol::error_type const type
         , std::uint16_t const code
         , data_type data
         , std::uint32_t const xid = get_xid()) noexcept
@@ -47,13 +58,20 @@ namespace messages {
     {
     }
 
-    template <class Message>
-    error(protocol::ofp_error_type const type
+    template <class Message, class = enable_if_is_message<Message>>
+    error(protocol::error_type const type
         , std::uint16_t const code
-        , Message const& msg
         , std::uint16_t const data_size
-        = std::numeric_limits<std::uint16_t>::max())
+        , Message const& msg)
       : error{type, code, create_data(msg, data_size), msg.xid()}
+    {
+    }
+
+    template <class Message, class = enable_if_is_message<Message>>
+    error(protocol::error_type const type
+        , std::uint16_t const code
+        , Message const& msg)
+      : error{type, code, create_data(msg, max_data_size), msg.xid()}
     {
     }
 
@@ -174,8 +192,6 @@ namespace messages {
       data.reserve(msg.length());
       msg.encode(data);
 
-      constexpr auto max_data_size
-        = std::numeric_limits<std::uint16_t>::max() - sizeof(raw_ofp_type);
       if (data_size > max_data_size) {
         data_size = max_data_size;
       }
