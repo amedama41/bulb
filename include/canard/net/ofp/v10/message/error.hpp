@@ -14,6 +14,7 @@
 #include <canard/net/ofp/type_traits/is_message.hpp>
 #include <canard/net/ofp/v10/detail/basic_message.hpp>
 #include <canard/net/ofp/v10/detail/byteorder.hpp>
+#include <canard/net/ofp/v10/error_code.hpp>
 #include <canard/net/ofp/v10/openflow.hpp>
 
 namespace canard {
@@ -67,11 +68,32 @@ namespace messages {
     {
     }
 
-    template <class Message, class = enable_if_is_message<Message>>
-    error(protocol::error_type const type
-        , std::uint16_t const code
+    template <class ErrorCode>
+    error(ErrorCode const code
+        , data_type data
+        , std::uint32_t const xid = get_xid()) noexcept
+      : error{
+          v10::error_code<ErrorCode>::error_type, code, std::move(data), xid
+        }
+    {
+    }
+
+    template <
+      class ErrorCode, class Message, class = enable_if_is_message<Message>
+    >
+    error(ErrorCode const code
+        , std::uint16_t const data_size
         , Message const& msg)
-      : error{type, code, create_data(msg, max_data_size), msg.xid()}
+      : error{code, create_data(msg, data_size), msg.xid()}
+    {
+    }
+
+    template <
+      class ErrorCode, class Message, class = enable_if_is_message<Message>
+    >
+    error(ErrorCode const code
+        , Message const& msg)
+      : error{code, create_data(msg, max_data_size), msg.xid()}
     {
     }
 
