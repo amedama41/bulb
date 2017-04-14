@@ -16,7 +16,7 @@ namespace proto = v10::protocol;
 namespace {
 struct parameters : action_fixture {
   proto::ofp_error_type type = proto::OFPET_BAD_REQUEST;
-  std::uint16_t code = proto::OFPBRC_BAD_LEN;
+  proto::ofp_bad_request_code code = proto::OFPBRC_BAD_LEN;
   std::uint32_t xid = 0x12345678;
   msg::error::data_type data
     = "\x01\x02\x03\x04\x05\x06\xa1\xa2""\xa3\xa4\xa5\xa6\x08\x00"
@@ -33,7 +33,7 @@ struct parameters : action_fixture {
   };
 };
 struct error_fixture : parameters {
-  msg::error sut{type, code, packet_out};
+  msg::error sut{code, packet_out};
   std::vector<unsigned char> bin
     = "\x01\x01\x00\x94\x11\x22\x33\x44""\x00\x01\x00\x06"
       "\x01\x0d\x00\x88\x11\x22\x33\x44""\xff\xff\xff\xff\xff\xfd\x00\x28"
@@ -87,7 +87,8 @@ BOOST_AUTO_TEST_SUITE(error)
       BOOST_TEST(sut.error_code() == code);
       BOOST_TEST((sut.data() == data));
     }
-    BOOST_FIXTURE_TEST_CASE(is_constructible_from_message, action_fixture)
+    BOOST_FIXTURE_TEST_CASE(
+        is_constructible_from_code_and_message, action_fixture)
     {
       auto const type = proto::OFPET_FLOW_MOD_FAILED;
       auto const code = proto::OFPFMFC_OVERLAP;
@@ -95,7 +96,7 @@ BOOST_AUTO_TEST_SUITE(error)
         v10::flow_entry{{v10::match{}, 1}, 1, {}}
       };
 
-      msg::error sut{type, code, req};
+      msg::error sut{code, req};
 
       BOOST_TEST(
           sut.length() == sizeof(v10::protocol::ofp_error_msg) + req.length());
@@ -116,7 +117,7 @@ BOOST_AUTO_TEST_SUITE(error)
     {
       auto const data_size = 64;
 
-      msg::error sut{type, code, packet_out, data_size};
+      msg::error sut{type, code, data_size, packet_out};
 
       BOOST_TEST(
           sut.length() == sizeof(v10::protocol::ofp_error_msg) + data_size);
@@ -161,7 +162,7 @@ BOOST_AUTO_TEST_SUITE(error)
   BOOST_FIXTURE_TEST_SUITE(equality, parameters)
     BOOST_AUTO_TEST_CASE(is_true_if_object_is_same)
     {
-      auto const sut = msg::error{type, code, packet_out};
+      auto const sut = msg::error{code, packet_out};
 
       BOOST_TEST((sut == sut));
     }

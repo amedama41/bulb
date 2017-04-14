@@ -37,13 +37,13 @@ BOOST_AUTO_TEST_SUITE(error_test)
         BOOST_TEST(sut.data() == edata, boost::test_tools::per_element{});
     }
 
-    BOOST_AUTO_TEST_CASE(construct_from_message_test)
+    BOOST_AUTO_TEST_CASE(construct_from_code_and_message_test)
     {
         auto const etype = protocol::OFPET_SWITCH_CONFIG_FAILED;
         auto const ecode = protocol::OFPSCFC_BAD_FLAGS;
         auto const msg = v13::messages::set_config{0xffff, 0xffff};
 
-        auto const sut = v13::messages::error{etype, ecode, msg};
+        auto const sut = v13::messages::error{ecode, msg};
 
         BOOST_TEST(sut.version() == protocol::OFP_VERSION);
         BOOST_TEST(sut.type() == protocol::OFPT_ERROR);
@@ -60,8 +60,7 @@ BOOST_AUTO_TEST_SUITE(error_test)
     {
         v13::messages::set_config const msg{0xff01, 0xfffe, 0x12345678};
         v13::messages::error sut = v13::messages::error{
-              protocol::OFPET_SWITCH_CONFIG_FAILED
-            , protocol::OFPSCFC_BAD_FLAGS, msg
+            protocol::OFPSCFC_BAD_FLAGS, msg
         };
         std::vector<std::uint8_t> bin_error
             = "\x04\x01\x00\x18\x12\x34\x56\x78"
