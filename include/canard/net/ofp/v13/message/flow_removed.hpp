@@ -7,6 +7,7 @@
 #include <utility>
 #include <canard/net/ofp/detail/decode.hpp>
 #include <canard/net/ofp/detail/encode.hpp>
+#include <canard/net/ofp/detail/memcmp.hpp>
 #include <canard/net/ofp/get_xid.hpp>
 #include <canard/net/ofp/v13/common/oxm_match.hpp>
 #include <canard/net/ofp/v13/detail/basic_message.hpp>
@@ -189,6 +190,13 @@ namespace messages {
       auto match = oxm_match::decode(first, last);
 
       return flow_removed{fremoved, std::move(match)};
+    }
+
+    auto equal_impl(flow_removed const& rhs) const noexcept
+      -> bool
+    {
+      return detail::memcmp(flow_removed_, rhs.flow_removed_)
+          && match_ == rhs.match_;
     }
 
     friend flow_entry_adaptor;

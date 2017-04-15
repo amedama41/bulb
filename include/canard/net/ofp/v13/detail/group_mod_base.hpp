@@ -6,6 +6,7 @@
 #include <utility>
 #include <canard/net/ofp/detail/decode.hpp>
 #include <canard/net/ofp/detail/encode.hpp>
+#include <canard/net/ofp/detail/memcmp.hpp>
 #include <canard/net/ofp/list.hpp>
 #include <canard/net/ofp/v13/common/bucket.hpp>
 #include <canard/net/ofp/v13/detail/basic_message.hpp>
@@ -164,6 +165,13 @@ namespace v13 {
       auto buckets = buckets_type::decode(first, last);
 
       return GroupMod{group_mod, std::move(buckets)};
+    }
+
+    auto equal_impl(GroupMod const& rhs) const noexcept
+      -> bool
+    {
+      return detail::memcmp(group_mod_, rhs.group_mod_)
+          && buckets_ == rhs.buckets_;
     }
 
   private:

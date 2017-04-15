@@ -7,6 +7,7 @@
 #include <canard/net/ofp/data_type.hpp>
 #include <canard/net/ofp/detail/decode.hpp>
 #include <canard/net/ofp/detail/encode.hpp>
+#include <canard/net/ofp/detail/memcmp.hpp>
 #include <canard/net/ofp/get_xid.hpp>
 #include <canard/net/ofp/v13/detail/basic_message.hpp>
 #include <canard/net/ofp/v13/detail/byteorder.hpp>
@@ -122,6 +123,13 @@ namespace messages {
         auto const data_length = header.length - sizeof(raw_ofp_type);
         auto data = ofp::decode_data(first, data_length);
         return T{header, std::move(data)};
+      }
+
+      auto equal_impl(T const& rhs) const noexcept
+        -> bool
+      {
+        return detail::memcmp(header_, rhs.header_)
+            && data_ == rhs.data_;
       }
 
     private:

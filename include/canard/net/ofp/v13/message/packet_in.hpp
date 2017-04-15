@@ -9,6 +9,7 @@
 #include <canard/net/ofp/detail/decode.hpp>
 #include <canard/net/ofp/detail/decode.hpp>
 #include <canard/net/ofp/detail/encode.hpp>
+#include <canard/net/ofp/detail/memcmp.hpp>
 #include <canard/net/ofp/detail/padding.hpp>
 #include <canard/net/ofp/get_xid.hpp>
 #include <canard/net/ofp/v13/common/oxm_match.hpp>
@@ -254,6 +255,14 @@ namespace messages {
       auto data = ofp::decode_data(first, data_length);
 
       return packet_in{pkt_in, std::move(match), std::move(data)};
+    }
+
+    auto equal_impl(packet_in const& rhs) const noexcept
+      -> bool
+    {
+      return detail::memcmp(packet_in_, rhs.packet_in_)
+          && match_ == rhs.match_
+          && data_ == rhs.data_;
     }
 
   private:

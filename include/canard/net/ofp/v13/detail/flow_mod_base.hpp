@@ -7,6 +7,7 @@
 #include <utility>
 #include <canard/net/ofp/detail/decode.hpp>
 #include <canard/net/ofp/detail/encode.hpp>
+#include <canard/net/ofp/detail/memcmp.hpp>
 #include <canard/net/ofp/list.hpp>
 #include <canard/net/ofp/v13/any_instruction.hpp>
 #include <canard/net/ofp/v13/common/oxm_match.hpp>
@@ -231,6 +232,14 @@ namespace flow_mod_detail {
       return FlowMod{
         flow_mod, std::move(match), std::move(instructions)
       };
+    }
+
+    auto equal_impl(FlowMod const& rhs) const noexcept
+      -> bool
+    {
+      return detail::memcmp(flow_mod_, rhs.flow_mod_)
+          && match_ == rhs.match_
+          && instructions_ == rhs.instructions_;
     }
 
   private:

@@ -10,6 +10,7 @@
 #include <canard/net/ofp/data_type.hpp>
 #include <canard/net/ofp/detail/decode.hpp>
 #include <canard/net/ofp/detail/encode.hpp>
+#include <canard/net/ofp/detail/memcmp.hpp>
 #include <canard/net/ofp/get_xid.hpp>
 #include <canard/net/ofp/type_traits/is_message.hpp>
 #include <canard/net/ofp/v13/detail/basic_message.hpp>
@@ -211,6 +212,13 @@ namespace messages {
       auto data = ofp::decode_data(first, data_length);
 
       return error{error_msg, std::move(data)};
+    }
+
+    auto equal_impl(error const& rhs) const noexcept
+      -> bool
+    {
+      return detail::memcmp(error_msg_, rhs.error_msg_)
+          && data_ == rhs.data();
     }
 
     template <class Message>

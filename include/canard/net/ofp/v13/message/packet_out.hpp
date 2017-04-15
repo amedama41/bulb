@@ -7,6 +7,7 @@
 #include <canard/net/ofp/data_type.hpp>
 #include <canard/net/ofp/detail/decode.hpp>
 #include <canard/net/ofp/detail/encode.hpp>
+#include <canard/net/ofp/detail/memcmp.hpp>
 #include <canard/net/ofp/get_xid.hpp>
 #include <canard/net/ofp/v13/action_list.hpp>
 #include <canard/net/ofp/v13/detail/basic_message.hpp>
@@ -210,6 +211,14 @@ namespace messages {
       auto data = ofp::decode_data(first, data_length);
 
       return packet_out{pkt_out, std::move(actions), std::move(data)};
+    }
+
+    auto equal_impl(packet_out const& rhs) const noexcept
+      -> bool
+    {
+      return detail::memcmp(packet_out_, rhs.packet_out_)
+          && actions_ == rhs.actions_
+          && data_ == rhs.data_;
     }
 
   private:

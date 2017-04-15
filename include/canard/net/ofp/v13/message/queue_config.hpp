@@ -6,6 +6,7 @@
 #include <utility>
 #include <canard/net/ofp/detail/decode.hpp>
 #include <canard/net/ofp/detail/encode.hpp>
+#include <canard/net/ofp/detail/memcmp.hpp>
 #include <canard/net/ofp/get_xid.hpp>
 #include <canard/net/ofp/list.hpp>
 #include <canard/net/ofp/v13/common/packet_queue.hpp>
@@ -186,6 +187,14 @@ namespace messages {
       auto queues = queues_type::decode(first, last);
 
       return queue_get_config_reply{queue_get_config, std::move(queues)};
+    }
+
+    auto equal_impl(queue_get_config_reply const& rhs) const noexcept
+      -> bool
+    {
+      return detail::memcmp(
+          queue_get_config_reply_, rhs.queue_get_config_reply_)
+          && queues_ == queues_;
     }
 
   private:
