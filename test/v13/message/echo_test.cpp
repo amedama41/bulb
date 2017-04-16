@@ -9,447 +9,415 @@ namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace protocol = v13::protocol;
 
+namespace {
+  struct echo_request_parameter {
+    v13::messages::echo_request::data_type data = "\x00\xff\x01\xfe"_bbin;
+    std::uint32_t xid = 0x0013fffe;
+  };
+  struct echo_request_fixture : echo_request_parameter
+  {
+    v13::messages::echo_request sut{data, xid};
+    std::vector<std::uint8_t> const bin
+      = "\x04\x02\x00\x0c\x00\x13\xff\xfe" "\x00\xff\x01\xfe"_bin;
+  };
+  struct no_data_echo_request_fixture
+  {
+    v13::messages::echo_request sut{0x0013fffe};
+    std::vector<std::uint8_t> const bin
+      = "\x04\x02\x00\x08\x00\x13\xff\xfe"_bin;
+  };
+
+  struct echo_reply_parameter {
+    v13::messages::echo_reply::data_type data = "\x00\xff\x01\xfe"_bbin;
+    std::uint32_t xid = 0x0013fffe;
+  };
+  struct echo_reply_fixture : echo_reply_parameter
+  {
+    v13::messages::echo_reply sut{data, 0x0013fffe};
+    std::vector<std::uint8_t> const bin
+      = "\x04\x03\x00\x0c\x00\x13\xff\xfe" "\x00\xff\x01\xfe"_bin;
+  };
+  struct no_data_echo_reply_fixture
+  {
+    v13::messages::echo_reply sut{0x0013fffe};
+    std::vector<std::uint8_t> const bin
+      = "\x04\x03\x00\x08\x00\x13\xff\xfe"_bin;
+  };
+}
+
 BOOST_AUTO_TEST_SUITE(message_test)
-
-BOOST_AUTO_TEST_SUITE(echo_request_test)
-
-    BOOST_AUTO_TEST_CASE(default_construct_test)
+BOOST_AUTO_TEST_SUITE(echo_request)
+  BOOST_AUTO_TEST_SUITE(constructor)
+    BOOST_AUTO_TEST_CASE(default_constructible)
     {
-        auto const sut = v13::messages::echo_request{};
+      v13::messages::echo_request const sut{};
 
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
-        BOOST_TEST(sut.data_length() == 0);
-        BOOST_TEST(sut.data().empty());
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REQUEST);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
+      BOOST_TEST(sut.data().empty());
     }
-
-    BOOST_AUTO_TEST_CASE(construct_from_xid_test)
+    BOOST_AUTO_TEST_CASE(constructible_from_xid)
     {
-        auto const xid = 0xffffffff;
+      auto const xid = 0xffffffff;
 
-        auto const sut = v13::messages::echo_request{xid};
+      v13::messages::echo_request const sut{xid};
 
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
-        BOOST_TEST(sut.xid() == xid);
-        BOOST_TEST(sut.data_length() == 0);
-        BOOST_TEST(sut.data().empty());
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REQUEST);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
+      BOOST_TEST(sut.xid() == xid);
+      BOOST_TEST(sut.data().empty());
     }
-
-    BOOST_AUTO_TEST_CASE(construct_from_data_test)
+    BOOST_AUTO_TEST_CASE(constructible_from_data)
     {
-        auto const data = "\x01\x02\x03\x04"_bbin;
+      auto const data = "\x01\x02\x03\x04"_bbin;
 
-        auto const sut = v13::messages::echo_request{data};
+      v13::messages::echo_request const sut{data};
 
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header) + data.size());
-        BOOST_TEST(sut.data_length() == data.size());
-        BOOST_TEST(sut.data() == data, boost::test_tools::per_element{});
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REQUEST);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_header) + data.size());
+      BOOST_TEST(sut.data() == data, boost::test_tools::per_element{});
     }
-
-    BOOST_AUTO_TEST_CASE(construct_from_data_and_xid_test)
+    BOOST_AUTO_TEST_CASE(constructible_from_data_and_xid)
     {
-        auto const data = "\xff\xff\xff\xff"_bbin;
-        auto const xid = 0xfefefefe;
+      auto const data = "\xff\xff\xff\xff"_bbin;
+      auto const xid = 0xfefefefe;
 
-        auto const sut = v13::messages::echo_request{data, xid};
+      v13::messages::echo_request const sut{data, xid};
 
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header) + data.size());
-        BOOST_TEST(sut.xid() == xid);
-        BOOST_TEST(sut.data_length() == data.size());
-        BOOST_TEST(sut.data() == data, boost::test_tools::per_element{});
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REQUEST);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_header) + data.size());
+      BOOST_TEST(sut.xid() == xid);
+      BOOST_TEST(sut.data() == data, boost::test_tools::per_element{});
     }
-
-
-    struct echo_request_fixture
+    BOOST_FIXTURE_TEST_CASE(copy_constructible, echo_request_fixture)
     {
-        v13::messages::echo_request::data_type data = "\x00\xff\x01\xfe"_bbin;
-        v13::messages::echo_request sut{data, 0x0013fffe};
-        std::vector<std::uint8_t> const echo_request_bin
-            = "\x04\x02\x00\x0c\x00\x13\xff\xfe" "\x00\xff\x01\xfe"_bin;
-    };
+      auto const copy = sut;
 
-    BOOST_FIXTURE_TEST_CASE(copy_construct_test, echo_request_fixture)
-    {
-        auto const copy = sut;
-
-        BOOST_TEST(copy.version() == sut.version());
-        BOOST_TEST(copy.type() == sut.type());
-        BOOST_TEST(copy.length() == sut.length());
-        BOOST_TEST(copy.xid() == sut.xid());
-        BOOST_TEST(copy.data_length() == sut.data_length());
-        BOOST_TEST((copy.data() == sut.data()));
+      BOOST_TEST((copy == sut));
     }
-
-    BOOST_FIXTURE_TEST_CASE(move_construct_test, echo_request_fixture)
+    BOOST_FIXTURE_TEST_CASE(move_constructible, echo_request_fixture)
     {
-        auto src = sut;
+      auto moved = sut;
 
-        auto copy = std::move(src);
+      auto copy = std::move(moved);
 
-        BOOST_TEST(copy.version() == sut.version());
-        BOOST_TEST(copy.type() == sut.type());
-        BOOST_TEST(copy.length() == sut.length());
-        BOOST_TEST(copy.xid() == sut.xid());
-        BOOST_TEST(copy.data_length() == sut.data_length());
-        BOOST_TEST((copy.data() == sut.data()));
-
-        BOOST_TEST(src.length() == sizeof(protocol::ofp_header));
-        BOOST_TEST(src.data_length() == 0);
-        BOOST_TEST(src.data().empty());
+      BOOST_TEST((copy == sut));
+      BOOST_TEST(moved.length() == sizeof(protocol::ofp_header));
+      BOOST_TEST(moved.data().empty());
     }
+  BOOST_AUTO_TEST_SUITE_END() // constructor
 
-    BOOST_FIXTURE_TEST_CASE(copy_assignment_test, echo_request_fixture)
+  BOOST_FIXTURE_TEST_SUITE(assignment, echo_request_fixture)
+    BOOST_AUTO_TEST_CASE(copy_assignable)
     {
-        auto copy = v13::messages::echo_request{};
+      auto copy = v13::messages::echo_request{};
 
-        copy = sut;
+      copy = sut;
 
-        BOOST_TEST(copy.version() == sut.version());
-        BOOST_TEST(copy.type() == sut.type());
-        BOOST_TEST(copy.length() == sut.length());
-        BOOST_TEST(copy.xid() == sut.xid());
-        BOOST_TEST(copy.data_length() == sut.data_length());
-        BOOST_TEST((copy.data() == sut.data()));
+      BOOST_TEST((copy == sut));
     }
-
-    BOOST_FIXTURE_TEST_CASE(move_assignment_test, echo_request_fixture)
+    BOOST_AUTO_TEST_CASE(move_assignable)
     {
-        auto src = sut;
-        auto copy = v13::messages::echo_request{};
+      auto moved = sut;
+      auto copy = v13::messages::echo_request{};
 
-        copy = std::move(src);
+      copy = std::move(moved);
 
-        BOOST_TEST(copy.version() == sut.version());
-        BOOST_TEST(copy.type() == sut.type());
-        BOOST_TEST(copy.length() == sut.length());
-        BOOST_TEST(copy.xid() == sut.xid());
-        BOOST_TEST(copy.data_length() == sut.data_length());
-        BOOST_TEST((copy.data() == sut.data()));
-
-        BOOST_TEST(src.length() == sizeof(protocol::ofp_header));
-        BOOST_TEST(src.data_length() == 0);
-        BOOST_TEST(src.data().empty());
+      BOOST_TEST((copy == sut));
+      BOOST_TEST(moved.length() == sizeof(protocol::ofp_header));
+      BOOST_TEST(moved.data().empty());
     }
+  BOOST_AUTO_TEST_SUITE_END() // assignment
 
-    BOOST_FIXTURE_TEST_CASE(extract_data_test, echo_request_fixture)
+  BOOST_FIXTURE_TEST_SUITE(equality, echo_request_parameter)
+    BOOST_AUTO_TEST_CASE(true_if_same_object)
     {
-        auto const extracted_data = sut.extract_data();
+      auto const sut = v13::messages::echo_request{data, xid};
 
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
-        BOOST_TEST(sut.data_length() == 0);
-        BOOST_TEST(sut.data().empty());
-
-        BOOST_TEST(extracted_data == data, boost::test_tools::per_element{});
+      BOOST_TEST((sut == sut));
     }
-
-    BOOST_FIXTURE_TEST_CASE(encode_test, echo_request_fixture)
+    BOOST_AUTO_TEST_CASE(true_if_values_are_equal)
     {
-        auto buffer = std::vector<unsigned char>{};
-
-        sut.encode(buffer);
-
-        BOOST_TEST(buffer.size() == sut.length());
-        BOOST_TEST(buffer == echo_request_bin);
+      BOOST_TEST(
+          (v13::messages::echo_request{data, xid}
+        == v13::messages::echo_request{data, xid}));
     }
-
-    BOOST_FIXTURE_TEST_CASE(decode_test, echo_request_fixture)
+    BOOST_AUTO_TEST_CASE(false_if_data_is_not_equal)
     {
-        auto it = echo_request_bin.begin();
-        auto it_end = echo_request_bin.end();
-
-        auto const echo = v13::messages::echo_request::decode(it, it_end);
-
-        BOOST_TEST((it == it_end));
-
-        BOOST_TEST(echo.version() == sut.version());
-        BOOST_TEST(echo.type() == sut.type());
-        BOOST_TEST(echo.length() == sut.length());
-        BOOST_TEST(echo.xid() == sut.xid());
-        BOOST_TEST(echo.data_length() == sut.data_length());
-        BOOST_TEST((echo.data() == sut.data()));
+      BOOST_TEST(
+          (v13::messages::echo_request{"1"_bbin, xid}
+        != v13::messages::echo_request{"2"_bbin, xid}));
     }
-
-    struct no_data_echo_request_fixture
+    BOOST_AUTO_TEST_CASE(false_if_xid_is_not_equal)
     {
-        v13::messages::echo_request sut{0x0013fffe};
-        std::vector<std::uint8_t> const echo_request_bin
-            = "\x04\x02\x00\x08\x00\x13\xff\xfe"_bin;
-    };
-
-    BOOST_FIXTURE_TEST_CASE(no_data_encode_test, no_data_echo_request_fixture)
-    {
-        auto buffer = std::vector<unsigned char>{};
-
-        sut.encode(buffer);
-
-        BOOST_TEST(buffer.size() == sut.length());
-        BOOST_TEST(buffer == echo_request_bin);
+      BOOST_TEST(
+          (v13::messages::echo_request{data, 1}
+        != v13::messages::echo_request{data, 2}));
     }
+  BOOST_AUTO_TEST_SUITE_END() // equality
 
-    BOOST_FIXTURE_TEST_CASE(no_data_decode_test, no_data_echo_request_fixture)
+  BOOST_AUTO_TEST_SUITE(extract_data)
+    BOOST_FIXTURE_TEST_CASE(move_data_ownership, echo_request_fixture)
     {
-        auto it = echo_request_bin.begin();
-        auto it_end = echo_request_bin.end();
+      auto const org_data = sut.data();
 
-        auto const echo = v13::messages::echo_request::decode(it, it_end);
+      auto const extracted_data = sut.extract_data();
 
-        BOOST_TEST((it == it_end));
-
-        BOOST_TEST(echo.version() == sut.version());
-        BOOST_TEST(echo.type() == sut.type());
-        BOOST_TEST(echo.length() == sut.length());
-        BOOST_TEST(echo.xid() == sut.xid());
-        BOOST_TEST(echo.data_length() == 0);
-        BOOST_TEST(echo.data().empty());
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
+      BOOST_TEST(sut.data().empty());
+      BOOST_TEST(extracted_data == org_data, boost::test_tools::per_element{});
     }
+  BOOST_AUTO_TEST_SUITE_END() // extract_data
 
-BOOST_AUTO_TEST_SUITE_END() // echo_request_test
-
-
-BOOST_AUTO_TEST_SUITE(echo_reply_test)
-
-    BOOST_AUTO_TEST_CASE(default_construct_test)
+  BOOST_AUTO_TEST_SUITE(encode)
+    BOOST_FIXTURE_TEST_CASE(generate_binary, echo_request_fixture)
     {
-        auto const sut = v13::messages::echo_reply{};
+      auto buffer = std::vector<unsigned char>{};
 
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REPLY);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
-        BOOST_TEST(sut.data_length() == 0);
-        BOOST_TEST(sut.data().empty());
+      sut.encode(buffer);
+
+      BOOST_TEST(buffer.size() == sut.byte_length());
+      BOOST_TEST(buffer == bin);
     }
-
-    BOOST_AUTO_TEST_CASE(construct_from_xid_test)
+    BOOST_FIXTURE_TEST_CASE(
+        generate_binary_from_no_data_echo, no_data_echo_request_fixture)
     {
-        auto const xid = 0xffffffff;
+      auto buffer = std::vector<unsigned char>{};
 
-        auto const sut = v13::messages::echo_reply{xid};
+      sut.encode(buffer);
 
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REPLY);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
-        BOOST_TEST(sut.xid() == xid);
-        BOOST_TEST(sut.data_length() == 0);
-        BOOST_TEST(sut.data().empty());
+      BOOST_TEST(buffer.size() == sut.byte_length());
+      BOOST_TEST(buffer == bin);
     }
+  BOOST_AUTO_TEST_SUITE_END() // encode
 
-    BOOST_AUTO_TEST_CASE(construct_from_data_test)
+  BOOST_AUTO_TEST_SUITE(decode)
+    BOOST_FIXTURE_TEST_CASE(constructible_from_binary, echo_request_fixture)
     {
-        auto const data = "\x01\x02\x03\x04"_bbin;
+      auto it = bin.begin();
 
-        auto const sut = v13::messages::echo_reply{data};
+      auto const echo = v13::messages::echo_request::decode(it, bin.end());
 
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REPLY);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header) + data.size());
-        BOOST_TEST(sut.data_length() == data.size());
-        BOOST_TEST(sut.data() == data, boost::test_tools::per_element{});
+      BOOST_TEST((it == bin.end()));
+      BOOST_TEST((echo == sut));
     }
-
-    BOOST_AUTO_TEST_CASE(construct_from_data_and_xid_test)
+    BOOST_FIXTURE_TEST_CASE(
+        constructible_from_no_data_binary, no_data_echo_request_fixture)
     {
-        auto const data = "\xff\xff\xff\xff"_bbin;
-        auto const xid = 0xfefefefe;
+      auto it = bin.begin();
 
-        auto const sut = v13::messages::echo_reply{data, xid};
+      auto const echo = v13::messages::echo_request::decode(it, bin.end());
 
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REPLY);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header) + data.size());
-        BOOST_TEST(sut.xid() == xid);
-        BOOST_TEST(sut.data_length() == data.size());
-        BOOST_TEST(sut.data() == data, boost::test_tools::per_element{});
+      BOOST_TEST((it == bin.end()));
+      BOOST_TEST((echo == sut));
     }
+  BOOST_AUTO_TEST_SUITE_END() // decode
+BOOST_AUTO_TEST_SUITE_END() // echo_request
 
-    BOOST_AUTO_TEST_CASE(construct_from_lvalue_echo_request_test)
+BOOST_AUTO_TEST_SUITE(echo_reply)
+  BOOST_AUTO_TEST_SUITE(constructor)
+    BOOST_AUTO_TEST_CASE(default_constructible)
     {
-        auto const data = "\xff\xff\xff\xff"_bbin;
-        auto const xid = 0xfefefefe;
-        auto const request
-            = v13::messages::echo_request{data, xid};
+      v13::messages::echo_reply const sut{};
 
-        auto const sut = v13::messages::echo_reply{request};
-
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REPLY);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header) + data.size());
-        BOOST_TEST(sut.xid() == xid);
-        BOOST_TEST(sut.data_length() == data.size());
-        BOOST_TEST(sut.data() == data, boost::test_tools::per_element{});
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REPLY);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
+      BOOST_TEST(sut.data().empty());
     }
-
-    BOOST_AUTO_TEST_CASE(construct_from_rvalue_echo_request_test)
+    BOOST_AUTO_TEST_CASE(constructible_from_xid)
     {
-        auto const data = "\xff\xff\xff\xff"_bbin;
-        auto const xid = 0xfefefefe;
-        auto request = v13::messages::echo_request{data, xid};
+      auto const xid = 0xffffffff;
 
-        auto const sut = v13::messages::echo_reply{std::move(request)};
+      v13::messages::echo_reply const sut{xid};
 
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REPLY);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header) + data.size());
-        BOOST_TEST(sut.xid() == xid);
-        BOOST_TEST(sut.data_length() == data.size());
-        BOOST_TEST(sut.data() == data, boost::test_tools::per_element{});
-
-        BOOST_TEST(request.length() == sizeof(protocol::ofp_header));
-        BOOST_TEST(request.data_length() == 0);
-        BOOST_TEST(request.data().empty());
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REPLY);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
+      BOOST_TEST(sut.xid() == xid);
+      BOOST_TEST(sut.data().empty());
     }
-
-    struct echo_reply_fixture
+    BOOST_AUTO_TEST_CASE(constructible_from_data)
     {
-        v13::messages::echo_reply::data_type data = "\x00\xff\x01\xfe"_bbin;
-        v13::messages::echo_reply sut{data, 0x0013fffe};
-        std::vector<std::uint8_t> const echo_reply_bin
-            = "\x04\x03\x00\x0c\x00\x13\xff\xfe" "\x00\xff\x01\xfe"_bin;
-    };
+      auto const data = "\x01\x02\x03\x04"_bbin;
 
-    BOOST_FIXTURE_TEST_CASE(copy_construct_test, echo_reply_fixture)
-    {
-        auto const copy = sut;
+      v13::messages::echo_reply const sut{data};
 
-        BOOST_TEST(copy.version() == sut.version());
-        BOOST_TEST(copy.type() == sut.type());
-        BOOST_TEST(copy.length() == sut.length());
-        BOOST_TEST(copy.xid() == sut.xid());
-        BOOST_TEST(copy.data_length() == sut.data_length());
-        BOOST_TEST((copy.data() == sut.data()));
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REPLY);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_header) + data.size());
+      BOOST_TEST(sut.data() == data, boost::test_tools::per_element{});
     }
-
-    BOOST_FIXTURE_TEST_CASE(move_construct_test, echo_reply_fixture)
+    BOOST_AUTO_TEST_CASE(constructible_from_data_and_xid)
     {
-        auto src = sut;
+      auto const data = "\xff\xff\xff\xff"_bbin;
+      auto const xid = 0xfefefefe;
 
-        auto copy = std::move(src);
+      v13::messages::echo_reply const sut{data, xid};
 
-        BOOST_TEST(copy.version() == sut.version());
-        BOOST_TEST(copy.type() == sut.type());
-        BOOST_TEST(copy.length() == sut.length());
-        BOOST_TEST(copy.xid() == sut.xid());
-        BOOST_TEST(copy.data_length() == sut.data_length());
-        BOOST_TEST((copy.data() == sut.data()));
-
-        BOOST_TEST(src.length() == sizeof(protocol::ofp_header));
-        BOOST_TEST(src.data_length() == 0);
-        BOOST_TEST(src.data().empty());
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REPLY);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_header) + data.size());
+      BOOST_TEST(sut.xid() == xid);
+      BOOST_TEST(sut.data() == data, boost::test_tools::per_element{});
     }
-
-    BOOST_FIXTURE_TEST_CASE(copy_assignment_test, echo_reply_fixture)
+    BOOST_AUTO_TEST_CASE(constructible_from_lvalue_echo_request)
     {
-        auto copy = v13::messages::echo_reply{};
+      auto const data = "\xff\xff\xff\xff"_bbin;
+      auto const xid = 0xfefefefe;
+      auto const request = v13::messages::echo_request{data, xid};
 
-        copy = sut;
+      v13::messages::echo_reply const sut{request};
 
-        BOOST_TEST(copy.version() == sut.version());
-        BOOST_TEST(copy.type() == sut.type());
-        BOOST_TEST(copy.length() == sut.length());
-        BOOST_TEST(copy.xid() == sut.xid());
-        BOOST_TEST(copy.data_length() == sut.data_length());
-        BOOST_TEST((copy.data() == sut.data()));
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REPLY);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_header) + data.size());
+      BOOST_TEST(sut.xid() == xid);
+      BOOST_TEST(sut.data() == data, boost::test_tools::per_element{});
     }
-
-    BOOST_FIXTURE_TEST_CASE(move_assignment_test, echo_reply_fixture)
+    BOOST_AUTO_TEST_CASE(constructible_from_rvalue_echo_request)
     {
-        auto src = sut;
-        auto copy = v13::messages::echo_reply{};
+      auto const data = "\xff\xff\xff\xff"_bbin;
+      auto const xid = 0xfefefefe;
+      auto request = v13::messages::echo_request{data, xid};
 
-        copy = std::move(src);
+      v13::messages::echo_reply const sut{std::move(request)};
 
-        BOOST_TEST(copy.version() == sut.version());
-        BOOST_TEST(copy.type() == sut.type());
-        BOOST_TEST(copy.length() == sut.length());
-        BOOST_TEST(copy.xid() == sut.xid());
-        BOOST_TEST(copy.data_length() == sut.data_length());
-        BOOST_TEST((copy.data() == sut.data()));
-
-        BOOST_TEST(src.length() == sizeof(protocol::ofp_header));
-        BOOST_TEST(src.data_length() == 0);
-        BOOST_TEST(src.data().empty());
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_ECHO_REPLY);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_header) + data.size());
+      BOOST_TEST(sut.xid() == xid);
+      BOOST_TEST(sut.data() == data, boost::test_tools::per_element{});
+      BOOST_TEST(request.length() == sizeof(protocol::ofp_header));
+      BOOST_TEST(request.data().empty());
     }
-
-    BOOST_FIXTURE_TEST_CASE(extract_data_test, echo_reply_fixture)
+    BOOST_FIXTURE_TEST_CASE(copy_constructible, echo_reply_fixture)
     {
-        auto const extracted_data = sut.extract_data();
+      auto const copy = sut;
 
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
-        BOOST_TEST(sut.data_length() == 0);
-        BOOST_TEST(sut.data().empty());
-        BOOST_TEST(extracted_data == data, boost::test_tools::per_element{});
+      BOOST_TEST((copy == sut));
     }
-
-    BOOST_FIXTURE_TEST_CASE(encode_test, echo_reply_fixture)
+    BOOST_FIXTURE_TEST_CASE(move_constructible, echo_reply_fixture)
     {
-        auto buffer = std::vector<unsigned char>{};
+      auto moved = sut;
 
-        sut.encode(buffer);
+      auto copy = std::move(moved);
 
-        BOOST_TEST(buffer.size() == sut.length());
-        BOOST_TEST(buffer == echo_reply_bin);
+      BOOST_TEST((copy == sut));
+      BOOST_TEST(moved.length() == sizeof(protocol::ofp_header));
+      BOOST_TEST(moved.data().empty());
     }
+  BOOST_AUTO_TEST_SUITE_END() // constructor
 
-    BOOST_FIXTURE_TEST_CASE(decode_test, echo_reply_fixture)
+  BOOST_FIXTURE_TEST_SUITE(assignment, echo_reply_fixture)
+    BOOST_AUTO_TEST_CASE(copy_assignable)
     {
-        auto it = echo_reply_bin.begin();
-        auto it_end = echo_reply_bin.end();
+      auto copy = v13::messages::echo_reply{};
 
-        auto const echo = v13::messages::echo_reply::decode(it, it_end);
+      copy = sut;
 
-        BOOST_TEST((it == it_end));
-
-        BOOST_TEST(echo.version() == sut.version());
-        BOOST_TEST(echo.type() == sut.type());
-        BOOST_TEST(echo.length() == sut.length());
-        BOOST_TEST(echo.xid() == sut.xid());
-        BOOST_TEST(echo.data_length() == sut.data_length());
-        BOOST_TEST((echo.data() == sut.data()));
+      BOOST_TEST((copy == sut));
     }
-
-    struct no_data_echo_reply_fixture
+    BOOST_AUTO_TEST_CASE(move_assignable)
     {
-        v13::messages::echo_reply sut{0x0013fffe};
-        std::vector<std::uint8_t> const echo_reply_bin
-            = "\x04\x03\x00\x08\x00\x13\xff\xfe"_bin;
-    };
+      auto moved = sut;
+      auto copy = v13::messages::echo_reply{};
 
-    BOOST_FIXTURE_TEST_CASE(no_data_encode_test, no_data_echo_reply_fixture)
-    {
-        auto buffer = std::vector<unsigned char>{};
+      copy = std::move(moved);
 
-        sut.encode(buffer);
-
-        BOOST_TEST(buffer.size() == sut.length());
-        BOOST_TEST(buffer == echo_reply_bin);
+      BOOST_TEST((copy == sut));
+      BOOST_TEST(moved.length() == sizeof(protocol::ofp_header));
+      BOOST_TEST(moved.data().empty());
     }
+  BOOST_AUTO_TEST_SUITE_END() // assignment
 
-    BOOST_FIXTURE_TEST_CASE(no_data_decode_test, no_data_echo_reply_fixture)
+  BOOST_FIXTURE_TEST_SUITE(equality, echo_reply_parameter)
+    BOOST_AUTO_TEST_CASE(true_if_same_object)
     {
-        auto it = echo_reply_bin.begin();
-        auto it_end = echo_reply_bin.end();
+      auto const sut = v13::messages::echo_reply{data, xid};
 
-        auto const echo = v13::messages::echo_reply::decode(it, it_end);
-
-        BOOST_TEST((it == it_end));
-
-        BOOST_TEST(echo.version() == sut.version());
-        BOOST_TEST(echo.type() == sut.type());
-        BOOST_TEST(echo.length() == sut.length());
-        BOOST_TEST(echo.xid() == sut.xid());
-        BOOST_TEST(echo.data_length() == 0);
-        BOOST_TEST(echo.data().empty());
+      BOOST_TEST((sut == sut));
     }
+    BOOST_AUTO_TEST_CASE(true_if_values_are_equal)
+    {
+      BOOST_TEST(
+          (v13::messages::echo_reply{data, xid}
+        == v13::messages::echo_reply{data, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_data_is_not_equal)
+    {
+      BOOST_TEST(
+          (v13::messages::echo_reply{"1"_bbin, xid}
+        != v13::messages::echo_reply{"2"_bbin, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_xid_is_not_equal)
+    {
+      BOOST_TEST(
+          (v13::messages::echo_reply{data, 1}
+        != v13::messages::echo_reply{data, 2}));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // equality
 
+  BOOST_AUTO_TEST_SUITE(extract_data)
+    BOOST_FIXTURE_TEST_CASE(move_data_ownership, echo_reply_fixture)
+    {
+      auto const org_data = sut.data();
 
-BOOST_AUTO_TEST_SUITE_END() // echo_reply_test
+      auto const extracted_data = sut.extract_data();
 
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
+      BOOST_TEST(sut.data().empty());
+      BOOST_TEST(extracted_data == org_data, boost::test_tools::per_element{});
+    }
+  BOOST_AUTO_TEST_SUITE_END() // extract_data
 
+  BOOST_AUTO_TEST_SUITE(encode)
+    BOOST_FIXTURE_TEST_CASE(generate_binary, echo_reply_fixture)
+    {
+      auto buffer = std::vector<unsigned char>{};
+
+      sut.encode(buffer);
+
+      BOOST_TEST(buffer.size() == sut.byte_length());
+      BOOST_TEST(buffer == bin);
+    }
+    BOOST_FIXTURE_TEST_CASE(
+        generate_binary_from_no_data_echo, no_data_echo_reply_fixture)
+    {
+      auto buffer = std::vector<unsigned char>{};
+
+      sut.encode(buffer);
+
+      BOOST_TEST(buffer.size() == sut.byte_length());
+      BOOST_TEST(buffer == bin);
+    }
+  BOOST_AUTO_TEST_SUITE_END() // encode
+
+  BOOST_AUTO_TEST_SUITE(decode)
+    BOOST_FIXTURE_TEST_CASE(constructible_from_binary, echo_reply_fixture)
+    {
+      auto it = bin.begin();
+
+      auto const echo = v13::messages::echo_reply::decode(it, bin.end());
+
+      BOOST_TEST((it == bin.end()));
+      BOOST_TEST((echo == sut));
+    }
+    BOOST_FIXTURE_TEST_CASE(
+        constructible_from_no_data_binary, no_data_echo_reply_fixture)
+    {
+      auto it = bin.begin();
+
+      auto const echo = v13::messages::echo_reply::decode(it, bin.end());
+
+      BOOST_TEST((it == bin.end()));
+      BOOST_TEST((echo == sut));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // decode
+BOOST_AUTO_TEST_SUITE_END() // echo_reply
 BOOST_AUTO_TEST_SUITE_END() // message_test
 
