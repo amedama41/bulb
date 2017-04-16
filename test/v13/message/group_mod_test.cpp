@@ -26,16 +26,12 @@ struct group_add_parameters {
   actions::set_ipv4_src set_ipv4_src{address_v4{0x7f000001}};
   actions::set_ipv4_dst set_ipv4_dst{address_v4{0x7f000002}};
   actions::output output2{0x87654321};
+  v13::bucket bucket1{weight1, { push_vlan, vlan_vid, output1 }};
+  v13::bucket bucket2{weight2, { set_ipv4_src, set_ipv4_dst, output2 }};
   std::uint32_t xid = 0x12345678;
 };
 struct group_add_fixture : group_add_parameters {
-  msg::group_add sut{
-      group_id, group_type, {
-          v13::bucket{weight1, { push_vlan, vlan_vid, output1 }}
-        , v13::bucket{weight2, { set_ipv4_src, set_ipv4_dst, output2 }}
-      }
-    , xid
-  };
+  msg::group_add sut{group_id, group_type, { bucket1, bucket2 }, xid};
   std::vector<unsigned char> bin
     = "\x04\x0f\x00\x88\x12\x34\x56\x78""\x00\x00\x01\x00\x01\x02\x03\x04"
       "\x00\x38\x11\x22\xff\xff\xff\xff""\xff\xff\xff\xff\x00\x00\x00\x00"
@@ -48,10 +44,12 @@ struct group_add_fixture : group_add_parameters {
       "\x00\x00\x00\x10\x87\x65\x43\x21""\xff\xff\x00\x00\x00\x00\x00\x00"
       ""_bin;
 };
-struct group_delete_fixture {
-  msg::group_delete sut{
-    protocol::OFPG_MAX, 0x12345678
-  };
+struct group_delete_parameters {
+  protocol::group group_id = protocol::OFPG_MAX;
+  std::uint32_t xid = 0x12345678;
+};
+struct group_delete_fixture : group_delete_parameters {
+  msg::group_delete sut{group_id, xid};
   std::vector<unsigned char> bin
     = "\x04\x0f\x00\x10\x12\x34\x56\x78""\x00\x02\x00\x00\xff\xff\xff\x00"
       ""_bin;
@@ -59,17 +57,16 @@ struct group_delete_fixture {
 }
 
 BOOST_AUTO_TEST_SUITE(message_test)
-
-BOOST_AUTO_TEST_SUITE(group_add_test)
+BOOST_AUTO_TEST_SUITE(group_add)
   BOOST_AUTO_TEST_SUITE(constructor)
     BOOST_AUTO_TEST_CASE(
         is_constructible_from_group_id_and_type_and_single_bucket)
     {
       auto const group_id = 0;
-      auto const sut = msg::group_add{
-          group_id, protocol::OFPGT_INDIRECT
-        , {v13::bucket{actions::output{4}}}
-      };
+      auto const buckets
+        = msg::group_add::buckets_type{v13::bucket{actions::output{4}}};
+
+      msg::group_add const sut{group_id, protocol::OFPGT_INDIRECT, buckets};
 
       BOOST_TEST(sut.version() == protocol::OFP_VERSION);
       BOOST_TEST(sut.type() == protocol::OFPT_GROUP_MOD);
@@ -77,7 +74,7 @@ BOOST_AUTO_TEST_SUITE(group_add_test)
       BOOST_TEST(sut.command() == protocol::OFPGC_ADD);
       BOOST_TEST(sut.group_id() == group_id);
       BOOST_TEST(sut.group_type() == protocol::OFPGT_INDIRECT);
-      BOOST_TEST(sut.buckets().size() == 1);
+      BOOST_TEST((sut.buckets() == buckets));
     }
     BOOST_AUTO_TEST_CASE(is_move_constructible)
     {
@@ -88,20 +85,54 @@ BOOST_AUTO_TEST_SUITE(group_add_test)
             , v13::bucket{1, {actions::set_vlan_vid{4}, actions::output{2}}} // 16 + 16 + 16 = 48
           }
       };
+      auto moved = sut;
 
-      auto const copy = std::move(sut);
+      auto const copy = std::move(moved);
 
-      BOOST_TEST(copy.version() == sut.version());
-      BOOST_TEST(copy.type() == sut.type());
-      BOOST_TEST(copy.length() == sizeof(protocol::ofp_group_mod) + 40 + 48);
-      BOOST_TEST(copy.command() == sut.command());
-      BOOST_TEST(copy.group_id() == sut.group_id());
-      BOOST_TEST(copy.group_type() == sut.group_type());
-      BOOST_TEST(copy.buckets().size() == 2);
-
-      BOOST_TEST(sut.buckets().size() == 0);
+      BOOST_TEST((copy == sut));
+      BOOST_TEST(moved.buckets().size() == 0);
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor
+
+  BOOST_FIXTURE_TEST_SUITE(equality, group_add_parameters)
+    BOOST_AUTO_TEST_CASE(true_if_same_object)
+    {
+      auto const sut
+        = msg::group_add{group_id, group_type, { bucket1, bucket2 }, xid};
+
+      BOOST_TEST((sut == sut));
+    }
+    BOOST_AUTO_TEST_CASE(true_if_values_are_equal)
+    {
+      BOOST_TEST(
+          (msg::group_add{group_id, group_type, { bucket1, bucket2 }, xid}
+        == msg::group_add{group_id, group_type, { bucket1, bucket2 }, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_group_id_is_not_equal)
+    {
+      BOOST_TEST(
+          (msg::group_add{1, group_type, { bucket1, bucket2 }, xid}
+        != msg::group_add{2, group_type, { bucket1, bucket2 }, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_group_type_is_not_equal)
+    {
+      BOOST_TEST(
+          (msg::group_add{group_id, 1, { bucket1, bucket2 }, xid}
+        != msg::group_add{group_id, 2, { bucket1, bucket2 }, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_buckets_is_not_equal)
+    {
+      BOOST_TEST(
+          (msg::group_add{group_id, group_type, { bucket1, bucket2 }, xid}
+        != msg::group_add{group_id, group_type, { bucket2, bucket1 }, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_xid_is_not_equal)
+    {
+      BOOST_TEST(
+          (msg::group_add{group_id, group_type, { bucket1, bucket2 }, 1}
+        != msg::group_add{group_id, group_type, { bucket1, bucket2 }, 2}));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // equality
 
   BOOST_AUTO_TEST_SUITE(encode)
     BOOST_FIXTURE_TEST_CASE(generate_binary, group_add_fixture)
@@ -120,28 +151,21 @@ BOOST_AUTO_TEST_SUITE(group_add_test)
     {
       auto it = bin.begin();
 
-      auto const decoded_message = msg::group_add::decode(it, bin.end());
+      auto const group_add = msg::group_add::decode(it, bin.end());
+
       BOOST_TEST((it == bin.end()));
-      BOOST_TEST(decoded_message.version() == sut.version());
-      BOOST_TEST(decoded_message.type() == sut.type());
-      BOOST_TEST(decoded_message.length() == sut.length());
-      BOOST_TEST(decoded_message.xid() == sut.xid());
-      BOOST_TEST(decoded_message.command() == sut.command());
-      BOOST_TEST(decoded_message.group_id() == sut.group_id());
-      BOOST_TEST(decoded_message.group_type() == sut.group_type());
-      BOOST_TEST(decoded_message.buckets().size() == sut.buckets().size());
+      BOOST_TEST((group_add == sut));
     }
   BOOST_AUTO_TEST_SUITE_END() // decode
+BOOST_AUTO_TEST_SUITE_END() // group_add
 
-BOOST_AUTO_TEST_SUITE_END() // group_add_test
-
-BOOST_AUTO_TEST_SUITE(group_delete_test)
-
+BOOST_AUTO_TEST_SUITE(group_delete)
   BOOST_AUTO_TEST_SUITE(constructor)
     BOOST_AUTO_TEST_CASE(is_constructible_from_group_id)
     {
       auto const group_id = protocol::OFPG_ANY;
-      auto const sut = msg::group_delete{group_id};
+
+      msg::group_delete const sut{group_id};
 
       BOOST_TEST(sut.version() == protocol::OFP_VERSION);
       BOOST_TEST(sut.type() == protocol::OFPT_GROUP_MOD);
@@ -153,19 +177,44 @@ BOOST_AUTO_TEST_SUITE(group_delete_test)
     BOOST_AUTO_TEST_CASE(is_move_constructible)
     {
       auto sut = msg::group_delete{0};
+      auto moved = sut;
 
-      auto const copy = std::move(sut);
+      auto const copy = std::move(moved);
 
-      BOOST_TEST(copy.version() == sut.version());
-      BOOST_TEST(copy.type() == sut.type());
-      BOOST_TEST(copy.length() == sizeof(protocol::ofp_group_mod));
-      BOOST_TEST(copy.command() == sut.command());
-      BOOST_TEST(copy.group_id() == sut.group_id());
+      BOOST_TEST((copy == sut));
+      BOOST_TEST(moved.buckets().size() == 0);
     }
   BOOST_AUTO_TEST_SUITE_END() // constructor
 
+  BOOST_FIXTURE_TEST_SUITE(equality, group_delete_parameters)
+    BOOST_AUTO_TEST_CASE(true_if_same_object)
+    {
+      auto const sut = msg::group_delete{group_id, xid};
+
+      BOOST_TEST((sut == sut));
+    }
+    BOOST_AUTO_TEST_CASE(true_if_values_are_equal)
+    {
+      BOOST_TEST(
+          (msg::group_delete{group_id, xid}
+        == msg::group_delete{group_id, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_group_id_is_not_equal)
+    {
+      BOOST_TEST(
+          (msg::group_delete{1, xid}
+        != msg::group_delete{2, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_xid_is_not_equal)
+    {
+      BOOST_TEST(
+          (msg::group_delete{group_id, 1}
+        != msg::group_delete{group_id, 2}));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // equality
+
   BOOST_AUTO_TEST_SUITE(encode)
-    BOOST_FIXTURE_TEST_CASE(encode_test, group_delete_fixture)
+    BOOST_FIXTURE_TEST_CASE(generate_binary, group_delete_fixture)
     {
       auto buffer = std::vector<unsigned char>{};
 
@@ -177,21 +226,15 @@ BOOST_AUTO_TEST_SUITE(group_delete_test)
   BOOST_AUTO_TEST_SUITE_END() // encode
 
   BOOST_AUTO_TEST_SUITE(decode)
-    BOOST_FIXTURE_TEST_CASE(decode_test, group_delete_fixture)
+    BOOST_FIXTURE_TEST_CASE(construct_from_binary, group_delete_fixture)
     {
       auto it = bin.begin();
 
-      auto const decoded_message = msg::group_delete::decode(it, bin.end());
+      auto const group_delete = msg::group_delete::decode(it, bin.end());
+
       BOOST_TEST((it == bin.end()));
-      BOOST_TEST(decoded_message.version() == sut.version());
-      BOOST_TEST(decoded_message.type() == sut.type());
-      BOOST_TEST(decoded_message.length() == sut.length());
-      BOOST_TEST(decoded_message.xid() == sut.xid());
-      BOOST_TEST(decoded_message.command() == sut.command());
-      BOOST_TEST(decoded_message.group_id() == sut.group_id());
+      BOOST_TEST((group_delete == sut));
     }
   BOOST_AUTO_TEST_SUITE_END() // decode
-
-BOOST_AUTO_TEST_SUITE_END() // group_delete_test
-
+BOOST_AUTO_TEST_SUITE_END() // group_delete
 BOOST_AUTO_TEST_SUITE_END() // message_test
