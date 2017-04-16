@@ -10,147 +10,191 @@ namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace protocol = v13::protocol;
 
+namespace {
+  struct barrier_request_fixture {
+    std::uint32_t xid = 0x12345678;
+    v13::messages::barrier_request sut{xid};
+    std::vector<std::uint8_t> bin = "\x04\x14\x00\x08\x12\x34\x56\x78"_bin;
+  };
+  struct barrier_reply_fixture {
+    std::uint32_t xid = 0x51627384;
+    v13::messages::barrier_reply sut{xid};
+    std::vector<std::uint8_t> bin = "\x04\x15\x00\x08\x51\x62\x73\x84"_bin;
+  };
+}
+
 BOOST_AUTO_TEST_SUITE(message_test)
 
-BOOST_AUTO_TEST_SUITE(barrier_request_test)
-
-    BOOST_AUTO_TEST_CASE(default_construct_test)
+BOOST_AUTO_TEST_SUITE(barrier_request)
+  BOOST_AUTO_TEST_SUITE(constructor)
+    BOOST_AUTO_TEST_CASE(default_constructible)
     {
-        auto const sut = v13::messages::barrier_request{};
+      v13::messages::barrier_request const sut{};
 
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_BARRIER_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_BARRIER_REQUEST);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
     }
-
-    BOOST_AUTO_TEST_CASE(construct_test)
+    BOOST_AUTO_TEST_CASE(constructible_from_xid)
     {
-        auto const xid = std::uint32_t{0xffffffff};
-        auto const sut = v13::messages::barrier_request{xid};
+      auto const xid = std::uint32_t{0xffffffff};
 
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_BARRIER_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
-        BOOST_TEST(sut.xid() == xid);
+      v13::messages::barrier_request const sut{xid};
+
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_BARRIER_REQUEST);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
+      BOOST_TEST(sut.xid() == xid);
     }
-
-    BOOST_AUTO_TEST_CASE(move_construct_test)
+    BOOST_FIXTURE_TEST_CASE(move_constructible, barrier_request_fixture)
     {
-        auto sut = v13::messages::barrier_request{0x0000ffff};
+      auto moved = sut;
 
-        auto const copy = std::move(sut);
+      auto const copy = std::move(moved);
 
-        BOOST_TEST(copy.version() == sut.version());
-        BOOST_TEST(copy.type() == sut.type());
-        BOOST_TEST(copy.length() == sut.length());
-        BOOST_TEST(copy.xid() == sut.xid());
+      BOOST_TEST((copy == sut));
     }
+  BOOST_AUTO_TEST_SUITE_END() // constructor
 
-    BOOST_AUTO_TEST_CASE(encode_test)
+  BOOST_AUTO_TEST_SUITE(equality)
+    BOOST_AUTO_TEST_CASE(true_if_same_object)
     {
-        auto const sut = v13::messages::barrier_request{0x12345678};
-        auto buffer = std::vector<std::uint8_t>{};
+      auto const sut = v13::messages::barrier_request{0x12345678};
 
-        sut.encode(buffer);
-
-        BOOST_TEST(buffer.size() == sut.length());
-        auto const expected = "\x04\x14\x00\x08\x12\x34\x56\x78"_bin;
-        BOOST_TEST(buffer == expected, boost::test_tools::per_element{});
+      BOOST_TEST((sut == sut));
     }
-
-    BOOST_AUTO_TEST_CASE(decode_test)
+    BOOST_AUTO_TEST_CASE(true_if_xid_is_equal)
     {
-        auto const buffer
-            = std::string("\x04\x14\x00\x08\x01\x02\x03\x04", 8);
+      auto const xid = 0x01020304;
 
-        auto it = buffer.begin();
-        auto const it_end = buffer.end();
-        auto const sut
-            = v13::messages::barrier_request::decode(it, it_end);
-
-        BOOST_TEST((it == it_end));
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_BARRIER_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
-        BOOST_TEST(sut.xid() == 0x01020304);
+      BOOST_TEST(
+          (v13::messages::barrier_request{xid}
+        == v13::messages::barrier_request{xid}));
     }
-
-BOOST_AUTO_TEST_SUITE_END() // barrier_request_test
-
-
-BOOST_AUTO_TEST_SUITE(barrier_reply_test)
-
-    BOOST_AUTO_TEST_CASE(default_construct_test)
+    BOOST_AUTO_TEST_CASE(false_if_xid_is_not_equal)
     {
-        auto const sut = v13::messages::barrier_reply{};
-
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_BARRIER_REPLY);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
+      BOOST_TEST(
+          (v13::messages::barrier_request{1}
+        != v13::messages::barrier_request{2}));
     }
+  BOOST_AUTO_TEST_SUITE_END() // equality
 
-    BOOST_AUTO_TEST_CASE(construct_from_xid)
+  BOOST_AUTO_TEST_SUITE(encode)
+    BOOST_FIXTURE_TEST_CASE(generate_binary, barrier_request_fixture)
     {
-        auto const xid = std::uint32_t{0x00110022};
-        auto const sut = v13::messages::barrier_reply{xid};
+      auto buffer = std::vector<std::uint8_t>{};
 
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_BARRIER_REPLY);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
-        BOOST_TEST(sut.xid() == xid);
+      sut.encode(buffer);
+
+      BOOST_TEST(buffer.size() == sut.byte_length());
+      BOOST_TEST(buffer == bin, boost::test_tools::per_element{});
     }
+  BOOST_AUTO_TEST_SUITE_END() // encode
 
-    BOOST_AUTO_TEST_CASE(construct_from_request_test)
+  BOOST_AUTO_TEST_SUITE(decode)
+    BOOST_FIXTURE_TEST_CASE(constructible_from_binary, barrier_request_fixture)
     {
-        auto const request = v13::messages::barrier_request{0x0abcdef0};
-        auto const sut = v13::messages::barrier_reply{request};
+      auto it = bin.begin();
 
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_BARRIER_REPLY);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
-        BOOST_TEST(sut.xid() == request.xid());
+      auto const barrier_request
+        = v13::messages::barrier_request::decode(it, bin.end());
+
+      BOOST_TEST((it == bin.end()));
+      BOOST_TEST((barrier_request == sut));
     }
+  BOOST_AUTO_TEST_SUITE_END() // decode
+BOOST_AUTO_TEST_SUITE_END() // barrier_request
 
-    BOOST_AUTO_TEST_CASE(move_construct_test)
+
+BOOST_AUTO_TEST_SUITE(barrier_reply)
+  BOOST_AUTO_TEST_SUITE(constructor)
+    BOOST_AUTO_TEST_CASE(default_constructible)
     {
-        auto sut = v13::messages::barrier_reply{0xffffffff};
+      v13::messages::barrier_reply sut{};
 
-        auto const copy = std::move(sut);
-
-        BOOST_TEST(copy.version() == sut.version());
-        BOOST_TEST(copy.type() == sut.type());
-        BOOST_TEST(copy.length() == sut.length());
-        BOOST_TEST(copy.xid() == sut.xid());
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_BARRIER_REPLY);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
     }
-
-    BOOST_AUTO_TEST_CASE(encode_test)
+    BOOST_AUTO_TEST_CASE(constructible_from_xid)
     {
-        auto const sut = v13::messages::barrier_reply{0xff12ff34};
-        auto buffer = std::vector<std::uint8_t>{};
+      auto const xid = std::uint32_t{0x00110022};
 
-        sut.encode(buffer);
+      v13::messages::barrier_reply const sut{xid};
 
-        BOOST_TEST(buffer.size() == sut.length());
-        auto const expected = "\x04\x15\x00\x08\xff\x12\xff\x34"_bin;
-        BOOST_TEST(buffer == expected, boost::test_tools::per_element{});
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_BARRIER_REPLY);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
+      BOOST_TEST(sut.xid() == xid);
     }
-
-    BOOST_AUTO_TEST_CASE(decode_test)
+    BOOST_AUTO_TEST_CASE(constructible_from_barrier_request)
     {
-        auto const buffer = "\x04\x15\x00\x08\x10\x20\x30\x40"_bin;
+      auto const request = v13::messages::barrier_request{0x0abcdef0};
 
-        auto it = buffer.begin();
-        auto it_end = buffer.end();
-        auto const sut = v13::messages::barrier_reply::decode(it, it_end);
+      v13::messages::barrier_reply const sut{request};
 
-        BOOST_TEST((it == it_end));
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_BARRIER_REPLY);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
-        BOOST_TEST(sut.xid() == 0x10203040);
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_BARRIER_REPLY);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
+      BOOST_TEST(sut.xid() == request.xid());
     }
+    BOOST_FIXTURE_TEST_CASE(move_constructible, barrier_reply_fixture)
+    {
+      auto moved = sut;
 
-BOOST_AUTO_TEST_SUITE_END() // barrier_reply_test
+      auto const copy = std::move(moved);
+
+      BOOST_TEST((copy == sut));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // constructor
+
+  BOOST_AUTO_TEST_SUITE(equality)
+    BOOST_AUTO_TEST_CASE(true_if_same_object)
+    {
+      auto const sut = v13::messages::barrier_reply{0x12345678};
+
+      BOOST_TEST((sut == sut));
+    }
+    BOOST_AUTO_TEST_CASE(true_if_xid_is_equal)
+    {
+      auto const xid = 0x01020304;
+
+      BOOST_TEST(
+          (v13::messages::barrier_reply{xid}
+        == v13::messages::barrier_reply{xid}));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_xid_is_not_equal)
+    {
+      BOOST_TEST(
+          (v13::messages::barrier_reply{1}
+        != v13::messages::barrier_reply{2}));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // equality
+
+  BOOST_AUTO_TEST_SUITE(encode)
+    BOOST_FIXTURE_TEST_CASE(generate_binary, barrier_reply_fixture)
+    {
+      auto buffer = std::vector<std::uint8_t>{};
+
+      sut.encode(buffer);
+
+      BOOST_TEST(buffer.size() == sut.byte_length());
+      BOOST_TEST(buffer == bin, boost::test_tools::per_element{});
+    }
+  BOOST_AUTO_TEST_SUITE_END() // encode
+
+  BOOST_AUTO_TEST_SUITE(decode)
+    BOOST_FIXTURE_TEST_CASE(constructible_from_binary, barrier_reply_fixture)
+    {
+      auto it = bin.begin();
+      auto const barrier_reply
+        = v13::messages::barrier_reply::decode(it, bin.end());
+
+      BOOST_TEST((it == bin.end()));
+      BOOST_TEST((barrier_reply == sut));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // decode
+BOOST_AUTO_TEST_SUITE_END() // barrier_reply
 
 BOOST_AUTO_TEST_SUITE_END() // message_test
 
