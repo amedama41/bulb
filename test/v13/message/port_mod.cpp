@@ -10,138 +10,182 @@
 
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
+namespace msg = v13::messages;
 namespace protocol = v13::protocol;
 
-BOOST_AUTO_TEST_SUITE(message_test)
+namespace {
 
-BOOST_AUTO_TEST_SUITE(port_mod_test)
-
-    BOOST_AUTO_TEST_CASE(construct_test)
-    {
-        auto const port_no = std::uint32_t{protocol::OFPP_MAX};
-        auto const hw_addr
-            = canard::mac_address{{0x10, 0x20, 0x30, 0x40, 0x50, 0x60}};
-        auto const config = std::uint32_t{protocol::OFPPC_NO_RECV};
-        auto const mask = std::uint32_t{
-            protocol::OFPPC_PORT_DOWN | protocol::OFPPC_NO_RECV
-        };
-        auto const advertise = std::uint32_t{
-            protocol::OFPPF_10GB_FD | protocol::OFPPF_AUTONEG
-        };
-        auto const xid = std::uint32_t{0x01010101};
-
-        auto const sut = v13::messages::port_mod{
-            port_no, hw_addr, config, mask, advertise, xid
-        };
-
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_PORT_MOD);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_port_mod));
-        BOOST_TEST(sut.xid() == xid);
-        BOOST_TEST(sut.port_no() == port_no);
-        BOOST_TEST(sut.hardware_address() == hw_addr);
-        BOOST_TEST(sut.config() == config);
-        BOOST_TEST(sut.mask() == mask);
-        BOOST_TEST(sut.advertised_features() == advertise);
-    }
-
-    BOOST_AUTO_TEST_CASE(construct_from_port_test)
-    {
-        auto const port = v13::port::from_ofp_port({
-              9, {0}, {0x11, 0x21, 0x31, 0x41, 0x51, 0x61}, {0}
-            , "eth0", protocol::OFPPC_PORT_DOWN, protocol::OFPPS_LINK_DOWN
-            , protocol::OFPPF_10GB_FD | protocol::OFPPF_FIBER
-            , protocol::OFPPF_10GB_FD | protocol::OFPPF_FIBER | protocol::OFPPF_AUTONEG
-            , protocol::OFPPF_10GB_FD | protocol::OFPPF_1GB_FD | protocol::OFPPF_FIBER | protocol::OFPPF_AUTONEG
-            , protocol::OFPPF_10GB_FD | protocol::OFPPF_1GB_FD | protocol::OFPPF_COPPER | protocol::OFPPF_AUTONEG
-            , 10000, 12000
-        });
-        auto const config = std::uint32_t{protocol::OFPPC_NO_RECV};
-        auto const mask = std::uint32_t{
-            protocol::OFPPC_PORT_DOWN | protocol::OFPPC_NO_RECV
-        };
-        auto const advertise = std::uint32_t{
-            protocol::OFPPF_10GB_FD | protocol::OFPPF_AUTONEG
-        };
-        auto const xid = std::uint32_t{0x01010101};
-
-        auto const sut = v13::messages::port_mod{
-            port, config, mask, advertise, xid
-        };
-
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_PORT_MOD);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_port_mod));
-        BOOST_TEST(sut.xid() == xid);
-        BOOST_TEST(sut.port_no() == port.port_no());
-        BOOST_TEST(sut.hardware_address() == port.hardware_address());
-        BOOST_TEST(sut.config() == config);
-        BOOST_TEST(sut.mask() == mask);
-        BOOST_TEST(sut.advertised_features() == advertise);
-    }
-
-    struct port_mod_fixture
-    {
-        v13::messages::port_mod const sut{
-              protocol::OFPP_MAX
-            , canard::mac_address{{0xff, 0x11, 0xff, 0x12, 0x13, 0x14}}
-            , protocol::OFPPC_NO_FWD
-            , protocol::OFPPC_PORT_DOWN | protocol::OFPPC_NO_RECV
-            , protocol::OFPPF_10GB_FD | protocol::OFPPF_AUTONEG
-            , 0x01010101
-        };
-        std::vector<std::uint8_t> bin_port_mod
-            = "\x04\x10\x00\x28\x01\x01\x01\x01" "\xff\xff\xff\x00\x00\x00\x00\x00"
-              "\xff\x11\xff\x12\x13\x14\x00\x00" "\x00\x00\x00\x20\x00\x00\x00\x05"
-              "\x00\x00\x20\x40\x00\x00\x00\x00"_bin
-            ;
+  struct port_mod_parameter {
+    std::uint32_t port_no = protocol::OFPP_MAX;
+    canard::mac_address hw_addr{{0xff, 0x11, 0xff, 0x12, 0x13, 0x14}};
+    std::uint32_t config = protocol::OFPPC_NO_FWD;
+    std::uint32_t mask = protocol::OFPPC_PORT_DOWN | protocol::OFPPC_NO_RECV;
+    std::uint32_t advertise = protocol::OFPPF_10GB_FD | protocol::OFPPF_AUTONEG;
+    std::uint32_t xid = 0x01010101;
+  };
+  struct port_mod_fixture : port_mod_parameter {
+    v13::messages::port_mod sut{
+      port_no, hw_addr, config, mask, advertise, xid
     };
+    std::vector<std::uint8_t> bin
+      = "\x04\x10\x00\x28\x01\x01\x01\x01" "\xff\xff\xff\x00\x00\x00\x00\x00"
+        "\xff\x11\xff\x12\x13\x14\x00\x00" "\x00\x00\x00\x20\x00\x00\x00\x05"
+        "\x00\x00\x20\x40\x00\x00\x00\x00"_bin
+      ;
+  };
 
-    BOOST_FIXTURE_TEST_CASE(copy_construct_test, port_mod_fixture)
+}
+
+BOOST_AUTO_TEST_SUITE(message_test)
+BOOST_AUTO_TEST_SUITE(port_mod)
+  BOOST_AUTO_TEST_SUITE(constructor)
+    BOOST_AUTO_TEST_CASE(constructible)
     {
-        auto const copy = sut;
+      auto const port_no = std::uint32_t{protocol::OFPP_MAX};
+      auto const hw_addr
+        = canard::mac_address{{0x10, 0x20, 0x30, 0x40, 0x50, 0x60}};
+      auto const config = std::uint32_t{protocol::OFPPC_NO_RECV};
+      auto const mask = std::uint32_t{
+        protocol::OFPPC_PORT_DOWN | protocol::OFPPC_NO_RECV
+      };
+      auto const advertise = std::uint32_t{
+        protocol::OFPPF_10GB_FD | protocol::OFPPF_AUTONEG
+      };
+      auto const xid = std::uint32_t{0x01010101};
 
-        BOOST_TEST(copy.version() == sut.version());
-        BOOST_TEST(copy.type() == sut.type());
-        BOOST_TEST(copy.length() == sut.length());
-        BOOST_TEST(copy.xid() == sut.xid());
-        BOOST_TEST(copy.port_no() == sut.port_no());
-        BOOST_TEST(copy.hardware_address() == sut.hardware_address());
-        BOOST_TEST(copy.config() == sut.config());
-        BOOST_TEST(copy.mask() == sut.mask());
-        BOOST_TEST(copy.advertised_features() == sut.advertised_features());
+      v13::messages::port_mod const sut{
+        port_no, hw_addr, config, mask, advertise, xid
+      };
+
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_PORT_MOD);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_port_mod));
+      BOOST_TEST(sut.xid() == xid);
+      BOOST_TEST(sut.port_no() == port_no);
+      BOOST_TEST(sut.hardware_address() == hw_addr);
+      BOOST_TEST(sut.config() == config);
+      BOOST_TEST(sut.mask() == mask);
+      BOOST_TEST(sut.advertised_features() == advertise);
     }
-
-    BOOST_FIXTURE_TEST_CASE(encode_test, port_mod_fixture)
+    BOOST_AUTO_TEST_CASE(constructible_from_port)
     {
-        auto buffer = std::vector<std::uint8_t>{};
+      auto const port = v13::port::from_ofp_port({
+            9, {0}, {0x11, 0x21, 0x31, 0x41, 0x51, 0x61}, {0}
+          , "eth0", protocol::OFPPC_PORT_DOWN, protocol::OFPPS_LINK_DOWN
+          , protocol::OFPPF_10GB_FD | protocol::OFPPF_FIBER
+          , protocol::OFPPF_10GB_FD | protocol::OFPPF_FIBER | protocol::OFPPF_AUTONEG
+          , protocol::OFPPF_10GB_FD | protocol::OFPPF_1GB_FD | protocol::OFPPF_FIBER | protocol::OFPPF_AUTONEG
+          , protocol::OFPPF_10GB_FD | protocol::OFPPF_1GB_FD | protocol::OFPPF_COPPER | protocol::OFPPF_AUTONEG
+          , 10000, 12000
+      });
+      auto const config = std::uint32_t{protocol::OFPPC_NO_RECV};
+      auto const mask = std::uint32_t{
+        protocol::OFPPC_PORT_DOWN | protocol::OFPPC_NO_RECV
+      };
+      auto const advertise = std::uint32_t{
+        protocol::OFPPF_10GB_FD | protocol::OFPPF_AUTONEG
+      };
+      auto const xid = std::uint32_t{0x01010101};
 
-        sut.encode(buffer);
+      v13::messages::port_mod const sut{port, config, mask, advertise, xid};
 
-        BOOST_TEST(buffer.size() == sut.length());
-        BOOST_TEST(buffer == bin_port_mod, boost::test_tools::per_element{});
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_PORT_MOD);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_port_mod));
+      BOOST_TEST(sut.xid() == xid);
+      BOOST_TEST(sut.port_no() == port.port_no());
+      BOOST_TEST(sut.hardware_address() == port.hardware_address());
+      BOOST_TEST(sut.config() == config);
+      BOOST_TEST(sut.mask() == mask);
+      BOOST_TEST(sut.advertised_features() == advertise);
     }
-
-    BOOST_FIXTURE_TEST_CASE(decode_test, port_mod_fixture)
+    BOOST_FIXTURE_TEST_CASE(copy_constructible, port_mod_fixture)
     {
-        auto it = bin_port_mod.begin();
-        auto const it_end = bin_port_mod.end();
+      auto const copy = sut;
 
-        auto const port_mod = v13::messages::port_mod::decode(it, it_end);
-
-        BOOST_TEST((it == it_end));
-        BOOST_TEST(port_mod.version() == sut.version());
-        BOOST_TEST(port_mod.type() == sut.type());
-        BOOST_TEST(port_mod.length() == sut.length());
-        BOOST_TEST(port_mod.xid() == sut.xid());
-        BOOST_TEST(port_mod.port_no() == sut.port_no());
-        BOOST_TEST(port_mod.hardware_address() == sut.hardware_address());
-        BOOST_TEST(port_mod.config() == sut.config());
-        BOOST_TEST(port_mod.mask() == sut.mask());
-        BOOST_TEST(port_mod.advertised_features() == sut.advertised_features());
+      BOOST_TEST((copy == sut));
     }
+  BOOST_AUTO_TEST_SUITE_END() // constructor
 
-BOOST_AUTO_TEST_SUITE_END() // port_mod_test
+  BOOST_FIXTURE_TEST_SUITE(equality, port_mod_parameter)
+    BOOST_AUTO_TEST_CASE(true_if_same_object)
+    {
+      auto const sut = msg::port_mod{
+        port_no, hw_addr, config, mask, advertise, xid
+      };
 
+      BOOST_TEST((sut == sut));
+    }
+    BOOST_AUTO_TEST_CASE(true_if_values_are_equal)
+    {
+      BOOST_TEST(
+          (msg::port_mod{port_no, hw_addr, config, mask, advertise, xid}
+        == msg::port_mod{port_no, hw_addr, config, mask, advertise, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_port_no_is_not_equal)
+    {
+      BOOST_TEST(
+          (msg::port_mod{1, hw_addr, config, mask, advertise, xid}
+        != msg::port_mod{2, hw_addr, config, mask, advertise, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_hw_addr_is_not_equal)
+    {
+      BOOST_TEST(
+          (msg::port_mod{port_no, "\x00\x00\x00\x00\x00\x01"_mac
+           , config, mask, advertise, xid}
+        != msg::port_mod{port_no, "\x00\x00\x00\x00\x00\x02"_mac
+           , config, mask, advertise, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_config_is_not_equal)
+    {
+      BOOST_TEST(
+          (msg::port_mod{port_no, hw_addr, 1, mask, advertise, xid}
+        != msg::port_mod{port_no, hw_addr, 2, mask, advertise, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_mask_is_not_equal)
+    {
+      BOOST_TEST(
+          (msg::port_mod{port_no, hw_addr, config, 1, advertise, xid}
+        != msg::port_mod{port_no, hw_addr, config, 2, advertise, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_advertise_is_not_equal)
+    {
+      BOOST_TEST(
+          (msg::port_mod{port_no, hw_addr, config, mask, 1, xid}
+        != msg::port_mod{port_no, hw_addr, config, mask, 2, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_xid_is_not_equal)
+    {
+      BOOST_TEST(
+          (msg::port_mod{port_no, hw_addr, config, mask, advertise, 1}
+        != msg::port_mod{port_no, hw_addr, config, mask, advertise, 2}));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // equality
+
+  BOOST_AUTO_TEST_SUITE(encode)
+    BOOST_FIXTURE_TEST_CASE(generate_binary, port_mod_fixture)
+    {
+      auto buffer = std::vector<std::uint8_t>{};
+
+      sut.encode(buffer);
+
+      BOOST_TEST(buffer.size() == sut.byte_length());
+      BOOST_TEST(buffer == bin, boost::test_tools::per_element{});
+    }
+  BOOST_AUTO_TEST_SUITE_END() // encode
+
+  BOOST_AUTO_TEST_SUITE(decode)
+    BOOST_FIXTURE_TEST_CASE(constructible_from_binary, port_mod_fixture)
+    {
+      auto it = bin.begin();
+
+      auto const port_mod = v13::messages::port_mod::decode(it, bin.end());
+
+      BOOST_TEST((it == bin.end()));
+      BOOST_TEST((port_mod == sut));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // decode
+
+BOOST_AUTO_TEST_SUITE_END() // port_mod
 BOOST_AUTO_TEST_SUITE_END() // message_test
 
