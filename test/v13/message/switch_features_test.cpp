@@ -5,142 +5,245 @@
 #include <cstdint>
 #include <vector>
 #include <canard/net/ofp/v13/openflow.hpp>
+#include "../../test_utility.hpp"
 
 namespace of = canard::net::ofp;
 namespace v13 = of::v13;
 namespace protocol = v13::protocol;
 
-template <std::size_t N>
-static auto to_buffer(char const (&expected)[N])
-    -> std::vector<unsigned char>
-{
-    return std::vector<unsigned char>(expected, expected + N - 1);
+namespace {
+  struct features_request_fixture {
+    v13::messages::features_request sut{64};
+    std::vector<std::uint8_t> bin = "\x04\x05\00\x08\x00\x00\x00\x40"_bin;
+  };
+  struct features_reply_parameter {
+    v13::messages::features_request request{8};
+    std::uint64_t dpid = 5;
+    std::uint32_t n_buffers = 7;
+    std::uint8_t n_tables = 10;
+    std::uint8_t auxiliary_id = 11;
+    std::uint32_t capabilities
+      = protocol::OFPC_TABLE_STATS | protocol::OFPC_PORT_BLOCKED;
+  };
+  struct features_reply_fixture : features_reply_parameter {
+    v13::messages::features_reply sut{
+      request, dpid, n_buffers, n_tables, auxiliary_id, capabilities
+    };
+    std::vector<std::uint8_t> bin
+      = "\x04\x06\x00\x20\x00\x00\x00\x08""\x00\x00\x00\x00\x00\x00\x00\x05"
+        "\x00\x00\x00\x07\x0a\x0b\x00\x00""\x00\x00\x01\x02\x00\x00\x00\x00"
+        ""_bin;
+  };
 }
 
 BOOST_AUTO_TEST_SUITE(message_test)
-
-BOOST_AUTO_TEST_SUITE(features_request_test)
-
-    BOOST_AUTO_TEST_CASE(default_constructor_test)
+BOOST_AUTO_TEST_SUITE(features_request)
+  BOOST_AUTO_TEST_SUITE(constructor)
+    BOOST_AUTO_TEST_CASE(default_constructible)
     {
-        auto sut = v13::messages::features_request{};
+      v13::messages::features_request const sut{};
 
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_FEATURES_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_FEATURES_REQUEST);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
     }
-
-    BOOST_AUTO_TEST_CASE(constructor_test)
+    BOOST_AUTO_TEST_CASE(constructible)
     {
-        auto const xid = std::uint32_t{32};
+      auto const xid = std::uint32_t{32};
 
-        auto sut = v13::messages::features_request{xid};
+      v13::messages::features_request const sut{xid};
 
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_FEATURES_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
-        BOOST_TEST(sut.xid() == xid);
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_FEATURES_REQUEST);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
+      BOOST_TEST(sut.xid() == xid);
     }
+  BOOST_AUTO_TEST_SUITE_END() // constructor
 
-    BOOST_AUTO_TEST_CASE(encode_test)
+  BOOST_AUTO_TEST_SUITE(equality)
+    BOOST_AUTO_TEST_CASE(true_if_same_object)
     {
-        auto buffer = std::vector<unsigned char>{};
-        auto sut = v13::messages::features_request{64};
+      auto const sut = v13::messages::features_request{12};
 
-        sut.encode(buffer);
-
-        char const expected[] = "\x04\x05\00\x08\x00\x00\x00\x40";
-        BOOST_TEST(buffer == to_buffer(expected), boost::test_tools::per_element{});
+      BOOST_TEST((sut == sut));
     }
-
-    BOOST_AUTO_TEST_CASE(decode_test)
+    BOOST_AUTO_TEST_CASE(true_if_xid_is_equal)
     {
-        char const buffer[] = "\x04\x05\00\x08\x00\x00\x00\x80";
+      auto const xid = std::uint32_t{1};
 
-        auto it = buffer;
-        auto it_end = buffer + sizeof(buffer) - 1;
-        auto sut = v13::messages::features_request::decode(it, it_end);
-
-        BOOST_TEST(it == it_end);
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_FEATURES_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_header));
-        BOOST_TEST(sut.xid() == 128);
+      BOOST_TEST(
+          (v13::messages::features_request{xid}
+        == v13::messages::features_request{xid}));
     }
-
-BOOST_AUTO_TEST_SUITE_END() // features_request_test
-
-
-BOOST_AUTO_TEST_SUITE(features_reply_test)
-
-    BOOST_AUTO_TEST_CASE(constructor_test)
+    BOOST_AUTO_TEST_CASE(false_if_xid_is_not_equal)
     {
-        auto const request = v13::messages::features_request{16};
-        auto const dpid = std::uint64_t{4};
-        auto const n_buffers = std::uint32_t{9};
-        auto const n_tables = std::uint32_t{8};
-        auto const auxiliary_id = std::uint8_t{12};
-        auto const capabilities
-            = protocol::OFPC_FLOW_STATS | protocol::OFPC_PORT_STATS;
-
-        auto sut = v13::messages::features_reply{
-            request, dpid, n_buffers, n_tables, auxiliary_id, capabilities
-        };
-
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_FEATURES_REPLY);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_switch_features));
-        BOOST_TEST(sut.xid() == request.xid());
-        BOOST_TEST(sut.datapath_id() == dpid);
-        BOOST_TEST(sut.num_buffers() == n_buffers);
-        BOOST_TEST(sut.num_tables() == n_tables);
-        BOOST_TEST(sut.auxiliary_id() == auxiliary_id);
-        BOOST_TEST(sut.capabilities() == capabilities);
+      BOOST_TEST(
+          (v13::messages::features_request{1}
+        != v13::messages::features_request{2}));
     }
+  BOOST_AUTO_TEST_SUITE_END() // equality
 
-    BOOST_AUTO_TEST_CASE(encode_test)
+  BOOST_AUTO_TEST_SUITE(encode)
+    BOOST_FIXTURE_TEST_CASE(generate_binary, features_request_fixture)
     {
-        auto buffer = std::vector<unsigned char>{};
-        auto sut = v13::messages::features_reply{
-              v13::messages::features_request{8}
-            , 5, 7, 10, 11
-            , protocol::OFPC_TABLE_STATS | protocol::OFPC_PORT_BLOCKED
-        };
+      auto buffer = std::vector<unsigned char>{};
 
-        sut.encode(buffer);
+      sut.encode(buffer);
 
-        char const expected[]
-            = "\x04\x06\x00\x20\x00\x00\x00\x08"
-              "\x00\x00\x00\x00\x00\x00\x00\x05"
-              "\x00\x00\x00\x07\x0a\x0b\x00\x00"
-              "\x00\x00\x01\x02\x00\x00\x00\x00";
-        BOOST_TEST(buffer == to_buffer(expected), boost::test_tools::per_element{});
+      BOOST_TEST(buffer.size() == sut.byte_length());
+      BOOST_TEST(buffer == bin, boost::test_tools::per_element{});
     }
+  BOOST_AUTO_TEST_SUITE_END() // encode
 
-    BOOST_AUTO_TEST_CASE(decode_test)
+  BOOST_AUTO_TEST_SUITE(decode)
+    BOOST_FIXTURE_TEST_CASE(constructible_from_binary, features_request_fixture)
     {
-        char const buffer[]
-            = "\x04\x06\x00\x20\x00\x01\x02\x03"
-              "\x00\x00\x00\x12\x00\x34\x00\x56"
-              "\x00\x01\xff\x07\x03\x10\x00\x00"
-              "\x00\x00\x01\x02\x00\x00\x00\x00";
+      auto it = bin.begin();
 
-        auto it = buffer;
-        auto const it_end = buffer + sizeof(buffer) - 1;
-        auto sut = v13::messages::features_reply::decode(it, it_end);
+      auto const features_request
+        = v13::messages::features_request::decode(it, bin.end());
 
-        BOOST_TEST(it == it_end);
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_FEATURES_REPLY);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_switch_features));
-        BOOST_TEST(sut.xid() == 0x10203);
-        BOOST_TEST(sut.datapath_id() == 0x1200340056);
-        BOOST_TEST(sut.num_buffers() == 0x1ff07);
-        BOOST_TEST(sut.num_tables() == 0x3);
-        BOOST_TEST(sut.auxiliary_id() == 0x10);
-        BOOST_TEST(sut.capabilities() == 0x102);
+      BOOST_TEST((it == bin.end()));
+      BOOST_TEST((features_request == sut));
     }
+  BOOST_AUTO_TEST_SUITE_END() // decode
+BOOST_AUTO_TEST_SUITE_END() // features_request
 
-BOOST_AUTO_TEST_SUITE_END() // features_reply_test
 
+BOOST_AUTO_TEST_SUITE(features_reply)
+  BOOST_AUTO_TEST_SUITE(constructor)
+    BOOST_AUTO_TEST_CASE(constructible)
+    {
+      auto const request = v13::messages::features_request{16};
+      auto const dpid = std::uint64_t{4};
+      auto const n_buffers = std::uint32_t{9};
+      auto const n_tables = std::uint32_t{8};
+      auto const auxiliary_id = std::uint8_t{12};
+      auto const capabilities
+        = protocol::OFPC_FLOW_STATS | protocol::OFPC_PORT_STATS;
+
+      v13::messages::features_reply const sut{
+        request, dpid, n_buffers, n_tables, auxiliary_id, capabilities
+      };
+
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_FEATURES_REPLY);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_switch_features));
+      BOOST_TEST(sut.xid() == request.xid());
+      BOOST_TEST(sut.datapath_id() == dpid);
+      BOOST_TEST(sut.num_buffers() == n_buffers);
+      BOOST_TEST(sut.num_tables() == n_tables);
+      BOOST_TEST(sut.auxiliary_id() == auxiliary_id);
+      BOOST_TEST(sut.capabilities() == capabilities);
+    }
+  BOOST_AUTO_TEST_SUITE_END() // constructor
+
+  BOOST_FIXTURE_TEST_SUITE(equality, features_reply_parameter)
+    BOOST_AUTO_TEST_CASE(true_if_same_object)
+    {
+      auto const sut = v13::messages::features_reply{
+        request, dpid, n_buffers, n_tables, auxiliary_id, capabilities
+      };
+
+      BOOST_TEST((sut == sut));
+    }
+    BOOST_AUTO_TEST_CASE(true_if_values_are_equal)
+    {
+      BOOST_TEST(
+          (v13::messages::features_reply{
+             request, dpid, n_buffers, n_tables, auxiliary_id, capabilities
+           }
+        == v13::messages::features_reply{
+             request, dpid, n_buffers, n_tables, auxiliary_id, capabilities
+           }));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_xid_is_not_equal)
+    {
+      using request = v13::messages::features_request;
+
+      BOOST_TEST(
+          (v13::messages::features_reply{
+             request{1}, dpid, n_buffers, n_tables, auxiliary_id, capabilities
+           }
+        != v13::messages::features_reply{
+             request{2}, dpid, n_buffers, n_tables, auxiliary_id, capabilities
+           }));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_dpid_is_not_equal)
+    {
+      BOOST_TEST(
+          (v13::messages::features_reply{
+             request, 1, n_buffers, n_tables, auxiliary_id, capabilities
+           }
+        != v13::messages::features_reply{
+             request, 2, n_buffers, n_tables, auxiliary_id, capabilities
+           }));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_n_buffers_is_not_equal)
+    {
+      BOOST_TEST(
+          (v13::messages::features_reply{
+             request, dpid, 1, n_tables, auxiliary_id, capabilities
+           }
+        != v13::messages::features_reply{
+             request, dpid, 2, n_tables, auxiliary_id, capabilities
+           }));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_n_tables_is_not_equal)
+    {
+      BOOST_TEST(
+          (v13::messages::features_reply{
+             request, dpid, n_buffers, 1, auxiliary_id, capabilities
+           }
+        != v13::messages::features_reply{
+             request, dpid, n_buffers, 2, auxiliary_id, capabilities
+           }));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_auxiliary_id_is_not_equal)
+    {
+      BOOST_TEST(
+          (v13::messages::features_reply{
+             request, dpid, n_buffers, n_tables, 1, capabilities
+           }
+        != v13::messages::features_reply{
+             request, dpid, n_buffers, n_tables, 2, capabilities
+           }));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_capabilities_is_not_equal)
+    {
+      BOOST_TEST(
+          (v13::messages::features_reply{
+             request, dpid, n_buffers, n_tables, auxiliary_id, 1
+           }
+        != v13::messages::features_reply{
+             request, dpid, n_buffers, n_tables, auxiliary_id, 2
+           }));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // equality
+
+  BOOST_AUTO_TEST_SUITE(encode)
+    BOOST_FIXTURE_TEST_CASE(generate_binary, features_reply_fixture)
+    {
+      auto buffer = std::vector<unsigned char>{};
+
+      sut.encode(buffer);
+
+      BOOST_TEST(buffer.size() == sut.byte_length());
+      BOOST_TEST(buffer == bin, boost::test_tools::per_element{});
+    }
+  BOOST_AUTO_TEST_SUITE_END() // encode
+
+  BOOST_AUTO_TEST_SUITE(decode)
+    BOOST_FIXTURE_TEST_CASE(constructible_from_binary, features_reply_fixture)
+    {
+      auto it = bin.begin();
+
+      auto const features_reply
+        = v13::messages::features_reply::decode(it, bin.end());
+
+      BOOST_TEST((it == bin.end()));
+      BOOST_TEST((features_reply == sut));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // decode
+BOOST_AUTO_TEST_SUITE_END() // features_reply
 BOOST_AUTO_TEST_SUITE_END() // message_test
