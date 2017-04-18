@@ -194,7 +194,7 @@ namespace messages {
     {
       return detail::memcmp(
           queue_get_config_reply_, rhs.queue_get_config_reply_)
-          && queues_ == queues_;
+          && queues_ == rhs.queues_;
     }
 
   private:
