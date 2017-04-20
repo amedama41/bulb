@@ -17,6 +17,6 @@ add_test(NAME v10_test COMMAND bulb::v10::test -l message)
 add_test(NAME v13_test COMMAND bulb::v13::test -l message)
 
 add_custom_target(check
-    COMMAND ${CMAKE_CTEST_COMMAND}
+    COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
     DEPENDS bulb::v10::test bulb::v13::test)
 
