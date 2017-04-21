@@ -8,6 +8,7 @@
 #include <utility>
 #include <canard/net/ofp/detail/decode.hpp>
 #include <canard/net/ofp/detail/encode.hpp>
+#include <canard/net/ofp/detail/memcmp.hpp>
 #include <canard/net/ofp/list.hpp>
 #include <canard/net/ofp/v13/common/oxm_match.hpp>
 #include <canard/net/ofp/v13/detail/basic_message.hpp>
@@ -162,6 +163,12 @@ namespace multipart_detail {
       return T{detail::decode<raw_ofp_type>(first, last)};
     }
 
+    auto equal_impl(T const& rhs) const noexcept
+      -> bool
+    {
+      return detail::memcmp(multipart_, rhs.multipart_);
+    }
+
   private:
     raw_ofp_type multipart_;
   };
@@ -248,6 +255,13 @@ namespace multipart_detail {
     {
       auto const multipart = detail::decode<raw_ofp_type>(first, last);
       return T{multipart, detail::decode<body_type>(first, last)};
+    }
+
+    auto equal_impl(T const& rhs) const noexcept
+      -> bool
+    {
+      return detail::memcmp(multipart_, rhs.multipart_)
+          && detail::memcmp(body_, rhs.body_);
     }
 
   private:
@@ -403,6 +417,14 @@ namespace multipart_detail {
       return T{multipart, body, std::move(match)};
     }
 
+    auto equal_impl(T const& rhs) const noexcept
+      -> bool
+    {
+      return detail::memcmp(multipart_, rhs.multipart_)
+          && detail::memcmp(body_, rhs.body_)
+          && match_ == rhs.match_;
+    }
+
   private:
     raw_ofp_type multipart_;
     body_type body_;
@@ -537,6 +559,13 @@ namespace multipart_detail {
       auto body = body_type::decode(first, last);
 
       return T{multipart, std::move(body)};
+    }
+
+    auto equal_impl(T const& rhs) const noexcept
+      -> bool
+    {
+      return detail::memcmp(multipart_, rhs.multipart_)
+          && body_ == rhs.body_;
     }
 
   private:
