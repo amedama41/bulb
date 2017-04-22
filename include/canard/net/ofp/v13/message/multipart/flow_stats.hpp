@@ -8,6 +8,7 @@
 #include <canard/net/ofp/detail/basic_protocol_type.hpp>
 #include <canard/net/ofp/detail/decode.hpp>
 #include <canard/net/ofp/detail/encode.hpp>
+#include <canard/net/ofp/detail/memcmp.hpp>
 #include <canard/net/ofp/get_xid.hpp>
 #include <canard/net/ofp/list.hpp>
 #include <canard/net/ofp/v13/any_instruction.hpp>
@@ -211,6 +212,14 @@ namespace multipart {
       auto instructions = instructions_type::decode(first, last);
 
       return flow_stats{stats, std::move(match), std::move(instructions)};
+    }
+
+    auto equal_impl(flow_stats const& rhs) const noexcept
+      -> bool
+    {
+      return detail::memcmp(flow_stats_, rhs.flow_stats_)
+          && match_ == rhs.match_
+          && instructions_ == rhs.instructions_;
     }
 
   private:

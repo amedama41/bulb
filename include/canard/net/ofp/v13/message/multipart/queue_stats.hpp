@@ -6,6 +6,7 @@
 #include <canard/net/ofp/detail/basic_protocol_type.hpp>
 #include <canard/net/ofp/detail/decode.hpp>
 #include <canard/net/ofp/detail/encode.hpp>
+#include <canard/net/ofp/detail/memcmp.hpp>
 #include <canard/net/ofp/get_xid.hpp>
 #include <canard/net/ofp/v13/detail/basic_multipart.hpp>
 #include <canard/net/ofp/v13/detail/byteorder.hpp>
@@ -117,6 +118,12 @@ namespace multipart {
       -> queue_stats
     {
       return queue_stats{detail::decode<raw_ofp_type>(first, last)};
+    }
+
+    auto equal_impl(queue_stats const& rhs) const noexcept
+      -> bool
+    {
+      return detail::memcmp(queue_stats_, rhs.queue_stats_);
     }
 
   private:

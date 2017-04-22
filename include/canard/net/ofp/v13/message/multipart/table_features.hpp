@@ -11,6 +11,7 @@
 #include <canard/net/ofp/detail/basic_protocol_type.hpp>
 #include <canard/net/ofp/detail/decode.hpp>
 #include <canard/net/ofp/detail/encode.hpp>
+#include <canard/net/ofp/detail/memcmp.hpp>
 #include <canard/net/ofp/get_xid.hpp>
 #include <canard/net/ofp/list.hpp>
 #include <canard/net/ofp/v13/detail/basic_multipart.hpp>
@@ -193,6 +194,13 @@ namespace multipart {
       last = std::next(first, prop_length);
       auto properties = properties_type::decode(first, last);
       return table_features{features, std::move(properties)};
+    }
+
+    auto equal_impl(table_features const& rhs) const noexcept
+      -> bool
+    {
+      return detail::memcmp(table_features_, rhs.table_features_)
+          && properties_ == rhs.properties_;
     }
 
   private:
