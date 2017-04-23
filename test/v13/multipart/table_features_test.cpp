@@ -2,239 +2,960 @@
 #include <canard/net/ofp/v13/message/multipart/table_features.hpp>
 #include <boost/test/unit_test.hpp>
 
+#include <boost/utility/string_ref.hpp>
 #include <canard/net/ofp/v13/io/openflow.hpp>
+#include "../../test_utility.hpp"
 
-namespace canard {
-namespace net {
-namespace ofp {
-namespace v13 {
+namespace ofp = canard::net::ofp;
+namespace v13 = ofp::v13;
+namespace protocol = v13::protocol;
+namespace multipart = v13::messages::multipart;
 
-BOOST_AUTO_TEST_SUITE(table_features_test)
+namespace {
 
-struct table_features_fixture {
-    static auto create_features(std::uint8_t const table_id)
-        -> messages::multipart::table_features
+  using body_type = multipart::table_features_request::body_type;
+
+  struct table_features_parameter {
+    static auto make_oxm_id(std::uint8_t field, bool hasmask, std::uint8_t len)
+      -> v13::oxm_id
     {
-        auto const table_name = "table" + std::to_string(table_id);
-        return messages::multipart::table_features{table_id, table_name.c_str(), 0xffffffffffffffff, 0xffffffffffffffff, 0, 0xffffffff
-            , table_feature_property_set{
-                  table_feature_properties::instructions{
-                      instruction_id{protocol::OFPIT_GOTO_TABLE}, instruction_id{protocol::OFPIT_WRITE_METADATA}
-                    , instruction_id{protocol::OFPIT_WRITE_ACTIONS}, instruction_id{protocol::OFPIT_APPLY_ACTIONS}
-                    , instruction_id{protocol::OFPIT_CLEAR_ACTIONS}, instruction_id{protocol::OFPIT_METER}
-                    , instruction_id{32, {'A', 'B'}}
-                  } // 4 + 4 * 6 + (8 + 2) = 38 => 40
-                , table_feature_properties::next_tables{
-                    1, 2, 3, 4, 5, 6, 7
-                  } // 4 + 7 = 11 => 16
-                , table_feature_properties::write_actions{
-                      action_id{protocol::OFPAT_OUTPUT}, action_id{protocol::OFPAT_COPY_TTL_OUT}, action_id{protocol::OFPAT_COPY_TTL_IN}
-                    , action_id{protocol::OFPAT_SET_MPLS_TTL}, action_id{protocol::OFPAT_DEC_MPLS_TTL}
-                    , action_id{protocol::OFPAT_PUSH_VLAN}, action_id{protocol::OFPAT_POP_VLAN}
-                    , action_id{protocol::OFPAT_PUSH_MPLS}, action_id{protocol::OFPAT_POP_MPLS}
-                    , action_id{protocol::OFPAT_SET_QUEUE}, action_id{protocol::OFPAT_GROUP}
-                    , action_id{protocol::OFPAT_SET_NW_TTL}, action_id{protocol::OFPAT_DEC_NW_TTL}
-                    , action_id{protocol::OFPAT_SET_FIELD}
-                    , action_id{protocol::OFPAT_PUSH_PBB}, action_id{protocol::OFPAT_POP_PBB}
-                  } // 4 + 4 * 16 = 68 => 72
-                , table_feature_properties::apply_actions{
-                      action_id{protocol::OFPAT_OUTPUT}, action_id{protocol::OFPAT_COPY_TTL_OUT}, action_id{protocol::OFPAT_COPY_TTL_IN}
-                    , action_id{protocol::OFPAT_SET_MPLS_TTL}, action_id{protocol::OFPAT_DEC_MPLS_TTL}
-                    , action_id{protocol::OFPAT_PUSH_VLAN}, action_id{protocol::OFPAT_POP_VLAN}
-                    , action_id{protocol::OFPAT_PUSH_MPLS}, action_id{protocol::OFPAT_POP_MPLS}
-                    , action_id{protocol::OFPAT_SET_QUEUE}, action_id{protocol::OFPAT_GROUP}
-                    , action_id{protocol::OFPAT_SET_NW_TTL}, action_id{protocol::OFPAT_DEC_NW_TTL}
-                    , action_id{protocol::OFPAT_SET_FIELD}
-                    , action_id{protocol::OFPAT_PUSH_PBB}, action_id{protocol::OFPAT_POP_PBB}
-                  } // 4 + 4 * 16 = 68 => 72
-                , table_feature_properties::match{
-                      oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IN_PORT, false, 4}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_METADATA, false, 8}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_ETH_DST, true, 12}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_ETH_SRC, true, 12}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_ETH_TYPE, false, 2}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_VLAN_VID, true, 4}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_VLAN_PCP, false, 1}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IP_DSCP, false, 1}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IP_ECN, false, 1}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IP_PROTO, false, 1}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IPV4_SRC, true, 8}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IPV4_DST, true, 8}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_TCP_SRC, false, 2}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_TCP_DST, false, 2}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_UDP_SRC, false, 2}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_UDP_DST, false, 2}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_SCTP_SRC, false, 2}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_SCTP_DST, false, 2}
-                    , oxm_id{std::uint32_t{32}, 0, false, 16}
-                  } // 4 + 4 * 18 + 8 = 84 => 88
-                , table_feature_properties::write_setfield{
-                      oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_ETH_DST, true, 12}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_ETH_SRC, true, 12}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_ETH_TYPE, false, 2}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_VLAN_VID, true, 4}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_VLAN_PCP, false, 1}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IP_DSCP, false, 1}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IP_ECN, false, 1}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IP_PROTO, false, 1}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IPV4_SRC, true, 8}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IPV4_DST, true, 8}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_TCP_SRC, false, 2}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_TCP_DST, false, 2}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_UDP_SRC, false, 2}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_UDP_DST, false, 2}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_SCTP_SRC, false, 2}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_SCTP_DST, false, 2}
-                  } // 4 + 4 * 16 = 68 => 72
-                , table_feature_properties::apply_setfield{
-                      oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_ETH_DST, true, 12}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_ETH_SRC, true, 12}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_ETH_TYPE, false, 2}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_VLAN_VID, true, 4}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_VLAN_PCP, false, 1}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IP_DSCP, false, 1}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IP_ECN, false, 1}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IP_PROTO, false, 1}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IPV4_SRC, true, 8}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_IPV4_DST, true, 8}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_TCP_SRC, false, 2}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_TCP_DST, false, 2}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_UDP_SRC, false, 2}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_UDP_DST, false, 2}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_SCTP_SRC, false, 2}
-                    , oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, protocol::OFPXMT_OFB_SCTP_DST, false, 2}
-                  } // 4 + 4 * 16 = 68 => 72
-              } // 40 + 16 + 72 + 72 + 88 + 72 + 72 = 432
-        }; // 64 + 432 = 496
-    }
-
-    messages::multipart::table_features features0 = create_features(0);
-    messages::multipart::table_features features1 = create_features(1);
-    messages::multipart::table_features features2 = create_features(2);
-    messages::multipart::table_features features3 = create_features(3);
-    messages::multipart::table_features features4 = create_features(4);
-    messages::multipart::table_features features5 = create_features(5);
-    messages::multipart::table_features features6 = create_features(6);
-    messages::multipart::table_features features7 = create_features(7);
-};
-
-BOOST_AUTO_TEST_SUITE(table_features_request_test)
-
-BOOST_AUTO_TEST_SUITE(instantiation_test)
-
-    BOOST_AUTO_TEST_CASE(default_constructor_test)
-    {
-        auto const sut = messages::multipart::table_features_request{};
-
-        BOOST_CHECK_EQUAL(sut.version(), protocol::OFP_VERSION);
-        BOOST_CHECK_EQUAL(sut.type(), protocol::OFPT_MULTIPART_REQUEST);
-        BOOST_CHECK_EQUAL(sut.length(), sizeof(protocol::ofp_multipart_request));
-        BOOST_CHECK_EQUAL(sut.multipart_type(), protocol::OFPMP_TABLE_FEATURES);
-        BOOST_CHECK_EQUAL(sut.flags(), 0);
-    }
-
-    BOOST_FIXTURE_TEST_CASE(constructor_test, table_features_fixture)
-    {
-        auto const sut = messages::multipart::table_features_request{
-            {features0, features1, features2, features3, features4, features5, features6, features7}
-        };
-
-        BOOST_CHECK_EQUAL(sut.version(), protocol::OFP_VERSION);
-        BOOST_CHECK_EQUAL(sut.type(), protocol::OFPT_MULTIPART_REQUEST);
-        BOOST_CHECK_EQUAL(sut.length(), sizeof(protocol::ofp_multipart_request) + 496 * 8);
-        BOOST_CHECK_EQUAL(sut.multipart_type(), protocol::OFPMP_TABLE_FEATURES);
-        BOOST_CHECK_EQUAL(sut.flags(), 0);
-    }
-
-BOOST_AUTO_TEST_SUITE_END() // instantiation_test
-
-struct encode_decode_fixture : table_features_fixture {
-    messages::multipart::table_features_request const sut = messages::multipart::table_features_request{
-        {features0, features1, features2, features3, features4, features5, features6, features7}
+      return v13::oxm_id{protocol::OFPXMC_OPENFLOW_BASIC, field, hasmask, len};
     };
-    std::vector<std::uint8_t> buffer{};
-};
-BOOST_FIXTURE_TEST_SUITE(encode_decode_test, encode_decode_fixture)
 
-    BOOST_AUTO_TEST_CASE(encode_test)
+    std::uint8_t table_id = 0x34;
+    boost::string_ref table_name = "test_table";
+    std::uint64_t metadata_match = 0x1f2f3f4f5f6f7f8f;
+    std::uint64_t metadata_write = 0xf1f2f3f4f5f6f7f8;
+    std::uint32_t config = 0x87654321;
+    std::uint32_t max_entries = 0x1f1f1f1f;
+    v13::table_feature_properties::instructions instructions{
+        v13::instruction_id{protocol::OFPIT_GOTO_TABLE}
+      , v13::instruction_id{protocol::OFPIT_WRITE_METADATA}
+      , v13::instruction_id{protocol::OFPIT_WRITE_ACTIONS}
+      , v13::instruction_id{protocol::OFPIT_APPLY_ACTIONS}
+      , v13::instruction_id{protocol::OFPIT_CLEAR_ACTIONS}
+      , v13::instruction_id{protocol::OFPIT_METER}
+      , v13::instruction_id{0x11223344, {'A', 'B'}}
+    }; // 4 + 4 * 6 + (8 + 2) = 38 => 40
+    v13::table_feature_properties::next_tables next_tables{
+      1, 2, 3, 4, 5, 6, 7
+    }; // 4 + 7 = 11 => 16
+    v13::table_feature_properties::write_actions write_actions{
+        v13::action_id{protocol::OFPAT_OUTPUT}
+      , v13::action_id{protocol::OFPAT_COPY_TTL_OUT}
+      , v13::action_id{protocol::OFPAT_COPY_TTL_IN}
+      , v13::action_id{protocol::OFPAT_SET_MPLS_TTL}
+      , v13::action_id{protocol::OFPAT_DEC_MPLS_TTL}
+      , v13::action_id{protocol::OFPAT_PUSH_VLAN}
+      , v13::action_id{protocol::OFPAT_POP_VLAN}
+      , v13::action_id{protocol::OFPAT_PUSH_MPLS}
+      , v13::action_id{protocol::OFPAT_POP_MPLS}
+      , v13::action_id{protocol::OFPAT_SET_QUEUE}
+      , v13::action_id{protocol::OFPAT_GROUP}
+      , v13::action_id{protocol::OFPAT_SET_NW_TTL}
+      , v13::action_id{protocol::OFPAT_DEC_NW_TTL}
+      , v13::action_id{protocol::OFPAT_SET_FIELD}
+      , v13::action_id{protocol::OFPAT_PUSH_PBB}
+      , v13::action_id{protocol::OFPAT_POP_PBB}
+    }; // 4 + 4 * 16 = 68 => 72
+    v13::table_feature_properties::apply_actions apply_actions{
+        v13::action_id{protocol::OFPAT_OUTPUT}
+      , v13::action_id{protocol::OFPAT_COPY_TTL_OUT}
+      , v13::action_id{protocol::OFPAT_COPY_TTL_IN}
+      , v13::action_id{protocol::OFPAT_SET_MPLS_TTL}
+      , v13::action_id{protocol::OFPAT_DEC_MPLS_TTL}
+      , v13::action_id{protocol::OFPAT_PUSH_VLAN}
+      , v13::action_id{protocol::OFPAT_POP_VLAN}
+      , v13::action_id{protocol::OFPAT_PUSH_MPLS}
+      , v13::action_id{protocol::OFPAT_POP_MPLS}
+      , v13::action_id{protocol::OFPAT_SET_QUEUE}
+      , v13::action_id{protocol::OFPAT_GROUP}
+      , v13::action_id{protocol::OFPAT_SET_NW_TTL}
+      , v13::action_id{protocol::OFPAT_DEC_NW_TTL}
+      , v13::action_id{protocol::OFPAT_SET_FIELD}
+      , v13::action_id{protocol::OFPAT_PUSH_PBB}
+      , v13::action_id{protocol::OFPAT_POP_PBB}
+    }; // 4 + 4 * 16 = 68 => 72
+    v13::table_feature_properties::match match{
+        make_oxm_id(protocol::OFPXMT_OFB_IN_PORT, false, 4)
+      , make_oxm_id(protocol::OFPXMT_OFB_METADATA, false, 8)
+      , make_oxm_id(protocol::OFPXMT_OFB_ETH_DST, true, 12)
+      , make_oxm_id(protocol::OFPXMT_OFB_ETH_SRC, true, 12)
+      , make_oxm_id(protocol::OFPXMT_OFB_ETH_TYPE, false, 2)
+      , make_oxm_id(protocol::OFPXMT_OFB_VLAN_VID, true, 4)
+      , make_oxm_id(protocol::OFPXMT_OFB_VLAN_PCP, false, 1)
+      , make_oxm_id(protocol::OFPXMT_OFB_IP_DSCP, false, 1)
+      , make_oxm_id(protocol::OFPXMT_OFB_IP_ECN, false, 1)
+      , make_oxm_id(protocol::OFPXMT_OFB_IP_PROTO, false, 1)
+      , make_oxm_id(protocol::OFPXMT_OFB_IPV4_SRC, true, 8)
+      , make_oxm_id(protocol::OFPXMT_OFB_IPV4_DST, true, 8)
+      , make_oxm_id(protocol::OFPXMT_OFB_TCP_SRC, false, 2)
+      , make_oxm_id(protocol::OFPXMT_OFB_TCP_DST, false, 2)
+      , make_oxm_id(protocol::OFPXMT_OFB_UDP_SRC, false, 2)
+      , make_oxm_id(protocol::OFPXMT_OFB_UDP_DST, false, 2)
+      , make_oxm_id(protocol::OFPXMT_OFB_SCTP_SRC, false, 2)
+      , make_oxm_id(protocol::OFPXMT_OFB_SCTP_DST, false, 2)
+      , v13::oxm_id{2, false, 16, std::uint32_t{0x01020304}}
+    }; // 4 + 4 * 18 + 8 = 84 => 88
+    v13::table_feature_properties::write_setfield write_setfield{
+        make_oxm_id(protocol::OFPXMT_OFB_ETH_DST, true, 12)
+      , make_oxm_id(protocol::OFPXMT_OFB_ETH_SRC, true, 12)
+      , make_oxm_id(protocol::OFPXMT_OFB_ETH_TYPE, false, 2)
+      , make_oxm_id(protocol::OFPXMT_OFB_VLAN_VID, true, 4)
+      , make_oxm_id(protocol::OFPXMT_OFB_VLAN_PCP, false, 1)
+      , make_oxm_id(protocol::OFPXMT_OFB_IP_DSCP, false, 1)
+      , make_oxm_id(protocol::OFPXMT_OFB_IP_ECN, false, 1)
+      , make_oxm_id(protocol::OFPXMT_OFB_IP_PROTO, false, 1)
+      , make_oxm_id(protocol::OFPXMT_OFB_IPV4_SRC, true, 8)
+      , make_oxm_id(protocol::OFPXMT_OFB_IPV4_DST, true, 8)
+      , make_oxm_id(protocol::OFPXMT_OFB_TCP_SRC, false, 2)
+      , make_oxm_id(protocol::OFPXMT_OFB_TCP_DST, false, 2)
+      , make_oxm_id(protocol::OFPXMT_OFB_UDP_SRC, false, 2)
+      , make_oxm_id(protocol::OFPXMT_OFB_UDP_DST, false, 2)
+      , make_oxm_id(protocol::OFPXMT_OFB_SCTP_SRC, false, 2)
+      , make_oxm_id(protocol::OFPXMT_OFB_SCTP_DST, false, 2)
+    }; // 4 + 4 * 16 = 68 => 72
+    v13::table_feature_properties::apply_setfield apply_setfield{
+        make_oxm_id(protocol::OFPXMT_OFB_ETH_DST, true, 12)
+      , make_oxm_id(protocol::OFPXMT_OFB_ETH_SRC, true, 12)
+      , make_oxm_id(protocol::OFPXMT_OFB_ETH_TYPE, false, 2)
+      , make_oxm_id(protocol::OFPXMT_OFB_VLAN_VID, true, 4)
+      , make_oxm_id(protocol::OFPXMT_OFB_VLAN_PCP, false, 1)
+      , make_oxm_id(protocol::OFPXMT_OFB_IP_DSCP, false, 1)
+      , make_oxm_id(protocol::OFPXMT_OFB_IP_ECN, false, 1)
+      , make_oxm_id(protocol::OFPXMT_OFB_IP_PROTO, false, 1)
+      , make_oxm_id(protocol::OFPXMT_OFB_IPV4_SRC, true, 8)
+      , make_oxm_id(protocol::OFPXMT_OFB_IPV4_DST, true, 8)
+      , make_oxm_id(protocol::OFPXMT_OFB_TCP_SRC, false, 2)
+      , make_oxm_id(protocol::OFPXMT_OFB_TCP_DST, false, 2)
+      , make_oxm_id(protocol::OFPXMT_OFB_UDP_SRC, false, 2)
+      , make_oxm_id(protocol::OFPXMT_OFB_UDP_DST, false, 2)
+      , make_oxm_id(protocol::OFPXMT_OFB_SCTP_SRC, false, 2)
+      , make_oxm_id(protocol::OFPXMT_OFB_SCTP_DST, false, 2)
+    }; // 4 + 4 * 16 = 68 => 72
+    v13::table_feature_property_set properties{
+        instructions, next_tables, write_actions, apply_actions
+      , match, write_setfield, apply_setfield
+    }; // 40 + 16 + 72 + 72 + 88 + 72 + 72 = 432
+  };
+  struct table_features_fixture : table_features_parameter {
+    auto create_features(std::uint8_t const table_id)
+      -> multipart::table_features
     {
-        sut.encode(buffer);
-
-        BOOST_CHECK_EQUAL(buffer.size(), sut.length());
+      auto const table_name = "table" + std::to_string(table_id);
+      return multipart::table_features{
+          table_id, table_name.c_str()
+        , metadata_match, metadata_write, config, max_entries, properties
+      }; // 64 + 432 = 496
     }
 
-BOOST_AUTO_TEST_SUITE_END() // encode_decode_test
-
-BOOST_AUTO_TEST_SUITE_END() // table_features_request_test
-
-
-BOOST_AUTO_TEST_SUITE(table_features_reply_test)
-
-BOOST_AUTO_TEST_SUITE(instantiation_test)
-
-    BOOST_AUTO_TEST_CASE(default_constructor_test)
-    {
-        auto const sut = messages::multipart::table_features_reply{{}};
-
-        BOOST_CHECK_EQUAL(sut.version(), protocol::OFP_VERSION);
-        BOOST_CHECK_EQUAL(sut.type(), protocol::OFPT_MULTIPART_REPLY);
-        BOOST_CHECK_EQUAL(sut.length(), sizeof(protocol::ofp_multipart_reply));
-        BOOST_CHECK_EQUAL(sut.multipart_type(), protocol::OFPMP_TABLE_FEATURES);
-        BOOST_CHECK_EQUAL(sut.flags(), 0);
-    }
-
-    BOOST_FIXTURE_TEST_CASE(constructor_test, table_features_fixture)
-    {
-        auto const sut = messages::multipart::table_features_reply{
-            {features0, features1, features2, features3, features4, features5, features6, features7}
-        };
-
-        BOOST_CHECK_EQUAL(sut.version(), protocol::OFP_VERSION);
-        BOOST_CHECK_EQUAL(sut.type(), protocol::OFPT_MULTIPART_REPLY);
-        BOOST_CHECK_EQUAL(sut.length(), sizeof(protocol::ofp_multipart_reply) + 496 * 8);
-        BOOST_CHECK_EQUAL(sut.multipart_type(), protocol::OFPMP_TABLE_FEATURES);
-        BOOST_CHECK_EQUAL(sut.flags(), 0);
-    }
-
-BOOST_AUTO_TEST_SUITE_END() // instantiation_test
-
-struct encode_decode_fixture : table_features_fixture { // TODO
-    messages::multipart::table_features_request const request = messages::multipart::table_features_request{
-        {features0, features1, features2, features3, features4, features5, features6, features7}
+    multipart::table_features sut{
+        table_id, table_name
+      , metadata_match, metadata_write, config, max_entries, properties
     };
-    messages::multipart::table_features_reply const sut = messages::multipart::table_features_reply{
-        {features0, features1, features2, features3, features4, features5, features6, features7}
+    std::vector<std::uint8_t> bin
+      = "\x01\xf0\x34\x00\x00\x00\x00\x00""test_table"
+                "\x00\x00\x00\x00\x00\x00""\x00\x00\x00\x00\x00\x00\x00\x00"
+        "\x00\x00\x00\x00\x00\x00\x00\x00""\x1f\x2f\x3f\x4f\x5f\x6f\x7f\x8f"
+        "\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8""\x87\x65\x43\x21\x1f\x1f\x1f\x1f"
+        // instructions properties
+        "\x00\x00\x00\x26\x00\x01\x00\x04""\x00\x02\x00\x04\x00\x03\x00\x04"
+        "\x00\x04\x00\x04\x00\x05\x00\x04""\x00\x06\x00\x04\xff\xff\x00\x0a"
+        "\x11\x22\x33\x44""A""B""\x00\x00"
+        // next_tables properties
+        "\x00\x02\x00\x0b\x01\x02\x03\x04""\x05\x06\x07\x00\x00\x00\x00\x00"
+        // write_actions properties
+        "\x00\x04\x00\x44\x00\x00\x00\x04""\x00\x0b\x00\x04\x00\x0c\x00\x04"
+        "\x00\x0f\x00\x04\x00\x10\x00\x04""\x00\x11\x00\x04\x00\x12\x00\x04"
+        "\x00\x13\x00\x04\x00\x14\x00\x04""\x00\x15\x00\x04\x00\x16\x00\x04"
+        "\x00\x17\x00\x04\x00\x18\x00\x04""\x00\x19\x00\x04\x00\x1a\x00\x04"
+        "\x00\x1b\x00\x04\x00\x00\x00\x00"
+        // apply_actions properties
+        "\x00\x06\x00\x44\x00\x00\x00\x04""\x00\x0b\x00\x04\x00\x0c\x00\x04"
+        "\x00\x0f\x00\x04\x00\x10\x00\x04""\x00\x11\x00\x04\x00\x12\x00\x04"
+        "\x00\x13\x00\x04\x00\x14\x00\x04""\x00\x15\x00\x04\x00\x16\x00\x04"
+        "\x00\x17\x00\x04\x00\x18\x00\x04""\x00\x19\x00\x04\x00\x1a\x00\x04"
+        "\x00\x1b\x00\x04\x00\x00\x00\x00"
+        // match properties
+        "\x00\x08\x00\x54\x80\x00\x00\x04""\x80\x00\x04\x08\x80\x00\x07\x0c"
+        "\x80\x00\x09\x0c\x80\x00\x0a\x02""\x80\x00\x0d\x04\x80\x00\x0e\x01"
+        "\x80\x00\x10\x01\x80\x00\x12\x01""\x80\x00\x14\x01\x80\x00\x17\x08"
+        "\x80\x00\x19\x08\x80\x00\x1a\x02""\x80\x00\x1c\x02\x80\x00\x1e\x02"
+        "\x80\x00\x20\x02\x80\x00\x22\x02""\x80\x00\x24\x02\xff\xff\x04\x10"
+        "\x01\x02\x03\x04\x00\x00\x00\x00"
+        // write_setfield properties
+        "\x00\x0c\x00\x44\x80\x00\x07\x0c""\x80\x00\x09\x0c\x80\x00\x0a\x02"
+        "\x80\x00\x0d\x04\x80\x00\x0e\x01""\x80\x00\x10\x01\x80\x00\x12\x01"
+        "\x80\x00\x14\x01\x80\x00\x17\x08""\x80\x00\x19\x08\x80\x00\x1a\x02"
+        "\x80\x00\x1c\x02\x80\x00\x1e\x02""\x80\x00\x20\x02\x80\x00\x22\x02"
+        "\x80\x00\x24\x02\x00\x00\x00\x00"
+        // apply_setfield properties
+        "\x00\x0e\x00\x44\x80\x00\x07\x0c""\x80\x00\x09\x0c\x80\x00\x0a\x02"
+        "\x80\x00\x0d\x04\x80\x00\x0e\x01""\x80\x00\x10\x01\x80\x00\x12\x01"
+        "\x80\x00\x14\x01\x80\x00\x17\x08""\x80\x00\x19\x08\x80\x00\x1a\x02"
+        "\x80\x00\x1c\x02\x80\x00\x1e\x02""\x80\x00\x20\x02\x80\x00\x22\x02"
+        "\x80\x00\x24\x02\x00\x00\x00\x00"
+
+        ""_bin;
+
+    multipart::table_features features0 = create_features(0);
+    multipart::table_features features1 = create_features(1);
+    multipart::table_features features2 = create_features(2);
+    multipart::table_features features3 = create_features(3);
+    multipart::table_features features4 = create_features(4);
+    multipart::table_features features5 = create_features(5);
+    multipart::table_features features6 = create_features(6);
+    multipart::table_features features7 = create_features(7);
+  };
+
+  struct table_features_request_parameter : table_features_fixture {
+    body_type body{features0, features1, features2, features3};
+    std::uint16_t flags = 0;
+    std::uint32_t xid = 0x12345678;
+  };
+  struct table_features_request_fixture : table_features_request_parameter {
+    multipart::table_features_request const sut{body, flags, xid};
+    std::vector<std::uint8_t> bin
+      = "\x04\x12\x07\xd0\x12\x34\x56\x78""\x00\x0c\x00\x00\x00\x00\x00\x00"
+
+        "\x01\xf0\x00\x00\x00\x00\x00\x00""table0"                "\x00\x00"
+        "\x00\x00\x00\x00\x00\x00\x00\x00""\x00\x00\x00\x00\x00\x00\x00\x00"
+        "\x00\x00\x00\x00\x00\x00\x00\x00""\x1f\x2f\x3f\x4f\x5f\x6f\x7f\x8f"
+        "\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8""\x87\x65\x43\x21\x1f\x1f\x1f\x1f"
+        "\x00\x00\x00\x26\x00\x01\x00\x04""\x00\x02\x00\x04\x00\x03\x00\x04"
+        "\x00\x04\x00\x04\x00\x05\x00\x04""\x00\x06\x00\x04\xff\xff\x00\x0a"
+        "\x11\x22\x33\x44""A""B""\x00\x00"
+        "\x00\x02\x00\x0b\x01\x02\x03\x04""\x05\x06\x07\x00\x00\x00\x00\x00"
+        "\x00\x04\x00\x44\x00\x00\x00\x04""\x00\x0b\x00\x04\x00\x0c\x00\x04"
+        "\x00\x0f\x00\x04\x00\x10\x00\x04""\x00\x11\x00\x04\x00\x12\x00\x04"
+        "\x00\x13\x00\x04\x00\x14\x00\x04""\x00\x15\x00\x04\x00\x16\x00\x04"
+        "\x00\x17\x00\x04\x00\x18\x00\x04""\x00\x19\x00\x04\x00\x1a\x00\x04"
+        "\x00\x1b\x00\x04\x00\x00\x00\x00"
+        "\x00\x06\x00\x44\x00\x00\x00\x04""\x00\x0b\x00\x04\x00\x0c\x00\x04"
+        "\x00\x0f\x00\x04\x00\x10\x00\x04""\x00\x11\x00\x04\x00\x12\x00\x04"
+        "\x00\x13\x00\x04\x00\x14\x00\x04""\x00\x15\x00\x04\x00\x16\x00\x04"
+        "\x00\x17\x00\x04\x00\x18\x00\x04""\x00\x19\x00\x04\x00\x1a\x00\x04"
+        "\x00\x1b\x00\x04\x00\x00\x00\x00"
+        "\x00\x08\x00\x54\x80\x00\x00\x04""\x80\x00\x04\x08\x80\x00\x07\x0c"
+        "\x80\x00\x09\x0c\x80\x00\x0a\x02""\x80\x00\x0d\x04\x80\x00\x0e\x01"
+        "\x80\x00\x10\x01\x80\x00\x12\x01""\x80\x00\x14\x01\x80\x00\x17\x08"
+        "\x80\x00\x19\x08\x80\x00\x1a\x02""\x80\x00\x1c\x02\x80\x00\x1e\x02"
+        "\x80\x00\x20\x02\x80\x00\x22\x02""\x80\x00\x24\x02\xff\xff\x04\x10"
+        "\x01\x02\x03\x04\x00\x00\x00\x00"
+        "\x00\x0c\x00\x44\x80\x00\x07\x0c""\x80\x00\x09\x0c\x80\x00\x0a\x02"
+        "\x80\x00\x0d\x04\x80\x00\x0e\x01""\x80\x00\x10\x01\x80\x00\x12\x01"
+        "\x80\x00\x14\x01\x80\x00\x17\x08""\x80\x00\x19\x08\x80\x00\x1a\x02"
+        "\x80\x00\x1c\x02\x80\x00\x1e\x02""\x80\x00\x20\x02\x80\x00\x22\x02"
+        "\x80\x00\x24\x02\x00\x00\x00\x00"
+        "\x00\x0e\x00\x44\x80\x00\x07\x0c""\x80\x00\x09\x0c\x80\x00\x0a\x02"
+        "\x80\x00\x0d\x04\x80\x00\x0e\x01""\x80\x00\x10\x01\x80\x00\x12\x01"
+        "\x80\x00\x14\x01\x80\x00\x17\x08""\x80\x00\x19\x08\x80\x00\x1a\x02"
+        "\x80\x00\x1c\x02\x80\x00\x1e\x02""\x80\x00\x20\x02\x80\x00\x22\x02"
+        "\x80\x00\x24\x02\x00\x00\x00\x00"
+
+        "\x01\xf0\x01\x00\x00\x00\x00\x00""table1"                "\x00\x00"
+        "\x00\x00\x00\x00\x00\x00\x00\x00""\x00\x00\x00\x00\x00\x00\x00\x00"
+        "\x00\x00\x00\x00\x00\x00\x00\x00""\x1f\x2f\x3f\x4f\x5f\x6f\x7f\x8f"
+        "\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8""\x87\x65\x43\x21\x1f\x1f\x1f\x1f"
+        "\x00\x00\x00\x26\x00\x01\x00\x04""\x00\x02\x00\x04\x00\x03\x00\x04"
+        "\x00\x04\x00\x04\x00\x05\x00\x04""\x00\x06\x00\x04\xff\xff\x00\x0a"
+        "\x11\x22\x33\x44""A""B""\x00\x00"
+        "\x00\x02\x00\x0b\x01\x02\x03\x04""\x05\x06\x07\x00\x00\x00\x00\x00"
+        "\x00\x04\x00\x44\x00\x00\x00\x04""\x00\x0b\x00\x04\x00\x0c\x00\x04"
+        "\x00\x0f\x00\x04\x00\x10\x00\x04""\x00\x11\x00\x04\x00\x12\x00\x04"
+        "\x00\x13\x00\x04\x00\x14\x00\x04""\x00\x15\x00\x04\x00\x16\x00\x04"
+        "\x00\x17\x00\x04\x00\x18\x00\x04""\x00\x19\x00\x04\x00\x1a\x00\x04"
+        "\x00\x1b\x00\x04\x00\x00\x00\x00"
+        "\x00\x06\x00\x44\x00\x00\x00\x04""\x00\x0b\x00\x04\x00\x0c\x00\x04"
+        "\x00\x0f\x00\x04\x00\x10\x00\x04""\x00\x11\x00\x04\x00\x12\x00\x04"
+        "\x00\x13\x00\x04\x00\x14\x00\x04""\x00\x15\x00\x04\x00\x16\x00\x04"
+        "\x00\x17\x00\x04\x00\x18\x00\x04""\x00\x19\x00\x04\x00\x1a\x00\x04"
+        "\x00\x1b\x00\x04\x00\x00\x00\x00"
+        "\x00\x08\x00\x54\x80\x00\x00\x04""\x80\x00\x04\x08\x80\x00\x07\x0c"
+        "\x80\x00\x09\x0c\x80\x00\x0a\x02""\x80\x00\x0d\x04\x80\x00\x0e\x01"
+        "\x80\x00\x10\x01\x80\x00\x12\x01""\x80\x00\x14\x01\x80\x00\x17\x08"
+        "\x80\x00\x19\x08\x80\x00\x1a\x02""\x80\x00\x1c\x02\x80\x00\x1e\x02"
+        "\x80\x00\x20\x02\x80\x00\x22\x02""\x80\x00\x24\x02\xff\xff\x04\x10"
+        "\x01\x02\x03\x04\x00\x00\x00\x00"
+        "\x00\x0c\x00\x44\x80\x00\x07\x0c""\x80\x00\x09\x0c\x80\x00\x0a\x02"
+        "\x80\x00\x0d\x04\x80\x00\x0e\x01""\x80\x00\x10\x01\x80\x00\x12\x01"
+        "\x80\x00\x14\x01\x80\x00\x17\x08""\x80\x00\x19\x08\x80\x00\x1a\x02"
+        "\x80\x00\x1c\x02\x80\x00\x1e\x02""\x80\x00\x20\x02\x80\x00\x22\x02"
+        "\x80\x00\x24\x02\x00\x00\x00\x00"
+        "\x00\x0e\x00\x44\x80\x00\x07\x0c""\x80\x00\x09\x0c\x80\x00\x0a\x02"
+        "\x80\x00\x0d\x04\x80\x00\x0e\x01""\x80\x00\x10\x01\x80\x00\x12\x01"
+        "\x80\x00\x14\x01\x80\x00\x17\x08""\x80\x00\x19\x08\x80\x00\x1a\x02"
+        "\x80\x00\x1c\x02\x80\x00\x1e\x02""\x80\x00\x20\x02\x80\x00\x22\x02"
+        "\x80\x00\x24\x02\x00\x00\x00\x00"
+
+        "\x01\xf0\x02\x00\x00\x00\x00\x00""table2"                "\x00\x00"
+        "\x00\x00\x00\x00\x00\x00\x00\x00""\x00\x00\x00\x00\x00\x00\x00\x00"
+        "\x00\x00\x00\x00\x00\x00\x00\x00""\x1f\x2f\x3f\x4f\x5f\x6f\x7f\x8f"
+        "\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8""\x87\x65\x43\x21\x1f\x1f\x1f\x1f"
+        "\x00\x00\x00\x26\x00\x01\x00\x04""\x00\x02\x00\x04\x00\x03\x00\x04"
+        "\x00\x04\x00\x04\x00\x05\x00\x04""\x00\x06\x00\x04\xff\xff\x00\x0a"
+        "\x11\x22\x33\x44""A""B""\x00\x00"
+        "\x00\x02\x00\x0b\x01\x02\x03\x04""\x05\x06\x07\x00\x00\x00\x00\x00"
+        "\x00\x04\x00\x44\x00\x00\x00\x04""\x00\x0b\x00\x04\x00\x0c\x00\x04"
+        "\x00\x0f\x00\x04\x00\x10\x00\x04""\x00\x11\x00\x04\x00\x12\x00\x04"
+        "\x00\x13\x00\x04\x00\x14\x00\x04""\x00\x15\x00\x04\x00\x16\x00\x04"
+        "\x00\x17\x00\x04\x00\x18\x00\x04""\x00\x19\x00\x04\x00\x1a\x00\x04"
+        "\x00\x1b\x00\x04\x00\x00\x00\x00"
+        "\x00\x06\x00\x44\x00\x00\x00\x04""\x00\x0b\x00\x04\x00\x0c\x00\x04"
+        "\x00\x0f\x00\x04\x00\x10\x00\x04""\x00\x11\x00\x04\x00\x12\x00\x04"
+        "\x00\x13\x00\x04\x00\x14\x00\x04""\x00\x15\x00\x04\x00\x16\x00\x04"
+        "\x00\x17\x00\x04\x00\x18\x00\x04""\x00\x19\x00\x04\x00\x1a\x00\x04"
+        "\x00\x1b\x00\x04\x00\x00\x00\x00"
+        "\x00\x08\x00\x54\x80\x00\x00\x04""\x80\x00\x04\x08\x80\x00\x07\x0c"
+        "\x80\x00\x09\x0c\x80\x00\x0a\x02""\x80\x00\x0d\x04\x80\x00\x0e\x01"
+        "\x80\x00\x10\x01\x80\x00\x12\x01""\x80\x00\x14\x01\x80\x00\x17\x08"
+        "\x80\x00\x19\x08\x80\x00\x1a\x02""\x80\x00\x1c\x02\x80\x00\x1e\x02"
+        "\x80\x00\x20\x02\x80\x00\x22\x02""\x80\x00\x24\x02\xff\xff\x04\x10"
+        "\x01\x02\x03\x04\x00\x00\x00\x00"
+        "\x00\x0c\x00\x44\x80\x00\x07\x0c""\x80\x00\x09\x0c\x80\x00\x0a\x02"
+        "\x80\x00\x0d\x04\x80\x00\x0e\x01""\x80\x00\x10\x01\x80\x00\x12\x01"
+        "\x80\x00\x14\x01\x80\x00\x17\x08""\x80\x00\x19\x08\x80\x00\x1a\x02"
+        "\x80\x00\x1c\x02\x80\x00\x1e\x02""\x80\x00\x20\x02\x80\x00\x22\x02"
+        "\x80\x00\x24\x02\x00\x00\x00\x00"
+        "\x00\x0e\x00\x44\x80\x00\x07\x0c""\x80\x00\x09\x0c\x80\x00\x0a\x02"
+        "\x80\x00\x0d\x04\x80\x00\x0e\x01""\x80\x00\x10\x01\x80\x00\x12\x01"
+        "\x80\x00\x14\x01\x80\x00\x17\x08""\x80\x00\x19\x08\x80\x00\x1a\x02"
+        "\x80\x00\x1c\x02\x80\x00\x1e\x02""\x80\x00\x20\x02\x80\x00\x22\x02"
+        "\x80\x00\x24\x02\x00\x00\x00\x00"
+
+        "\x01\xf0\x03\x00\x00\x00\x00\x00""table3"                "\x00\x00"
+        "\x00\x00\x00\x00\x00\x00\x00\x00""\x00\x00\x00\x00\x00\x00\x00\x00"
+        "\x00\x00\x00\x00\x00\x00\x00\x00""\x1f\x2f\x3f\x4f\x5f\x6f\x7f\x8f"
+        "\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8""\x87\x65\x43\x21\x1f\x1f\x1f\x1f"
+        "\x00\x00\x00\x26\x00\x01\x00\x04""\x00\x02\x00\x04\x00\x03\x00\x04"
+        "\x00\x04\x00\x04\x00\x05\x00\x04""\x00\x06\x00\x04\xff\xff\x00\x0a"
+        "\x11\x22\x33\x44""A""B""\x00\x00"
+        "\x00\x02\x00\x0b\x01\x02\x03\x04""\x05\x06\x07\x00\x00\x00\x00\x00"
+        "\x00\x04\x00\x44\x00\x00\x00\x04""\x00\x0b\x00\x04\x00\x0c\x00\x04"
+        "\x00\x0f\x00\x04\x00\x10\x00\x04""\x00\x11\x00\x04\x00\x12\x00\x04"
+        "\x00\x13\x00\x04\x00\x14\x00\x04""\x00\x15\x00\x04\x00\x16\x00\x04"
+        "\x00\x17\x00\x04\x00\x18\x00\x04""\x00\x19\x00\x04\x00\x1a\x00\x04"
+        "\x00\x1b\x00\x04\x00\x00\x00\x00"
+        "\x00\x06\x00\x44\x00\x00\x00\x04""\x00\x0b\x00\x04\x00\x0c\x00\x04"
+        "\x00\x0f\x00\x04\x00\x10\x00\x04""\x00\x11\x00\x04\x00\x12\x00\x04"
+        "\x00\x13\x00\x04\x00\x14\x00\x04""\x00\x15\x00\x04\x00\x16\x00\x04"
+        "\x00\x17\x00\x04\x00\x18\x00\x04""\x00\x19\x00\x04\x00\x1a\x00\x04"
+        "\x00\x1b\x00\x04\x00\x00\x00\x00"
+        "\x00\x08\x00\x54\x80\x00\x00\x04""\x80\x00\x04\x08\x80\x00\x07\x0c"
+        "\x80\x00\x09\x0c\x80\x00\x0a\x02""\x80\x00\x0d\x04\x80\x00\x0e\x01"
+        "\x80\x00\x10\x01\x80\x00\x12\x01""\x80\x00\x14\x01\x80\x00\x17\x08"
+        "\x80\x00\x19\x08\x80\x00\x1a\x02""\x80\x00\x1c\x02\x80\x00\x1e\x02"
+        "\x80\x00\x20\x02\x80\x00\x22\x02""\x80\x00\x24\x02\xff\xff\x04\x10"
+        "\x01\x02\x03\x04\x00\x00\x00\x00"
+        "\x00\x0c\x00\x44\x80\x00\x07\x0c""\x80\x00\x09\x0c\x80\x00\x0a\x02"
+        "\x80\x00\x0d\x04\x80\x00\x0e\x01""\x80\x00\x10\x01\x80\x00\x12\x01"
+        "\x80\x00\x14\x01\x80\x00\x17\x08""\x80\x00\x19\x08\x80\x00\x1a\x02"
+        "\x80\x00\x1c\x02\x80\x00\x1e\x02""\x80\x00\x20\x02\x80\x00\x22\x02"
+        "\x80\x00\x24\x02\x00\x00\x00\x00"
+        "\x00\x0e\x00\x44\x80\x00\x07\x0c""\x80\x00\x09\x0c\x80\x00\x0a\x02"
+        "\x80\x00\x0d\x04\x80\x00\x0e\x01""\x80\x00\x10\x01\x80\x00\x12\x01"
+        "\x80\x00\x14\x01\x80\x00\x17\x08""\x80\x00\x19\x08\x80\x00\x1a\x02"
+        "\x80\x00\x1c\x02\x80\x00\x1e\x02""\x80\x00\x20\x02\x80\x00\x22\x02"
+        "\x80\x00\x24\x02\x00\x00\x00\x00"
+        ""_bin;
+  };
+
+  struct table_features_reply_parameter : table_features_fixture {
+    body_type body{
+        features0, features1, features2, features3
+      , features4, features5, features6, features7
     };
-    std::vector<std::uint8_t> buffer{};
+    std::uint16_t flags = protocol::OFPMPF_REPLY_MORE;
+    std::uint32_t xid = 0x12345678;
+  };
+  struct table_features_reply_fixture : table_features_reply_parameter {
+    multipart::table_features_reply const sut{body, flags, xid};
+    std::vector<std::uint8_t> bin
+      = "\x04\x13\x0f\x90\x12\x34\x56\x78""\x00\x0c\x00\x01\x00\x00\x00\x00"
 
-    encode_decode_fixture() { request.encode(buffer); }
-};
-BOOST_FIXTURE_TEST_SUITE(encode_decode_test, encode_decode_fixture)
+        "\x01\xf0\x00\x00\x00\x00\x00\x00""table0"                "\x00\x00"
+        "\x00\x00\x00\x00\x00\x00\x00\x00""\x00\x00\x00\x00\x00\x00\x00\x00"
+        "\x00\x00\x00\x00\x00\x00\x00\x00""\x1f\x2f\x3f\x4f\x5f\x6f\x7f\x8f"
+        "\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8""\x87\x65\x43\x21\x1f\x1f\x1f\x1f"
+        "\x00\x00\x00\x26\x00\x01\x00\x04""\x00\x02\x00\x04\x00\x03\x00\x04"
+        "\x00\x04\x00\x04\x00\x05\x00\x04""\x00\x06\x00\x04\xff\xff\x00\x0a"
+        "\x11\x22\x33\x44""A""B""\x00\x00"
+        "\x00\x02\x00\x0b\x01\x02\x03\x04""\x05\x06\x07\x00\x00\x00\x00\x00"
+        "\x00\x04\x00\x44\x00\x00\x00\x04""\x00\x0b\x00\x04\x00\x0c\x00\x04"
+        "\x00\x0f\x00\x04\x00\x10\x00\x04""\x00\x11\x00\x04\x00\x12\x00\x04"
+        "\x00\x13\x00\x04\x00\x14\x00\x04""\x00\x15\x00\x04\x00\x16\x00\x04"
+        "\x00\x17\x00\x04\x00\x18\x00\x04""\x00\x19\x00\x04\x00\x1a\x00\x04"
+        "\x00\x1b\x00\x04\x00\x00\x00\x00"
+        "\x00\x06\x00\x44\x00\x00\x00\x04""\x00\x0b\x00\x04\x00\x0c\x00\x04"
+        "\x00\x0f\x00\x04\x00\x10\x00\x04""\x00\x11\x00\x04\x00\x12\x00\x04"
+        "\x00\x13\x00\x04\x00\x14\x00\x04""\x00\x15\x00\x04\x00\x16\x00\x04"
+        "\x00\x17\x00\x04\x00\x18\x00\x04""\x00\x19\x00\x04\x00\x1a\x00\x04"
+        "\x00\x1b\x00\x04\x00\x00\x00\x00"
+        "\x00\x08\x00\x54\x80\x00\x00\x04""\x80\x00\x04\x08\x80\x00\x07\x0c"
+        "\x80\x00\x09\x0c\x80\x00\x0a\x02""\x80\x00\x0d\x04\x80\x00\x0e\x01"
+        "\x80\x00\x10\x01\x80\x00\x12\x01""\x80\x00\x14\x01\x80\x00\x17\x08"
+        "\x80\x00\x19\x08\x80\x00\x1a\x02""\x80\x00\x1c\x02\x80\x00\x1e\x02"
+        "\x80\x00\x20\x02\x80\x00\x22\x02""\x80\x00\x24\x02\xff\xff\x04\x10"
+        "\x01\x02\x03\x04\x00\x00\x00\x00"
+        "\x00\x0c\x00\x44\x80\x00\x07\x0c""\x80\x00\x09\x0c\x80\x00\x0a\x02"
+        "\x80\x00\x0d\x04\x80\x00\x0e\x01""\x80\x00\x10\x01\x80\x00\x12\x01"
+        "\x80\x00\x14\x01\x80\x00\x17\x08""\x80\x00\x19\x08\x80\x00\x1a\x02"
+        "\x80\x00\x1c\x02\x80\x00\x1e\x02""\x80\x00\x20\x02\x80\x00\x22\x02"
+        "\x80\x00\x24\x02\x00\x00\x00\x00"
+        "\x00\x0e\x00\x44\x80\x00\x07\x0c""\x80\x00\x09\x0c\x80\x00\x0a\x02"
+        "\x80\x00\x0d\x04\x80\x00\x0e\x01""\x80\x00\x10\x01\x80\x00\x12\x01"
+        "\x80\x00\x14\x01\x80\x00\x17\x08""\x80\x00\x19\x08\x80\x00\x1a\x02"
+        "\x80\x00\x1c\x02\x80\x00\x1e\x02""\x80\x00\x20\x02\x80\x00\x22\x02"
+        "\x80\x00\x24\x02\x00\x00\x00\x00"
 
-    BOOST_AUTO_TEST_CASE(decode_test)
+        "\x01\xf0\x01\x00\x00\x00\x00\x00""table1"                "\x00\x00"
+        "\x00\x00\x00\x00\x00\x00\x00\x00""\x00\x00\x00\x00\x00\x00\x00\x00"
+        "\x00\x00\x00\x00\x00\x00\x00\x00""\x1f\x2f\x3f\x4f\x5f\x6f\x7f\x8f"
+        "\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8""\x87\x65\x43\x21\x1f\x1f\x1f\x1f"
+        "\x00\x00\x00\x26\x00\x01\x00\x04""\x00\x02\x00\x04\x00\x03\x00\x04"
+        "\x00\x04\x00\x04\x00\x05\x00\x04""\x00\x06\x00\x04\xff\xff\x00\x0a"
+        "\x11\x22\x33\x44""A""B""\x00\x00"
+        "\x00\x02\x00\x0b\x01\x02\x03\x04""\x05\x06\x07\x00\x00\x00\x00\x00"
+        "\x00\x04\x00\x44\x00\x00\x00\x04""\x00\x0b\x00\x04\x00\x0c\x00\x04"
+        "\x00\x0f\x00\x04\x00\x10\x00\x04""\x00\x11\x00\x04\x00\x12\x00\x04"
+        "\x00\x13\x00\x04\x00\x14\x00\x04""\x00\x15\x00\x04\x00\x16\x00\x04"
+        "\x00\x17\x00\x04\x00\x18\x00\x04""\x00\x19\x00\x04\x00\x1a\x00\x04"
+        "\x00\x1b\x00\x04\x00\x00\x00\x00"
+        "\x00\x06\x00\x44\x00\x00\x00\x04""\x00\x0b\x00\x04\x00\x0c\x00\x04"
+        "\x00\x0f\x00\x04\x00\x10\x00\x04""\x00\x11\x00\x04\x00\x12\x00\x04"
+        "\x00\x13\x00\x04\x00\x14\x00\x04""\x00\x15\x00\x04\x00\x16\x00\x04"
+        "\x00\x17\x00\x04\x00\x18\x00\x04""\x00\x19\x00\x04\x00\x1a\x00\x04"
+        "\x00\x1b\x00\x04\x00\x00\x00\x00"
+        "\x00\x08\x00\x54\x80\x00\x00\x04""\x80\x00\x04\x08\x80\x00\x07\x0c"
+        "\x80\x00\x09\x0c\x80\x00\x0a\x02""\x80\x00\x0d\x04\x80\x00\x0e\x01"
+        "\x80\x00\x10\x01\x80\x00\x12\x01""\x80\x00\x14\x01\x80\x00\x17\x08"
+        "\x80\x00\x19\x08\x80\x00\x1a\x02""\x80\x00\x1c\x02\x80\x00\x1e\x02"
+        "\x80\x00\x20\x02\x80\x00\x22\x02""\x80\x00\x24\x02\xff\xff\x04\x10"
+        "\x01\x02\x03\x04\x00\x00\x00\x00"
+        "\x00\x0c\x00\x44\x80\x00\x07\x0c""\x80\x00\x09\x0c\x80\x00\x0a\x02"
+        "\x80\x00\x0d\x04\x80\x00\x0e\x01""\x80\x00\x10\x01\x80\x00\x12\x01"
+        "\x80\x00\x14\x01\x80\x00\x17\x08""\x80\x00\x19\x08\x80\x00\x1a\x02"
+        "\x80\x00\x1c\x02\x80\x00\x1e\x02""\x80\x00\x20\x02\x80\x00\x22\x02"
+        "\x80\x00\x24\x02\x00\x00\x00\x00"
+        "\x00\x0e\x00\x44\x80\x00\x07\x0c""\x80\x00\x09\x0c\x80\x00\x0a\x02"
+        "\x80\x00\x0d\x04\x80\x00\x0e\x01""\x80\x00\x10\x01\x80\x00\x12\x01"
+        "\x80\x00\x14\x01\x80\x00\x17\x08""\x80\x00\x19\x08\x80\x00\x1a\x02"
+        "\x80\x00\x1c\x02\x80\x00\x1e\x02""\x80\x00\x20\x02\x80\x00\x22\x02"
+        "\x80\x00\x24\x02\x00\x00\x00\x00"
+
+        "\x01\xf0\x02\x00\x00\x00\x00\x00""table2"                "\x00\x00"
+        "\x00\x00\x00\x00\x00\x00\x00\x00""\x00\x00\x00\x00\x00\x00\x00\x00"
+        "\x00\x00\x00\x00\x00\x00\x00\x00""\x1f\x2f\x3f\x4f\x5f\x6f\x7f\x8f"
+        "\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8""\x87\x65\x43\x21\x1f\x1f\x1f\x1f"
+        "\x00\x00\x00\x26\x00\x01\x00\x04""\x00\x02\x00\x04\x00\x03\x00\x04"
+        "\x00\x04\x00\x04\x00\x05\x00\x04""\x00\x06\x00\x04\xff\xff\x00\x0a"
+        "\x11\x22\x33\x44""A""B""\x00\x00"
+        "\x00\x02\x00\x0b\x01\x02\x03\x04""\x05\x06\x07\x00\x00\x00\x00\x00"
+        "\x00\x04\x00\x44\x00\x00\x00\x04""\x00\x0b\x00\x04\x00\x0c\x00\x04"
+        "\x00\x0f\x00\x04\x00\x10\x00\x04""\x00\x11\x00\x04\x00\x12\x00\x04"
+        "\x00\x13\x00\x04\x00\x14\x00\x04""\x00\x15\x00\x04\x00\x16\x00\x04"
+        "\x00\x17\x00\x04\x00\x18\x00\x04""\x00\x19\x00\x04\x00\x1a\x00\x04"
+        "\x00\x1b\x00\x04\x00\x00\x00\x00"
+        "\x00\x06\x00\x44\x00\x00\x00\x04""\x00\x0b\x00\x04\x00\x0c\x00\x04"
+        "\x00\x0f\x00\x04\x00\x10\x00\x04""\x00\x11\x00\x04\x00\x12\x00\x04"
+        "\x00\x13\x00\x04\x00\x14\x00\x04""\x00\x15\x00\x04\x00\x16\x00\x04"
+        "\x00\x17\x00\x04\x00\x18\x00\x04""\x00\x19\x00\x04\x00\x1a\x00\x04"
+        "\x00\x1b\x00\x04\x00\x00\x00\x00"
+        "\x00\x08\x00\x54\x80\x00\x00\x04""\x80\x00\x04\x08\x80\x00\x07\x0c"
+        "\x80\x00\x09\x0c\x80\x00\x0a\x02""\x80\x00\x0d\x04\x80\x00\x0e\x01"
+        "\x80\x00\x10\x01\x80\x00\x12\x01""\x80\x00\x14\x01\x80\x00\x17\x08"
+        "\x80\x00\x19\x08\x80\x00\x1a\x02""\x80\x00\x1c\x02\x80\x00\x1e\x02"
+        "\x80\x00\x20\x02\x80\x00\x22\x02""\x80\x00\x24\x02\xff\xff\x04\x10"
+        "\x01\x02\x03\x04\x00\x00\x00\x00"
+        "\x00\x0c\x00\x44\x80\x00\x07\x0c""\x80\x00\x09\x0c\x80\x00\x0a\x02"
+        "\x80\x00\x0d\x04\x80\x00\x0e\x01""\x80\x00\x10\x01\x80\x00\x12\x01"
+        "\x80\x00\x14\x01\x80\x00\x17\x08""\x80\x00\x19\x08\x80\x00\x1a\x02"
+        "\x80\x00\x1c\x02\x80\x00\x1e\x02""\x80\x00\x20\x02\x80\x00\x22\x02"
+        "\x80\x00\x24\x02\x00\x00\x00\x00"
+        "\x00\x0e\x00\x44\x80\x00\x07\x0c""\x80\x00\x09\x0c\x80\x00\x0a\x02"
+        "\x80\x00\x0d\x04\x80\x00\x0e\x01""\x80\x00\x10\x01\x80\x00\x12\x01"
+        "\x80\x00\x14\x01\x80\x00\x17\x08""\x80\x00\x19\x08\x80\x00\x1a\x02"
+        "\x80\x00\x1c\x02\x80\x00\x1e\x02""\x80\x00\x20\x02\x80\x00\x22\x02"
+        "\x80\x00\x24\x02\x00\x00\x00\x00"
+
+        "\x01\xf0\x03\x00\x00\x00\x00\x00""table3"                "\x00\x00"
+        "\x00\x00\x00\x00\x00\x00\x00\x00""\x00\x00\x00\x00\x00\x00\x00\x00"
+        "\x00\x00\x00\x00\x00\x00\x00\x00""\x1f\x2f\x3f\x4f\x5f\x6f\x7f\x8f"
+        "\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8""\x87\x65\x43\x21\x1f\x1f\x1f\x1f"
+        "\x00\x00\x00\x26\x00\x01\x00\x04""\x00\x02\x00\x04\x00\x03\x00\x04"
+        "\x00\x04\x00\x04\x00\x05\x00\x04""\x00\x06\x00\x04\xff\xff\x00\x0a"
+        "\x11\x22\x33\x44""A""B""\x00\x00"
+        "\x00\x02\x00\x0b\x01\x02\x03\x04""\x05\x06\x07\x00\x00\x00\x00\x00"
+        "\x00\x04\x00\x44\x00\x00\x00\x04""\x00\x0b\x00\x04\x00\x0c\x00\x04"
+        "\x00\x0f\x00\x04\x00\x10\x00\x04""\x00\x11\x00\x04\x00\x12\x00\x04"
+        "\x00\x13\x00\x04\x00\x14\x00\x04""\x00\x15\x00\x04\x00\x16\x00\x04"
+        "\x00\x17\x00\x04\x00\x18\x00\x04""\x00\x19\x00\x04\x00\x1a\x00\x04"
+        "\x00\x1b\x00\x04\x00\x00\x00\x00"
+        "\x00\x06\x00\x44\x00\x00\x00\x04""\x00\x0b\x00\x04\x00\x0c\x00\x04"
+        "\x00\x0f\x00\x04\x00\x10\x00\x04""\x00\x11\x00\x04\x00\x12\x00\x04"
+        "\x00\x13\x00\x04\x00\x14\x00\x04""\x00\x15\x00\x04\x00\x16\x00\x04"
+        "\x00\x17\x00\x04\x00\x18\x00\x04""\x00\x19\x00\x04\x00\x1a\x00\x04"
+        "\x00\x1b\x00\x04\x00\x00\x00\x00"
+        "\x00\x08\x00\x54\x80\x00\x00\x04""\x80\x00\x04\x08\x80\x00\x07\x0c"
+        "\x80\x00\x09\x0c\x80\x00\x0a\x02""\x80\x00\x0d\x04\x80\x00\x0e\x01"
+        "\x80\x00\x10\x01\x80\x00\x12\x01""\x80\x00\x14\x01\x80\x00\x17\x08"
+        "\x80\x00\x19\x08\x80\x00\x1a\x02""\x80\x00\x1c\x02\x80\x00\x1e\x02"
+        "\x80\x00\x20\x02\x80\x00\x22\x02""\x80\x00\x24\x02\xff\xff\x04\x10"
+        "\x01\x02\x03\x04\x00\x00\x00\x00"
+        "\x00\x0c\x00\x44\x80\x00\x07\x0c""\x80\x00\x09\x0c\x80\x00\x0a\x02"
+        "\x80\x00\x0d\x04\x80\x00\x0e\x01""\x80\x00\x10\x01\x80\x00\x12\x01"
+        "\x80\x00\x14\x01\x80\x00\x17\x08""\x80\x00\x19\x08\x80\x00\x1a\x02"
+        "\x80\x00\x1c\x02\x80\x00\x1e\x02""\x80\x00\x20\x02\x80\x00\x22\x02"
+        "\x80\x00\x24\x02\x00\x00\x00\x00"
+        "\x00\x0e\x00\x44\x80\x00\x07\x0c""\x80\x00\x09\x0c\x80\x00\x0a\x02"
+        "\x80\x00\x0d\x04\x80\x00\x0e\x01""\x80\x00\x10\x01\x80\x00\x12\x01"
+        "\x80\x00\x14\x01\x80\x00\x17\x08""\x80\x00\x19\x08\x80\x00\x1a\x02"
+        "\x80\x00\x1c\x02\x80\x00\x1e\x02""\x80\x00\x20\x02\x80\x00\x22\x02"
+        "\x80\x00\x24\x02\x00\x00\x00\x00"
+
+        "\x01\xf0\x04\x00\x00\x00\x00\x00""table4"                "\x00\x00"
+        "\x00\x00\x00\x00\x00\x00\x00\x00""\x00\x00\x00\x00\x00\x00\x00\x00"
+        "\x00\x00\x00\x00\x00\x00\x00\x00""\x1f\x2f\x3f\x4f\x5f\x6f\x7f\x8f"
+        "\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8""\x87\x65\x43\x21\x1f\x1f\x1f\x1f"
+        "\x00\x00\x00\x26\x00\x01\x00\x04""\x00\x02\x00\x04\x00\x03\x00\x04"
+        "\x00\x04\x00\x04\x00\x05\x00\x04""\x00\x06\x00\x04\xff\xff\x00\x0a"
+        "\x11\x22\x33\x44""A""B""\x00\x00"
+        "\x00\x02\x00\x0b\x01\x02\x03\x04""\x05\x06\x07\x00\x00\x00\x00\x00"
+        "\x00\x04\x00\x44\x00\x00\x00\x04""\x00\x0b\x00\x04\x00\x0c\x00\x04"
+        "\x00\x0f\x00\x04\x00\x10\x00\x04""\x00\x11\x00\x04\x00\x12\x00\x04"
+        "\x00\x13\x00\x04\x00\x14\x00\x04""\x00\x15\x00\x04\x00\x16\x00\x04"
+        "\x00\x17\x00\x04\x00\x18\x00\x04""\x00\x19\x00\x04\x00\x1a\x00\x04"
+        "\x00\x1b\x00\x04\x00\x00\x00\x00"
+        "\x00\x06\x00\x44\x00\x00\x00\x04""\x00\x0b\x00\x04\x00\x0c\x00\x04"
+        "\x00\x0f\x00\x04\x00\x10\x00\x04""\x00\x11\x00\x04\x00\x12\x00\x04"
+        "\x00\x13\x00\x04\x00\x14\x00\x04""\x00\x15\x00\x04\x00\x16\x00\x04"
+        "\x00\x17\x00\x04\x00\x18\x00\x04""\x00\x19\x00\x04\x00\x1a\x00\x04"
+        "\x00\x1b\x00\x04\x00\x00\x00\x00"
+        "\x00\x08\x00\x54\x80\x00\x00\x04""\x80\x00\x04\x08\x80\x00\x07\x0c"
+        "\x80\x00\x09\x0c\x80\x00\x0a\x02""\x80\x00\x0d\x04\x80\x00\x0e\x01"
+        "\x80\x00\x10\x01\x80\x00\x12\x01""\x80\x00\x14\x01\x80\x00\x17\x08"
+        "\x80\x00\x19\x08\x80\x00\x1a\x02""\x80\x00\x1c\x02\x80\x00\x1e\x02"
+        "\x80\x00\x20\x02\x80\x00\x22\x02""\x80\x00\x24\x02\xff\xff\x04\x10"
+        "\x01\x02\x03\x04\x00\x00\x00\x00"
+        "\x00\x0c\x00\x44\x80\x00\x07\x0c""\x80\x00\x09\x0c\x80\x00\x0a\x02"
+        "\x80\x00\x0d\x04\x80\x00\x0e\x01""\x80\x00\x10\x01\x80\x00\x12\x01"
+        "\x80\x00\x14\x01\x80\x00\x17\x08""\x80\x00\x19\x08\x80\x00\x1a\x02"
+        "\x80\x00\x1c\x02\x80\x00\x1e\x02""\x80\x00\x20\x02\x80\x00\x22\x02"
+        "\x80\x00\x24\x02\x00\x00\x00\x00"
+        "\x00\x0e\x00\x44\x80\x00\x07\x0c""\x80\x00\x09\x0c\x80\x00\x0a\x02"
+        "\x80\x00\x0d\x04\x80\x00\x0e\x01""\x80\x00\x10\x01\x80\x00\x12\x01"
+        "\x80\x00\x14\x01\x80\x00\x17\x08""\x80\x00\x19\x08\x80\x00\x1a\x02"
+        "\x80\x00\x1c\x02\x80\x00\x1e\x02""\x80\x00\x20\x02\x80\x00\x22\x02"
+        "\x80\x00\x24\x02\x00\x00\x00\x00"
+
+        "\x01\xf0\x05\x00\x00\x00\x00\x00""table5"                "\x00\x00"
+        "\x00\x00\x00\x00\x00\x00\x00\x00""\x00\x00\x00\x00\x00\x00\x00\x00"
+        "\x00\x00\x00\x00\x00\x00\x00\x00""\x1f\x2f\x3f\x4f\x5f\x6f\x7f\x8f"
+        "\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8""\x87\x65\x43\x21\x1f\x1f\x1f\x1f"
+        "\x00\x00\x00\x26\x00\x01\x00\x04""\x00\x02\x00\x04\x00\x03\x00\x04"
+        "\x00\x04\x00\x04\x00\x05\x00\x04""\x00\x06\x00\x04\xff\xff\x00\x0a"
+        "\x11\x22\x33\x44""A""B""\x00\x00"
+        "\x00\x02\x00\x0b\x01\x02\x03\x04""\x05\x06\x07\x00\x00\x00\x00\x00"
+        "\x00\x04\x00\x44\x00\x00\x00\x04""\x00\x0b\x00\x04\x00\x0c\x00\x04"
+        "\x00\x0f\x00\x04\x00\x10\x00\x04""\x00\x11\x00\x04\x00\x12\x00\x04"
+        "\x00\x13\x00\x04\x00\x14\x00\x04""\x00\x15\x00\x04\x00\x16\x00\x04"
+        "\x00\x17\x00\x04\x00\x18\x00\x04""\x00\x19\x00\x04\x00\x1a\x00\x04"
+        "\x00\x1b\x00\x04\x00\x00\x00\x00"
+        "\x00\x06\x00\x44\x00\x00\x00\x04""\x00\x0b\x00\x04\x00\x0c\x00\x04"
+        "\x00\x0f\x00\x04\x00\x10\x00\x04""\x00\x11\x00\x04\x00\x12\x00\x04"
+        "\x00\x13\x00\x04\x00\x14\x00\x04""\x00\x15\x00\x04\x00\x16\x00\x04"
+        "\x00\x17\x00\x04\x00\x18\x00\x04""\x00\x19\x00\x04\x00\x1a\x00\x04"
+        "\x00\x1b\x00\x04\x00\x00\x00\x00"
+        "\x00\x08\x00\x54\x80\x00\x00\x04""\x80\x00\x04\x08\x80\x00\x07\x0c"
+        "\x80\x00\x09\x0c\x80\x00\x0a\x02""\x80\x00\x0d\x04\x80\x00\x0e\x01"
+        "\x80\x00\x10\x01\x80\x00\x12\x01""\x80\x00\x14\x01\x80\x00\x17\x08"
+        "\x80\x00\x19\x08\x80\x00\x1a\x02""\x80\x00\x1c\x02\x80\x00\x1e\x02"
+        "\x80\x00\x20\x02\x80\x00\x22\x02""\x80\x00\x24\x02\xff\xff\x04\x10"
+        "\x01\x02\x03\x04\x00\x00\x00\x00"
+        "\x00\x0c\x00\x44\x80\x00\x07\x0c""\x80\x00\x09\x0c\x80\x00\x0a\x02"
+        "\x80\x00\x0d\x04\x80\x00\x0e\x01""\x80\x00\x10\x01\x80\x00\x12\x01"
+        "\x80\x00\x14\x01\x80\x00\x17\x08""\x80\x00\x19\x08\x80\x00\x1a\x02"
+        "\x80\x00\x1c\x02\x80\x00\x1e\x02""\x80\x00\x20\x02\x80\x00\x22\x02"
+        "\x80\x00\x24\x02\x00\x00\x00\x00"
+        "\x00\x0e\x00\x44\x80\x00\x07\x0c""\x80\x00\x09\x0c\x80\x00\x0a\x02"
+        "\x80\x00\x0d\x04\x80\x00\x0e\x01""\x80\x00\x10\x01\x80\x00\x12\x01"
+        "\x80\x00\x14\x01\x80\x00\x17\x08""\x80\x00\x19\x08\x80\x00\x1a\x02"
+        "\x80\x00\x1c\x02\x80\x00\x1e\x02""\x80\x00\x20\x02\x80\x00\x22\x02"
+        "\x80\x00\x24\x02\x00\x00\x00\x00"
+
+        "\x01\xf0\x06\x00\x00\x00\x00\x00""table6"                "\x00\x00"
+        "\x00\x00\x00\x00\x00\x00\x00\x00""\x00\x00\x00\x00\x00\x00\x00\x00"
+        "\x00\x00\x00\x00\x00\x00\x00\x00""\x1f\x2f\x3f\x4f\x5f\x6f\x7f\x8f"
+        "\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8""\x87\x65\x43\x21\x1f\x1f\x1f\x1f"
+        "\x00\x00\x00\x26\x00\x01\x00\x04""\x00\x02\x00\x04\x00\x03\x00\x04"
+        "\x00\x04\x00\x04\x00\x05\x00\x04""\x00\x06\x00\x04\xff\xff\x00\x0a"
+        "\x11\x22\x33\x44""A""B""\x00\x00"
+        "\x00\x02\x00\x0b\x01\x02\x03\x04""\x05\x06\x07\x00\x00\x00\x00\x00"
+        "\x00\x04\x00\x44\x00\x00\x00\x04""\x00\x0b\x00\x04\x00\x0c\x00\x04"
+        "\x00\x0f\x00\x04\x00\x10\x00\x04""\x00\x11\x00\x04\x00\x12\x00\x04"
+        "\x00\x13\x00\x04\x00\x14\x00\x04""\x00\x15\x00\x04\x00\x16\x00\x04"
+        "\x00\x17\x00\x04\x00\x18\x00\x04""\x00\x19\x00\x04\x00\x1a\x00\x04"
+        "\x00\x1b\x00\x04\x00\x00\x00\x00"
+        "\x00\x06\x00\x44\x00\x00\x00\x04""\x00\x0b\x00\x04\x00\x0c\x00\x04"
+        "\x00\x0f\x00\x04\x00\x10\x00\x04""\x00\x11\x00\x04\x00\x12\x00\x04"
+        "\x00\x13\x00\x04\x00\x14\x00\x04""\x00\x15\x00\x04\x00\x16\x00\x04"
+        "\x00\x17\x00\x04\x00\x18\x00\x04""\x00\x19\x00\x04\x00\x1a\x00\x04"
+        "\x00\x1b\x00\x04\x00\x00\x00\x00"
+        "\x00\x08\x00\x54\x80\x00\x00\x04""\x80\x00\x04\x08\x80\x00\x07\x0c"
+        "\x80\x00\x09\x0c\x80\x00\x0a\x02""\x80\x00\x0d\x04\x80\x00\x0e\x01"
+        "\x80\x00\x10\x01\x80\x00\x12\x01""\x80\x00\x14\x01\x80\x00\x17\x08"
+        "\x80\x00\x19\x08\x80\x00\x1a\x02""\x80\x00\x1c\x02\x80\x00\x1e\x02"
+        "\x80\x00\x20\x02\x80\x00\x22\x02""\x80\x00\x24\x02\xff\xff\x04\x10"
+        "\x01\x02\x03\x04\x00\x00\x00\x00"
+        "\x00\x0c\x00\x44\x80\x00\x07\x0c""\x80\x00\x09\x0c\x80\x00\x0a\x02"
+        "\x80\x00\x0d\x04\x80\x00\x0e\x01""\x80\x00\x10\x01\x80\x00\x12\x01"
+        "\x80\x00\x14\x01\x80\x00\x17\x08""\x80\x00\x19\x08\x80\x00\x1a\x02"
+        "\x80\x00\x1c\x02\x80\x00\x1e\x02""\x80\x00\x20\x02\x80\x00\x22\x02"
+        "\x80\x00\x24\x02\x00\x00\x00\x00"
+        "\x00\x0e\x00\x44\x80\x00\x07\x0c""\x80\x00\x09\x0c\x80\x00\x0a\x02"
+        "\x80\x00\x0d\x04\x80\x00\x0e\x01""\x80\x00\x10\x01\x80\x00\x12\x01"
+        "\x80\x00\x14\x01\x80\x00\x17\x08""\x80\x00\x19\x08\x80\x00\x1a\x02"
+        "\x80\x00\x1c\x02\x80\x00\x1e\x02""\x80\x00\x20\x02\x80\x00\x22\x02"
+        "\x80\x00\x24\x02\x00\x00\x00\x00"
+
+        "\x01\xf0\x07\x00\x00\x00\x00\x00""table7"                "\x00\x00"
+        "\x00\x00\x00\x00\x00\x00\x00\x00""\x00\x00\x00\x00\x00\x00\x00\x00"
+        "\x00\x00\x00\x00\x00\x00\x00\x00""\x1f\x2f\x3f\x4f\x5f\x6f\x7f\x8f"
+        "\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8""\x87\x65\x43\x21\x1f\x1f\x1f\x1f"
+        "\x00\x00\x00\x26\x00\x01\x00\x04""\x00\x02\x00\x04\x00\x03\x00\x04"
+        "\x00\x04\x00\x04\x00\x05\x00\x04""\x00\x06\x00\x04\xff\xff\x00\x0a"
+        "\x11\x22\x33\x44""A""B""\x00\x00"
+        "\x00\x02\x00\x0b\x01\x02\x03\x04""\x05\x06\x07\x00\x00\x00\x00\x00"
+        "\x00\x04\x00\x44\x00\x00\x00\x04""\x00\x0b\x00\x04\x00\x0c\x00\x04"
+        "\x00\x0f\x00\x04\x00\x10\x00\x04""\x00\x11\x00\x04\x00\x12\x00\x04"
+        "\x00\x13\x00\x04\x00\x14\x00\x04""\x00\x15\x00\x04\x00\x16\x00\x04"
+        "\x00\x17\x00\x04\x00\x18\x00\x04""\x00\x19\x00\x04\x00\x1a\x00\x04"
+        "\x00\x1b\x00\x04\x00\x00\x00\x00"
+        "\x00\x06\x00\x44\x00\x00\x00\x04""\x00\x0b\x00\x04\x00\x0c\x00\x04"
+        "\x00\x0f\x00\x04\x00\x10\x00\x04""\x00\x11\x00\x04\x00\x12\x00\x04"
+        "\x00\x13\x00\x04\x00\x14\x00\x04""\x00\x15\x00\x04\x00\x16\x00\x04"
+        "\x00\x17\x00\x04\x00\x18\x00\x04""\x00\x19\x00\x04\x00\x1a\x00\x04"
+        "\x00\x1b\x00\x04\x00\x00\x00\x00"
+        "\x00\x08\x00\x54\x80\x00\x00\x04""\x80\x00\x04\x08\x80\x00\x07\x0c"
+        "\x80\x00\x09\x0c\x80\x00\x0a\x02""\x80\x00\x0d\x04\x80\x00\x0e\x01"
+        "\x80\x00\x10\x01\x80\x00\x12\x01""\x80\x00\x14\x01\x80\x00\x17\x08"
+        "\x80\x00\x19\x08\x80\x00\x1a\x02""\x80\x00\x1c\x02\x80\x00\x1e\x02"
+        "\x80\x00\x20\x02\x80\x00\x22\x02""\x80\x00\x24\x02\xff\xff\x04\x10"
+        "\x01\x02\x03\x04\x00\x00\x00\x00"
+        "\x00\x0c\x00\x44\x80\x00\x07\x0c""\x80\x00\x09\x0c\x80\x00\x0a\x02"
+        "\x80\x00\x0d\x04\x80\x00\x0e\x01""\x80\x00\x10\x01\x80\x00\x12\x01"
+        "\x80\x00\x14\x01\x80\x00\x17\x08""\x80\x00\x19\x08\x80\x00\x1a\x02"
+        "\x80\x00\x1c\x02\x80\x00\x1e\x02""\x80\x00\x20\x02\x80\x00\x22\x02"
+        "\x80\x00\x24\x02\x00\x00\x00\x00"
+        "\x00\x0e\x00\x44\x80\x00\x07\x0c""\x80\x00\x09\x0c\x80\x00\x0a\x02"
+        "\x80\x00\x0d\x04\x80\x00\x0e\x01""\x80\x00\x10\x01\x80\x00\x12\x01"
+        "\x80\x00\x14\x01\x80\x00\x17\x08""\x80\x00\x19\x08\x80\x00\x1a\x02"
+        "\x80\x00\x1c\x02\x80\x00\x1e\x02""\x80\x00\x20\x02\x80\x00\x22\x02"
+        "\x80\x00\x24\x02\x00\x00\x00\x00"
+
+        ""_bin;
+  };
+
+}
+
+BOOST_AUTO_TEST_SUITE(message_test)
+BOOST_AUTO_TEST_SUITE(multipart_test)
+
+BOOST_AUTO_TEST_SUITE(table_features)
+  BOOST_AUTO_TEST_SUITE(constructor)
+    BOOST_FIXTURE_TEST_CASE(copy_constructible, table_features_fixture)
     {
-        // TODO
-        buffer[1] = protocol::OFPT_MULTIPART_REPLY;
-        auto it = buffer.begin();
+      auto const copy = sut;
 
-        auto const decoded_msg = messages::multipart::table_features_reply::decode(it, buffer.end());
-
-        BOOST_REQUIRE(it == buffer.end());
-        BOOST_CHECK_EQUAL(decoded_msg.version(), sut.version());
-        BOOST_CHECK_EQUAL(decoded_msg.type(), sut.type());
-        BOOST_CHECK_EQUAL(decoded_msg.length(), sut.length());
-        BOOST_CHECK_EQUAL(decoded_msg.xid(), sut.xid() - 1); // TODO
-        BOOST_CHECK_EQUAL(decoded_msg.multipart_type(), sut.multipart_type());
-        BOOST_CHECK_EQUAL(decoded_msg.flags(), sut.flags());
+      BOOST_TEST((copy == sut));
     }
+    BOOST_FIXTURE_TEST_CASE(move_constructible, table_features_fixture)
+    {
+      auto moved = sut;
 
-BOOST_AUTO_TEST_SUITE_END() // encode_decode_test
+      auto const copy = std::move(moved);
 
-BOOST_AUTO_TEST_SUITE_END() // table_features_reply_test
+      BOOST_TEST((copy == sut));
+      BOOST_TEST(moved.length() == sizeof(protocol::ofp_table_features));
+      BOOST_TEST(moved.properties().empty());
+    }
+  BOOST_AUTO_TEST_SUITE_END() // constructor
 
-BOOST_AUTO_TEST_SUITE_END() // table_features_test
+  BOOST_FIXTURE_TEST_SUITE(assignment, table_features_fixture)
+    BOOST_AUTO_TEST_CASE(copy_assignable)
+    {
+      auto copy = multipart::table_features{
+        1, "", 1, 1, 1, 1, v13::table_feature_property_set{}
+      };
 
-} // namespace v13
-} // namespace ofp
-} // namespace net
-} // namespace canard
+      copy = sut;
+
+      BOOST_TEST((copy == sut));
+    }
+    BOOST_AUTO_TEST_CASE(move_assignable)
+    {
+      auto copy = multipart::table_features{
+        1, "", 1, 1, 1, 1, v13::table_feature_property_set{}
+      };
+      auto moved = sut;
+
+      copy = std::move(moved);
+
+      BOOST_TEST((copy == sut));
+      BOOST_TEST(moved.length() == sizeof(protocol::ofp_table_features));
+      BOOST_TEST(moved.properties().empty());
+    }
+  BOOST_AUTO_TEST_SUITE_END() // constructor
+
+  BOOST_FIXTURE_TEST_SUITE(equality, table_features_parameter)
+    BOOST_AUTO_TEST_CASE(true_if_same_object)
+    {
+      auto const sut = multipart::table_features{
+          table_id, table_name, metadata_match, metadata_write,
+          config, max_entries, properties
+      };
+
+      BOOST_TEST((sut == sut));
+    }
+    BOOST_AUTO_TEST_CASE(true_if_values_are_equal)
+    {
+      BOOST_TEST(
+          (multipart::table_features{
+             table_id, table_name, metadata_match, metadata_write,
+             config, max_entries, properties
+           }
+        == multipart::table_features{
+             table_id, table_name, metadata_match, metadata_write,
+             config, max_entries, properties
+           }));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_table_id_is_not_equal)
+    {
+      BOOST_TEST(
+          (multipart::table_features{
+             1, table_name, metadata_match, metadata_write,
+             config, max_entries, properties
+           }
+        != multipart::table_features{
+             2, table_name, metadata_match, metadata_write,
+             config, max_entries, properties
+           }));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_table_name_is_not_equal)
+    {
+      BOOST_TEST(
+          (multipart::table_features{
+             table_id, "table_name1", metadata_match, metadata_write,
+             config, max_entries, properties
+           }
+        != multipart::table_features{
+             table_id, "table_name2", metadata_match, metadata_write,
+             config, max_entries, properties
+           }));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_metadata_match_is_not_equal)
+    {
+      BOOST_TEST(
+          (multipart::table_features{
+             table_id, table_name, 1, metadata_write,
+             config, max_entries, properties
+           }
+        != multipart::table_features{
+             table_id, table_name, 2, metadata_write,
+             config, max_entries, properties
+           }));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_metadata_write_is_not_equal)
+    {
+      BOOST_TEST(
+          (multipart::table_features{
+             table_id, table_name, metadata_match, 1,
+             config, max_entries, properties
+           }
+        != multipart::table_features{
+             table_id, table_name, metadata_match, 2,
+             config, max_entries, properties
+           }));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_config_is_not_equal)
+    {
+      BOOST_TEST(
+          (multipart::table_features{
+             table_id, table_name, metadata_match, metadata_write,
+             1, max_entries, properties
+           }
+        != multipart::table_features{
+             table_id, table_name, metadata_match, metadata_write,
+             2, max_entries, properties
+           }));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_max_entries_is_not_equal)
+    {
+      BOOST_TEST(
+          (multipart::table_features{
+             table_id, table_name, metadata_match, metadata_write,
+             config, 1, properties
+           }
+        != multipart::table_features{
+             table_id, table_name, metadata_match, metadata_write,
+             config, 2, properties
+           }));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_properties_is_not_equal)
+    {
+      BOOST_TEST(
+          (multipart::table_features{
+             table_id, table_name, metadata_match, metadata_write,
+             config, max_entries, v13::table_feature_property_set{apply_actions}
+           }
+        != multipart::table_features{
+             table_id, table_name, metadata_match, metadata_write,
+             config, max_entries, v13::table_feature_property_set{write_actions}
+           }));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // equality
+  BOOST_AUTO_TEST_SUITE(encode)
+    BOOST_FIXTURE_TEST_CASE(generate_binary, table_features_fixture)
+    {
+      auto buffer = std::vector<std::uint8_t>{};
+
+      sut.encode(buffer);
+
+      BOOST_TEST(buffer.size() == sut.byte_length());
+      BOOST_TEST(buffer == bin, boost::test_tools::per_element{});
+    }
+  BOOST_AUTO_TEST_SUITE_END() // encode
+
+  BOOST_AUTO_TEST_SUITE(decode)
+    BOOST_FIXTURE_TEST_CASE(construct_from_binary, table_features_fixture)
+    {
+      auto it = bin.begin();
+
+      auto const table_features
+        = multipart::table_features::decode(it, bin.end());
+
+      BOOST_TEST((it == bin.end()));
+      BOOST_TEST((table_features == sut));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // decode
+BOOST_AUTO_TEST_SUITE_END() // table_features
+
+BOOST_AUTO_TEST_SUITE(table_features_request)
+  BOOST_AUTO_TEST_SUITE(constructor)
+    BOOST_AUTO_TEST_CASE(default_constructible)
+    {
+      multipart::table_features_request const sut{};
+
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_MULTIPART_REQUEST);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_multipart_request));
+      BOOST_TEST(sut.multipart_type() == protocol::OFPMP_TABLE_FEATURES);
+      BOOST_TEST(sut.flags() == 0);
+      BOOST_TEST(sut.body().empty());
+    }
+    BOOST_FIXTURE_TEST_CASE(constructible, table_features_fixture)
+    {
+      auto const body = body_type{
+          features0, features1, features2, features3
+        , features4, features5, features6, features7
+      };
+
+      multipart::table_features_request const sut{body};
+
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_MULTIPART_REQUEST);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_multipart_request) + 496 * 8);
+      BOOST_TEST(sut.multipart_type() == protocol::OFPMP_TABLE_FEATURES);
+      BOOST_TEST(sut.flags() == 0);
+      BOOST_TEST((sut.body() == body));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // constructor
+
+  BOOST_AUTO_TEST_SUITE(encode)
+    BOOST_FIXTURE_TEST_CASE(generate_binary, table_features_request_fixture)
+    {
+      auto buffer = std::vector<std::uint8_t>{};
+
+      sut.encode(buffer);
+
+      BOOST_TEST(buffer.size() == sut.byte_length());
+      BOOST_TEST(buffer == bin, boost::test_tools::per_element{});
+    }
+  BOOST_AUTO_TEST_SUITE_END() // encode
+
+  BOOST_AUTO_TEST_SUITE(decode)
+    BOOST_FIXTURE_TEST_CASE(
+        construct_from_binary, table_features_request_fixture)
+    {
+      auto it = bin.begin();
+
+      auto const table_features_request
+        = multipart::table_features_request::decode(it, bin.end());
+
+      BOOST_TEST((it == bin.end()));
+      BOOST_TEST((table_features_request == sut));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // decode
+BOOST_AUTO_TEST_SUITE_END() // table_features_request
+
+
+BOOST_AUTO_TEST_SUITE(table_features_reply)
+  BOOST_AUTO_TEST_SUITE(constructor)
+    BOOST_AUTO_TEST_CASE(default_constructible)
+    {
+      multipart::table_features_reply const sut{{}};
+
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_MULTIPART_REPLY);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_multipart_reply));
+      BOOST_TEST(sut.multipart_type() == protocol::OFPMP_TABLE_FEATURES);
+      BOOST_TEST(sut.flags() == 0);
+      BOOST_TEST(sut.body().empty());
+    }
+    BOOST_FIXTURE_TEST_CASE(constructible, table_features_fixture)
+    {
+      auto const body = body_type{
+          features0, features1, features2, features3
+        , features4, features5, features6, features7
+      };
+
+      multipart::table_features_reply const sut{body};
+
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_MULTIPART_REPLY);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_multipart_reply) + 496 * 8);
+      BOOST_TEST(sut.multipart_type() == protocol::OFPMP_TABLE_FEATURES);
+      BOOST_TEST(sut.flags() == 0);
+      BOOST_TEST((sut.body() == body));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // constructor
+
+  BOOST_AUTO_TEST_SUITE(encode)
+    BOOST_FIXTURE_TEST_CASE(generate_binary, table_features_reply_fixture)
+    {
+      auto buffer = std::vector<std::uint8_t>{};
+
+      sut.encode(buffer);
+
+      BOOST_TEST(buffer.size() == sut.byte_length());
+      BOOST_TEST(buffer == bin, boost::test_tools::per_element{});
+    }
+  BOOST_AUTO_TEST_SUITE_END() // encode
+
+  BOOST_AUTO_TEST_SUITE(decode)
+    BOOST_FIXTURE_TEST_CASE(
+        construct_from_binary, table_features_reply_fixture)
+    {
+      auto it = bin.begin();
+
+      auto const table_features_reply
+        = multipart::table_features_reply::decode(it, bin.end());
+
+      BOOST_TEST((it == bin.end()));
+      BOOST_TEST((table_features_reply == sut));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // decode
+BOOST_AUTO_TEST_SUITE_END() // table_features_reply
+
+BOOST_AUTO_TEST_SUITE_END() // multipart_test
+BOOST_AUTO_TEST_SUITE_END() // message_test
