@@ -15,286 +15,368 @@ namespace protocol = v13::protocol;
 
 namespace {
 
-using body_type = multipart::table_stats_reply::body_type;
+  using body_type = multipart::table_stats_reply::body_type;
 
-struct table_stats_fixture
-{
+  struct table_stats_parameter {
+    std::uint8_t table_id = protocol::OFPTT_MAX;
+    std::uint32_t active_count = 0x12345678;
+    std::uint64_t lookup_count = 0xf1f2f3f4f5f6f7f8;
+    std::uint64_t matched_count = 0x0102030405060708;
+  };
+  struct table_stats_fixture : table_stats_parameter {
     multipart::table_stats sut{
-        protocol::OFPTT_MAX, 0x12345678, 0xf1f2f3f4f5f6f7f8, 0x0102030405060708
+      table_id, active_count, lookup_count, matched_count
     };
-    std::vector<std::uint8_t> bin_table_stats
-        = "\xfe\x00\x00\x00\x12\x34\x56\x78""\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8"
-          "\x01\x02\x03\x04\x05\x06\x07\x08"_bin
+    std::vector<std::uint8_t> bin
+      = "\xfe\x00\x00\x00\x12\x34\x56\x78""\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8"
+        "\x01\x02\x03\x04\x05\x06\x07\x08"_bin
         ;
-};
+    multipart::table_stats& table_stats = sut;
+  };
 
-struct table_stats_request_fixture
-{
+  struct table_stats_request_fixture {
     multipart::table_stats_request sut{0x12345678};
-    std::vector<std::uint8_t> bin_table_stats_request
-        = "\x04\x12\x00\x10\x12\x34\x56\x78""\x00\x03\x00\x00\x00\x00\x00\x00"_bin
+    std::vector<std::uint8_t> bin
+      = "\x04\x12\x00\x10\x12\x34\x56\x78""\x00\x03\x00\x00\x00\x00\x00\x00"_bin
         ;
-};
+  };
 
-struct table_stats_reply_fixture : table_stats_fixture
-{
-    multipart::table_stats_reply sut{
-          ::body_type(3, table_stats_fixture::sut)
-        , protocol::OFPMPF_REPLY_MORE
-        , 0x12345678
-    };
-    std::vector<std::uint8_t> bin_table_stats_reply
-        = "\x04\x13\x00\x58\x12\x34\x56\x78""\x00\x03\x00\x01\x00\x00\x00\x00"
-          "\xfe\x00\x00\x00\x12\x34\x56\x78""\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8"
-          "\x01\x02\x03\x04\x05\x06\x07\x08"
-          "\xfe\x00\x00\x00\x12\x34\x56\x78""\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8"
-          "\x01\x02\x03\x04\x05\x06\x07\x08"
-          "\xfe\x00\x00\x00\x12\x34\x56\x78""\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8"
-          "\x01\x02\x03\x04\x05\x06\x07\x08"_bin
+  struct table_stats_reply_parameter : table_stats_fixture {
+    ::body_type body{3, table_stats};
+    std::uint16_t flags = protocol::OFPMPF_REPLY_MORE;
+    std::uint32_t xid = 0x12345678;
+  };
+  struct table_stats_reply_fixture : table_stats_reply_parameter {
+    multipart::table_stats_reply sut{body, flags, xid};
+    std::vector<std::uint8_t> bin
+      = "\x04\x13\x00\x58\x12\x34\x56\x78""\x00\x03\x00\x01\x00\x00\x00\x00"
+        "\xfe\x00\x00\x00\x12\x34\x56\x78""\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8"
+        "\x01\x02\x03\x04\x05\x06\x07\x08"
+        "\xfe\x00\x00\x00\x12\x34\x56\x78""\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8"
+        "\x01\x02\x03\x04\x05\x06\x07\x08"
+        "\xfe\x00\x00\x00\x12\x34\x56\x78""\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8"
+        "\x01\x02\x03\x04\x05\x06\x07\x08"_bin
         ;
-};
+  };
 
 }
 
 BOOST_AUTO_TEST_SUITE(message_test)
 BOOST_AUTO_TEST_SUITE(multipart_test)
 
-BOOST_AUTO_TEST_SUITE(table_stats_test)
-
-    BOOST_AUTO_TEST_CASE(construct_test)
+BOOST_AUTO_TEST_SUITE(table_stats)
+  BOOST_AUTO_TEST_SUITE(constructor)
+    BOOST_AUTO_TEST_CASE(constructible)
     {
-        auto const table_id = std::uint8_t{protocol::OFPTT_ALL};
-        auto const active_count = std::uint32_t{43};
-        auto const lookup_count = std::uint32_t{83232};
-        auto const matched_count = std::uint32_t{4323};
+      auto const table_id = std::uint8_t{protocol::OFPTT_ALL};
+      auto const active_count = std::uint32_t{43};
+      auto const lookup_count = std::uint32_t{83232};
+      auto const matched_count = std::uint32_t{4323};
 
-        auto const sut = multipart::table_stats{
-            table_id, active_count, lookup_count, matched_count
-        };
+      multipart::table_stats const sut{
+        table_id, active_count, lookup_count, matched_count
+      };
 
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_table_stats));
-        BOOST_TEST(sut.table_id() == table_id);
-        BOOST_TEST(sut.active_count() == active_count);
-        BOOST_TEST(sut.lookup_count() == lookup_count);
-        BOOST_TEST(sut.matched_count() == matched_count);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_table_stats));
+      BOOST_TEST(sut.table_id() == table_id);
+      BOOST_TEST(sut.active_count() == active_count);
+      BOOST_TEST(sut.lookup_count() == lookup_count);
+      BOOST_TEST(sut.matched_count() == matched_count);
     }
-
-    BOOST_FIXTURE_TEST_CASE(copy_construct_test, table_stats_fixture)
+    BOOST_FIXTURE_TEST_CASE(copy_constructible, table_stats_fixture)
     {
-        auto const copy = sut;
+      auto const copy = sut;
 
-        BOOST_TEST(copy.length() == sut.length());
-        BOOST_TEST(copy.table_id() == sut.table_id());
-        BOOST_TEST(copy.active_count() == sut.active_count());
-        BOOST_TEST(copy.lookup_count() == sut.lookup_count());
-        BOOST_TEST(copy.matched_count() == sut.matched_count());
+      BOOST_TEST((copy == sut));
     }
-
-    BOOST_FIXTURE_TEST_CASE(move_construct_test, table_stats_fixture)
+    BOOST_FIXTURE_TEST_CASE(move_constructible, table_stats_fixture)
     {
-        auto src = sut;
+      auto moved = sut;
 
-        auto const copy = std::move(src);
+      auto const copy = std::move(moved);
 
-        BOOST_TEST(copy.length() == sut.length());
-        BOOST_TEST(copy.table_id() == sut.table_id());
-        BOOST_TEST(copy.active_count() == sut.active_count());
-        BOOST_TEST(copy.lookup_count() == sut.lookup_count());
-        BOOST_TEST(copy.matched_count() == sut.matched_count());
+      BOOST_TEST((copy == sut));
     }
+  BOOST_AUTO_TEST_SUITE_END() // constructor
 
-    BOOST_FIXTURE_TEST_CASE(encode_test, table_stats_fixture)
+  BOOST_FIXTURE_TEST_SUITE(equality, table_stats_parameter)
+    BOOST_AUTO_TEST_CASE(true_if_same_object)
     {
-        auto buffer = std::vector<std::uint8_t>{};
+      auto const sut = multipart::table_stats{
+        table_id, active_count, lookup_count, matched_count
+      };
 
-        sut.encode(buffer);
-
-        BOOST_TEST(buffer.size() == sut.length());
-        BOOST_TEST(buffer == bin_table_stats, boost::test_tools::per_element{});
+      BOOST_TEST((sut == sut));
     }
-
-    BOOST_FIXTURE_TEST_CASE(decode_test, table_stats_fixture)
+    BOOST_AUTO_TEST_CASE(true_if_values_are_equal)
     {
-        auto it = bin_table_stats.begin();
-        auto const it_end = bin_table_stats.end();
-
-        auto const table_stats = multipart::table_stats::decode(it, it_end);
-
-        BOOST_TEST((it == it_end));
-        BOOST_TEST(table_stats.length() == sut.length());
-        BOOST_TEST(table_stats.table_id() == sut.table_id());
-        BOOST_TEST(table_stats.active_count() == sut.active_count());
-        BOOST_TEST(table_stats.lookup_count() == sut.lookup_count());
-        BOOST_TEST(table_stats.matched_count() == sut.matched_count());
+      BOOST_TEST(
+          (multipart::table_stats{
+             table_id, active_count, lookup_count, matched_count
+           }
+        == multipart::table_stats{
+             table_id, active_count, lookup_count, matched_count
+           }));
     }
-
-BOOST_AUTO_TEST_SUITE_END() // table_stats_test
-
-
-BOOST_AUTO_TEST_SUITE(table_stats_request_test)
-
-    BOOST_AUTO_TEST_CASE(construct_test)
+    BOOST_AUTO_TEST_CASE(false_if_table_id_is_not_equal)
     {
-        auto const sut = multipart::table_stats_request{};
-
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_MULTIPART_REQUEST);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_multipart_request));
-        BOOST_TEST(sut.multipart_type() == protocol::OFPMP_TABLE);
-        BOOST_TEST(sut.flags() == 0);
+      BOOST_TEST(
+          (multipart::table_stats{
+             1, active_count, lookup_count, matched_count
+           }
+        != multipart::table_stats{
+             2, active_count, lookup_count, matched_count
+           }));
     }
-
-    BOOST_FIXTURE_TEST_CASE(copy_construct_test, table_stats_request_fixture)
+    BOOST_AUTO_TEST_CASE(false_if_active_count_is_not_equal)
     {
-        auto const copy = sut;
-
-        BOOST_TEST(copy.version() == sut.version());
-        BOOST_TEST(copy.type() == sut.type());
-        BOOST_TEST(copy.length() == sut.length());
-        BOOST_TEST(copy.xid() == sut.xid());
-        BOOST_TEST(copy.multipart_type() == sut.multipart_type());
-        BOOST_TEST(copy.flags() == sut.flags());
+      BOOST_TEST(
+          (multipart::table_stats{
+             table_id, 1, lookup_count, matched_count
+           }
+        != multipart::table_stats{
+             table_id, 2, lookup_count, matched_count
+           }));
     }
-
-    BOOST_FIXTURE_TEST_CASE(move_construct_test, table_stats_request_fixture)
+    BOOST_AUTO_TEST_CASE(false_if_lookup_count_is_not_equal)
     {
-        auto src = sut;
-
-        auto const copy = std::move(src);
-
-        BOOST_TEST(copy.version() == sut.version());
-        BOOST_TEST(copy.type() == sut.type());
-        BOOST_TEST(copy.length() == sut.length());
-        BOOST_TEST(copy.xid() == sut.xid());
-        BOOST_TEST(copy.multipart_type() == sut.multipart_type());
-        BOOST_TEST(copy.flags() == sut.flags());
-        BOOST_TEST(src.length() == sut.length());
+      BOOST_TEST(
+          (multipart::table_stats{
+             table_id, active_count, 1, matched_count
+           }
+        != multipart::table_stats{
+             table_id, active_count, 2, matched_count
+           }));
     }
-
-    BOOST_FIXTURE_TEST_CASE(encode_test, table_stats_request_fixture)
+    BOOST_AUTO_TEST_CASE(false_if_matched_count_is_not_equal)
     {
-        auto buffer = std::vector<std::uint8_t>{};
-
-        sut.encode(buffer);
-
-        BOOST_TEST(buffer.size() == sut.length());
-        BOOST_TEST(buffer == bin_table_stats_request, boost::test_tools::per_element{});
+      BOOST_TEST(
+          (multipart::table_stats{
+             table_id, active_count, lookup_count, 1
+           }
+        != multipart::table_stats{
+             table_id, active_count, lookup_count, 2
+           }));
     }
+  BOOST_AUTO_TEST_SUITE_END() // equality
 
-    BOOST_FIXTURE_TEST_CASE(decode_test, table_stats_request_fixture)
+  BOOST_AUTO_TEST_SUITE(encode)
+    BOOST_FIXTURE_TEST_CASE(generate_binary, table_stats_fixture)
     {
-        auto it = bin_table_stats_request.begin();
-        auto const it_end = bin_table_stats_request.end();
+      auto buffer = std::vector<std::uint8_t>{};
 
-        auto const table_stats_request
-            = multipart::table_stats_request::decode(it, it_end);
+      sut.encode(buffer);
 
-        BOOST_TEST((it == it_end));
-        BOOST_TEST(table_stats_request.version() == sut.version());
-        BOOST_TEST(table_stats_request.type() == sut.type());
-        BOOST_TEST(table_stats_request.length() == sut.length());
-        BOOST_TEST(table_stats_request.xid() == sut.xid());
-        BOOST_TEST(table_stats_request.multipart_type() == sut.multipart_type());
-        BOOST_TEST(table_stats_request.flags() == sut.flags());
+      BOOST_TEST(buffer.size() == sut.byte_length());
+      BOOST_TEST(buffer == bin, boost::test_tools::per_element{});
     }
+  BOOST_AUTO_TEST_SUITE_END() // encode
 
-BOOST_AUTO_TEST_SUITE_END() // table_stats_request_test
-
-
-BOOST_AUTO_TEST_SUITE(table_stats_reply_test)
-
-    BOOST_FIXTURE_TEST_CASE(construct_test, table_stats_fixture)
+  BOOST_AUTO_TEST_SUITE(decode)
+    BOOST_FIXTURE_TEST_CASE(construct_from_binary, table_stats_fixture)
     {
-        auto const size = 5;
-        auto const table_stats = ::body_type(size, table_stats_fixture::sut);
+      auto it = bin.begin();
 
-        auto const sut = multipart::table_stats_reply{table_stats};
+      auto const table_stats = multipart::table_stats::decode(it, bin.end());
 
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_MULTIPART_REPLY);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_multipart_reply)
-                                 + sizeof(protocol::ofp_table_stats) * size);
-        BOOST_TEST(sut.multipart_type() == protocol::OFPMP_TABLE);
-        BOOST_TEST(sut.flags() == 0);
-        BOOST_TEST(sut.size() == size);
+      BOOST_TEST((it == bin.end()));
+      BOOST_TEST((table_stats == sut));
     }
+  BOOST_AUTO_TEST_SUITE_END() // decode
+BOOST_AUTO_TEST_SUITE_END() // table_stats
 
-    BOOST_FIXTURE_TEST_CASE(construct_with_flag_test, table_stats_fixture)
+
+BOOST_AUTO_TEST_SUITE(table_stats_request)
+  BOOST_AUTO_TEST_SUITE(constructor)
+    BOOST_AUTO_TEST_CASE(constructible)
     {
-        auto const size = 0;
-        auto const table_stats = ::body_type(size, table_stats_fixture::sut);
-        auto const flags = std::uint16_t(protocol::OFPMPF_REPLY_MORE);
+      multipart::table_stats_request const sut{};
 
-        auto const sut = multipart::table_stats_reply{table_stats, flags};
-
-        BOOST_TEST(sut.version() == protocol::OFP_VERSION);
-        BOOST_TEST(sut.type() == protocol::OFPT_MULTIPART_REPLY);
-        BOOST_TEST(sut.length() == sizeof(protocol::ofp_multipart_reply)
-                                 + sizeof(protocol::ofp_table_stats) * size);
-        BOOST_TEST(sut.multipart_type() == protocol::OFPMP_TABLE);
-        BOOST_TEST(sut.flags() == flags);
-        BOOST_TEST(sut.size() == size);
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_MULTIPART_REQUEST);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_multipart_request));
+      BOOST_TEST(sut.multipart_type() == protocol::OFPMP_TABLE);
+      BOOST_TEST(sut.flags() == 0);
     }
-
-    BOOST_FIXTURE_TEST_CASE(copy_construct_test, table_stats_reply_fixture)
+    BOOST_FIXTURE_TEST_CASE(copy_constructible, table_stats_request_fixture)
     {
-        auto const copy = sut;
+      auto const copy = sut;
 
-        BOOST_TEST(copy.version() == sut.version());
-        BOOST_TEST(copy.type() == sut.type());
-        BOOST_TEST(copy.length() == sut.length());
-        BOOST_TEST(copy.xid() == sut.xid());
-        BOOST_TEST(copy.multipart_type() == sut.multipart_type());
-        BOOST_TEST(copy.flags() == sut.flags());
-        BOOST_TEST(copy.size() == sut.size());
+      BOOST_TEST((copy == sut));
     }
-
-    BOOST_FIXTURE_TEST_CASE(move_construct_test, table_stats_reply_fixture)
+    BOOST_FIXTURE_TEST_CASE(move_constructible, table_stats_request_fixture)
     {
-        auto src = sut;
+      auto moved = sut;
 
-        auto const copy = std::move(src);
+      auto const copy = std::move(moved);
 
-        BOOST_TEST(copy.version() == sut.version());
-        BOOST_TEST(copy.type() == sut.type());
-        BOOST_TEST(copy.length() == sut.length());
-        BOOST_TEST(copy.xid() == sut.xid());
-        BOOST_TEST(copy.multipart_type() == sut.multipart_type());
-        BOOST_TEST(copy.flags() == sut.flags());
-        BOOST_TEST(copy.size() == sut.size());
-        BOOST_TEST(src.length() == sizeof(protocol::ofp_multipart_reply));
-        BOOST_TEST(src.size() == 0);
+      BOOST_TEST((copy == sut));
     }
+  BOOST_AUTO_TEST_SUITE_END() // constructor
 
-    BOOST_FIXTURE_TEST_CASE(encode_test, table_stats_reply_fixture)
+  BOOST_AUTO_TEST_SUITE(equality)
+    BOOST_AUTO_TEST_CASE(true_if_same_object)
     {
-        auto buffer = std::vector<std::uint8_t>{};
+      auto const sut = multipart::table_stats_request{1};
 
-        sut.encode(buffer);
-
-        BOOST_TEST(buffer.size() == sut.length());
-        BOOST_TEST(buffer == bin_table_stats_reply, boost::test_tools::per_element{});
+      BOOST_TEST((sut == sut));
     }
-
-    BOOST_FIXTURE_TEST_CASE(decode_test, table_stats_reply_fixture)
+    BOOST_AUTO_TEST_CASE(true_if_xid_is_equal)
     {
-        auto it = bin_table_stats_reply.begin();
-        auto const it_end = bin_table_stats_reply.end();
+      auto const xid = 23;
 
-        auto const table_stats_reply
-            = multipart::table_stats_reply::decode(it, it_end);
-
-        BOOST_TEST((it == it_end));
-        BOOST_TEST(table_stats_reply.version() == sut.version());
-        BOOST_TEST(table_stats_reply.type() == sut.type());
-        BOOST_TEST(table_stats_reply.length() == sut.length());
-        BOOST_TEST(table_stats_reply.xid() == sut.xid());
-        BOOST_TEST(table_stats_reply.multipart_type() == sut.multipart_type());
-        BOOST_TEST(table_stats_reply.flags() == sut.flags());
-        BOOST_TEST(table_stats_reply.size() == sut.size());
+      BOOST_TEST(
+          (multipart::table_stats_request{xid}
+        == multipart::table_stats_request{xid}));
     }
+    BOOST_AUTO_TEST_CASE(false_if_xid_is_not_equal)
+    {
+      BOOST_TEST(
+          (multipart::table_stats_request{1}
+        != multipart::table_stats_request{2}));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // equality
 
-BOOST_AUTO_TEST_SUITE_END() // table_stats_reply_test
+  BOOST_AUTO_TEST_SUITE(encode)
+    BOOST_FIXTURE_TEST_CASE(generate_binary, table_stats_request_fixture)
+    {
+      auto buffer = std::vector<std::uint8_t>{};
+
+      sut.encode(buffer);
+
+      BOOST_TEST(buffer.size() == sut.byte_length());
+      BOOST_TEST(buffer == bin, boost::test_tools::per_element{});
+    }
+  BOOST_AUTO_TEST_SUITE_END() // encode
+
+  BOOST_AUTO_TEST_SUITE(decode)
+    BOOST_FIXTURE_TEST_CASE(construct_from_binary, table_stats_request_fixture)
+    {
+      auto it = bin.begin();
+
+      auto const table_stats_request
+        = multipart::table_stats_request::decode(it, bin.end());
+
+      BOOST_TEST((it == bin.end()));
+      BOOST_TEST((table_stats_request == sut));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // decode
+BOOST_AUTO_TEST_SUITE_END() // table_stats_request
+
+
+BOOST_AUTO_TEST_SUITE(table_stats_reply)
+  BOOST_AUTO_TEST_SUITE(constructor)
+    BOOST_FIXTURE_TEST_CASE(constructible, table_stats_fixture)
+    {
+      auto const size = 5;
+      auto const body = ::body_type(size, table_stats);
+
+      multipart::table_stats_reply const sut{body};
+
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_MULTIPART_REPLY);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_multipart_reply)
+          + sizeof(protocol::ofp_table_stats) * size);
+      BOOST_TEST(sut.multipart_type() == protocol::OFPMP_TABLE);
+      BOOST_TEST(sut.flags() == 0);
+      BOOST_TEST((sut.body() == body));
+    }
+    BOOST_FIXTURE_TEST_CASE(constructible_with_flag, table_stats_fixture)
+    {
+      auto const size = 0;
+      auto const body = ::body_type(size, table_stats);
+      auto const flags = std::uint16_t(protocol::OFPMPF_REPLY_MORE);
+
+      multipart::table_stats_reply const sut{body, flags};
+
+      BOOST_TEST(sut.version() == protocol::OFP_VERSION);
+      BOOST_TEST(sut.type() == protocol::OFPT_MULTIPART_REPLY);
+      BOOST_TEST(sut.length() == sizeof(protocol::ofp_multipart_reply)
+          + sizeof(protocol::ofp_table_stats) * size);
+      BOOST_TEST(sut.multipart_type() == protocol::OFPMP_TABLE);
+      BOOST_TEST(sut.flags() == flags);
+      BOOST_TEST((sut.body() == body));
+    }
+    BOOST_FIXTURE_TEST_CASE(copy_constructible, table_stats_reply_fixture)
+    {
+      auto const copy = sut;
+
+      BOOST_TEST((copy == sut));
+    }
+    BOOST_FIXTURE_TEST_CASE(move_constructible, table_stats_reply_fixture)
+    {
+      auto moved = sut;
+
+      auto const copy = std::move(moved);
+
+      BOOST_TEST((copy == sut));
+      BOOST_TEST(moved.length() == sizeof(protocol::ofp_multipart_reply));
+      BOOST_TEST(moved.body().empty());
+    }
+  BOOST_AUTO_TEST_SUITE_END() // constructor
+
+  BOOST_FIXTURE_TEST_SUITE(equality, table_stats_reply_parameter)
+    BOOST_AUTO_TEST_CASE(true_if_same_object)
+    {
+      auto const sut = multipart::table_stats_reply{body, flags, xid};
+
+      BOOST_TEST((sut == sut));
+    }
+    BOOST_AUTO_TEST_CASE(true_if_values_are_equal)
+    {
+      BOOST_TEST(
+          (multipart::table_stats_reply{body, flags, xid}
+        == multipart::table_stats_reply{body, flags, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_body_is_not_equal)
+    {
+      auto const table_stats1 = multipart::table_stats{1, 1, 1, 1};
+      auto const table_stats2 = multipart::table_stats{2, 2, 2, 2};
+
+      BOOST_TEST(
+          (multipart::table_stats_reply{body_type{table_stats1}, flags, xid}
+        != multipart::table_stats_reply{body_type{table_stats2}, flags, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_flags_is_not_equal)
+    {
+      BOOST_TEST(
+          (multipart::table_stats_reply{body, 0, xid}
+        != multipart::table_stats_reply{body, 1, xid}));
+    }
+    BOOST_AUTO_TEST_CASE(false_if_xid_is_not_equal)
+    {
+      BOOST_TEST(
+          (multipart::table_stats_reply{body, flags, 1}
+        != multipart::table_stats_reply{body, flags, 2}));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // equality
+
+  BOOST_AUTO_TEST_SUITE(encode)
+    BOOST_FIXTURE_TEST_CASE(generate_binary, table_stats_reply_fixture)
+    {
+      auto buffer = std::vector<std::uint8_t>{};
+
+      sut.encode(buffer);
+
+      BOOST_TEST(buffer.size() == sut.byte_length());
+      BOOST_TEST(buffer == bin, boost::test_tools::per_element{});
+    }
+  BOOST_AUTO_TEST_SUITE_END() // encode
+
+  BOOST_AUTO_TEST_SUITE(decode)
+    BOOST_FIXTURE_TEST_CASE(construct_from_binary, table_stats_reply_fixture)
+    {
+      auto it = bin.begin();
+
+      auto const table_stats_reply
+        = multipart::table_stats_reply::decode(it, bin.end());
+
+      BOOST_TEST((it == bin.end()));
+      BOOST_TEST((table_stats_reply == sut));
+    }
+  BOOST_AUTO_TEST_SUITE_END() // decode
+
+BOOST_AUTO_TEST_SUITE_END() // table_stats_reply
 
 BOOST_AUTO_TEST_SUITE_END() // multipart_test
 BOOST_AUTO_TEST_SUITE_END() // message_test
