@@ -94,7 +94,7 @@ namespace multipart {
     {
       auto tmp = std::move(other);
       std::swap(table_features_, tmp.table_features_);
-      properties_.swap(properties_);
+      properties_.swap(tmp.properties_);
       return *this;
     }
 
