@@ -460,12 +460,6 @@ namespace multipart_detail {
       return body;
     }
 
-    auto size() const noexcept
-      -> std::size_t
-    {
-      return body_.size();
-    }
-
   protected:
     array_body_multipart(
         std::uint16_t const flags, body_type&& body, std::uint32_t const xid)
