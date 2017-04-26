@@ -82,8 +82,6 @@ namespace messages {
 
     using raw_ofp_type = protocol::ofp_queue_get_config_reply;
     using queues_type = ofp::list<packet_queue>;
-    using iterator = queues_type::const_iterator;
-    using const_iterator = queues_type::const_iterator;
 
     queue_get_config_reply(
           std::uint32_t const port_no

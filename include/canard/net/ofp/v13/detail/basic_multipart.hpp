@@ -442,8 +442,6 @@ namespace multipart_detail {
   public:
     using raw_ofp_type = MultipartType;
     using body_type = ofp::list<elem_type>;
-    using iterator = typename body_type::iterator;
-    using const_iterator = typename body_type::const_iterator;
 
     auto body() const noexcept
       -> body_type const&
