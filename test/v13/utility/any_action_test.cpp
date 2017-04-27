@@ -410,7 +410,7 @@ BOOST_AUTO_TEST_SUITE(any_action_test)
       auto const sut = v13::any_action{actions::set_tcp_src{1}};
 
       BOOST_CHECK_THROW(
-          v13::any_cast<actions::set_udp_src>(sut), boost::bad_get);
+          v13::any_cast<actions::set_udp_src>(sut), ofp::bad_get);
     }
     BOOST_AUTO_TEST_CASE(return_pointer_if_argument_is_pointer)
     {

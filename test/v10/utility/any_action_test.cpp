@@ -441,7 +441,7 @@ BOOST_AUTO_TEST_SUITE(any_action_test)
       auto const sut = ofp::v10::any_action{actions::strip_vlan{}};
 
       BOOST_CHECK_THROW(
-          ofp::v10::any_cast<actions::output>(sut), boost::bad_get);
+          ofp::v10::any_cast<actions::output>(sut), ofp::bad_get);
     }
   BOOST_AUTO_TEST_SUITE_END() // reference_style_any_cast
 

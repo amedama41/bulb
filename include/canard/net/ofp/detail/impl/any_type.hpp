@@ -6,7 +6,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <boost/variant/apply_visitor.hpp>
 #include <canard/net/ofp/detail/visitors.hpp>
 
 namespace canard {
@@ -56,7 +55,7 @@ namespace detail {
     -> bool
   {
     auto visitor = detail::equivalent_visitor{};
-    return boost::apply_visitor(visitor, variant_, rhs.variant_);
+    return detail::apply_visitor(visitor, variant_, rhs.variant_);
   }
 
 } // namespace detail

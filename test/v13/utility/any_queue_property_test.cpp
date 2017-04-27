@@ -243,7 +243,7 @@ BOOST_AUTO_TEST_SUITE(any_queue_property_test)
       auto const sut = v13::any_queue_property{queue_props::max_rate{3}};
 
       BOOST_CHECK_THROW(
-          v13::any_cast<queue_props::min_rate>(sut), boost::bad_get);
+          v13::any_cast<queue_props::min_rate>(sut), ofp::bad_get);
     }
   BOOST_AUTO_TEST_SUITE_END() // reference_style_any_cast
 

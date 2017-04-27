@@ -8,6 +8,8 @@ enable_testing()
 
 option(BULB_USE_EXPLICIT_INSTANTIATION
     "use explicit instantiation for building libbulb" ON)
+option(BULB_USE_MAPBOX_VARIANT
+    "use mapbox::util::variant instead of boost::variant" OFF)
 
 add_library(bulb_base INTERFACE)
 target_compile_options(bulb_base INTERFACE "-Wall" "-pedantic" "-std=c++11")
@@ -43,6 +45,10 @@ target_compile_options(bulb PRIVATE "-x" "c++")
 if(BULB_USE_EXPLICIT_INSTANTIATION)
     target_compile_definitions(bulb
         PUBLIC CANARD_NET_OFP_USE_EXPLICIT_INSTANTIATION)
+endif()
+if(BULB_USE_MAPBOX_VARIANT)
+    target_compile_definitions(bulb
+        PUBLIC CANARD_NET_OFP_USE_MAPBOX_VARIANT)
 endif()
 target_link_libraries(bulb PUBLIC Boost::system PRIVATE bulb_base)
 add_library(bulb::libbulb ALIAS bulb)

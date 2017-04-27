@@ -15,9 +15,7 @@
 #include <boost/mpl/placeholders.hpp>
 #include <boost/mpl/transform_view.hpp>
 #include <boost/operators.hpp>
-#include <boost/variant/apply_visitor.hpp>
-#include <boost/variant/get.hpp>
-#include <boost/variant/variant.hpp>
+#include <canard/net/ofp/detail/variant.hpp>
 #include <canard/net/ofp/detail/visitors.hpp>
 #include <canard/net/ofp/type_traits/type_list.hpp>
 
@@ -89,14 +87,14 @@ namespace detail {
     auto visit(Visitor&& visitor)
       -> typename std::remove_reference<Visitor>::type::result_type
     {
-      return boost::apply_visitor(std::forward<Visitor>(visitor), variant_);
+      return detail::apply_visitor(std::forward<Visitor>(visitor), variant_);
     }
 
     template <class Visitor>
     auto visit(Visitor&& visitor) const
       -> typename std::remove_reference<Visitor>::type::result_type
     {
-      return boost::apply_visitor(std::forward<Visitor>(visitor), variant_);
+      return detail::apply_visitor(std::forward<Visitor>(visitor), variant_);
     }
 
     template <class Validator>
@@ -225,28 +223,28 @@ namespace detail {
     auto ref_any_cast()
       -> T&
     {
-      return boost::get<T>(variant_);
+      return detail::get<T>(variant_);
     }
 
     template <class T>
     auto ref_any_cast() const
       -> T const&
     {
-      return boost::get<T>(variant_);
+      return detail::get<T>(variant_);
     }
 
     template <class T>
     auto ptr_any_cast()
       -> T*
     {
-      return boost::get<T>(std::addressof(variant_));
+      return detail::get<T>(std::addressof(variant_));
     }
 
     template <class T>
     auto ptr_any_cast() const
       -> T const*
     {
-      return boost::get<T>(std::addressof(variant_));
+      return detail::get<T>(std::addressof(variant_));
     }
 
     struct to_any
@@ -260,7 +258,7 @@ namespace detail {
     };
 
   private:
-    using variant_t = typename boost::make_variant_over<inner_type_list>::type;
+    using variant_t = typename detail::make_variant_over<inner_type_list>::type;
     variant_t variant_;
   };
 
