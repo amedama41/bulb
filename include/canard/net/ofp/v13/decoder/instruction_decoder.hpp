@@ -45,7 +45,7 @@ namespace v13 {
 
 #     define CANARD_NET_OFP_V13_INSTRUCTION_CASE(z, N, _) \
       using instruction ## N = std::tuple_element<N, decode_type_list>::type; \
-      case instruction ## N::instruction_type: \
+      case instruction ## N::type(): \
         if (!instruction ## N::is_valid_instruction_length(instruction)) { \
           throw exception{ \
               protocol::bad_instruction_code::bad_len \

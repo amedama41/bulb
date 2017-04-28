@@ -44,7 +44,7 @@ namespace v10 {
 
 #     define CANARD_NET_OFP_V10_QUEUE_PROPERTY_CASE(z, N, _) \
       using property ## N = std::tuple_element<N, decode_type_list>::type; \
-      case property ## N::queue_property: \
+      case property ## N::property(): \
         if (!property ## N::is_valid_queue_property_length(prop_header)) { \
           throw v10::exception{ \
               v10::exception::ex_error_type::bad_queue_property \

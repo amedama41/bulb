@@ -47,7 +47,7 @@ namespace v13 {
 #     define CANARD_NET_OFP_V13_ACTION_CASE(z, N, _) \
       using action ## N \
         = std::tuple_element<N, non_set_field_action_type_list>::type; \
-      case action ## N::action_type: \
+      case action ## N::type(): \
         if (!action ## N::is_valid_action_length(action_header)) { \
           throw exception{ \
             protocol::bad_action_code::bad_len, "invalid action length" \

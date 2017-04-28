@@ -44,7 +44,7 @@ namespace v10 {
 
 #     define CANARD_NET_OFP_V10_ACTION_CASE(z, N, _) \
       using action ## N = std::tuple_element<N, decode_type_list>::type; \
-      case action ## N::action_type: \
+      case action ## N::type(): \
         if (!action ## N::is_valid_action_length(action_header)) { \
           throw v10::exception{ \
             protocol::OFPBAC_BAD_LEN, "invalid action length" \
