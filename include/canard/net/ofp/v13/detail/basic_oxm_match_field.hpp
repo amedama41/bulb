@@ -107,8 +107,8 @@ namespace v13 {
       : public detail::basic_protocol_type<T>
   {
   public:
-    using raw_ofp_type = std::uint32_t;
-    using oxm_header_type = raw_ofp_type;
+    using ofp_type = std::uint32_t;
+    using oxm_header_type = ofp_type;
     using value_type = typename OXMMatchFieldTraits::value_type;
 
     static constexpr auto oxm_class() noexcept

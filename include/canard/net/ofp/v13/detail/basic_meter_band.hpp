@@ -32,7 +32,7 @@ namespace v13 {
     static constexpr auto length() noexcept
       -> std::uint16_t
     {
-      return sizeof(typename MeterBand::raw_ofp_type);
+      return sizeof(typename MeterBand::ofp_type);
     }
 
     auto rate() const noexcept
@@ -101,7 +101,7 @@ namespace v13 {
       -> MeterBand
     {
       return MeterBand{
-        detail::decode<typename MeterBand::raw_ofp_type>(first, last)
+        detail::decode<typename MeterBand::ofp_type>(first, last)
       };
     }
   };

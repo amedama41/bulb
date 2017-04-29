@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_SUITE(stats_test)
     {
       auto const header = protocol::ofp_header{
           protocol::OFP_VERSION, T::type()
-        , sizeof(typename T::raw_ofp_type), random_xid()
+        , sizeof(typename T::ofp_type), random_xid()
       };
 
       auto const error_msg = T::validate_header(header);
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_SUITE(stats_test)
     {
       auto const header = protocol::ofp_header{
           protocol::OFP_VERSION + 1, T::type()
-        , sizeof(typename T::raw_ofp_type), random_xid()
+        , sizeof(typename T::ofp_type), random_xid()
       };
 
       auto const error_msg = T::validate_header(header);
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_SUITE(stats_test)
     {
       auto const header = protocol::ofp_header{
           protocol::OFP_VERSION, T::type() + 1
-        , sizeof(typename T::raw_ofp_type), random_xid()
+        , sizeof(typename T::ofp_type), random_xid()
       };
 
       auto const error_msg = T::validate_header(header);
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_SUITE(stats_test)
     {
       auto const header = protocol::ofp_header{
           protocol::OFP_VERSION, T::type()
-        , sizeof(typename T::raw_ofp_type) - 1, random_xid()
+        , sizeof(typename T::ofp_type) - 1, random_xid()
       };
 
       auto const error_msg = T::validate_header(header);
@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_SUITE(stats_test)
     {
       auto const header = protocol::ofp_header{
           protocol::OFP_VERSION, T::type()
-        , sizeof(typename T::raw_ofp_type) + 1, random_xid()
+        , sizeof(typename T::ofp_type) + 1, random_xid()
       };
 
       auto const error_msg = T::validate_header(header);

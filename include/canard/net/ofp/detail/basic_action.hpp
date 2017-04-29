@@ -68,7 +68,7 @@ namespace detail {
       using is_fixed_length
         = std::integral_constant<bool, T::is_fixed_length_action>;
       return basic_action_detail::is_valid_length(
-          header.len, sizeof(typename T::raw_ofp_type), is_fixed_length{});
+          header.len, sizeof(typename T::ofp_type), is_fixed_length{});
     }
   };
 

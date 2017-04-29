@@ -27,7 +27,7 @@ namespace v13 {
     using base_t = basic_instruction<T>;
 
   public:
-    using raw_ofp_type = ofp::v13::protocol::ofp_instruction_actions;
+    using ofp_type = ofp::v13::protocol::ofp_instruction_actions;
 
     auto length() const noexcept
       -> std::uint16_t
@@ -46,7 +46,7 @@ namespace v13 {
     {
       auto actions = ofp::v13::action_list{};
       actions.swap(actions_);
-      instruction_actions_.len = sizeof(raw_ofp_type);
+      instruction_actions_.len = sizeof(ofp_type);
       return actions;
     }
 
@@ -61,7 +61,7 @@ namespace v13 {
     explicit basic_instruction_actions(ofp::v13::action_list&& actions)
       : instruction_actions_{
             T::instruction_type
-          , actions.calc_ofp_length(sizeof(raw_ofp_type))
+          , actions.calc_ofp_length(sizeof(ofp_type))
           , { 0, 0, 0, 0 }
         }
       , actions_(std::move(actions))
@@ -69,7 +69,7 @@ namespace v13 {
     }
 
     basic_instruction_actions(
-          raw_ofp_type const& instruction_actions
+          ofp_type const& instruction_actions
         , ofp::v13::action_list&& actions)
       : instruction_actions_(instruction_actions)
       , actions_(std::move(actions))
@@ -125,8 +125,8 @@ namespace v13 {
       -> T
     {
       auto const instruction_actions
-        = detail::decode<raw_ofp_type>(first, last);
-      last = std::next(first, instruction_actions.len - sizeof(raw_ofp_type));
+        = detail::decode<ofp_type>(first, last);
+      last = std::next(first, instruction_actions.len - sizeof(ofp_type));
       auto actions = ofp::v13::action_list::decode(first, last);
       return T{instruction_actions, std::move(actions)};
     }
@@ -145,7 +145,7 @@ namespace v13 {
     }
 
   private:
-    raw_ofp_type instruction_actions_;
+    ofp_type instruction_actions_;
     ofp::v13::action_list actions_;
   };
 

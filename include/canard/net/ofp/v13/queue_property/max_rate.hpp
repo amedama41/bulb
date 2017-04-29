@@ -16,7 +16,7 @@ namespace queue_properties {
     : public queue_property_detail::basic_queue_property<max_rate>
   {
   public:
-    using raw_ofp_type = protocol::ofp_queue_prop_max_rate;
+    using ofp_type = protocol::ofp_queue_prop_max_rate;
 
     static constexpr protocol::ofp_queue_properties queue_property
       = protocol::OFPQT_MAX_RATE;
@@ -24,7 +24,7 @@ namespace queue_properties {
     explicit max_rate(std::uint16_t const rate) noexcept
       : max_rate_{
             protocol::ofp_queue_prop_header{
-              queue_property, sizeof(raw_ofp_type), { 0, 0, 0, 0 }
+              queue_property, sizeof(ofp_type), { 0, 0, 0, 0 }
             }
           , rate
           , { 0, 0, 0, 0, 0, 0 }
@@ -53,13 +53,13 @@ namespace queue_properties {
   private:
     friend basic_queue_property;
 
-    explicit max_rate(raw_ofp_type const& max_rate) noexcept
+    explicit max_rate(ofp_type const& max_rate) noexcept
       : max_rate_(max_rate)
     {
     }
 
     auto ofp_queue_property() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return max_rate_;
     }
@@ -71,7 +71,7 @@ namespace queue_properties {
     }
 
   private:
-    raw_ofp_type max_rate_;
+    ofp_type max_rate_;
   };
 
 } // namespace queue_properties

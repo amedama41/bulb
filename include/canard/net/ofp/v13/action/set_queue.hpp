@@ -16,7 +16,7 @@ namespace actions {
     : public detail::v13::basic_fixed_length_action<set_queue>
   {
   public:
-    using raw_ofp_type = protocol::ofp_action_set_queue;
+    using ofp_type = protocol::ofp_action_set_queue;
 
     static constexpr protocol::ofp_action_type action_type
       = protocol::OFPAT_SET_QUEUE;
@@ -35,13 +35,13 @@ namespace actions {
   private:
     friend basic_fixed_length_action;
 
-    explicit set_queue(raw_ofp_type const& action_set_queue) noexcept
+    explicit set_queue(ofp_type const& action_set_queue) noexcept
       : action_set_queue_(action_set_queue)
     {
     }
 
     auto ofp_action() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return action_set_queue_;
     }
@@ -60,7 +60,7 @@ namespace actions {
     }
 
   private:
-    raw_ofp_type action_set_queue_;
+    ofp_type action_set_queue_;
   };
 
 } // namespace actions

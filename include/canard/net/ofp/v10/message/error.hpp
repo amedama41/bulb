@@ -27,14 +27,14 @@ namespace messages {
     : public v10_detail::basic_message<error>
   {
   public:
-    using raw_ofp_type = protocol::ofp_error_msg;
+    using ofp_type = protocol::ofp_error_msg;
     using data_type = ofp::data_type;
 
     static constexpr protocol::ofp_type message_type = protocol::OFPT_ERROR;
 
   private:
     static constexpr std::uint16_t max_data_size
-      = std::numeric_limits<std::uint16_t>::max() - sizeof(raw_ofp_type);
+      = std::numeric_limits<std::uint16_t>::max() - sizeof(ofp_type);
 
     template <class Message>
     using enable_if_is_message
@@ -49,7 +49,7 @@ namespace messages {
             protocol::ofp_header{
                 protocol::OFP_VERSION
               , message_type
-              , ofp::calc_ofp_length(data, sizeof(raw_ofp_type))
+              , ofp::calc_ofp_length(data, sizeof(ofp_type))
               , xid
             }
           , std::uint16_t(type)
@@ -103,7 +103,7 @@ namespace messages {
       : error_msg_(other.error_msg_)
       , data_(std::move(other.data_))
     {
-      other.error_msg_.header.length = sizeof(raw_ofp_type);
+      other.error_msg_.header.length = sizeof(ofp_type);
     }
 
     auto operator=(error const& other)
@@ -156,7 +156,7 @@ namespace messages {
     {
       auto data = data_type{};
       data.swap(data_);
-      error_msg_.header.length = sizeof(raw_ofp_type);
+      error_msg_.header.length = sizeof(ofp_type);
       return data;
     }
 
@@ -174,7 +174,7 @@ namespace messages {
 
     friend basic_message::basic_protocol_type;
 
-    error(raw_ofp_type const& error_msg, data_type&& data) noexcept
+    error(ofp_type const& error_msg, data_type&& data) noexcept
       : error_msg_(error_msg)
       , data_(std::move(data))
     {
@@ -191,9 +191,9 @@ namespace messages {
     static auto decode_impl(Iterator& first, Iterator last)
       -> error
     {
-      auto const error_msg = detail::decode<raw_ofp_type>(first, last);
+      auto const error_msg = detail::decode<ofp_type>(first, last);
 
-      auto const data_length = error_msg.header.length - sizeof(raw_ofp_type);
+      auto const data_length = error_msg.header.length - sizeof(ofp_type);
       auto data = ofp::decode_data(first, data_length);
 
       return error{error_msg, std::move(data)};
@@ -225,7 +225,7 @@ namespace messages {
     }
 
   private:
-    raw_ofp_type error_msg_;
+    ofp_type error_msg_;
     data_type data_;
   };
 

@@ -27,8 +27,7 @@ namespace instructions {
   private:
     friend basic_instruction_actions;
 
-    explicit clear_actions(
-        raw_ofp_type const& instruction_actions, action_list&& actions)
+    clear_actions(ofp_type const& instruction_actions, action_list&& actions)
       : basic_instruction_actions{instruction_actions, std::move(actions)}
     {
     }

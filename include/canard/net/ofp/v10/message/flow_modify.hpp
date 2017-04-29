@@ -152,7 +152,7 @@ namespace messages {
   private:
     friend flow_mod_base;
 
-    flow_modify(raw_ofp_type const& flow_mod, action_list&& actions)
+    flow_modify(ofp_type const& flow_mod, action_list&& actions)
       : flow_modify_base{flow_mod, std::move(actions)}
     {
     }
@@ -227,7 +227,7 @@ namespace messages {
   private:
     friend flow_mod_base;
 
-    flow_modify_strict(raw_ofp_type const& flow_mod, action_list&& actions)
+    flow_modify_strict(ofp_type const& flow_mod, action_list&& actions)
       : flow_modify_base{flow_mod, std::move(actions)}
     {
     }

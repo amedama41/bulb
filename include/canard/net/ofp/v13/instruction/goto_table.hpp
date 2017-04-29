@@ -16,14 +16,14 @@ namespace instructions {
     : public detail::v13::basic_fixed_length_instruction<goto_table>
   {
   public:
-    using raw_ofp_type = protocol::ofp_instruction_goto_table;
+    using ofp_type = protocol::ofp_instruction_goto_table;
 
     static constexpr protocol::ofp_instruction_type instruction_type
       = protocol::OFPIT_GOTO_TABLE;
 
     explicit goto_table(std::uint8_t const table_id) noexcept
       : instruction_goto_table_{
-          instruction_type, sizeof(raw_ofp_type), table_id, { 0, 0, 0 }
+          instruction_type, sizeof(ofp_type), table_id, { 0, 0, 0 }
         }
     {
     }
@@ -37,13 +37,13 @@ namespace instructions {
   private:
     friend basic_fixed_length_instruction;
 
-    explicit goto_table(raw_ofp_type const& instruction_goto_table) noexcept
+    explicit goto_table(ofp_type const& instruction_goto_table) noexcept
       : instruction_goto_table_(instruction_goto_table)
     {
     }
 
     auto ofp_instruction() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return instruction_goto_table_;
     }
@@ -62,7 +62,7 @@ namespace instructions {
     }
 
   private:
-    raw_ofp_type instruction_goto_table_;
+    ofp_type instruction_goto_table_;
   };
 
 } // namespace instructions

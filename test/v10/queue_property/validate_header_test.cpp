@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_SUITE(validate_header)
       return_nullptr_if_header_is_valid, T, all_queue_property_types)
   {
     auto const header = protocol::ofp_queue_prop_header{
-        T::type(), sizeof(typename T::raw_ofp_type)
+        T::type(), sizeof(typename T::ofp_type)
       , { random_pad(), random_pad(), random_pad(), random_pad() }
     };
 
@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_SUITE(validate_header)
       return_error_message_if_type_is_incorrect, T, all_queue_property_types)
   {
     auto const header = protocol::ofp_queue_prop_header{
-        T::type() + 1, sizeof(typename T::raw_ofp_type)
+        T::type() + 1, sizeof(typename T::ofp_type)
       , { random_pad(), random_pad(), random_pad(), random_pad() }
     };
 
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_SUITE(validate_header)
       , T, all_queue_property_types)
   {
     auto const header = protocol::ofp_queue_prop_header{
-        T::type(), sizeof(typename T::raw_ofp_type) - 1
+        T::type(), sizeof(typename T::ofp_type) - 1
       , { random_pad(), random_pad(), random_pad(), random_pad() }
     };
 
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_SUITE(validate_header)
       , T, all_queue_property_types)
   {
     auto const header = protocol::ofp_queue_prop_header{
-        T::type(), sizeof(typename T::raw_ofp_type) + 1
+        T::type(), sizeof(typename T::ofp_type) + 1
       , { random_pad(), random_pad(), random_pad(), random_pad() }
     };
 

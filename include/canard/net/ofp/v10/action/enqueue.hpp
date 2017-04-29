@@ -18,18 +18,14 @@ namespace actions {
     : public detail::v10::basic_fixed_length_action<enqueue>
   {
   public:
-    using raw_ofp_type = protocol::ofp_action_enqueue;
+    using ofp_type = protocol::ofp_action_enqueue;
 
     static constexpr protocol::ofp_action_type action_type
       = protocol::OFPAT_ENQUEUE;
 
     enqueue(std::uint32_t const queue_id, std::uint16_t const port_no) noexcept
       : enqueue_{
-            action_type
-          , sizeof(raw_ofp_type)
-          , port_no
-          , { 0, 0, 0, 0, 0, 0 }
-          , queue_id
+          action_type, sizeof(ofp_type), port_no, { 0, 0, 0, 0, 0, 0 }, queue_id
         }
     {
     }
@@ -49,13 +45,13 @@ namespace actions {
   private:
     friend basic_fixed_length_action;
 
-    explicit enqueue(raw_ofp_type const& action_enqueue) noexcept
+    explicit enqueue(ofp_type const& action_enqueue) noexcept
       : enqueue_(action_enqueue)
     {
     }
 
     auto ofp_action() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return enqueue_;
     }
@@ -80,7 +76,7 @@ namespace actions {
     }
 
   private:
-    raw_ofp_type enqueue_;
+    ofp_type enqueue_;
   };
 
 } // namespace actions

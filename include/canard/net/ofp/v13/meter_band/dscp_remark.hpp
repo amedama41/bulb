@@ -19,7 +19,7 @@ namespace meter_bands {
       = protocol::OFPMBT_DSCP_REMARK;
 
   public:
-    using raw_ofp_type = protocol::ofp_meter_band_dscp_remark;
+    using ofp_type = protocol::ofp_meter_band_dscp_remark;
 
     dscp_remark(
           std::uint8_t const prec_level
@@ -50,13 +50,13 @@ namespace meter_bands {
   private:
     friend basic_meter_band;
 
-    explicit dscp_remark(raw_ofp_type const& dscp_remark) noexcept
+    explicit dscp_remark(ofp_type const& dscp_remark) noexcept
       : dscp_remark_(dscp_remark)
     {
     }
 
     auto ofp_meter_band() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return dscp_remark_;
     }
@@ -70,7 +70,7 @@ namespace meter_bands {
     }
 
   private:
-    raw_ofp_type dscp_remark_;
+    ofp_type dscp_remark_;
   };
 
 } // namespace meter_bands

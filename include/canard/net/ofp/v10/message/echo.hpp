@@ -28,7 +28,7 @@ namespace messages {
       using base_t = v10_detail::basic_message<T>;
 
     public:
-      using raw_ofp_type = protocol::ofp_header;
+      using ofp_type = protocol::ofp_header;
       using data_type = ofp::data_type;
 
     protected:
@@ -36,14 +36,14 @@ namespace messages {
         : header_{
               protocol::OFP_VERSION
             , T::message_type
-            , ofp::calc_ofp_length(data, sizeof(raw_ofp_type))
+            , ofp::calc_ofp_length(data, sizeof(ofp_type))
             , xid
           }
         , data_(std::move(data))
       {
       }
 
-      echo_base(raw_ofp_type const& header, data_type&& data) noexcept
+      echo_base(ofp_type const& header, data_type&& data) noexcept
         : header_(header)
         , data_(std::move(data))
       {
@@ -55,7 +55,7 @@ namespace messages {
         : header_(other.header_)
         , data_(std::move(other).data_)
       {
-        other.header_.length = sizeof(raw_ofp_type);
+        other.header_.length = sizeof(ofp_type);
       }
 
       auto operator=(echo_base const& other)
@@ -97,7 +97,7 @@ namespace messages {
       {
         auto data = data_type{};
         data.swap(data_);
-        header_.length = sizeof(raw_ofp_type);
+        header_.length = sizeof(ofp_type);
         return data;
       }
 
@@ -119,9 +119,9 @@ namespace messages {
       static auto decode_impl(Iterator& first, Iterator last)
         -> T
       {
-        auto const header = detail::decode<raw_ofp_type>(first, last);
+        auto const header = detail::decode<ofp_type>(first, last);
 
-        auto const data_length = header.length - sizeof(raw_ofp_type);
+        auto const data_length = header.length - sizeof(ofp_type);
         auto data = ofp::decode_data(first, data_length);
 
         return T{header, std::move(data)};
@@ -135,7 +135,7 @@ namespace messages {
       }
 
     private:
-      raw_ofp_type header_;
+      ofp_type header_;
       data_type data_;
     };
 
@@ -163,8 +163,7 @@ namespace messages {
   private:
     friend echo_base;
 
-    echo_request(
-        raw_ofp_type const& header, echo_base::data_type&& data) noexcept
+    echo_request(ofp_type const& header, echo_base::data_type&& data) noexcept
       : echo_base{header, std::move(data)}
     {
     }
@@ -197,8 +196,7 @@ namespace messages {
   private:
     friend echo_base;
 
-    echo_reply(
-        raw_ofp_type const& header, echo_base::data_type&& data) noexcept
+    echo_reply(ofp_type const& header, echo_base::data_type&& data) noexcept
       : echo_base{header, std::move(data)}
     {
     }

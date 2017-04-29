@@ -33,7 +33,7 @@ namespace flow_mod_detail {
   public:
     static constexpr protocol::ofp_type message_type = protocol::OFPT_FLOW_MOD;
 
-    using raw_ofp_type = protocol::ofp_flow_mod;
+    using ofp_type = protocol::ofp_flow_mod;
     using instructions_type = ofp::list<any_instruction>;
 
     auto header() const noexcept
@@ -68,7 +68,7 @@ namespace flow_mod_detail {
     {
       auto instructions = instructions_type{};
       instructions.swap(instructions_);
-      flow_mod_.header.length = sizeof(raw_ofp_type) + match_.byte_length();
+      flow_mod_.header.length = sizeof(ofp_type) + match_.byte_length();
       return instructions;
     }
 
@@ -90,7 +90,7 @@ namespace flow_mod_detail {
                 base_t::version()
               , base_t::type()
               , instructions.calc_ofp_length(
-                  match.calc_ofp_length(sizeof(raw_ofp_type)))
+                  match.calc_ofp_length(sizeof(ofp_type)))
               , xid
             }
           , cookie
@@ -124,7 +124,7 @@ namespace flow_mod_detail {
             protocol::ofp_header{
                 base_t::version()
               , base_t::type()
-              , match.calc_ofp_length(sizeof(raw_ofp_type))
+              , match.calc_ofp_length(sizeof(ofp_type))
               , xid
             }
           , cookie
@@ -146,7 +146,7 @@ namespace flow_mod_detail {
     }
 
     flow_mod_base(
-          raw_ofp_type const& flow_mod
+          ofp_type const& flow_mod
         , oxm_match&& match
         , instructions_type&& instructions)
       : flow_mod_(flow_mod)
@@ -197,7 +197,7 @@ namespace flow_mod_detail {
         detail::basic_protocol_type_tag<FlowMod>) noexcept
       -> std::uint16_t
     {
-      return sizeof(raw_ofp_type) + oxm_match::min_byte_length();
+      return sizeof(ofp_type) + oxm_match::min_byte_length();
     }
 
     template <class Container>
@@ -212,8 +212,8 @@ namespace flow_mod_detail {
     static auto decode_impl(Iterator& first, Iterator last)
       -> FlowMod
     {
-      auto const flow_mod = detail::decode<raw_ofp_type>(first, last);
-      last = std::next(first, flow_mod.header.length - sizeof(raw_ofp_type));
+      auto const flow_mod = detail::decode<ofp_type>(first, last);
+      last = std::next(first, flow_mod.header.length - sizeof(ofp_type));
 
       auto const ofp_match
         = detail::decode_without_consumption<protocol::ofp_match>(first, last);
@@ -243,7 +243,7 @@ namespace flow_mod_detail {
     }
 
   private:
-    raw_ofp_type flow_mod_;
+    ofp_type flow_mod_;
     oxm_match match_;
     instructions_type instructions_;
   };

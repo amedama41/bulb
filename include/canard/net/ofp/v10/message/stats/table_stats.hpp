@@ -28,7 +28,7 @@ namespace statistics {
     : public detail::basic_protocol_type<table_stats>
   {
   public:
-    using raw_ofp_type = protocol::ofp_table_stats;
+    using ofp_type = protocol::ofp_table_stats;
 
     table_stats(
           std::uint8_t const table_id
@@ -58,7 +58,7 @@ namespace statistics {
     static constexpr auto length() noexcept
       -> std::uint16_t
     {
-      return sizeof(raw_ofp_type);
+      return sizeof(ofp_type);
     }
 
     auto table_id() const noexcept
@@ -104,7 +104,7 @@ namespace statistics {
     }
 
   private:
-    explicit table_stats(raw_ofp_type const& table_stats) noexcept
+    explicit table_stats(ofp_type const& table_stats) noexcept
       : table_stats_(table_stats)
     {
     }
@@ -121,7 +121,7 @@ namespace statistics {
     static auto decode_impl(Iterator& first, Iterator last)
       -> table_stats
     {
-      return table_stats{detail::decode<raw_ofp_type>(first, last)};
+      return table_stats{detail::decode<ofp_type>(first, last)};
     }
 
     auto equal_impl(table_stats const& rhs) const noexcept
@@ -131,7 +131,7 @@ namespace statistics {
     }
 
   private:
-    raw_ofp_type table_stats_;
+    ofp_type table_stats_;
   };
 
 
@@ -151,7 +151,7 @@ namespace statistics {
   private:
     friend basic_stats_request::base_type;
 
-    explicit table_stats_request(raw_ofp_type const& stats_request) noexcept
+    explicit table_stats_request(ofp_type const& stats_request) noexcept
       : basic_stats_request{stats_request}
     {
     }
@@ -176,8 +176,7 @@ namespace statistics {
   private:
     friend basic_stats_reply::base_type;
 
-    table_stats_reply(
-        raw_ofp_type const& stats_reply, body_type&& table_stats)
+    table_stats_reply(ofp_type const& stats_reply, body_type&& table_stats)
       : basic_stats_reply{stats_reply, std::move(table_stats)}
     {
     }

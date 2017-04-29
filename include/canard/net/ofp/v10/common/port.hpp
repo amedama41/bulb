@@ -24,7 +24,7 @@ namespace v10 {
     , public detail::basic_protocol_type<port>
   {
   public:
-    using raw_ofp_type = protocol::ofp_phy_port;
+    using ofp_type = protocol::ofp_phy_port;
 
     port(std::uint16_t const port_no
        , canard::mac_address const addr
@@ -56,16 +56,16 @@ namespace v10 {
     static constexpr auto length() noexcept
       -> std::uint16_t
     {
-      return sizeof(raw_ofp_type);
+      return sizeof(ofp_type);
     }
 
     auto ofp_port() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return port_;
     }
 
-    static auto from_ofp_port(raw_ofp_type const& ofp_port) noexcept
+    static auto from_ofp_port(ofp_type const& ofp_port) noexcept
       -> port
     {
       return port{ofp_port};
@@ -74,7 +74,7 @@ namespace v10 {
   private:
     friend basic_protocol_type;
 
-    explicit port(raw_ofp_type const& phy_port) noexcept
+    explicit port(ofp_type const& phy_port) noexcept
       : port_(phy_port)
     {
     }
@@ -89,7 +89,7 @@ namespace v10 {
     static auto decode_impl(Iterator& first, Iterator last)
       -> port
     {
-      return port{detail::decode<raw_ofp_type>(first, last)};
+      return port{detail::decode<ofp_type>(first, last)};
     }
 
     auto equal_impl(port const& rhs) const noexcept
@@ -113,7 +113,7 @@ namespace v10 {
     }
 
   private:
-    raw_ofp_type port_;
+    ofp_type port_;
   };
 
 } // namespace v10

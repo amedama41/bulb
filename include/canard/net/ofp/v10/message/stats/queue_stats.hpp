@@ -24,7 +24,7 @@ namespace statistics {
     : public detail::basic_protocol_type<queue_stats>
   {
   public:
-    using raw_ofp_type = protocol::ofp_queue_stats;
+    using ofp_type = protocol::ofp_queue_stats;
 
     queue_stats(
           std::uint32_t const queue_id
@@ -46,7 +46,7 @@ namespace statistics {
     static constexpr auto length() noexcept
       -> std::uint16_t
     {
-      return sizeof(raw_ofp_type);
+      return sizeof(ofp_type);
     }
 
     auto queue_id() const noexcept
@@ -80,7 +80,7 @@ namespace statistics {
     }
 
   private:
-    explicit queue_stats(raw_ofp_type const& queue_stats) noexcept
+    explicit queue_stats(ofp_type const& queue_stats) noexcept
       : queue_stats_(queue_stats)
     {
     }
@@ -97,7 +97,7 @@ namespace statistics {
     static auto decode_impl(Iterator& first, Iterator last)
       -> queue_stats
     {
-      return queue_stats{detail::decode<raw_ofp_type>(first, last)};
+      return queue_stats{detail::decode<ofp_type>(first, last)};
     }
 
     auto equal_impl(queue_stats const& rhs) const noexcept
@@ -107,7 +107,7 @@ namespace statistics {
     }
 
   private:
-    raw_ofp_type queue_stats_;
+    ofp_type queue_stats_;
   };
 
 
@@ -124,9 +124,7 @@ namespace statistics {
           std::uint32_t const queue_id
         , std::uint16_t const port_no
         , std::uint32_t const xid = get_xid()) noexcept
-      : basic_stats_request{
-          0, raw_ofp_stats_type{port_no, { 0, 0 }, queue_id}, xid
-        }
+      : basic_stats_request{0, body_type{port_no, { 0, 0 }, queue_id}, xid}
     {
     }
 
@@ -146,8 +144,8 @@ namespace statistics {
     friend basic_stats_request::base_type;
 
     queue_stats_request(
-          raw_ofp_type const& stats_request
-        , raw_ofp_stats_type const& queue_stats_request) noexcept
+          ofp_type const& stats_request
+        , body_type const& queue_stats_request) noexcept
       : basic_stats_request{stats_request, queue_stats_request}
     {
     }
@@ -172,8 +170,7 @@ namespace statistics {
   private:
     friend basic_stats_reply::base_type;
 
-    queue_stats_reply(
-        raw_ofp_type const& stats_reply, body_type&& queue_stats)
+    queue_stats_reply(ofp_type const& stats_reply, body_type&& queue_stats)
       : basic_stats_reply{stats_reply, std::move(queue_stats)}
     {
     }

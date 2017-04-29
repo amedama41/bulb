@@ -55,7 +55,7 @@ namespace v10 {
     >::type;
 
   public:
-    using raw_ofp_type = protocol::ofp_match;
+    using ofp_type = protocol::ofp_match;
 
     match() noexcept
       : match_{protocol::OFPFW_ALL, 0}
@@ -75,7 +75,7 @@ namespace v10 {
       static_cast<void>(unused);
     }
 
-    explicit match(raw_ofp_type const& match) noexcept
+    explicit match(ofp_type const& match) noexcept
       : match_(match)
     {
     }
@@ -96,7 +96,7 @@ namespace v10 {
     static constexpr auto length() noexcept
       -> std::uint16_t
     {
-      return sizeof(raw_ofp_type);
+      return sizeof(ofp_type);
     }
 
     auto wildcards() const noexcept
@@ -128,7 +128,7 @@ namespace v10 {
     }
 
     auto ofp_match() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return match_;
     }
@@ -152,7 +152,7 @@ namespace v10 {
     static auto decode_impl(Iterator& first, Iterator last)
       -> match
     {
-      return match{detail::decode<raw_ofp_type>(first, last)};
+      return match{detail::decode<ofp_type>(first, last)};
     }
 
     auto equal_impl(match const& rhs) const noexcept
@@ -203,7 +203,7 @@ namespace v10 {
     };
 
   private:
-    raw_ofp_type match_;
+    ofp_type match_;
   };
 
 } // namespace v10

@@ -24,7 +24,7 @@ namespace statistics {
     : public detail::basic_protocol_type<port_stats>
   {
   public:
-    using raw_ofp_type = protocol::ofp_port_stats;
+    using ofp_type = protocol::ofp_port_stats;
 
     port_stats(
           std::uint16_t const port_no
@@ -62,7 +62,7 @@ namespace statistics {
     static constexpr auto length() noexcept
       -> std::uint16_t
     {
-      return sizeof(raw_ofp_type);
+      return sizeof(ofp_type);
     }
 
     auto port_no() const noexcept
@@ -144,7 +144,7 @@ namespace statistics {
     }
 
   private:
-    explicit port_stats(raw_ofp_type const& port_stats) noexcept
+    explicit port_stats(ofp_type const& port_stats) noexcept
       : port_stats_(port_stats)
     {
     }
@@ -161,7 +161,7 @@ namespace statistics {
     static auto decode_impl(Iterator& first, Iterator last)
       -> port_stats
     {
-      return port_stats{detail::decode<raw_ofp_type>(first, last)};
+      return port_stats{detail::decode<ofp_type>(first, last)};
     }
 
     auto equal_impl(port_stats const& rhs) const noexcept
@@ -171,7 +171,7 @@ namespace statistics {
     }
 
   private:
-    raw_ofp_type port_stats_;
+    ofp_type port_stats_;
   };
 
 
@@ -187,11 +187,7 @@ namespace statistics {
     explicit port_stats_request(
           std::uint16_t const port_no
         , std::uint32_t const xid = get_xid()) noexcept
-      : basic_stats_request{
-            0
-          , raw_ofp_stats_type{port_no, { 0, 0, 0, 0, 0, 0 }}
-          , xid
-        }
+      : basic_stats_request{0, body_type{port_no, { 0, 0, 0, 0, 0, 0 }}, xid}
     {
     }
 
@@ -205,8 +201,8 @@ namespace statistics {
     friend basic_stats_request::base_type;
 
     port_stats_request(
-          raw_ofp_type const& stats_request
-        , raw_ofp_stats_type const& port_stats_request) noexcept
+          ofp_type const& stats_request
+        , body_type const& port_stats_request) noexcept
       : basic_stats_request{stats_request, port_stats_request}
     {
     }
@@ -231,8 +227,7 @@ namespace statistics {
   private:
     friend basic_stats_reply::base_type;
 
-    port_stats_reply(
-        raw_ofp_type const& stats_reply, body_type&& port_stats)
+    port_stats_reply(ofp_type const& stats_reply, body_type&& port_stats)
       : basic_stats_reply{stats_reply, std::move(port_stats)}
     {
     }

@@ -23,13 +23,13 @@ namespace messages {
     : public v10_detail::basic_fixed_length_message<features_request>
   {
   public:
-    using raw_ofp_type = protocol::ofp_header;
+    using ofp_type = protocol::ofp_header;
 
     static constexpr protocol::ofp_type message_type
       = protocol::OFPT_FEATURES_REQUEST;
 
     explicit features_request(std::uint32_t const xid = get_xid()) noexcept
-      : header_{protocol::OFP_VERSION, message_type, sizeof(raw_ofp_type), xid}
+      : header_{protocol::OFP_VERSION, message_type, sizeof(ofp_type), xid}
     {
     }
 
@@ -42,19 +42,19 @@ namespace messages {
   private:
     friend basic_fixed_length_message;
 
-    explicit features_request(raw_ofp_type const& header) noexcept
+    explicit features_request(ofp_type const& header) noexcept
       : header_(header)
     {
     }
 
     auto ofp_message() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return header_;
     }
 
   private:
-    raw_ofp_type header_;
+    ofp_type header_;
   };
 
 
@@ -62,7 +62,7 @@ namespace messages {
     : public v10_detail::basic_message<features_reply>
   {
   public:
-    using raw_ofp_type = protocol::ofp_switch_features;
+    using ofp_type = protocol::ofp_switch_features;
     using ports_type = ofp::list<port>;
 
     static constexpr protocol::ofp_type message_type
@@ -80,7 +80,7 @@ namespace messages {
             protocol::ofp_header{
                 protocol::OFP_VERSION
               , message_type
-              , ports.calc_ofp_length(sizeof(raw_ofp_type))
+              , ports.calc_ofp_length(sizeof(ofp_type))
               , xid
             }
           , dpid
@@ -179,7 +179,7 @@ namespace messages {
     {
       auto tmp = ports_type{};
       tmp.swap(ports_);
-      switch_features_.header.length = sizeof(raw_ofp_type);
+      switch_features_.header.length = sizeof(ofp_type);
       return tmp;
     }
 
@@ -193,12 +193,12 @@ namespace messages {
         , std::uint16_t const length) noexcept
       -> bool
     {
-      return (length - sizeof(raw_ofp_type)) % port::min_length() == 0;
+      return (length - sizeof(ofp_type)) % port::min_length() == 0;
     }
 
     friend basic_message::basic_protocol_type;
 
-    features_reply(raw_ofp_type const& features, ports_type&& ports)
+    features_reply(ofp_type const& features, ports_type&& ports)
       : switch_features_(features)
       , ports_(std::move(ports))
     {
@@ -215,9 +215,9 @@ namespace messages {
     static auto decode_impl(Iterator& first, Iterator last)
       -> features_reply
     {
-      auto const features = detail::decode<raw_ofp_type>(first, last);
+      auto const features = detail::decode<ofp_type>(first, last);
 
-      auto const ports_length = features.header.length - sizeof(raw_ofp_type);
+      auto const ports_length = features.header.length - sizeof(ofp_type);
       last = std::next(first, ports_length);
 
       auto ports = ports_type::decode(first, last);
@@ -233,7 +233,7 @@ namespace messages {
     }
 
   private:
-    raw_ofp_type switch_features_;
+    ofp_type switch_features_;
     ports_type ports_;
   };
 

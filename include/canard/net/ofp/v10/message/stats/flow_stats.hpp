@@ -29,7 +29,7 @@ namespace statistics {
     : public detail::basic_protocol_type<flow_stats>
   {
   public:
-    using raw_ofp_type = protocol::ofp_flow_stats;
+    using ofp_type = protocol::ofp_flow_stats;
 
     flow_stats(
           v10::flow_entry entry
@@ -38,7 +38,7 @@ namespace statistics {
         , v10::elapsed_time const& elapsed_time
         , v10::counters const& counters)
       : flow_stats_{
-            entry.actions().calc_ofp_length(sizeof(raw_ofp_type))
+            entry.actions().calc_ofp_length(sizeof(ofp_type))
           , table_id
           , 0
           , entry.match().ofp_match()
@@ -125,7 +125,7 @@ namespace statistics {
     {
       auto actions = action_list{};
       actions.swap(actions_);
-      flow_stats_.length = sizeof(raw_ofp_type);
+      flow_stats_.length = sizeof(ofp_type);
       return actions;
     }
 
@@ -196,7 +196,7 @@ namespace statistics {
     }
 
   private:
-    flow_stats(raw_ofp_type const& stats, action_list&& actions)
+    flow_stats(ofp_type const& stats, action_list&& actions)
       : flow_stats_(stats)
       , actions_(std::move(actions))
     {
@@ -215,8 +215,8 @@ namespace statistics {
     static auto decode_impl(Iterator& first, Iterator last)
       -> flow_stats
     {
-      auto const stats = detail::decode<raw_ofp_type>(first, last);
-      if (stats.length < sizeof(raw_ofp_type)) {
+      auto const stats = detail::decode<ofp_type>(first, last);
+      if (stats.length < sizeof(ofp_type)) {
         throw v10::exception{
             v10::exception::ex_error_type::bad_stats_element
           , v10::exception::ex_error_code::bad_length
@@ -224,7 +224,7 @@ namespace statistics {
         } << CANARD_NET_OFP_ERROR_INFO();
       }
 
-      auto const actions_length = stats.length - sizeof(raw_ofp_type);
+      auto const actions_length = stats.length - sizeof(ofp_type);
       if (std::distance(first, last) < actions_length) {
         throw v10::exception{
           protocol::OFPBRC_BAD_LEN, "too small data size for flow_stats"
@@ -245,7 +245,7 @@ namespace statistics {
     }
 
   private:
-    raw_ofp_type flow_stats_;
+    ofp_type flow_stats_;
     action_list actions_;
   };
 
@@ -265,9 +265,7 @@ namespace statistics {
         , std::uint16_t const out_port = protocol::OFPP_NONE
         , std::uint32_t const xid = get_xid()) noexcept
       : basic_stats_request{
-            0
-          , raw_ofp_stats_type{match.ofp_match(), table_id, 0, out_port}
-          , xid
+          0, body_type{match.ofp_match(), table_id, 0, out_port}, xid
         }
     {
     }
@@ -294,8 +292,7 @@ namespace statistics {
     friend basic_stats_request::base_type;
 
     flow_stats_request(
-          raw_ofp_type const& stats_request
-        , raw_ofp_stats_type const& flow_stats) noexcept
+        ofp_type const& stats_request, body_type const& flow_stats) noexcept
       : basic_stats_request{stats_request, flow_stats}
     {
     }
@@ -320,8 +317,7 @@ namespace statistics {
   private:
     friend basic_stats_reply::base_type;
 
-    flow_stats_reply(
-        raw_ofp_type const& stats_reply, body_type&& flow_stats)
+    flow_stats_reply(ofp_type const& stats_reply, body_type&& flow_stats)
       : basic_stats_reply{stats_reply, std::move(flow_stats)}
     {
     }

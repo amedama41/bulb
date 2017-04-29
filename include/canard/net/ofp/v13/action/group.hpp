@@ -16,7 +16,7 @@ namespace actions {
     : public detail::v13::basic_fixed_length_action<group>
   {
   public:
-    using raw_ofp_type = protocol::ofp_action_group;
+    using ofp_type = protocol::ofp_action_group;
 
     static constexpr protocol::ofp_action_type action_type
       = protocol::OFPAT_GROUP;
@@ -35,13 +35,13 @@ namespace actions {
   private:
     friend basic_fixed_length_action;
 
-    explicit group(raw_ofp_type const& action_group) noexcept
+    explicit group(ofp_type const& action_group) noexcept
       : action_group_(action_group)
     {
     }
 
     auto ofp_action() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return action_group_;
     }
@@ -60,7 +60,7 @@ namespace actions {
     }
 
   private:
-    raw_ofp_type action_group_;
+    ofp_type action_group_;
   };
 
 } // namespace actions

@@ -33,7 +33,7 @@ namespace v13 {
     static constexpr protocol::ofp_match_type match_type = protocol::OFPMT_OXM;
 
   public:
-    using raw_ofp_type = protocol::ofp_match;
+    using ofp_type = protocol::ofp_match;
     using oxm_fields_type = ofp::list<any_oxm_match_field>;
 
   private:
@@ -153,7 +153,7 @@ namespace v13 {
     }
 
   private:
-    oxm_match(raw_ofp_type const& match, oxm_fields_type&& oxm_fields)
+    oxm_match(ofp_type const& match, oxm_fields_type&& oxm_fields)
       : match_(match)
       , oxm_fields_(std::move(oxm_fields))
     {
@@ -162,7 +162,7 @@ namespace v13 {
     friend basic_protocol_type;
 
     static constexpr std::uint16_t base_size
-      = offsetof(oxm_match::raw_ofp_type, pad);
+      = offsetof(oxm_match::ofp_type, pad);
 
     friend constexpr auto get_min_length(
         detail::basic_protocol_type_tag<oxm_match>) noexcept
@@ -189,7 +189,7 @@ namespace v13 {
     static auto decode_impl(Iterator& first, Iterator last)
       -> oxm_match
     {
-      auto const match = detail::decode<raw_ofp_type>(
+      auto const match = detail::decode<ofp_type>(
           first, last, detail::copy_size<base_size>{});
       last = std::next(first, match.length - base_size);
       auto oxm_fields = oxm_fields_type::decode(first, last);
@@ -211,7 +211,7 @@ namespace v13 {
     }
 
   private:
-    raw_ofp_type match_;
+    ofp_type match_;
     oxm_fields_type oxm_fields_;
   };
 

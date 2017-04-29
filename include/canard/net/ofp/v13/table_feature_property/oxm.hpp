@@ -31,7 +31,7 @@ namespace table_feature_properties {
       using base_t = detail::v13::basic_table_feature_property<T>;
 
     public:
-      using raw_ofp_type = protocol::ofp_table_feature_prop_oxm;
+      using ofp_type = protocol::ofp_table_feature_prop_oxm;
       using oxm_ids_type = ofp::list<oxm_id>;
 
     private:
@@ -45,8 +45,7 @@ namespace table_feature_properties {
     public:
       explicit basic_prop_oxm(oxm_ids_type oxm_ids)
         : table_feature_prop_oxm_{
-              base_t::type()
-            , oxm_ids.calc_ofp_length(sizeof(raw_ofp_type))
+            base_t::type(), oxm_ids.calc_ofp_length(sizeof(ofp_type))
           }
         , oxm_ids_(std::move(oxm_ids))
       {
@@ -101,14 +100,13 @@ namespace table_feature_properties {
       {
         auto oxm_ids = oxm_ids_type{};
         oxm_ids.swap(oxm_ids_);
-        table_feature_prop_oxm_.length = sizeof(raw_ofp_type);
+        table_feature_prop_oxm_.length = sizeof(ofp_type);
         return oxm_ids;
       }
 
     protected:
       basic_prop_oxm(
-            raw_ofp_type const& table_feature_prop_oxm
-          , oxm_ids_type&& oxm_ids)
+          ofp_type const& table_feature_prop_oxm, oxm_ids_type&& oxm_ids)
         : table_feature_prop_oxm_(table_feature_prop_oxm)
         , oxm_ids_(std::move(oxm_ids))
       {
@@ -136,9 +134,9 @@ namespace table_feature_properties {
       static auto decode_impl(Iterator& first, Iterator last)
         -> T
       {
-        auto const property = detail::decode<raw_ofp_type>(first, last);
+        auto const property = detail::decode<ofp_type>(first, last);
 
-        last = std::next(first, property.length - sizeof(raw_ofp_type));
+        last = std::next(first, property.length - sizeof(ofp_type));
         auto oxm_ids = oxm_ids_type::decode(first, last);
 
         return T{property, std::move(oxm_ids)};
@@ -171,7 +169,7 @@ namespace table_feature_properties {
       }
 
     private:
-      raw_ofp_type table_feature_prop_oxm_;
+      ofp_type table_feature_prop_oxm_;
       oxm_ids_type oxm_ids_;
     };
 

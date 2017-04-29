@@ -23,7 +23,7 @@ namespace messages {
       using base_t = detail::v13::basic_fixed_length_message<T>;
 
     public:
-      using raw_ofp_type = protocol::ofp_async_config;
+      using ofp_type = protocol::ofp_async_config;
       using mask_array_type = std::array<std::uint32_t, 2>;
 
     public:
@@ -97,7 +97,7 @@ namespace messages {
           , std::uint32_t const flow_removed_slave_mask
           , std::uint32_t const xid) noexcept
         : async_config_{
-              {base_t::version(), base_t::type(), sizeof(raw_ofp_type), xid}
+              {base_t::version(), base_t::type(), sizeof(ofp_type), xid}
             , { packet_in_master_mask, packet_in_slave_mask }
             , { port_status_master_mask, port_status_slave_mask }
             , { flow_removed_master_mask, flow_removed_slave_mask }
@@ -105,7 +105,7 @@ namespace messages {
       {
       }
 
-      explicit async_config_base(raw_ofp_type const& async_config) noexcept
+      explicit async_config_base(ofp_type const& async_config) noexcept
         : async_config_(async_config)
       {
       }
@@ -114,13 +114,13 @@ namespace messages {
       friend base_t;
 
       auto ofp_message() const noexcept
-        -> raw_ofp_type const&
+        -> ofp_type const&
       {
         return async_config_;
       }
 
     private:
-      raw_ofp_type async_config_;
+      ofp_type async_config_;
     };
 
   } // namespace async_config_detail
@@ -130,13 +130,13 @@ namespace messages {
     : public detail::v13::basic_fixed_length_message<get_async_request>
   {
   public:
-    using raw_ofp_type = protocol::ofp_header;
+    using ofp_type = protocol::ofp_header;
 
     static constexpr protocol::ofp_type message_type
       = protocol::OFPT_GET_ASYNC_REQUEST;
 
     explicit get_async_request(std::uint32_t const xid = get_xid()) noexcept
-      : header_{version(), type(), sizeof(raw_ofp_type), xid}
+      : header_{version(), type(), sizeof(ofp_type), xid}
     {
     }
 
@@ -149,19 +149,19 @@ namespace messages {
   private:
     friend basic_fixed_length_message;
 
-    explicit get_async_request(raw_ofp_type const& header) noexcept
+    explicit get_async_request(ofp_type const& header) noexcept
       : header_(header)
     {
     }
 
     auto ofp_message() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return header_;
     }
 
   private:
-    raw_ofp_type header_;
+    ofp_type header_;
   };
 
   class get_async_reply
@@ -205,7 +205,7 @@ namespace messages {
   private:
     friend async_config_base::basic_fixed_length_message;
 
-    explicit get_async_reply(raw_ofp_type const& async_config) noexcept
+    explicit get_async_reply(ofp_type const& async_config) noexcept
       : async_config_base{async_config}
     {
     }
@@ -251,7 +251,7 @@ namespace messages {
   private:
     friend async_config_base::basic_fixed_length_message;
 
-    explicit set_async(raw_ofp_type const& async_config) noexcept
+    explicit set_async(ofp_type const& async_config) noexcept
       : async_config_base{async_config}
     {
     }

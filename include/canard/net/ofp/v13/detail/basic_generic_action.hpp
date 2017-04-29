@@ -17,7 +17,7 @@ namespace v13 {
     using base_t = basic_fixed_length_action<T>;
 
   public:
-    using raw_ofp_type = ofp::v13::protocol::ofp_action_header;
+    using ofp_type = ofp::v13::protocol::ofp_action_header;
 
   protected:
     basic_generic_action() noexcept
@@ -25,7 +25,7 @@ namespace v13 {
     {
     }
 
-    explicit basic_generic_action(raw_ofp_type const& action_header) noexcept
+    explicit basic_generic_action(ofp_type const& action_header) noexcept
       : action_header_(action_header)
     {
     }
@@ -34,7 +34,7 @@ namespace v13 {
     friend base_t;
 
     auto ofp_action() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return action_header_;
     }
@@ -50,7 +50,7 @@ namespace v13 {
     }
 
   private:
-    raw_ofp_type action_header_;
+    ofp_type action_header_;
   };
 
 } // namespace v13

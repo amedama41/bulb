@@ -27,7 +27,7 @@ namespace actions {
   private:
     friend basic_action_push::basic_fixed_length_action;
 
-    explicit push_pbb(raw_ofp_type const& ofp_action) noexcept
+    explicit push_pbb(ofp_type const& ofp_action) noexcept
       : basic_action_push(ofp_action)
     {
     }

@@ -25,7 +25,7 @@ namespace detail {
     static constexpr auto length() noexcept
       -> std::uint16_t
     {
-      return sizeof(typename T::raw_ofp_type);
+      return sizeof(typename T::ofp_type);
     }
 
   private:
@@ -57,7 +57,7 @@ namespace detail {
     static auto decode_impl(Iterator& first, Iterator last)
       -> T
     {
-      return T{detail::decode<typename T::raw_ofp_type>(first, last)};
+      return T{detail::decode<typename T::ofp_type>(first, last)};
     }
 
     auto equal_impl(T const& rhs) const noexcept

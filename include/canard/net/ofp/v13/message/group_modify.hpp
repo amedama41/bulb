@@ -32,7 +32,7 @@ namespace messages {
   private:
     friend group_mod_base;
 
-    group_modify(raw_ofp_type const& group_mod, buckets_type&& buckets)
+    group_modify(ofp_type const& group_mod, buckets_type&& buckets)
       : group_mod_base{group_mod, std::move(buckets)}
     {
     }

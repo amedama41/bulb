@@ -31,7 +31,7 @@ namespace table_feature_properties {
       using base_t = detail::v13::basic_table_feature_property<T>;
 
     public:
-      using raw_ofp_type = protocol::ofp_table_feature_prop_actions;
+      using ofp_type = protocol::ofp_table_feature_prop_actions;
       using action_ids_type = ofp::list<action_id>;
 
     private:
@@ -45,8 +45,7 @@ namespace table_feature_properties {
     public:
       explicit basic_prop_actions(action_ids_type action_ids)
         : table_feature_prop_actions_{
-              base_t::type()
-            , action_ids.calc_ofp_length(sizeof(raw_ofp_type))
+            base_t::type(), action_ids.calc_ofp_length(sizeof(ofp_type))
           }
         , action_ids_(std::move(action_ids))
       {
@@ -103,13 +102,13 @@ namespace table_feature_properties {
       {
         auto action_ids = action_ids_type{};
         action_ids.swap(action_ids_);
-        table_feature_prop_actions_.length = sizeof(raw_ofp_type);
+        table_feature_prop_actions_.length = sizeof(ofp_type);
         return action_ids;
       }
 
     protected:
       basic_prop_actions(
-            raw_ofp_type const& table_feature_prop_actions
+            ofp_type const& table_feature_prop_actions
           , action_ids_type&& action_ids)
         : table_feature_prop_actions_(table_feature_prop_actions)
         , action_ids_(std::move(action_ids))
@@ -138,9 +137,9 @@ namespace table_feature_properties {
       static auto decode_impl(Iterator& first, Iterator last)
         -> T
       {
-        auto const property = detail::decode<raw_ofp_type>(first, last);
+        auto const property = detail::decode<ofp_type>(first, last);
 
-        last = std::next(first, property.length - sizeof(raw_ofp_type));
+        last = std::next(first, property.length - sizeof(ofp_type));
         auto action_ids = action_ids_type::decode(first, last);
 
         return T{property, std::move(action_ids)};
@@ -173,7 +172,7 @@ namespace table_feature_properties {
       }
 
     private:
-      raw_ofp_type table_feature_prop_actions_;
+      ofp_type table_feature_prop_actions_;
       action_ids_type action_ids_;
     };
 

@@ -22,7 +22,7 @@ namespace messages {
       using base_t = detail::v13::basic_fixed_length_message<T>;
 
     public:
-      using raw_ofp_type = protocol::ofp_role_request;
+      using ofp_type = protocol::ofp_role_request;
 
       auto header() const noexcept
         -> protocol::ofp_header const&
@@ -48,7 +48,7 @@ namespace messages {
           , std::uint64_t const generation_id
           , std::uint32_t const xid) noexcept
         : role_request_{
-              {base_t::version(), base_t::type(), sizeof(raw_ofp_type), xid}
+              {base_t::version(), base_t::type(), sizeof(ofp_type), xid}
             , role
             , { 0, 0, 0, 0 }
             , generation_id
@@ -56,7 +56,7 @@ namespace messages {
       {
       }
 
-      explicit role_base(raw_ofp_type const& role_request) noexcept
+      explicit role_base(ofp_type const& role_request) noexcept
         : role_request_(role_request)
       {
       }
@@ -65,13 +65,13 @@ namespace messages {
       friend base_t;
 
       auto ofp_message() const noexcept
-        -> raw_ofp_type const&
+        -> ofp_type const&
       {
         return role_request_;
       }
 
     private:
-      raw_ofp_type role_request_;
+      ofp_type role_request_;
     };
 
   } // namespace role_detail
@@ -95,7 +95,7 @@ namespace messages {
   private:
     friend role_base::basic_fixed_length_message;
 
-    explicit role_request(raw_ofp_type const& role_request) noexcept
+    explicit role_request(ofp_type const& role_request) noexcept
       : role_base{role_request}
     {
     }
@@ -119,7 +119,7 @@ namespace messages {
   private:
     friend role_base::basic_fixed_length_message;
 
-    explicit role_reply(raw_ofp_type const& role_request) noexcept
+    explicit role_reply(ofp_type const& role_request) noexcept
       : role_base{role_request}
     {
     }

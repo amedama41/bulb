@@ -24,7 +24,7 @@ namespace multipart {
     : public detail::basic_protocol_type<queue_stats>
   {
   public:
-    using raw_ofp_type = protocol::ofp_queue_stats;
+    using ofp_type = protocol::ofp_queue_stats;
 
     queue_stats(
           std::uint32_t const queue_id
@@ -48,7 +48,7 @@ namespace multipart {
     static constexpr auto length() noexcept
       -> std::uint16_t
     {
-      return sizeof(raw_ofp_type);
+      return sizeof(ofp_type);
     }
 
     auto queue_id() const noexcept
@@ -100,7 +100,7 @@ namespace multipart {
     }
 
   private:
-    explicit queue_stats(raw_ofp_type const& queue_stats) noexcept
+    explicit queue_stats(ofp_type const& queue_stats) noexcept
       : queue_stats_(queue_stats)
     {
     }
@@ -117,7 +117,7 @@ namespace multipart {
     static auto decode_impl(Iterator& first, Iterator last)
       -> queue_stats
     {
-      return queue_stats{detail::decode<raw_ofp_type>(first, last)};
+      return queue_stats{detail::decode<ofp_type>(first, last)};
     }
 
     auto equal_impl(queue_stats const& rhs) const noexcept
@@ -127,7 +127,7 @@ namespace multipart {
     }
 
   private:
-    raw_ofp_type queue_stats_;
+    ofp_type queue_stats_;
   };
 
 
@@ -164,7 +164,7 @@ namespace multipart {
     friend basic_multipart_request::base_type;
 
     queue_stats_request(
-          raw_ofp_type const& multipart_request
+          ofp_type const& multipart_request
         , body_type const& queue_stats_request) noexcept
       : basic_multipart_request{multipart_request, queue_stats_request}
     {
@@ -194,8 +194,7 @@ namespace multipart {
 
     static constexpr bool is_fixed_length_element = true;
 
-    queue_stats_reply(
-        raw_ofp_type const multipart_reply, body_type&& queue_stats)
+    queue_stats_reply(ofp_type const multipart_reply, body_type&& queue_stats)
       : basic_multipart_reply{multipart_reply, std::move(queue_stats)}
     {
     }

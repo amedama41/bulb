@@ -24,14 +24,12 @@ namespace v10 {
     : public detail::basic_protocol_type<packet_queue>
   {
   public:
-    using raw_ofp_type = protocol::ofp_packet_queue;
+    using ofp_type = protocol::ofp_packet_queue;
     using properties_type = list<any_queue_property>;
 
     packet_queue(std::uint32_t const queue_id, properties_type properties)
       : packet_queue_{
-            queue_id
-          , properties.calc_ofp_length(sizeof(raw_ofp_type))
-          , { 0, 0 }
+          queue_id, properties.calc_ofp_length(sizeof(ofp_type)), { 0, 0 }
         }
       , properties_(std::move(properties))
     {
@@ -48,7 +46,7 @@ namespace v10 {
       : packet_queue_(other.packet_queue_)
       , properties_(std::move(other).properties_)
     {
-      other.packet_queue_.len = sizeof(raw_ofp_type);
+      other.packet_queue_.len = sizeof(ofp_type);
     }
 
     auto operator=(packet_queue const& other)
@@ -87,7 +85,7 @@ namespace v10 {
   private:
     friend basic_protocol_type;
 
-    packet_queue(raw_ofp_type const& pkt_queue, properties_type&& properties)
+    packet_queue(ofp_type const& pkt_queue, properties_type&& properties)
       : packet_queue_(pkt_queue)
       , properties_(std::move(properties))
     {
@@ -104,15 +102,15 @@ namespace v10 {
     static auto decode_impl(Iterator& first, Iterator last)
       -> packet_queue
     {
-      auto const pkt_queue = detail::decode<raw_ofp_type>(first, last);
-      if (pkt_queue.len < sizeof(raw_ofp_type)) {
+      auto const pkt_queue = detail::decode<ofp_type>(first, last);
+      if (pkt_queue.len < sizeof(ofp_type)) {
         throw v10::exception{
             exception::ex_error_type::bad_packet_queue
           , exception::ex_error_code::bad_length
           , "packet_queue length is too small"
         } << CANARD_NET_OFP_ERROR_INFO();
       }
-      auto const properties_length = pkt_queue.len - sizeof(raw_ofp_type);
+      auto const properties_length = pkt_queue.len - sizeof(ofp_type);
       if (std::distance(first, last) < properties_length) {
         throw v10::exception{
           protocol::OFPBRC_BAD_LEN, "too small data size for packet_queue"
@@ -144,7 +142,7 @@ namespace v10 {
     }
 
   private:
-    raw_ofp_type packet_queue_;
+    ofp_type packet_queue_;
     properties_type properties_;
   };
 

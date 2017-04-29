@@ -28,13 +28,13 @@ namespace messages {
     static constexpr protocol::ofp_type message_type
       = protocol::OFPT_QUEUE_GET_CONFIG_REQUEST;
 
-    using raw_ofp_type = protocol::ofp_queue_get_config_request;
+    using ofp_type = protocol::ofp_queue_get_config_request;
 
     explicit queue_get_config_request(
           std::uint32_t const port_no
         , std::uint32_t const xid = get_xid()) noexcept
       : queue_get_config_request_{
-            protocol::ofp_header{version(), type(), sizeof(raw_ofp_type), xid}
+            protocol::ofp_header{version(), type(), sizeof(ofp_type), xid}
           , port_no
           , { 0, 0, 0, 0 }
         }
@@ -57,19 +57,19 @@ namespace messages {
     friend basic_fixed_length_message;
 
     explicit queue_get_config_request(
-        raw_ofp_type const& queue_get_config_request) noexcept
+        ofp_type const& queue_get_config_request) noexcept
       : queue_get_config_request_(queue_get_config_request)
     {
     }
 
     auto ofp_message() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return queue_get_config_request_;
     }
 
   private:
-    raw_ofp_type queue_get_config_request_;
+    ofp_type queue_get_config_request_;
   };
 
 
@@ -80,7 +80,7 @@ namespace messages {
     static constexpr protocol::ofp_type message_type
       = protocol::OFPT_QUEUE_GET_CONFIG_REPLY;
 
-    using raw_ofp_type = protocol::ofp_queue_get_config_reply;
+    using ofp_type = protocol::ofp_queue_get_config_reply;
     using queues_type = ofp::list<packet_queue>;
 
     queue_get_config_reply(
@@ -89,10 +89,7 @@ namespace messages {
         , std::uint32_t const xid = get_xid())
       : queue_get_config_reply_{
             protocol::ofp_header{
-                version()
-              , type()
-              , queues.calc_ofp_length(sizeof(raw_ofp_type))
-              , xid
+              version(), type(), queues.calc_ofp_length(sizeof(ofp_type)), xid
             }
           , port_no
           , { 0, 0, 0, 0 }
@@ -153,7 +150,7 @@ namespace messages {
 
   private:
     queue_get_config_reply(
-        raw_ofp_type const& queue_get_config_reply, queues_type&& queues)
+        ofp_type const& queue_get_config_reply, queues_type&& queues)
       : queue_get_config_reply_(queue_get_config_reply)
       , queues_(std::move(queues))
     {
@@ -176,10 +173,10 @@ namespace messages {
     static auto decode_impl(Iterator& first, Iterator last)
       -> queue_get_config_reply
     {
-      auto const queue_get_config = detail::decode<raw_ofp_type>(first, last);
+      auto const queue_get_config = detail::decode<ofp_type>(first, last);
 
       auto const queues_length
-        = queue_get_config.header.length - sizeof(raw_ofp_type);
+        = queue_get_config.header.length - sizeof(ofp_type);
       last = std::next(first, queues_length);
 
       auto queues = queues_type::decode(first, last);
@@ -196,7 +193,7 @@ namespace messages {
     }
 
   private:
-    raw_ofp_type queue_get_config_reply_;
+    ofp_type queue_get_config_reply_;
     queues_type queues_;
   };
 

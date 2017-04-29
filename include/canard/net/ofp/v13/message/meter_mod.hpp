@@ -33,7 +33,7 @@ namespace messages {
   private:
     friend meter_mod_base;
 
-    meter_add(raw_ofp_type const& meter_mod, bands_type&& bands)
+    meter_add(ofp_type const& meter_mod, bands_type&& bands)
       : meter_mod_base{meter_mod, std::move(bands)}
     {
     }
@@ -81,7 +81,7 @@ namespace messages {
   private:
     friend meter_mod_base;
 
-    meter_modify(raw_ofp_type const& meter_mod, bands_type&& bands)
+    meter_modify(ofp_type const& meter_mod, bands_type&& bands)
       : meter_mod_base{meter_mod, std::move(bands)}
     {
     }
@@ -127,7 +127,7 @@ namespace messages {
   private:
     friend meter_mod_base;
 
-    meter_delete(raw_ofp_type const& meter_mod, bands_type&& bands)
+    meter_delete(ofp_type const& meter_mod, bands_type&& bands)
       : meter_mod_base{meter_mod, std::move(bands)}
     {
     }

@@ -19,7 +19,7 @@ namespace actions {
     : public detail::v10::basic_fixed_length_action<output>
   {
   public:
-    using raw_ofp_type = protocol::ofp_action_output;
+    using ofp_type = protocol::ofp_action_output;
 
     static constexpr protocol::ofp_action_type action_type
       = protocol::OFPAT_OUTPUT;
@@ -28,7 +28,7 @@ namespace actions {
           std::uint16_t const port
         , std::uint16_t const max_len
         = std::numeric_limits<std::uint16_t>::max()) noexcept
-      : action_output_{action_type, sizeof(raw_ofp_type), port, max_len}
+      : action_output_{action_type, sizeof(ofp_type), port, max_len}
     {
     }
 
@@ -55,13 +55,13 @@ namespace actions {
   private:
     friend basic_fixed_length_action;
 
-    explicit output(raw_ofp_type const output) noexcept
+    explicit output(ofp_type const output) noexcept
       : action_output_(output)
     {
     }
 
     auto ofp_action() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return action_output_;
     }
@@ -84,7 +84,7 @@ namespace actions {
     }
 
   private:
-    raw_ofp_type action_output_;
+    ofp_type action_output_;
   };
 
 } // namespace actions

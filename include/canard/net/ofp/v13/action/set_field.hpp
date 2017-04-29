@@ -33,7 +33,7 @@ namespace actions {
       = offsetof(protocol::ofp_action_set_field, field);
 
   public:
-    using raw_ofp_type = protocol::ofp_action_set_field;
+    using ofp_type = protocol::ofp_action_set_field;
     using oxm_match_field = OXMMatchField;
     using value_type = typename oxm_match_field::value_type;
 
@@ -69,7 +69,7 @@ namespace actions {
       return set_field{std::move(field)};
     }
 
-    static auto validate_set_field(raw_ofp_type const& set_field) noexcept
+    static auto validate_set_field(ofp_type const& set_field) noexcept
       -> char const*
     {
       auto it = set_field.field;
@@ -80,7 +80,7 @@ namespace actions {
         return error_msg;
       }
       if (set_field.len != detail::v13::exact_length(
-            sizeof(raw_ofp_type) + oxm_header.oxm_length())) {
+            sizeof(ofp_type) + oxm_header.oxm_length())) {
         return "invalid set_field length";
       }
       return nullptr;
@@ -131,7 +131,7 @@ namespace actions {
     static auto decode_impl(Iterator& first, Iterator last)
       -> set_field
     {
-      std::advance(first, sizeof(raw_ofp_type::type));
+      std::advance(first, sizeof(ofp_type::type));
       auto const length = detail::decode<std::uint16_t>(first, last);
       auto field = oxm_match_field::decode(first, last);
       std::advance(first, length - (base_size + field.length()));

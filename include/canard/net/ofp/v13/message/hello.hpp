@@ -57,14 +57,14 @@ namespace messages {
   public:
     static constexpr protocol::ofp_type message_type = protocol::OFPT_HELLO;
 
-    using raw_ofp_type = protocol::ofp_hello;
+    using ofp_type = protocol::ofp_hello;
     using hello_elements_type = ofp::list<any_hello_element>;
 
     explicit hello(
           std::uint8_t const version = protocol::OFP_VERSION
         , std::uint32_t const xid = get_xid())
       : hello_{
-          protocol::ofp_header{version, message_type, sizeof(raw_ofp_type), xid}
+          protocol::ofp_header{version, message_type, sizeof(ofp_type), xid}
         }
       , elements_{}
     {
@@ -77,7 +77,7 @@ namespace messages {
           protocol::ofp_header{
               version
             , message_type
-            , elements.calc_ofp_length(sizeof(raw_ofp_type))
+            , elements.calc_ofp_length(sizeof(ofp_type))
             , xid
           }
         }
@@ -170,7 +170,7 @@ namespace messages {
     {
       auto elements = hello_elements_type{};
       elements.swap(elements_);
-      hello_.header.length = sizeof(raw_ofp_type);
+      hello_.header.length = sizeof(ofp_type);
       return elements;
     }
 
@@ -200,7 +200,7 @@ namespace messages {
     }
 
   private:
-    hello(raw_ofp_type const& hello, hello_elements_type&& elements)
+    hello(ofp_type const& hello, hello_elements_type&& elements)
       : hello_(hello)
       , elements_(std::move(elements))
     {
@@ -219,8 +219,8 @@ namespace messages {
     static auto decode_impl(Iterator& first, Iterator last)
       -> hello
     {
-      auto const h = detail::decode<raw_ofp_type>(first, last);
-      auto const hello_elements_length = h.header.length - sizeof(raw_ofp_type);
+      auto const h = detail::decode<ofp_type>(first, last);
+      auto const hello_elements_length = h.header.length - sizeof(ofp_type);
       last = std::next(first, hello_elements_length);
 
       auto elements = hello_elements_type::decode(first, last);
@@ -236,7 +236,7 @@ namespace messages {
     }
 
   private:
-    raw_ofp_type hello_;
+    ofp_type hello_;
     hello_elements_type elements_;
   };
 

@@ -22,8 +22,8 @@ namespace v13 {
   {
   public:
     using oxm_header_type = std::uint32_t;
-    using raw_ofp_type = oxm_header_type;
-    using raw_ofp_exp_type = protocol::ofp_oxm_experimenter_header;
+    using ofp_type = oxm_header_type;
+    using ofp_exp_type = protocol::ofp_oxm_experimenter_header;
 
     explicit oxm_id(oxm_header_type const oxm_header) noexcept
       : oxm_header_{oxm_header, 0}
@@ -105,11 +105,11 @@ namespace v13 {
     auto length() const noexcept
       -> std::uint16_t
     {
-      return is_experimenter() ? sizeof(raw_ofp_exp_type) : sizeof(raw_ofp_type);
+      return is_experimenter() ? sizeof(ofp_exp_type) : sizeof(ofp_type);
     };
 
   private:
-    oxm_id(raw_ofp_type const oxm_header
+    oxm_id(ofp_type const oxm_header
          , std::uint32_t const experimenter_id) noexcept
       : oxm_header_{oxm_header, experimenter_id}
     {
@@ -132,7 +132,7 @@ namespace v13 {
     static auto decode_impl(Iterator& first, Iterator last)
       -> oxm_id
     {
-      auto const header = detail::decode<raw_ofp_type>(first, last);
+      auto const header = detail::decode<ofp_type>(first, last);
       auto experimenter_id = std::uint32_t{0};
       if (oxm_header_ops::oxm_class(header) == protocol::OFPXMC_EXPERIMENTER) {
         if (std::distance(first, last) < sizeof(experimenter_id)) {
@@ -169,7 +169,7 @@ namespace v13 {
     }
 
   private:
-    raw_ofp_exp_type oxm_header_;
+    ofp_exp_type oxm_header_;
   };
 
 } // namespace v13

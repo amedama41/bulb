@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_SUITE(actions_test)
     BOOST_AUTO_TEST_CASE_TEMPLATE(
         return_nullptr_if_header_is_valid, Action, all_action_types)
     {
-      constexpr auto min_length = sizeof(typename Action::raw_ofp_type);
+      constexpr auto min_length = sizeof(typename Action::ofp_type);
       auto const header = protocol::ofp_action_header{
           Action::type(), min_length
         , { random_pad(), random_pad(), random_pad(), random_pad() }
@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_SUITE(actions_test)
     BOOST_AUTO_TEST_CASE_TEMPLATE(
           return_error_message_if_type_is_incorrect, Action, all_action_types)
     {
-      constexpr auto min_length = sizeof(typename Action::raw_ofp_type);
+      constexpr auto min_length = sizeof(typename Action::ofp_type);
       auto const header = protocol::ofp_action_header{
           Action::type() + 1, min_length
         , { random_pad(), random_pad(), random_pad(), random_pad() }
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_SUITE(actions_test)
           return_error_message_if_length_is_less_than_ofp_struct_size
         , Action, all_action_types)
     {
-      constexpr auto min_length = sizeof(typename Action::raw_ofp_type);
+      constexpr auto min_length = sizeof(typename Action::ofp_type);
       auto const header = protocol::ofp_action_header{
           Action::type(), min_length - 1
         , { random_pad(), random_pad(), random_pad(), random_pad() }
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_SUITE(actions_test)
         , FixedLengthAction, fixed_length_action_types)
     {
       constexpr auto min_length
-        = sizeof(typename FixedLengthAction::raw_ofp_type);
+        = sizeof(typename FixedLengthAction::ofp_type);
       auto const header = protocol::ofp_action_header{
           FixedLengthAction::type(), min_length + 1
         , { random_pad(), random_pad(), random_pad(), random_pad() }
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_SUITE(actions_test)
         , VariableLengthAction, variable_length_action_types)
     {
       constexpr auto min_length
-        = sizeof(typename VariableLengthAction::raw_ofp_type);
+        = sizeof(typename VariableLengthAction::ofp_type);
       auto const header = protocol::ofp_action_header{
           VariableLengthAction::type(), min_length + 1
         , { random_pad(), random_pad(), random_pad(), random_pad() }

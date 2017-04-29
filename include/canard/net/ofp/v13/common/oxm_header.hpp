@@ -64,7 +64,7 @@ namespace v13 {
     : public detail::basic_protocol_type<oxm_header>
   {
   public:
-    using raw_ofp_type = std::uint32_t;
+    using ofp_type = std::uint32_t;
 
     constexpr explicit oxm_header(std::uint32_t const oxm_header) noexcept
       : oxm_header_(oxm_header)
@@ -102,7 +102,7 @@ namespace v13 {
     }
 
     constexpr auto to_ofp_type() const noexcept
-      -> raw_ofp_type
+      -> ofp_type
     {
       return oxm_header_;
     }
@@ -110,7 +110,7 @@ namespace v13 {
     constexpr static auto length() noexcept
       -> std::uint16_t
     {
-      return sizeof(raw_ofp_type);
+      return sizeof(ofp_type);
     }
 
     constexpr static auto make_header(
@@ -118,7 +118,7 @@ namespace v13 {
         , std::uint8_t const oxm_field
         , bool const oxm_hasmask
         , std::uint8_t const oxm_length) noexcept
-      -> raw_ofp_type
+      -> ofp_type
     {
       return oxm_header_ops::oxm_header(
           oxm_class, oxm_field, oxm_hasmask, oxm_length);
@@ -142,7 +142,7 @@ namespace v13 {
     static auto decode_impl(Iterator& first, Iterator last)
       -> oxm_header
     {
-      return oxm_header{detail::decode<raw_ofp_type>(first, last)};
+      return oxm_header{detail::decode<ofp_type>(first, last)};
     }
 
     auto equal_impl(oxm_header const& rhs) const noexcept
@@ -158,7 +158,7 @@ namespace v13 {
     }
 
   private:
-    raw_ofp_type oxm_header_;
+    ofp_type oxm_header_;
   };
 
 } // namespace v13

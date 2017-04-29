@@ -37,7 +37,7 @@ namespace messages {
     static constexpr protocol::ofp_type message_type
       = protocol::OFPT_FLOW_REMOVED;
 
-    using raw_ofp_type = protocol::ofp_flow_removed;
+    using ofp_type = protocol::ofp_flow_removed;
 
     flow_removed(
           oxm_match match
@@ -51,10 +51,7 @@ namespace messages {
         , std::uint32_t const xid = get_xid())
       : flow_removed_{
             protocol::ofp_header{
-                version()
-              , type()
-              , match.calc_ofp_length(sizeof(raw_ofp_type))
-              , xid
+              version(), type(), match.calc_ofp_length(sizeof(ofp_type)), xid
             }
           , cookie
           , priority
@@ -143,7 +140,7 @@ namespace messages {
     }
 
   private:
-    flow_removed(raw_ofp_type const& fremoved, oxm_match&& match)
+    flow_removed(ofp_type const& fremoved, oxm_match&& match)
       : flow_removed_(fremoved)
       , match_(std::move(match))
     {
@@ -173,9 +170,9 @@ namespace messages {
     static auto decode_impl(Iterator& first, Iterator last)
       -> flow_removed
     {
-      auto const fremoved = detail::decode<raw_ofp_type>(first, last);
+      auto const fremoved = detail::decode<ofp_type>(first, last);
 
-      auto const match_length = fremoved.header.length - sizeof(raw_ofp_type);
+      auto const match_length = fremoved.header.length - sizeof(ofp_type);
       last = std::next(first, match_length);
 
       auto const ofp_match
@@ -208,7 +205,7 @@ namespace messages {
     }
 
   private:
-    raw_ofp_type flow_removed_;
+    ofp_type flow_removed_;
     oxm_match match_;
   };
 

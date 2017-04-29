@@ -16,13 +16,13 @@ namespace instructions {
     : public detail::v13::basic_fixed_length_instruction<meter>
   {
   public:
-    using raw_ofp_type = protocol::ofp_instruction_meter;
+    using ofp_type = protocol::ofp_instruction_meter;
 
     static constexpr protocol::ofp_instruction_type instruction_type
       = protocol::OFPIT_METER;
 
     explicit meter(std::uint32_t const meter_id) noexcept
-      : instruction_meter_{instruction_type, sizeof(raw_ofp_type), meter_id}
+      : instruction_meter_{instruction_type, sizeof(ofp_type), meter_id}
     {
     }
 
@@ -35,13 +35,13 @@ namespace instructions {
   private:
     friend basic_fixed_length_instruction;
 
-    explicit meter(raw_ofp_type const& instruction_meter) noexcept
+    explicit meter(ofp_type const& instruction_meter) noexcept
       : instruction_meter_(instruction_meter)
     {
     }
 
     auto ofp_instruction() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return instruction_meter_;
     }
@@ -60,7 +60,7 @@ namespace instructions {
     }
 
   private:
-    raw_ofp_type instruction_meter_;
+    ofp_type instruction_meter_;
   };
 
 } // namespace instructions

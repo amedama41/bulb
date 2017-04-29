@@ -19,7 +19,7 @@ namespace meter_bands {
       = protocol::OFPMBT_DROP;
 
   public:
-    using raw_ofp_type = protocol::ofp_meter_band_drop;
+    using ofp_type = protocol::ofp_meter_band_drop;
 
     drop(std::uint32_t const rate, std::uint32_t const burst_size) noexcept
       : drop_{
@@ -40,13 +40,13 @@ namespace meter_bands {
   private:
     friend basic_meter_band;
 
-    explicit drop(raw_ofp_type const& drop) noexcept
+    explicit drop(ofp_type const& drop) noexcept
       : drop_(drop)
     {
     }
 
     auto ofp_meter_band() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return drop_;
     }
@@ -59,7 +59,7 @@ namespace meter_bands {
     }
 
   private:
-    raw_ofp_type drop_;
+    ofp_type drop_;
   };
 
 } // namespace meter_bands

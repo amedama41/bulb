@@ -111,14 +111,14 @@ namespace multipart_detail {
     using base_t = basic_multipart<T, MultipartType>;
 
   public:
-    using raw_ofp_type = MultipartType;
+    using ofp_type = MultipartType;
 
   protected:
     empty_body_multipart(
         std::uint16_t const flags, std::uint32_t const xid) noexcept
       : multipart_{
             protocol::ofp_header{
-              base_t::version(), base_t::type(), sizeof(raw_ofp_type), xid
+              base_t::version(), base_t::type(), sizeof(ofp_type), xid
             }
           , T::multipart_type_value
           , flags
@@ -127,7 +127,7 @@ namespace multipart_detail {
     {
     }
 
-    explicit empty_body_multipart(raw_ofp_type const& multipart) noexcept
+    explicit empty_body_multipart(ofp_type const& multipart) noexcept
       : multipart_(multipart)
     {
     }
@@ -160,7 +160,7 @@ namespace multipart_detail {
     static auto decode_impl(Iterator& first, Iterator last)
       -> T
     {
-      return T{detail::decode<raw_ofp_type>(first, last)};
+      return T{detail::decode<ofp_type>(first, last)};
     }
 
     auto equal_impl(T const& rhs) const noexcept
@@ -170,7 +170,7 @@ namespace multipart_detail {
     }
 
   private:
-    raw_ofp_type multipart_;
+    ofp_type multipart_;
   };
 
 
@@ -181,7 +181,7 @@ namespace multipart_detail {
     using base_t = basic_multipart<T, MultipartType>;
 
   public:
-    using raw_ofp_type = MultipartType;
+    using ofp_type = MultipartType;
     using body_type = BodyType;
 
   protected:
@@ -193,7 +193,7 @@ namespace multipart_detail {
             protocol::ofp_header{
                 base_t::version()
               , base_t::type()
-              , sizeof(raw_ofp_type) + sizeof(body_type)
+              , sizeof(ofp_type) + sizeof(body_type)
               , xid
             }
           , T::multipart_type_value
@@ -205,7 +205,7 @@ namespace multipart_detail {
     }
 
     single_element_multipart(
-        raw_ofp_type const& multipart, body_type const& body) noexcept
+        ofp_type const& multipart, body_type const& body) noexcept
       : multipart_(multipart)
       , body_(body)
     {
@@ -239,7 +239,7 @@ namespace multipart_detail {
         detail::basic_protocol_type_tag<T>) noexcept
       -> std::uint16_t
     {
-      return sizeof(raw_ofp_type) + sizeof(body_type);
+      return sizeof(ofp_type) + sizeof(body_type);
     }
 
     template <class Container>
@@ -253,7 +253,7 @@ namespace multipart_detail {
     static auto decode_impl(Iterator& first, Iterator last)
       -> T
     {
-      auto const multipart = detail::decode<raw_ofp_type>(first, last);
+      auto const multipart = detail::decode<ofp_type>(first, last);
       return T{multipart, detail::decode<body_type>(first, last)};
     }
 
@@ -265,7 +265,7 @@ namespace multipart_detail {
     }
 
   private:
-    raw_ofp_type multipart_;
+    ofp_type multipart_;
     body_type body_;
   };
 
@@ -277,7 +277,7 @@ namespace multipart_detail {
     using base_t = basic_multipart<T, MultipartType>;
 
   public:
-    using raw_ofp_type = MultipartType;
+    using ofp_type = MultipartType;
     using body_type = BodyType;
 
     auto match() const noexcept
@@ -304,7 +304,7 @@ namespace multipart_detail {
             protocol::ofp_header{
                 base_t::version()
               , base_t::type()
-              , match.calc_ofp_length(sizeof(raw_ofp_type) + sizeof(body_type))
+              , match.calc_ofp_length(sizeof(ofp_type) + sizeof(body_type))
               , xid
             }
           , T::multipart_type_value
@@ -317,7 +317,7 @@ namespace multipart_detail {
     }
 
     single_element_with_match_multipart(
-          raw_ofp_type const& multipart
+          ofp_type const& multipart
         , body_type const& body
         , oxm_match&& match) noexcept
       : multipart_(multipart)
@@ -381,8 +381,7 @@ namespace multipart_detail {
         detail::basic_protocol_type_tag<T>) noexcept
       -> std::uint16_t
     {
-      return sizeof(raw_ofp_type)
-        + sizeof(body_type) + oxm_match::min_byte_length();
+      return sizeof(ofp_type) + sizeof(body_type) + oxm_match::min_byte_length();
     }
 
     template <class Container>
@@ -397,8 +396,8 @@ namespace multipart_detail {
     static auto decode_impl(Iterator& first, Iterator last)
       -> T
     {
-      auto const multipart = detail::decode<raw_ofp_type>(first, last);
-      last = std::next(first, multipart.header.length - sizeof(raw_ofp_type));
+      auto const multipart = detail::decode<ofp_type>(first, last);
+      last = std::next(first, multipart.header.length - sizeof(ofp_type));
 
       auto const body = detail::decode<body_type>(first, last);
 
@@ -426,7 +425,7 @@ namespace multipart_detail {
     }
 
   private:
-    raw_ofp_type multipart_;
+    ofp_type multipart_;
     body_type body_;
     oxm_match match_;
   };
@@ -440,7 +439,7 @@ namespace multipart_detail {
     using elem_type = typename std::remove_all_extents<BodyType>::type;
 
   public:
-    using raw_ofp_type = MultipartType;
+    using ofp_type = MultipartType;
     using body_type = ofp::list<elem_type>;
 
     auto body() const noexcept
@@ -465,7 +464,7 @@ namespace multipart_detail {
             protocol::ofp_header{
                 base_t::version()
               , base_t::type()
-              , body.calc_ofp_length(sizeof(raw_ofp_type))
+              , body.calc_ofp_length(sizeof(ofp_type))
               , xid
             }
           , T::multipart_type_value
@@ -476,7 +475,7 @@ namespace multipart_detail {
     {
     }
 
-    array_body_multipart(raw_ofp_type const& multipart, body_type&& body)
+    array_body_multipart(ofp_type const& multipart, body_type&& body)
       : multipart_(multipart)
       , body_(std::move(body))
     {
@@ -544,8 +543,8 @@ namespace multipart_detail {
     static auto decode_impl(Iterator& first, Iterator last)
       -> T
     {
-      auto const multipart = detail::decode<raw_ofp_type>(first, last);
-      auto const body_length = multipart.header.length - sizeof(raw_ofp_type);
+      auto const multipart = detail::decode<ofp_type>(first, last);
+      auto const body_length = multipart.header.length - sizeof(ofp_type);
       last = std::next(first, body_length);
 
       auto body = body_type::decode(first, last);
@@ -561,7 +560,7 @@ namespace multipart_detail {
     }
 
   private:
-    raw_ofp_type multipart_;
+    ofp_type multipart_;
     body_type body_;
   };
 

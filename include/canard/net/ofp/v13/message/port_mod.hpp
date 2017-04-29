@@ -22,7 +22,7 @@ namespace messages {
     static constexpr protocol::ofp_type message_type
       = protocol::OFPT_PORT_MOD;
 
-    using raw_ofp_type = protocol::ofp_port_mod;
+    using ofp_type = protocol::ofp_port_mod;
 
     port_mod(
           std::uint32_t const port_no
@@ -32,7 +32,7 @@ namespace messages {
         , std::uint32_t const advertise
         , std::uint32_t const xid = get_xid()) noexcept
       : port_mod_{
-            protocol::ofp_header{version(), type(), sizeof(raw_ofp_type), xid}
+            protocol::ofp_header{version(), type(), sizeof(ofp_type), xid}
           , port_no
           , { 0, 0, 0, 0 }
           , {
@@ -100,19 +100,19 @@ namespace messages {
   private:
     friend basic_fixed_length_message;
 
-    explicit port_mod(raw_ofp_type const& port_mod) noexcept
+    explicit port_mod(ofp_type const& port_mod) noexcept
       : port_mod_(port_mod)
       {
       }
 
     auto ofp_message() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return port_mod_;
     }
 
   private:
-    raw_ofp_type port_mod_;
+    ofp_type port_mod_;
   };
 
 } // namespace messages

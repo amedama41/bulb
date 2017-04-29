@@ -138,7 +138,7 @@ namespace messages {
   private:
     friend flow_mod_base;
 
-    flow_add(raw_ofp_type const& flow_mod, action_list&& actions)
+    flow_add(ofp_type const& flow_mod, action_list&& actions)
       : flow_mod_base{flow_mod, std::move(actions)}
     {
     }

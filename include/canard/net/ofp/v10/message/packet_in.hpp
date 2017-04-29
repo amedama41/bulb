@@ -35,7 +35,7 @@ namespace messages {
     }
 
   public:
-    using raw_ofp_type = protocol::ofp_packet_in;
+    using ofp_type = protocol::ofp_packet_in;
     using data_type = ofp::data_type;
 
     static constexpr protocol::ofp_type message_type
@@ -147,7 +147,7 @@ namespace messages {
 
     friend basic_message::basic_protocol_type;
 
-    packet_in(raw_ofp_type const& pkt_in, data_type&& data) noexcept
+    packet_in(ofp_type const& pkt_in, data_type&& data) noexcept
       : packet_in_(pkt_in)
       , data_(std::move(data))
     {
@@ -165,7 +165,7 @@ namespace messages {
     static auto decode_impl(Iterator& first, Iterator last)
       -> packet_in
     {
-      auto const pkt_in = detail::decode<raw_ofp_type>(
+      auto const pkt_in = detail::decode<ofp_type>(
           first, last, detail::copy_size<min_pkt_in_len>{});
 
       auto const data_length
@@ -183,7 +183,7 @@ namespace messages {
     }
 
   public:
-    raw_ofp_type packet_in_;
+    ofp_type packet_in_;
     data_type data_;
   };
 

@@ -31,7 +31,7 @@ namespace multipart {
     : public detail::basic_protocol_type<table_features>
   {
   public:
-    using raw_ofp_type = protocol::ofp_table_features;
+    using ofp_type = protocol::ofp_table_features;
     using properties_type = ofp::list<any_table_feature_property>;
 
     table_features(
@@ -43,7 +43,7 @@ namespace multipart {
         , std::uint32_t const max_entries
         , properties_type properties)
       : table_features_{
-            properties.calc_ofp_length(sizeof(raw_ofp_type))
+            properties.calc_ofp_length(sizeof(ofp_type))
           , table_id
           , { 0, 0, 0, 0, 0 }
           , ""
@@ -156,7 +156,7 @@ namespace multipart {
     }
 
   private:
-    table_features(raw_ofp_type const& features, properties_type&& properties)
+    table_features(ofp_type const& features, properties_type&& properties)
       : table_features_(features)
       , properties_(std::move(properties))
     {
@@ -175,7 +175,7 @@ namespace multipart {
     static auto decode_impl(Iterator& first, Iterator last)
       -> table_features
     {
-      auto const features = detail::decode<raw_ofp_type>(first, last);
+      auto const features = detail::decode<ofp_type>(first, last);
       if (features.length < min_length()) {
         throw exception{
             exception::ex_error_type::bad_multipart_element
@@ -183,7 +183,7 @@ namespace multipart {
           , "too small table_features length"
         } << CANARD_NET_OFP_ERROR_INFO();
       }
-      auto const prop_length = features.length - sizeof(raw_ofp_type);
+      auto const prop_length = features.length - sizeof(ofp_type);
       if (std::distance(first, last) < prop_length) {
         throw exception{
             protocol::bad_request_code::bad_len
@@ -204,7 +204,7 @@ namespace multipart {
     }
 
   private:
-    raw_ofp_type table_features_;
+    ofp_type table_features_;
     properties_type properties_;
   };
 
@@ -237,7 +237,7 @@ namespace multipart {
     static constexpr bool is_fixed_length_element = false;
 
     table_features_request(
-        raw_ofp_type const& multipart_request, body_type&& table_features)
+        ofp_type const& multipart_request, body_type&& table_features)
       : basic_multipart_request{
         multipart_request, std::move(table_features)
       }
@@ -269,7 +269,7 @@ namespace multipart {
     static constexpr bool is_fixed_length_element = false;
 
     table_features_reply(
-        raw_ofp_type const& multipart_reply, body_type&& table_features)
+        ofp_type const& multipart_reply, body_type&& table_features)
       : basic_multipart_reply{multipart_reply, std::move(table_features)}
     {
     }

@@ -24,7 +24,7 @@ namespace multipart {
     : public detail::basic_protocol_type<port_stats>
   {
   public:
-    using raw_ofp_type = protocol::ofp_port_stats;
+    using ofp_type = protocol::ofp_port_stats;
 
     port_stats(
           std::uint32_t const port_no
@@ -65,7 +65,7 @@ namespace multipart {
     static constexpr auto length() noexcept
       -> std::uint16_t
     {
-      return sizeof(raw_ofp_type);
+      return sizeof(ofp_type);
     }
 
     auto port_no() const noexcept
@@ -159,7 +159,7 @@ namespace multipart {
     }
 
   private:
-    explicit port_stats(raw_ofp_type const& port_stats) noexcept
+    explicit port_stats(ofp_type const& port_stats) noexcept
       : port_stats_(port_stats)
     {
     }
@@ -176,7 +176,7 @@ namespace multipart {
     static auto decode_impl(Iterator& first, Iterator last)
       -> port_stats
     {
-      return port_stats{detail::decode<raw_ofp_type>(first, last)};
+      return port_stats{detail::decode<ofp_type>(first, last)};
     }
 
     auto equal_impl(port_stats const& rhs) const noexcept
@@ -186,7 +186,7 @@ namespace multipart {
     }
 
   private:
-    raw_ofp_type port_stats_;
+    ofp_type port_stats_;
   };
 
 
@@ -216,7 +216,7 @@ namespace multipart {
     friend basic_multipart_request::base_type;
 
     port_stats_request(
-          raw_ofp_type const& multipart_request
+          ofp_type const& multipart_request
         , body_type const& port_stats_request) noexcept
       : basic_multipart_request{multipart_request, port_stats_request}
     {
@@ -246,8 +246,7 @@ namespace multipart {
 
     static constexpr bool is_fixed_length_element = true;
 
-    port_stats_reply(
-        raw_ofp_type const& multipart_reply, body_type&& port_stats)
+    port_stats_reply(ofp_type const& multipart_reply, body_type&& port_stats)
       : basic_multipart_reply{multipart_reply, std::move(port_stats)}
     {
     }

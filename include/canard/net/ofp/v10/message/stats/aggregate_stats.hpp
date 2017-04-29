@@ -30,9 +30,7 @@ namespace statistics {
         , std::uint16_t const out_port = protocol::OFPP_NONE
         , std::uint32_t const xid = get_xid()) noexcept
       : basic_stats_request{
-            0
-          , raw_ofp_stats_type{match.ofp_match(), table_id, 0, out_port}
-          , xid
+          0, body_type{match.ofp_match(), table_id, 0, out_port}, xid
         }
     {
     }
@@ -59,8 +57,8 @@ namespace statistics {
     friend basic_stats_request::base_type;
 
     aggregate_stats_request(
-          raw_ofp_type const& stats_request
-        , raw_ofp_stats_type const& aggregate_stats_request) noexcept
+          ofp_type const& stats_request
+        , body_type const& aggregate_stats_request) noexcept
       : basic_stats_request{stats_request, aggregate_stats_request}
     {
     }
@@ -82,7 +80,7 @@ namespace statistics {
         , std::uint32_t const xid = get_xid()) noexcept
       : basic_stats_reply{
             0
-          , raw_ofp_stats_type{
+          , body_type{
                 counters.packet_count()
               , counters.byte_count()
               , flow_count
@@ -115,8 +113,8 @@ namespace statistics {
     friend basic_stats_reply::base_type;
 
     aggregate_stats_reply(
-          raw_ofp_type const& stats_reply
-        , raw_ofp_stats_type const& aggregate_stats_reply) noexcept
+          ofp_type const& stats_reply
+        , body_type const& aggregate_stats_reply) noexcept
       : basic_stats_reply{stats_reply, aggregate_stats_reply}
     {
     }

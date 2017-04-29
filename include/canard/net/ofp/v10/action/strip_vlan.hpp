@@ -15,26 +15,26 @@ namespace actions {
     : public detail::v10::basic_fixed_length_action<strip_vlan>
   {
   public:
-    using raw_ofp_type = protocol::ofp_action_header;
+    using ofp_type = protocol::ofp_action_header;
 
     static constexpr protocol::ofp_action_type action_type
       = protocol::OFPAT_STRIP_VLAN;
 
     strip_vlan() noexcept
-      : strip_vlan_{action_type, sizeof(raw_ofp_type), { 0, 0, 0, 0 }}
+      : strip_vlan_{action_type, sizeof(ofp_type), { 0, 0, 0, 0 }}
     {
     }
 
   private:
     friend basic_fixed_length_action;
 
-    explicit strip_vlan(raw_ofp_type const& action_header) noexcept
+    explicit strip_vlan(ofp_type const& action_header) noexcept
       : strip_vlan_(action_header)
     {
     }
 
     auto ofp_action() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return strip_vlan_;
     }
@@ -50,7 +50,7 @@ namespace actions {
     }
 
   private:
-    raw_ofp_type strip_vlan_;
+    ofp_type strip_vlan_;
   };
 
   using pop_vlan = strip_vlan;

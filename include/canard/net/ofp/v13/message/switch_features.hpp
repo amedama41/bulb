@@ -20,10 +20,10 @@ namespace messages {
     static constexpr protocol::ofp_type message_type
       = protocol::OFPT_FEATURES_REQUEST;
 
-    using raw_ofp_type = protocol::ofp_header;
+    using ofp_type = protocol::ofp_header;
 
     features_request(std::uint32_t const xid = get_xid()) noexcept
-      : header_{version(), type(), sizeof(raw_ofp_type), xid}
+      : header_{version(), type(), sizeof(ofp_type), xid}
     {
     }
 
@@ -36,19 +36,19 @@ namespace messages {
   private:
     friend basic_fixed_length_message;
 
-    explicit features_request(raw_ofp_type const& header) noexcept
+    explicit features_request(ofp_type const& header) noexcept
       : header_(header)
     {
     }
 
     auto ofp_message() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return header_;
     }
 
   private:
-    raw_ofp_type header_;
+    ofp_type header_;
   };
 
 
@@ -59,7 +59,7 @@ namespace messages {
     static constexpr protocol::ofp_type message_type
       = protocol::OFPT_FEATURES_REPLY;
 
-    using raw_ofp_type = protocol::ofp_switch_features;
+    using ofp_type = protocol::ofp_switch_features;
 
     features_reply(
           features_request const& request
@@ -70,7 +70,7 @@ namespace messages {
         , std::uint32_t const capabilities) noexcept
       : switch_features_{
             protocol::ofp_header{
-              version(), type(), sizeof(raw_ofp_type), request.xid()
+              version(), type(), sizeof(ofp_type), request.xid()
             }
           , dpid
           , n_buffers
@@ -122,19 +122,19 @@ namespace messages {
   private:
     friend basic_fixed_length_message;
 
-    explicit features_reply(raw_ofp_type const& switch_features) noexcept
+    explicit features_reply(ofp_type const& switch_features) noexcept
       : switch_features_(switch_features)
     {
     }
 
     auto ofp_message() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return switch_features_;
     }
 
   private:
-    raw_ofp_type switch_features_;
+    ofp_type switch_features_;
   };
 
 } // namespace messages

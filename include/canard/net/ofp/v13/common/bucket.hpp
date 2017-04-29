@@ -24,7 +24,7 @@ namespace v13 {
     : public detail::basic_protocol_type<bucket>
   {
   public:
-    using raw_ofp_type = protocol::ofp_bucket;
+    using ofp_type = protocol::ofp_bucket;
 
     bucket(std::uint16_t const weight
          , std::uint32_t const watch_port
@@ -137,7 +137,7 @@ namespace v13 {
     {
       auto actions = action_list{};
       actions.swap(actions_);
-      bucket_.len = sizeof(raw_ofp_type);
+      bucket_.len = sizeof(ofp_type);
       return actions;
     }
 
@@ -169,7 +169,7 @@ namespace v13 {
     }
 
   private:
-    bucket(raw_ofp_type const& bkt, action_list&& actions)
+    bucket(ofp_type const& bkt, action_list&& actions)
       : bucket_(bkt)
       , actions_(std::move(actions))
     {
@@ -197,9 +197,9 @@ namespace v13 {
     static auto decode_impl(Iterator& first, Iterator last)
       -> bucket
     {
-      auto const bkt = detail::decode<raw_ofp_type>(first, last);
+      auto const bkt = detail::decode<ofp_type>(first, last);
 
-      if (bkt.len < sizeof(raw_ofp_type)) {
+      if (bkt.len < sizeof(ofp_type)) {
         throw exception{
             exception::ex_error_type::bad_bucket
           , exception::ex_error_code::bad_length
@@ -207,7 +207,7 @@ namespace v13 {
         } << CANARD_NET_OFP_ERROR_INFO();
       }
 
-      auto const actions_length = bkt.len - sizeof(raw_ofp_type);
+      auto const actions_length = bkt.len - sizeof(ofp_type);
       if (std::distance(first, last) < actions_length) {
         throw exception{
           protocol::bad_request_code::bad_len, "too small data size for bucket"
@@ -239,7 +239,7 @@ namespace v13 {
     }
 
   private:
-    raw_ofp_type bucket_;
+    ofp_type bucket_;
     action_list actions_;
   };
 

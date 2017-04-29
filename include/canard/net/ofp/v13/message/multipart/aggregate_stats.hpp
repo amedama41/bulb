@@ -101,7 +101,7 @@ namespace multipart {
     friend basic_multipart_request::base_type;
 
     aggregate_stats_request(
-          raw_ofp_type const& multipart_request
+          ofp_type const& multipart_request
         , body_type const& aggregate_stats_request
         , oxm_match&& match)
       : basic_multipart_request{
@@ -166,7 +166,7 @@ namespace multipart {
     friend basic_multipart_reply::base_type;
 
     aggregate_stats_reply(
-          raw_ofp_type const& multipart_reply
+          ofp_type const& multipart_reply
         , body_type const& aggregate_stats_reply) noexcept
       : basic_multipart_reply{multipart_reply, aggregate_stats_reply}
     {

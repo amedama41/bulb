@@ -23,7 +23,7 @@ namespace detail {
     constexpr auto get_min_length(basic_protocol_type_tag<T>) noexcept
       -> std::uint16_t
     {
-      return sizeof(typename T::raw_ofp_type);
+      return sizeof(typename T::ofp_type);
     };
 
     constexpr auto exclude_padding(...) noexcept

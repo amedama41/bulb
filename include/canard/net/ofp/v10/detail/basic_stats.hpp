@@ -43,10 +43,10 @@ namespace stats_detail {
     using base_t = v10_detail::basic_message<T>;
 
   public:
-    using raw_ofp_type = StatsType;
+    using ofp_type = StatsType;
 
     static constexpr protocol::ofp_type message_type
-      = stats_message_type<raw_ofp_type>::value;
+      = stats_message_type<ofp_type>::value;
 
     auto header() const noexcept
       -> protocol::ofp_header const&
@@ -68,7 +68,7 @@ namespace stats_detail {
 
     using base_t::validate_header;
 
-    static auto validate_header(raw_ofp_type const& stats) noexcept
+    static auto validate_header(ofp_type const& stats) noexcept
       -> char const*
     {
       if (stats.type != stats_type()) {
@@ -80,8 +80,7 @@ namespace stats_detail {
       return nullptr;
     }
 
-    static constexpr auto is_valid_stats_length(
-        raw_ofp_type const& stats) noexcept
+    static constexpr auto is_valid_stats_length(ofp_type const& stats) noexcept
       -> bool
     {
       return T::is_valid_stats_length_impl(stats.header.length);
@@ -96,7 +95,7 @@ namespace stats_detail {
         v10_detail::basic_message_tag<T>) noexcept
       -> std::uint16_t
     {
-      return sizeof(raw_ofp_type);
+      return sizeof(ofp_type);
     }
   };
 
@@ -108,14 +107,14 @@ namespace stats_detail {
     using base_t = basic_stats<T, StatsType>;
 
   public:
-    using raw_ofp_type = typename base_t::raw_ofp_type;
+    using ofp_type = typename base_t::ofp_type;
 
   protected:
     empty_body_stats(
         std::uint16_t const flags, std::uint32_t const xid) noexcept
       : stats_{
             protocol::ofp_header{
-              protocol::OFP_VERSION, T::message_type, sizeof(raw_ofp_type), xid
+              protocol::OFP_VERSION, T::message_type, sizeof(ofp_type), xid
             }
           , T::stats_type_value
           , flags
@@ -123,7 +122,7 @@ namespace stats_detail {
     {
     }
 
-    explicit empty_body_stats(raw_ofp_type const& stats) noexcept
+    explicit empty_body_stats(ofp_type const& stats) noexcept
       : stats_(stats)
     {
     }
@@ -141,7 +140,7 @@ namespace stats_detail {
     static auto decode_impl(Iterator& first, Iterator last)
       -> T
     {
-      return T{detail::decode<raw_ofp_type>(first, last)};
+      return T{detail::decode<ofp_type>(first, last)};
     }
 
     auto equal_impl(T const& rhs) const noexcept
@@ -153,7 +152,7 @@ namespace stats_detail {
     friend base_t;
 
     auto stats() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return stats_;
     }
@@ -162,11 +161,11 @@ namespace stats_detail {
         std::uint16_t const length) noexcept
       -> bool
     {
-      return length == sizeof(raw_ofp_type);
+      return length == sizeof(ofp_type);
     }
 
   private:
-    raw_ofp_type stats_;
+    ofp_type stats_;
   };
 
 
@@ -177,19 +176,19 @@ namespace stats_detail {
     using base_t = basic_stats<T, StatsType>;
 
   public:
-    using raw_ofp_type = typename base_t::raw_ofp_type;
-    using raw_ofp_stats_type = BodyType;
+    using ofp_type = typename base_t::ofp_type;
+    using body_type = BodyType;
 
   protected:
     single_element_stats(
           std::uint16_t const flags
-        , raw_ofp_stats_type const& body
+        , body_type const& body
         , std::uint32_t const xid) noexcept
       : stats_{
             protocol::ofp_header{
                 protocol::OFP_VERSION
               , T::message_type
-              , sizeof(raw_ofp_type) + sizeof(raw_ofp_stats_type)
+              , sizeof(ofp_type) + sizeof(body_type)
               , xid
             }
           , T::stats_type_value
@@ -199,15 +198,14 @@ namespace stats_detail {
     {
     }
 
-    single_element_stats(
-        raw_ofp_type const& stats, raw_ofp_stats_type const& body) noexcept
+    single_element_stats(ofp_type const& stats, body_type const& body) noexcept
       : stats_(stats)
       , body_(body)
     {
     }
 
     auto body() const noexcept
-      -> raw_ofp_stats_type const&
+      -> body_type const&
     {
       return body_;
     }
@@ -219,7 +217,7 @@ namespace stats_detail {
         detail::basic_protocol_type_tag<T>) noexcept
       -> std::uint16_t
     {
-      return sizeof(raw_ofp_type) + sizeof(raw_ofp_stats_type);
+      return sizeof(ofp_type) + sizeof(body_type);
     }
 
     template <class Container>
@@ -233,8 +231,8 @@ namespace stats_detail {
     static auto decode_impl(Iterator& first, Iterator last)
       -> T
     {
-      auto const stats = detail::decode<raw_ofp_type>(first, last);
-      return T{stats, detail::decode<raw_ofp_stats_type>(first, last)};
+      auto const stats = detail::decode<ofp_type>(first, last);
+      return T{stats, detail::decode<body_type>(first, last)};
     }
 
     auto equal_impl(T const& rhs) const noexcept
@@ -256,12 +254,12 @@ namespace stats_detail {
         std::uint16_t const length) noexcept
       -> bool
     {
-      return length == sizeof(raw_ofp_type) + sizeof(raw_ofp_stats_type);
+      return length == sizeof(ofp_type) + sizeof(body_type);
     }
 
   private:
-    raw_ofp_type stats_;
-    raw_ofp_stats_type body_;
+    ofp_type stats_;
+    body_type body_;
   };
 
 
@@ -273,7 +271,7 @@ namespace stats_detail {
     using elem_type = typename std::remove_all_extents<BodyType>::type;
 
   public:
-    using raw_ofp_type = typename base_t::raw_ofp_type;
+    using ofp_type = typename base_t::ofp_type;
     using body_type = ofp::list<elem_type>;
 
     auto body() const noexcept
@@ -287,7 +285,7 @@ namespace stats_detail {
     {
       auto body = body_type{};
       body.swap(body_);
-      stats_.header.length = sizeof(raw_ofp_type);
+      stats_.header.length = sizeof(ofp_type);
       return body;
     }
 
@@ -300,7 +298,7 @@ namespace stats_detail {
             protocol::ofp_header{
                 protocol::OFP_VERSION
               , T::message_type
-              , body.calc_ofp_length(sizeof(raw_ofp_type))
+              , body.calc_ofp_length(sizeof(ofp_type))
               , xid
             }
           , T::stats_type_value
@@ -310,7 +308,7 @@ namespace stats_detail {
     {
     }
 
-    array_body_stats(raw_ofp_type const& stats, body_type&& body)
+    array_body_stats(ofp_type const& stats, body_type&& body)
       : stats_(stats)
       , body_(std::move(body))
     {
@@ -353,8 +351,8 @@ namespace stats_detail {
     static auto decode_impl(Iterator& first, Iterator last)
       -> T
     {
-      auto const stats = detail::decode<raw_ofp_type>(first, last);
-      auto const body_length = stats.header.length - sizeof(raw_ofp_type);
+      auto const stats = detail::decode<ofp_type>(first, last);
+      auto const body_length = stats.header.length - sizeof(ofp_type);
       last = std::next(first, body_length);
 
       auto body = body_type::decode(first, last);
@@ -372,7 +370,7 @@ namespace stats_detail {
     friend base_t;
 
     auto stats() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return stats_;
     }
@@ -381,12 +379,12 @@ namespace stats_detail {
         std::uint16_t const length) noexcept
       -> bool
     {
-      return length >= sizeof(raw_ofp_type)
-          && T::is_valid_stats_body_length(length - sizeof(raw_ofp_type));
+      return length >= sizeof(ofp_type)
+          && T::is_valid_stats_body_length(length - sizeof(ofp_type));
     }
 
   private:
-    raw_ofp_type stats_;
+    ofp_type stats_;
     body_type body_;
   };
 

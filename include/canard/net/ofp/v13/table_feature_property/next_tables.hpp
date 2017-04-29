@@ -33,14 +33,11 @@ namespace table_feature_properties {
       using base_t = detail::v13::basic_table_feature_property<T>;
 
     public:
-      using raw_ofp_type = protocol::ofp_table_feature_prop_next_tables;
+      using ofp_type = protocol::ofp_table_feature_prop_next_tables;
       using next_table_ids_type = boost::container::vector<std::uint8_t>;
 
       basic_prop_next_tables()
-        : table_feature_prop_next_tables_{
-              base_t::type()
-            , sizeof(raw_ofp_type)
-          }
+        : table_feature_prop_next_tables_{base_t::type(), sizeof(ofp_type)}
         , next_table_ids_{}
       {
       }
@@ -102,13 +99,13 @@ namespace table_feature_properties {
       {
         auto next_table_ids = next_table_ids_type{};
         next_table_ids.swap(next_table_ids_);
-        table_feature_prop_next_tables_.length = sizeof(raw_ofp_type);
+        table_feature_prop_next_tables_.length = sizeof(ofp_type);
         return next_table_ids;
       }
 
     protected:
       basic_prop_next_tables(
-            raw_ofp_type const& table_feature_prop_next_tables
+            ofp_type const& table_feature_prop_next_tables
           , next_table_ids_type&& next_table_ids)
         : table_feature_prop_next_tables_(table_feature_prop_next_tables)
         , next_table_ids_(std::move(next_table_ids))
@@ -122,10 +119,10 @@ namespace table_feature_properties {
         constexpr auto max_length = std::numeric_limits<std::uint16_t>::max();
         auto const table_ids_length
           = table_ids.size() * sizeof(next_table_ids_type::value_type);
-        if (table_ids_length > max_length - sizeof(raw_ofp_type)) {
+        if (table_ids_length > max_length - sizeof(ofp_type)) {
           throw std::runtime_error{"too many table_ids"};
         }
-        return sizeof(raw_ofp_type) + table_ids_length;
+        return sizeof(ofp_type) + table_ids_length;
       }
 
       friend typename base_t::basic_protocol_type;
@@ -149,9 +146,9 @@ namespace table_feature_properties {
       static auto decode_impl(Iterator& first, Iterator last)
         -> T
       {
-        auto const property = detail::decode<raw_ofp_type>(first, last);
+        auto const property = detail::decode<ofp_type>(first, last);
 
-        last = std::next(first, property.length - sizeof(raw_ofp_type));
+        last = std::next(first, property.length - sizeof(ofp_type));
         auto next_table_ids = next_table_ids_type(first, last);
         first = last;
 
@@ -183,7 +180,7 @@ namespace table_feature_properties {
       }
 
     private:
-      raw_ofp_type table_feature_prop_next_tables_;
+      ofp_type table_feature_prop_next_tables_;
       next_table_ids_type next_table_ids_;
     };
 

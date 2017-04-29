@@ -15,7 +15,7 @@ namespace actions {
     : public detail::v13::basic_fixed_length_action<pop_mpls>
   {
   public:
-    using raw_ofp_type = protocol::ofp_action_pop_mpls;
+    using ofp_type = protocol::ofp_action_pop_mpls;
 
     static constexpr protocol::ofp_action_type action_type
       = protocol::OFPAT_POP_MPLS;
@@ -52,13 +52,13 @@ namespace actions {
   private:
     friend basic_fixed_length_action;
 
-    explicit pop_mpls(raw_ofp_type const& action_pop_mpls) noexcept
+    explicit pop_mpls(ofp_type const& action_pop_mpls) noexcept
       : action_pop_mpls_(action_pop_mpls)
     {
     }
 
     auto ofp_action() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return action_pop_mpls_;
     }
@@ -74,7 +74,7 @@ namespace actions {
     }
 
   private:
-    raw_ofp_type action_pop_mpls_;
+    ofp_type action_pop_mpls_;
   };
 
 } // namespace actions

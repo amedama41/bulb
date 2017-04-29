@@ -18,7 +18,7 @@ namespace v13 {
     using base_t = basic_fixed_length_action<T>;
 
   public:
-    using raw_ofp_type = ofp::v13::protocol::ofp_action_push;
+    using ofp_type = ofp::v13::protocol::ofp_action_push;
 
     auto ethertype() const noexcept
       -> std::uint16_t
@@ -32,7 +32,7 @@ namespace v13 {
     {
     }
 
-    explicit basic_action_push(raw_ofp_type const& action_push) noexcept
+    explicit basic_action_push(ofp_type const& action_push) noexcept
       : action_push_(action_push)
     {
     }
@@ -41,7 +41,7 @@ namespace v13 {
     friend base_t;
 
     auto ofp_action() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return action_push_;
     }
@@ -53,7 +53,7 @@ namespace v13 {
     }
 
   private:
-    raw_ofp_type action_push_;
+    ofp_type action_push_;
   };
 
 } // namespace v13

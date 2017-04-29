@@ -23,7 +23,7 @@ namespace multipart {
     : public detail::basic_protocol_type<table_stats>
   {
   public:
-    using raw_ofp_type = protocol::ofp_table_stats;
+    using ofp_type = protocol::ofp_table_stats;
 
     table_stats(
           std::uint8_t const table_id
@@ -39,7 +39,7 @@ namespace multipart {
     static constexpr auto length() noexcept
       -> std::uint16_t
     {
-      return sizeof(raw_ofp_type);
+      return sizeof(ofp_type);
     }
 
     auto table_id() const noexcept
@@ -67,7 +67,7 @@ namespace multipart {
     }
 
   private:
-    explicit table_stats(raw_ofp_type const& table_stats) noexcept
+    explicit table_stats(ofp_type const& table_stats) noexcept
       : table_stats_(table_stats)
     {
     }
@@ -84,7 +84,7 @@ namespace multipart {
     static auto decode_impl(Iterator& first, Iterator last)
       -> table_stats
     {
-      return table_stats{detail::decode<raw_ofp_type>(first, last)};
+      return table_stats{detail::decode<ofp_type>(first, last)};
     }
 
     auto equal_impl(table_stats const& rhs) const noexcept
@@ -94,7 +94,7 @@ namespace multipart {
     }
 
   private:
-    raw_ofp_type table_stats_;
+    ofp_type table_stats_;
   };
 
 
@@ -115,7 +115,7 @@ namespace multipart {
   private:
     friend basic_multipart_request::base_type;
 
-    explicit table_stats_request(raw_ofp_type const& multipart_request) noexcept
+    explicit table_stats_request(ofp_type const& multipart_request) noexcept
       : basic_multipart_request{multipart_request}
     {
     }
@@ -144,8 +144,7 @@ namespace multipart {
 
     static constexpr bool is_fixed_length_element = true;
 
-    table_stats_reply(
-        raw_ofp_type const& multipart_reply, body_type&& table_stats)
+    table_stats_reply(ofp_type const& multipart_reply, body_type&& table_stats)
       : basic_multipart_reply{multipart_reply, std::move(table_stats)}
     {
     }

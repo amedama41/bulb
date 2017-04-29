@@ -32,7 +32,7 @@ namespace statistics {
   private:
     friend basic_stats_request::base_type;
 
-    explicit description_request(raw_ofp_type const& stats_request) noexcept
+    explicit description_request(ofp_type const& stats_request) noexcept
       : basic_stats_request{stats_request}
     {
     }
@@ -95,8 +95,7 @@ namespace statistics {
     friend basic_stats_reply::base_type;
 
     description_reply(
-          raw_ofp_type const& stats_reply
-        , raw_ofp_stats_type const& desc_stats) noexcept
+        ofp_type const& stats_reply, body_type const& desc_stats) noexcept
       : basic_stats_reply{stats_reply, desc_stats}
     {
     }
@@ -107,11 +106,11 @@ namespace statistics {
         , boost::string_ref sw_desc
         , boost::string_ref serial
         , boost::string_ref dp_desc)
-      -> raw_ofp_stats_type
+      -> body_type
     {
       using boost::adaptors::sliced;
 
-      auto desc = raw_ofp_stats_type{};
+      auto desc = body_type{};
 
       auto const mfr_desc_size
         = std::min(mfr_desc.size(), sizeof(desc.mfr_desc) - 1);

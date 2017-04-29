@@ -22,7 +22,7 @@ namespace messages {
       using base_t = detail::v13::basic_fixed_length_message<T>;
 
     public:
-      using raw_ofp_type = protocol::ofp_header;
+      using ofp_type = protocol::ofp_header;
 
       auto header() const noexcept
         -> protocol::ofp_header const&
@@ -32,11 +32,11 @@ namespace messages {
 
     protected:
       explicit barrier_base(std::uint32_t const xid) noexcept
-        : header_{base_t::version(), base_t::type(), sizeof(raw_ofp_type), xid}
+        : header_{base_t::version(), base_t::type(), sizeof(ofp_type), xid}
       {
       }
 
-      explicit barrier_base(raw_ofp_type const& header) noexcept
+      explicit barrier_base(ofp_type const& header) noexcept
         : header_(header)
       {
       }
@@ -45,13 +45,13 @@ namespace messages {
       friend base_t;
 
       auto ofp_message() const noexcept
-        -> raw_ofp_type const&
+        -> ofp_type const&
       {
         return header_;
       }
 
     private:
-      raw_ofp_type header_;
+      ofp_type header_;
     };
 
   } // namespace barrier_detail
@@ -72,7 +72,7 @@ namespace messages {
   private:
     friend barrier_base::basic_fixed_length_message;
 
-    explicit barrier_request(raw_ofp_type const& header) noexcept
+    explicit barrier_request(ofp_type const& header) noexcept
       : barrier_base{header}
     {
     }
@@ -99,7 +99,7 @@ namespace messages {
   private:
     friend barrier_base::basic_fixed_length_message;
 
-    explicit barrier_reply(raw_ofp_type const& header) noexcept
+    explicit barrier_reply(ofp_type const& header) noexcept
       : barrier_base{header}
     {
     }

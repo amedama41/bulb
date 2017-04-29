@@ -19,7 +19,7 @@ namespace messages {
     : public v10_detail::basic_fixed_length_message<flow_removed>
   {
   public:
-    using raw_ofp_type = protocol::ofp_flow_removed;
+    using ofp_type = protocol::ofp_flow_removed;
 
     static constexpr protocol::ofp_type message_type
       = protocol::OFPT_FLOW_REMOVED;
@@ -35,10 +35,7 @@ namespace messages {
         , std::uint32_t const xid = get_xid())
       : flow_removed_{
             protocol::ofp_header{
-                protocol::OFP_VERSION
-              , message_type
-              , sizeof(raw_ofp_type)
-              , xid
+              protocol::OFP_VERSION, message_type, sizeof(ofp_type), xid
             }
           , match.ofp_match()
           , cookie
@@ -144,19 +141,19 @@ namespace messages {
   private:
     friend basic_fixed_length_message;
 
-    explicit flow_removed(raw_ofp_type const& removed) noexcept
+    explicit flow_removed(ofp_type const& removed) noexcept
       : flow_removed_(removed)
     {
     }
 
     auto ofp_message() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return flow_removed_;
     }
 
   private:
-    raw_ofp_type flow_removed_;
+    ofp_type flow_removed_;
   };
 
 } // namespace messages

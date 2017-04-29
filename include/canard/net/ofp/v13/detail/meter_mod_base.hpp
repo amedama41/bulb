@@ -22,7 +22,7 @@ namespace v13 {
     using base_t = ofp::detail::v13::basic_message<MeterMod>;
 
   public:
-    using raw_ofp_type = ofp::v13::protocol::ofp_meter_mod;
+    using ofp_type = ofp::v13::protocol::ofp_meter_mod;
     using bands_type = ofp::list<ofp::v13::any_meter_band>;
 
     static constexpr ofp::v13::protocol::ofp_type message_type
@@ -63,7 +63,7 @@ namespace v13 {
     {
       auto bands = bands_type{};
       bands.swap(bands_);
-      meter_mod_.header.length = sizeof(raw_ofp_type);
+      meter_mod_.header.length = sizeof(ofp_type);
       return std::move(bands);
     }
 
@@ -76,7 +76,7 @@ namespace v13 {
             ofp::v13::protocol::ofp_header{
                 base_t::version()
               , base_t::type()
-              , bands.calc_ofp_length(sizeof(raw_ofp_type))
+              , bands.calc_ofp_length(sizeof(ofp_type))
               , xid
             }
           , command()
@@ -90,10 +90,7 @@ namespace v13 {
     meter_mod_base(std::uint32_t const meter_id, std::uint32_t const xid)
       : meter_mod_{
             ofp::v13::protocol::ofp_header{
-                base_t::version()
-              , base_t::type()
-              , sizeof(raw_ofp_type)
-              , xid
+              base_t::version(), base_t::type(), sizeof(ofp_type), xid
             }
           , command()
           , 0
@@ -103,7 +100,7 @@ namespace v13 {
     {
     }
 
-    meter_mod_base(raw_ofp_type const& meter_mod, bands_type&& bands)
+    meter_mod_base(ofp_type const& meter_mod, bands_type&& bands)
       : meter_mod_(meter_mod)
       , bands_(std::move(bands))
     {
@@ -174,8 +171,8 @@ namespace v13 {
     static auto decode_impl(Iterator& first, Iterator last)
       -> MeterMod
     {
-      auto const meter_mod = ofp::detail::decode<raw_ofp_type>(first, last);
-      auto const bands_length = meter_mod.header.length - sizeof(raw_ofp_type);
+      auto const meter_mod = ofp::detail::decode<ofp_type>(first, last);
+      auto const bands_length = meter_mod.header.length - sizeof(ofp_type);
       last = std::next(first, bands_length);
       auto bands = bands_type::decode(first, last);
       return MeterMod{meter_mod, std::move(bands)};
@@ -196,7 +193,7 @@ namespace v13 {
     }
 
   private:
-    raw_ofp_type meter_mod_;
+    ofp_type meter_mod_;
     bands_type bands_;
   };
 

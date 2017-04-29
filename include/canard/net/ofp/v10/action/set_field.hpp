@@ -28,7 +28,7 @@ namespace actions {
     struct ofp_action_info
     {
       static constexpr protocol::action_type action_type = ActionType;
-      using raw_ofp_type = OFPAction;
+      using ofp_type = OFPAction;
     };
 
     template <class MatchField, action_type ActionType, class OFPAction>
@@ -57,27 +57,25 @@ namespace actions {
       static constexpr protocol::action_type action_type
         = ofp_action_info::action_type;
 
-      using raw_ofp_type = typename ofp_action_info::raw_ofp_type;
+      using ofp_type = typename ofp_action_info::ofp_type;
     };
 
     template <class ValueType, class SetFieldInfo>
     auto to_ofp_action(ValueType value, SetFieldInfo) noexcept
-      -> typename SetFieldInfo::raw_ofp_type
+      -> typename SetFieldInfo::ofp_type
     {
-      using raw_ofp_type = typename SetFieldInfo::raw_ofp_type;
-      return raw_ofp_type{
-        SetFieldInfo::action_type, sizeof(raw_ofp_type), value
-      };
+      using ofp_type = typename SetFieldInfo::ofp_type;
+      return ofp_type{SetFieldInfo::action_type, sizeof(ofp_type), value};
     }
 
     inline auto to_ofp_action(
         std::uint8_t const value, set_field_info<match_fields::ip_dscp>) noexcept
-      -> set_field_info<match_fields::ip_dscp>::raw_ofp_type
+      -> set_field_info<match_fields::ip_dscp>::ofp_type
     {
       using info = set_field_info<match_fields::ip_dscp>;
-      return info::raw_ofp_type{
+      return info::ofp_type{
           info::action_type
-        , sizeof(info::raw_ofp_type)
+        , sizeof(info::ofp_type)
         , std::uint8_t(std::uint32_t{value} << 2)
         , { 0, 0, 0 }
       };
@@ -86,12 +84,12 @@ namespace actions {
     template <class SetFieldInfo>
     auto to_ofp_action(
         boost::asio::ip::address_v4 const& value, SetFieldInfo) noexcept
-      -> typename SetFieldInfo::raw_ofp_type
+      -> typename SetFieldInfo::ofp_type
     {
-      using raw_ofp_type = typename SetFieldInfo::raw_ofp_type;
-      return raw_ofp_type{
+      using ofp_type = typename SetFieldInfo::ofp_type;
+      return ofp_type{
           SetFieldInfo::action_type
-        , sizeof(raw_ofp_type)
+        , sizeof(ofp_type)
         , std::uint32_t(value.to_ulong())
       };
     }
@@ -99,13 +97,13 @@ namespace actions {
     template <class SetFieldInfo>
     auto to_ofp_action(
         canard::mac_address const& value, SetFieldInfo) noexcept
-      -> typename SetFieldInfo::raw_ofp_type
+      -> typename SetFieldInfo::ofp_type
     {
-      using raw_ofp_type = typename SetFieldInfo::raw_ofp_type;
+      using ofp_type = typename SetFieldInfo::ofp_type;
       auto const& bytes = value.to_bytes();
-      return raw_ofp_type{
+      return ofp_type{
           SetFieldInfo::action_type
-        , sizeof(raw_ofp_type)
+        , sizeof(ofp_type)
         , { bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5] }
         , { 0, 0, 0, 0, 0, 0 }
       };
@@ -153,7 +151,7 @@ namespace actions {
     using set_field_info = set_field_detail::set_field_info<MatchField>;
 
   public:
-    using raw_ofp_type = typename set_field_info::raw_ofp_type;
+    using ofp_type = typename set_field_info::ofp_type;
 
     static constexpr protocol::action_type action_type
       = set_field_info::action_type;
@@ -183,13 +181,13 @@ namespace actions {
   private:
     friend base_t;
 
-    explicit set_field(raw_ofp_type const& action) noexcept
+    explicit set_field(ofp_type const& action) noexcept
       : set_field_(action)
     {
     }
 
     auto ofp_action() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return set_field_;
     }
@@ -206,7 +204,7 @@ namespace actions {
     }
 
   private:
-    raw_ofp_type set_field_;
+    ofp_type set_field_;
   };
 
   using set_eth_src = set_field<match_fields::eth_src>;

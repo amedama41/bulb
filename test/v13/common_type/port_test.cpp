@@ -266,7 +266,7 @@ BOOST_AUTO_TEST_SUITE(port_test)
     }
     BOOST_AUTO_TEST_CASE(is_false_if_padding_is_not_equal)
     {
-      bin[offsetof(v13::port::raw_ofp_type, name) - 1] = 0xff;
+      bin[offsetof(v13::port::ofp_type, name) - 1] = 0xff;
       auto it = bin.begin();
 
       auto port = v13::port::decode(it, bin.end());
@@ -276,7 +276,7 @@ BOOST_AUTO_TEST_SUITE(port_test)
     BOOST_AUTO_TEST_CASE(
         is_false_if_byte_after_name_termination_null_is_not_equal)
     {
-      bin[offsetof(v13::port::raw_ofp_type, config) - 1] = 0xff;
+      bin[offsetof(v13::port::ofp_type, config) - 1] = 0xff;
       auto it = bin.begin();
 
       auto port = v13::port::decode(it, bin.end());
@@ -458,7 +458,7 @@ BOOST_AUTO_TEST_SUITE(port_test)
     }
     BOOST_AUTO_TEST_CASE(is_true_if_padding_is_not_equal)
     {
-      bin[offsetof(v13::port::raw_ofp_type, name) - 1] = 0xff;
+      bin[offsetof(v13::port::ofp_type, name) - 1] = 0xff;
       auto it = bin.begin();
 
       auto port = v13::port::decode(it, bin.end());
@@ -468,7 +468,7 @@ BOOST_AUTO_TEST_SUITE(port_test)
     BOOST_AUTO_TEST_CASE(
         is_true_if_byte_after_name_termination_null_is_not_equal)
     {
-      bin[offsetof(v13::port::raw_ofp_type, config) - 1] = 0xff;
+      bin[offsetof(v13::port::ofp_type, config) - 1] = 0xff;
       auto it = bin.begin();
 
       auto port = v13::port::decode(it, bin.end());

@@ -25,8 +25,8 @@ namespace v13 {
       = offsetof(protocol::ofp_action_header, pad);
 
   public:
-    using raw_ofp_type = protocol::ofp_action_header;
-    using raw_ofp_exp_type = protocol::ofp_action_experimenter_header;
+    using ofp_type = protocol::ofp_action_header;
+    using ofp_exp_type = protocol::ofp_action_experimenter_header;
     using data_type = ofp::data_type;
 
     explicit action_id(std::uint16_t const type) noexcept
@@ -38,7 +38,7 @@ namespace v13 {
     action_id(std::uint32_t const experimenter_id, data_type data) noexcept
       : action_header_{
             protocol::OFPAT_EXPERIMENTER
-          , ofp::calc_ofp_length(data, sizeof(raw_ofp_exp_type))
+          , ofp::calc_ofp_length(data, sizeof(ofp_exp_type))
           , experimenter_id
         }
       , data_(std::move(data))
@@ -105,7 +105,7 @@ namespace v13 {
     }
 
   private:
-    action_id(raw_ofp_exp_type const& header, data_type&& data) noexcept
+    action_id(ofp_exp_type const& header, data_type&& data) noexcept
       : action_header_(header)
       , data_(std::move(data))
     {
@@ -137,7 +137,7 @@ namespace v13 {
     static auto decode_impl(Iterator& first, Iterator last)
       -> action_id
     {
-      auto header = detail::decode<raw_ofp_exp_type>(
+      auto header = detail::decode<ofp_exp_type>(
           first, last, detail::copy_size<base_size>{});
       if (header.len < base_size) {
         throw exception{
@@ -174,7 +174,7 @@ namespace v13 {
       -> bool
     {
       auto const cmp_size
-        = is_experimenter() ? sizeof(raw_ofp_exp_type) : base_size;
+        = is_experimenter() ? sizeof(ofp_exp_type) : base_size;
       return (std::memcmp(&action_header_, &rhs.action_header_, cmp_size) == 0)
           && data_ == rhs.data_;
     }
@@ -193,7 +193,7 @@ namespace v13 {
     }
 
   private:
-    raw_ofp_exp_type action_header_;
+    ofp_exp_type action_header_;
     data_type data_;
   };
 

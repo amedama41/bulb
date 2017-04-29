@@ -28,7 +28,7 @@ namespace flow_mod_detail {
     using base_t = v10_detail::basic_message<FlowMod>;
 
   public:
-    using raw_ofp_type = protocol::ofp_flow_mod;
+    using ofp_type = protocol::ofp_flow_mod;
 
     static constexpr protocol::ofp_type message_type = protocol::OFPT_FLOW_MOD;
 
@@ -55,7 +55,7 @@ namespace flow_mod_detail {
     {
       auto actions = action_list{};
       actions.swap(actions_);
-      flow_mod_.header.length = sizeof(raw_ofp_type);
+      flow_mod_.header.length = sizeof(ofp_type);
       return actions;
     }
 
@@ -74,7 +74,7 @@ namespace flow_mod_detail {
             protocol::ofp_header{
                 protocol::OFP_VERSION
               , message_type
-              , actions.calc_ofp_length(sizeof(raw_ofp_type))
+              , actions.calc_ofp_length(sizeof(ofp_type))
               , xid
             }
           , match.ofp_match()
@@ -100,7 +100,7 @@ namespace flow_mod_detail {
             protocol::ofp_header{
                 protocol::OFP_VERSION
               , message_type
-              , std::uint16_t(sizeof(raw_ofp_type))
+              , std::uint16_t(sizeof(ofp_type))
               , xid
             }
           , match.ofp_match()
@@ -137,14 +137,14 @@ namespace flow_mod_detail {
       return *this;
     }
 
-    flow_mod_base(raw_ofp_type const& flow_mod, action_list&& actions)
+    flow_mod_base(ofp_type const& flow_mod, action_list&& actions)
       : flow_mod_(flow_mod)
       , actions_(std::move(actions))
     {
     }
 
     auto ofp_flow_mod() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return flow_mod_;
     }
@@ -167,8 +167,8 @@ namespace flow_mod_detail {
     static auto decode_impl(Iterator& first, Iterator last)
       -> FlowMod
     {
-      auto const flow_mod = detail::decode<raw_ofp_type>(first, last);
-      auto const actions_length = flow_mod.header.length - sizeof(raw_ofp_type);
+      auto const flow_mod = detail::decode<ofp_type>(first, last);
+      auto const actions_length = flow_mod.header.length - sizeof(ofp_type);
       last = std::next(first, actions_length);
 
       auto actions = action_list::decode(first, last);
@@ -183,7 +183,7 @@ namespace flow_mod_detail {
     }
 
   private:
-    raw_ofp_type flow_mod_;
+    ofp_type flow_mod_;
     action_list actions_;
   };
 

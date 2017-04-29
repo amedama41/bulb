@@ -29,7 +29,7 @@ namespace v13 {
     static ofp::v13::protocol::ofp_type const message_type
       = ofp::v13::protocol::OFPT_GROUP_MOD;
 
-    using raw_ofp_type = ofp::v13::protocol::ofp_group_mod;
+    using ofp_type = ofp::v13::protocol::ofp_group_mod;
     using buckets_type = ofp::list<ofp::v13::bucket>;
 
     auto header() const noexcept
@@ -67,7 +67,7 @@ namespace v13 {
     {
       auto buckets = buckets_type{};
       buckets.swap(buckets_);
-      group_mod_.header.length = sizeof(raw_ofp_type);
+      group_mod_.header.length = sizeof(ofp_type);
       return buckets;
     }
 
@@ -81,7 +81,7 @@ namespace v13 {
             ofp::v13::protocol::ofp_header{
                 base_t::version()
               , base_t::type()
-              , buckets.calc_ofp_length(sizeof(raw_ofp_type))
+              , buckets.calc_ofp_length(sizeof(ofp_type))
               , xid
             }
           , command()
@@ -96,10 +96,7 @@ namespace v13 {
     group_mod_base(std::uint32_t const group_id, std::uint32_t const xid)
       : group_mod_{
             ofp::v13::protocol::ofp_header{
-                base_t::version()
-              , base_t::type()
-              , sizeof(raw_ofp_type)
-              , xid
+              base_t::version(), base_t::type(), sizeof(ofp_type), xid
             }
           , command()
           , 0
@@ -110,7 +107,7 @@ namespace v13 {
     {
     }
 
-    group_mod_base(raw_ofp_type const& group_mod, buckets_type&& buckets)
+    group_mod_base(ofp_type const& group_mod, buckets_type&& buckets)
       : group_mod_(group_mod)
       , buckets_(std::move(buckets))
     {
@@ -157,9 +154,9 @@ namespace v13 {
     static auto decode_impl(Iterator& first, Iterator last)
       -> GroupMod
     {
-      auto const group_mod = detail::decode<raw_ofp_type>(first, last);
+      auto const group_mod = detail::decode<ofp_type>(first, last);
       auto const buckets_length
-        = group_mod.header.length - sizeof(raw_ofp_type);
+        = group_mod.header.length - sizeof(ofp_type);
       last = std::next(first, buckets_length);
 
       auto buckets = buckets_type::decode(first, last);
@@ -175,7 +172,7 @@ namespace v13 {
     }
 
   private:
-    raw_ofp_type group_mod_;
+    ofp_type group_mod_;
     buckets_type buckets_;
   };
 

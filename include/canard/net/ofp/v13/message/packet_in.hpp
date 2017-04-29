@@ -35,7 +35,7 @@ namespace messages {
       + data_alignment_padding_size;
 
   public:
-    using raw_ofp_type = protocol::ofp_packet_in;
+    using ofp_type = protocol::ofp_packet_in;
     using data_type = ofp::data_type;
 
     static constexpr protocol::ofp_type message_type
@@ -55,7 +55,7 @@ namespace messages {
                 version()
               , type()
               , ofp::calc_ofp_length(data, match.calc_ofp_length(
-                    sizeof(raw_ofp_type) + data_alignment_padding_size))
+                    sizeof(ofp_type) + data_alignment_padding_size))
               , xid
             }
           , buffer_id
@@ -198,7 +198,7 @@ namespace messages {
     }
 
   private:
-    packet_in(raw_ofp_type const& pkt_in, oxm_match&& match, data_type&& data)
+    packet_in(ofp_type const& pkt_in, oxm_match&& match, data_type&& data)
       : packet_in_(pkt_in)
       , match_(std::move(match))
       , data_(std::move(data))
@@ -232,8 +232,8 @@ namespace messages {
     static auto decode_impl(Iterator& first, Iterator last)
       -> packet_in
     {
-      auto const pkt_in = detail::decode<raw_ofp_type>(first, last);
-      auto const rest_size = pkt_in.header.length - sizeof(raw_ofp_type);
+      auto const pkt_in = detail::decode<ofp_type>(first, last);
+      auto const rest_size = pkt_in.header.length - sizeof(ofp_type);
 
       auto const ofp_match
         = detail::decode_without_consumption<protocol::ofp_match>(first, last);
@@ -266,7 +266,7 @@ namespace messages {
     }
 
   private:
-    raw_ofp_type packet_in_;
+    ofp_type packet_in_;
     oxm_match match_;
     data_type data_;
   };

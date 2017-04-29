@@ -59,7 +59,7 @@ namespace v13 {
     static auto decode_impl(Iterator& first, Iterator last)
       -> T
     {
-      return T{detail::decode<typename T::raw_ofp_type>(first, last)};
+      return T{detail::decode<typename T::ofp_type>(first, last)};
     }
 
     auto equal_impl(T const& rhs) const noexcept

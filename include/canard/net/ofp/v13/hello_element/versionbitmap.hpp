@@ -31,7 +31,7 @@ namespace hello_elements {
     : public detail::basic_protocol_type<versionbitmap>
   {
   public:
-    using raw_ofp_type = protocol::ofp_hello_elem_versionbitmap;
+    using ofp_type = protocol::ofp_hello_elem_versionbitmap;
     using ofp_header_type = protocol::ofp_hello_elem_header;
     using bitmaps_type = boost::container::vector<std::uint32_t>;
 
@@ -99,7 +99,7 @@ namespace hello_elements {
     {
       auto bitmaps = bitmaps_type{};
       bitmaps.swap(bitmaps_);
-      versionbitmap_.length = sizeof(raw_ofp_type);
+      versionbitmap_.length = sizeof(ofp_type);
       return bitmaps;
     }
 
@@ -155,7 +155,7 @@ namespace hello_elements {
     }
 
   private:
-    versionbitmap(raw_ofp_type const& versionbitmap, bitmaps_type&& bitmaps)
+    versionbitmap(ofp_type const& versionbitmap, bitmaps_type&& bitmaps)
       : versionbitmap_(versionbitmap)
       , bitmaps_(std::move(bitmaps))
     {
@@ -183,9 +183,9 @@ namespace hello_elements {
     static auto decode_impl(Iterator& first, Iterator last)
       -> versionbitmap
     {
-      auto const vbitmap = detail::decode<raw_ofp_type>(first, last);
+      auto const vbitmap = detail::decode<ofp_type>(first, last);
 
-      auto const bitmaps_length = vbitmap.length - sizeof(raw_ofp_type);
+      auto const bitmaps_length = vbitmap.length - sizeof(ofp_type);
       auto bitmaps = bitmaps_type(
           bitmaps_length / sizeof(bitmap_type), boost::container::default_init);
       std::copy_n(
@@ -243,16 +243,16 @@ namespace hello_elements {
       -> std::uint16_t
     {
       constexpr auto max_bitmaps_size
-        = (std::numeric_limits<std::uint16_t>::max() - sizeof(raw_ofp_type))
+        = (std::numeric_limits<std::uint16_t>::max() - sizeof(ofp_type))
         / sizeof(bitmap_type);
       if (bitmaps.size() > max_bitmaps_size) {
         throw std::runtime_error{"invalid bitmaps size"};
       }
-      return sizeof(raw_ofp_type) + bitmaps.size() * sizeof(bitmap_type);
+      return sizeof(ofp_type) + bitmaps.size() * sizeof(bitmap_type);
     }
 
   private:
-    raw_ofp_type versionbitmap_;
+    ofp_type versionbitmap_;
     bitmaps_type bitmaps_;
   };
 

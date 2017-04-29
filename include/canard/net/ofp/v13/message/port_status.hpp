@@ -23,14 +23,14 @@ namespace messages {
     static constexpr protocol::ofp_type message_type
       = protocol::OFPT_PORT_STATUS;
 
-    using raw_ofp_type = protocol::ofp_port_status;
+    using ofp_type = protocol::ofp_port_status;
 
     port_status(
           v13::protocol::ofp_port_reason const reason
         , v13::port const& port
         , std::uint32_t const xid = get_xid()) noexcept
       : port_status_{
-            protocol::ofp_header{version(), type(), sizeof(raw_ofp_type), xid}
+            protocol::ofp_header{version(), type(), sizeof(ofp_type), xid}
           , std::uint8_t(reason)
           , { 0, 0, 0, 0, 0, 0, 0 }
           , port.ofp_port()
@@ -77,13 +77,13 @@ namespace messages {
   private:
     friend basic_fixed_length_message;
 
-    explicit port_status(raw_ofp_type const& status) noexcept
+    explicit port_status(ofp_type const& status) noexcept
       : port_status_(status)
     {
     }
 
     auto ofp_message() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return port_status_;
     }
@@ -97,7 +97,7 @@ namespace messages {
     }
 
   private:
-    raw_ofp_type port_status_;
+    ofp_type port_status_;
   };
 
 } // namespace messages

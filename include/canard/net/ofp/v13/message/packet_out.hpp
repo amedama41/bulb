@@ -25,7 +25,7 @@ namespace messages {
     : public detail::v13::basic_message<packet_out>
   {
   public:
-    using raw_ofp_type = protocol::ofp_packet_out;
+    using ofp_type = protocol::ofp_packet_out;
     using data_type = ofp::data_type;
 
     static constexpr protocol::ofp_type message_type
@@ -43,7 +43,7 @@ namespace messages {
             protocol::ofp_header{version(), type(), length, xid}
           , buffer_id
           , in_port
-          , std::uint16_t(length - (sizeof(raw_ofp_type) + data.size()))
+          , std::uint16_t(length - (sizeof(ofp_type) + data.size()))
           , { 0, 0, 0, 0, 0, 0 }
         }
       , actions_(std::move(actions))
@@ -58,7 +58,7 @@ namespace messages {
         , action_list actions
         , std::uint32_t const xid = get_xid())
       : packet_out{
-            actions.calc_ofp_length(sizeof(raw_ofp_type))
+            actions.calc_ofp_length(sizeof(ofp_type))
           , buffer_id, in_port, std::move(actions), data_type{}, xid
         }
     {
@@ -71,7 +71,7 @@ namespace messages {
         , std::uint32_t const xid = get_xid())
       : packet_out{
             actions.calc_ofp_length(
-                ofp::calc_ofp_length(data, sizeof(raw_ofp_type)))
+                ofp::calc_ofp_length(data, sizeof(ofp_type)))
           , protocol::OFP_NO_BUFFER
           , in_port
           , std::move(actions)
@@ -88,7 +88,7 @@ namespace messages {
       , actions_(other.extract_actions())
       , data_(std::move(other.data_))
     {
-      other.packet_out_.header.length = sizeof(raw_ofp_type);
+      other.packet_out_.header.length = sizeof(ofp_type);
     }
 
     auto operator=(packet_out const& other)
@@ -169,8 +169,7 @@ namespace messages {
     }
 
   private:
-    packet_out(
-        raw_ofp_type const& pkt_out, action_list&& actions, data_type&& data)
+    packet_out(ofp_type const& pkt_out, action_list&& actions, data_type&& data)
       : packet_out_(pkt_out)
       , actions_(std::move(actions))
       , data_(std::move(data))
@@ -195,8 +194,8 @@ namespace messages {
     static auto decode_impl(Iterator& first, Iterator last)
       -> packet_out
     {
-      auto const pkt_out = detail::decode<raw_ofp_type>(first, last);
-      auto const rest_size = pkt_out.header.length - sizeof(raw_ofp_type);
+      auto const pkt_out = detail::decode<ofp_type>(first, last);
+      auto const rest_size = pkt_out.header.length - sizeof(ofp_type);
       if (rest_size < pkt_out.actions_len) {
         throw exception{
             protocol::bad_request_code::bad_len
@@ -222,7 +221,7 @@ namespace messages {
     }
 
   private:
-    raw_ofp_type packet_out_;
+    ofp_type packet_out_;
     action_list actions_;
     data_type data_;
   };

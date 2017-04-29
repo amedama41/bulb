@@ -22,7 +22,7 @@ namespace messages {
       using base_t = v10_detail::basic_fixed_length_message<T>;
 
     public:
-      using raw_ofp_type = protocol::ofp_switch_config;
+      using ofp_type = protocol::ofp_switch_config;
 
     protected:
       switch_config_base(
@@ -31,7 +31,7 @@ namespace messages {
           , std::uint32_t const xid = get_xid()) noexcept
         : config_{
               protocol::ofp_header{
-                protocol::OFP_VERSION, T::message_type, sizeof(raw_ofp_type), xid
+                protocol::OFP_VERSION, T::message_type, sizeof(ofp_type), xid
               }
             , flags
             , miss_send_len
@@ -39,7 +39,7 @@ namespace messages {
       {
       }
 
-      explicit switch_config_base(raw_ofp_type const& config) noexcept
+      explicit switch_config_base(ofp_type const& config) noexcept
         : config_(config)
       {
       }
@@ -67,13 +67,13 @@ namespace messages {
       friend base_t;
 
       auto ofp_message() const noexcept
-        -> raw_ofp_type const&
+        -> ofp_type const&
       {
         return config_;
       }
 
     private:
-      raw_ofp_type config_;
+      ofp_type config_;
     };
 
   } // namespace switch_config_detail
@@ -83,13 +83,13 @@ namespace messages {
     : public v10_detail::basic_fixed_length_message<get_config_request>
   {
   public:
-    using raw_ofp_type = protocol::ofp_header;
+    using ofp_type = protocol::ofp_header;
 
     static constexpr protocol::ofp_type message_type
       = protocol::OFPT_GET_CONFIG_REQUEST;
 
     explicit get_config_request(std::uint32_t const xid = get_xid()) noexcept
-      : header_{protocol::OFP_VERSION, message_type, sizeof(raw_ofp_type), xid}
+      : header_{protocol::OFP_VERSION, message_type, sizeof(ofp_type), xid}
     {
     }
 
@@ -102,19 +102,19 @@ namespace messages {
   private:
     friend basic_fixed_length_message;
 
-    explicit get_config_request(raw_ofp_type const header) noexcept
+    explicit get_config_request(ofp_type const header) noexcept
       : header_(header)
     {
     }
 
     auto ofp_message() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return header_;
     }
 
   private:
-    raw_ofp_type header_;
+    ofp_type header_;
   };
 
 
@@ -144,7 +144,7 @@ namespace messages {
   private:
     friend switch_config_base::basic_fixed_length_message;
 
-    explicit get_config_reply(raw_ofp_type const& config) noexcept
+    explicit get_config_reply(ofp_type const& config) noexcept
       : switch_config_base{config}
     {
     }
@@ -169,7 +169,7 @@ namespace messages {
   private:
     friend switch_config_base::basic_fixed_length_message;
 
-    explicit set_config(raw_ofp_type const& config) noexcept
+    explicit set_config(ofp_type const& config) noexcept
       : switch_config_base{config}
     {
     }

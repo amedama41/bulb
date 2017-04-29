@@ -21,18 +21,18 @@ namespace hello_elements {
     : public detail::basic_protocol_type<unknown_element>
   {
   public:
-    using raw_ofp_type = protocol::ofp_hello_elem_header;
+    using ofp_type = protocol::ofp_hello_elem_header;
     using ofp_header_type = protocol::ofp_hello_elem_header;
     using data_type = ofp::data_type;
 
     explicit unknown_element(std::uint16_t const type)
-      : header_{type, sizeof(raw_ofp_type)}
+      : header_{type, sizeof(ofp_type)}
       , data_{}
     {
     }
 
     unknown_element(std::uint16_t const type, data_type data)
-      : header_{type, ofp::calc_ofp_length(data, sizeof(raw_ofp_type))}
+      : header_{type, ofp::calc_ofp_length(data, sizeof(ofp_type))}
       , data_(std::move(data))
     {
     }
@@ -83,7 +83,7 @@ namespace hello_elements {
     {
       auto data = data_type{};
       data.swap(data_);
-      header_.length = sizeof(raw_ofp_type);
+      header_.length = sizeof(ofp_type);
       return data;
     }
 
@@ -100,11 +100,11 @@ namespace hello_elements {
             ofp_header_type const& header) noexcept
         -> bool
     {
-      return header.length >= sizeof(raw_ofp_type);
+      return header.length >= sizeof(ofp_type);
     }
 
   private:
-    unknown_element(raw_ofp_type const& header, data_type&& data)
+    unknown_element(ofp_type const& header, data_type&& data)
       : header_(header)
       , data_(std::move(data))
     {
@@ -130,9 +130,9 @@ namespace hello_elements {
     static auto decode_impl(Iterator& first, Iterator last)
       -> unknown_element
     {
-      auto const header = detail::decode<raw_ofp_type>(first, last);
+      auto const header = detail::decode<ofp_type>(first, last);
 
-      auto data = ofp::decode_data(first, header.length - sizeof(raw_ofp_type));
+      auto data = ofp::decode_data(first, header.length - sizeof(ofp_type));
 
       return unknown_element(header, std::move(data));
     }
@@ -151,7 +151,7 @@ namespace hello_elements {
     }
 
   private:
-    raw_ofp_type header_;
+    ofp_type header_;
     data_type data_;
   };
 

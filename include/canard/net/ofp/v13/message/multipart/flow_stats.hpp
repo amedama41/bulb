@@ -35,7 +35,7 @@ namespace multipart {
       >
   {
   public:
-    using raw_ofp_type = protocol::ofp_flow_stats;
+    using ofp_type = protocol::ofp_flow_stats;
     using instructions_type = ofp::list<any_instruction>;
 
     flow_stats(
@@ -47,7 +47,7 @@ namespace multipart {
         , v13::counters const& counters)
       : flow_stats_{
             entry.instructions().calc_ofp_length(
-                entry.match().calc_ofp_length(sizeof(raw_ofp_type)))
+                entry.match().calc_ofp_length(sizeof(ofp_type)))
           , table_id
           , 0
           , elapsed_time.duration_sec()
@@ -127,7 +127,7 @@ namespace multipart {
     {
       auto instructions = instructions_type{};
       instructions.swap(instructions_);
-      flow_stats_.length = sizeof(raw_ofp_type) + match_.byte_length();
+      flow_stats_.length = sizeof(ofp_type) + match_.byte_length();
       return instructions;
     }
 
@@ -139,7 +139,7 @@ namespace multipart {
 
   private:
     flow_stats(
-          raw_ofp_type const& stats
+          ofp_type const& stats
         , oxm_match&& match
         , instructions_type&& instructions)
       : flow_stats_(stats)
@@ -159,7 +159,7 @@ namespace multipart {
     friend basic_protocol_type;
 
     static constexpr std::uint16_t base_size
-      = sizeof(raw_ofp_type) + oxm_match::min_byte_length();
+      = sizeof(ofp_type) + oxm_match::min_byte_length();
 
     friend constexpr auto get_min_length(
         detail::basic_protocol_type_tag<flow_stats>) noexcept
@@ -180,7 +180,7 @@ namespace multipart {
     static auto decode_impl(Iterator& first, Iterator last)
       -> flow_stats
     {
-      auto const stats = detail::decode<raw_ofp_type>(first, last);
+      auto const stats = detail::decode<ofp_type>(first, last);
       if (stats.length < base_size) {
         throw exception{
             exception::ex_error_type::bad_multipart_element
@@ -188,7 +188,7 @@ namespace multipart {
           , "too small flow_stats length"
         } << CANARD_NET_OFP_ERROR_INFO();
       }
-      auto const rest_length = stats.length - sizeof(raw_ofp_type);
+      auto const rest_length = stats.length - sizeof(ofp_type);
       if (std::distance(first, last) < rest_length) {
         throw exception{
             protocol::bad_request_code::bad_len
@@ -223,7 +223,7 @@ namespace multipart {
     }
 
   private:
-    raw_ofp_type flow_stats_;
+    ofp_type flow_stats_;
     oxm_match match_;
     instructions_type instructions_;
   };
@@ -336,7 +336,7 @@ namespace multipart {
     friend basic_multipart_request::base_type;
 
     flow_stats_request(
-          raw_ofp_type const& multipart_request
+          ofp_type const& multipart_request
         , body_type const& flow_stats_request
         , oxm_match&& match)
       : basic_multipart_request{
@@ -369,8 +369,7 @@ namespace multipart {
 
     static constexpr bool is_fixed_length_element = false;
 
-    flow_stats_reply(
-        raw_ofp_type const& multipart_reply, body_type&& flow_stats)
+    flow_stats_reply(ofp_type const& multipart_reply, body_type&& flow_stats)
       : basic_multipart_reply{multipart_reply, std::move(flow_stats)}
     {
     }

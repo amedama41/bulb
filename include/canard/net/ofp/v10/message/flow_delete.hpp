@@ -46,7 +46,7 @@ namespace messages {
   private:
     friend flow_mod_base;
 
-    flow_delete(raw_ofp_type const& flow_mod, action_list&& actions)
+    flow_delete(ofp_type const& flow_mod, action_list&& actions)
       : flow_mod_base{flow_mod, std::move(actions)}
     {
     }
@@ -104,7 +104,7 @@ namespace messages {
   private:
     friend flow_mod_base;
 
-    flow_delete_strict(raw_ofp_type const& flow_mod, action_list&& actions)
+    flow_delete_strict(ofp_type const& flow_mod, action_list&& actions)
       : flow_mod_base{flow_mod, std::move(actions)}
     {
     }

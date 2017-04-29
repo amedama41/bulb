@@ -15,7 +15,7 @@ namespace actions {
     : public detail::v13::basic_fixed_length_action<set_mpls_ttl>
   {
   public:
-    using raw_ofp_type = protocol::ofp_action_mpls_ttl;
+    using ofp_type = protocol::ofp_action_mpls_ttl;
 
     static constexpr protocol::ofp_action_type action_type
       = protocol::OFPAT_SET_MPLS_TTL;
@@ -34,13 +34,13 @@ namespace actions {
   private:
     friend basic_fixed_length_action;
 
-    explicit set_mpls_ttl(raw_ofp_type const& action_mpls_ttl) noexcept
+    explicit set_mpls_ttl(ofp_type const& action_mpls_ttl) noexcept
       : action_mpls_ttl_(action_mpls_ttl)
     {
     }
 
     auto ofp_action() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return action_mpls_ttl_;
     }
@@ -56,7 +56,7 @@ namespace actions {
     }
 
   private:
-    raw_ofp_type action_mpls_ttl_;
+    ofp_type action_mpls_ttl_;
   };
 
 } // namespace actions

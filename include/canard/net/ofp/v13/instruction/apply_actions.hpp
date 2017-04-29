@@ -35,8 +35,7 @@ namespace instructions {
   private:
     friend basic_instruction_actions;
 
-    apply_actions(
-        raw_ofp_type const& instruction_actions, action_list&& actions)
+    apply_actions(ofp_type const& instruction_actions, action_list&& actions)
       : basic_instruction_actions{instruction_actions, std::move(actions)}
     {
     }

@@ -20,14 +20,14 @@ namespace messages {
     static constexpr protocol::ofp_type message_type
       = protocol::OFPT_TABLE_MOD;
 
-    using raw_ofp_type = protocol::ofp_table_mod;
+    using ofp_type = protocol::ofp_table_mod;
 
     table_mod(
           std::uint8_t const table_id
         , std::uint32_t const config
         , std::uint32_t const xid = get_xid())
       : table_mod_{
-            protocol::ofp_header{version(), type(), sizeof(raw_ofp_type), xid}
+            protocol::ofp_header{version(), type(), sizeof(ofp_type), xid}
           , table_id
           , { 0, 0, 0 }
           , config
@@ -56,19 +56,19 @@ namespace messages {
   private:
     friend basic_fixed_length_message;
 
-    explicit table_mod(raw_ofp_type const& table_mod) noexcept
+    explicit table_mod(ofp_type const& table_mod) noexcept
       : table_mod_(table_mod)
     {
     }
 
     auto ofp_message() const noexcept
-      -> raw_ofp_type const&
+      -> ofp_type const&
     {
       return table_mod_;
     }
 
   private:
-    raw_ofp_type table_mod_;
+    ofp_type table_mod_;
   };
 
 } // namespace messages

@@ -34,7 +34,7 @@ namespace multipart {
   private:
     friend basic_multipart_request::base_type;
 
-    explicit description_request(raw_ofp_type const& multipart_request) noexcept
+    explicit description_request(ofp_type const& multipart_request) noexcept
       : basic_multipart_request{multipart_request}
     {
     }
@@ -97,7 +97,7 @@ namespace multipart {
     friend basic_multipart_reply::base_type;
 
     description_reply(
-        raw_ofp_type const& multipart_reply, body_type const& desc) noexcept
+        ofp_type const& multipart_reply, body_type const& desc) noexcept
       : basic_multipart_reply{multipart_reply, desc}
     {
     }
