@@ -107,7 +107,7 @@ namespace v13 {
       return oxm_header_;
     }
 
-    constexpr static auto length() noexcept
+    constexpr auto length() const noexcept
       -> std::uint16_t
     {
       return sizeof(ofp_type);

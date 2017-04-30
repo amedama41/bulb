@@ -36,7 +36,7 @@ namespace detail {
       return property();
     }
 
-    static constexpr auto length() noexcept
+    auto length() const noexcept
       -> std::uint16_t
     {
       return sizeof(typename T::ofp_type);
@@ -58,7 +58,7 @@ namespace detail {
         ofp_header_type const& header) noexcept
       -> bool
     {
-      return header.len == length();
+      return header.len == sizeof(typename T::ofp_type);
     }
 
   private:

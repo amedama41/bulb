@@ -53,7 +53,7 @@ namespace v10 {
           , std::min(name.size(), sizeof(port_.name) - 1));
     }
 
-    static constexpr auto length() noexcept
+    auto length() const noexcept
       -> std::uint16_t
     {
       return sizeof(ofp_type);

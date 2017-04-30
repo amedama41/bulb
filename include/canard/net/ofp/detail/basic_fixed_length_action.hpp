@@ -22,7 +22,7 @@ namespace detail {
     basic_fixed_length_action() = default;
 
   public:
-    static constexpr auto length() noexcept
+    auto length() const noexcept
       -> std::uint16_t
     {
       return sizeof(typename T::ofp_type);

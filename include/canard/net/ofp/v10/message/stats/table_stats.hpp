@@ -55,7 +55,7 @@ namespace statistics {
       boost::copy(name | sliced(0, name_size), table_stats_.name);
     }
 
-    static constexpr auto length() noexcept
+    auto length() const noexcept
       -> std::uint16_t
     {
       return sizeof(ofp_type);

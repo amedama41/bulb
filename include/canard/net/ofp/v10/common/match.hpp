@@ -93,7 +93,7 @@ namespace v10 {
           && ((wildcards() & all_mask_wo_nw_addr) == all_mask_wo_nw_addr);
     }
 
-    static constexpr auto length() noexcept
+    auto length() const noexcept
       -> std::uint16_t
     {
       return sizeof(ofp_type);

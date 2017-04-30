@@ -24,7 +24,7 @@ namespace v13 {
     basic_fixed_length_instruction() = default;
 
   public:
-    static constexpr auto length() noexcept
+    auto length() const noexcept
       -> std::uint16_t
     {
       return T::min_length();

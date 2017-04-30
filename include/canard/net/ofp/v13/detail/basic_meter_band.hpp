@@ -29,7 +29,7 @@ namespace v13 {
       return MeterBand::band_type;
     }
 
-    static constexpr auto length() noexcept
+    auto length() const noexcept
       -> std::uint16_t
     {
       return sizeof(typename MeterBand::ofp_type);
@@ -63,7 +63,7 @@ namespace v13 {
             ofp_header_type const& header) noexcept
         -> bool
     {
-        return header.len == length();
+        return header.len == sizeof(typename MeterBand::ofp_type);
     }
 
   protected:
