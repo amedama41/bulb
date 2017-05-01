@@ -35,7 +35,6 @@ BOOST_AUTO_TEST_SUITE(set_queue_test)
         using sut = actions::set_queue;
 
         BOOST_TEST(sut::type() == protocol::OFPAT_SET_QUEUE);
-        BOOST_TEST(sut::length() == sizeof(protocol::ofp_action_set_queue));
     }
 
     BOOST_AUTO_TEST_CASE(constructor_test)
@@ -44,6 +43,7 @@ BOOST_AUTO_TEST_SUITE(set_queue_test)
 
         auto const sut = actions::set_queue{queue_id};
 
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_action_set_queue));
         BOOST_TEST(sut.queue_id() == queue_id);
     }
 

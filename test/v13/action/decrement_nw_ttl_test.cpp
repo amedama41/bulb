@@ -35,21 +35,20 @@ BOOST_AUTO_TEST_SUITE(decrement_nw_ttl_test)
         using sut = actions::decrement_nw_ttl;
 
         BOOST_TEST(sut::type() == protocol::OFPAT_DEC_NW_TTL);
-        BOOST_TEST(sut::length() == sizeof(protocol::ofp_action_header));
     }
 
     BOOST_AUTO_TEST_CASE(construct_test)
     {
         auto const sut = actions::decrement_nw_ttl{};
 
-        BOOST_TEST(((void)sut, true));
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_action_header));
     }
 
     BOOST_AUTO_TEST_CASE(create_test)
     {
         auto const sut = actions::decrement_nw_ttl::create();
 
-        BOOST_TEST(((void)sut, true));
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_action_header));
     }
 
     BOOST_AUTO_TEST_SUITE(equality)

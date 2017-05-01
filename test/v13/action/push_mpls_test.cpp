@@ -35,7 +35,6 @@ BOOST_AUTO_TEST_SUITE(push_mpls_test)
         using sut = actions::push_mpls;
 
         BOOST_TEST(sut::type() == protocol::OFPAT_PUSH_MPLS);
-        BOOST_TEST(sut::length() == sizeof(protocol::ofp_action_push));
     }
 
     BOOST_DATA_TEST_CASE(
@@ -45,6 +44,7 @@ BOOST_AUTO_TEST_SUITE(push_mpls_test)
     {
         auto const sut = actions::push_mpls{ethertype};
 
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_action_push));
         BOOST_TEST(sut.ethertype() == ethertype);
     }
 

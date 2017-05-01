@@ -38,8 +38,6 @@ BOOST_AUTO_TEST_SUITE(write_metadata_test)
         using sut = instructions::write_metadata;
 
         BOOST_TEST(sut::type() == v13::protocol::OFPIT_WRITE_METADATA);
-        BOOST_TEST(sut::length()
-                == sizeof(v13::protocol::ofp_instruction_write_metadata));
     }
 
     BOOST_AUTO_TEST_CASE(construct_from_metadata_test)
@@ -48,6 +46,8 @@ BOOST_AUTO_TEST_SUITE(write_metadata_test)
 
         auto const sut = instructions::write_metadata{metadata};
 
+        BOOST_TEST(sut.length()
+                == sizeof(v13::protocol::ofp_instruction_write_metadata));
         BOOST_TEST(sut.metadata() == metadata);
         BOOST_TEST(sut.metadata_mask()
                 == std::numeric_limits<std::uint64_t>::max());

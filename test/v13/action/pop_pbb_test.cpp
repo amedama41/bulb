@@ -35,21 +35,20 @@ BOOST_AUTO_TEST_SUITE(pop_pbb_test)
         using sut = actions::pop_pbb;
 
         BOOST_TEST(sut::type() == protocol::OFPAT_POP_PBB);
-        BOOST_TEST(sut::length() == sizeof(protocol::ofp_action_header));
     }
 
     BOOST_AUTO_TEST_CASE(construct_test)
     {
         auto const sut = actions::pop_pbb{};
 
-        BOOST_TEST(((void)sut, true));
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_action_header));
     }
 
     BOOST_AUTO_TEST_CASE(create_test)
     {
         auto const sut = actions::pop_pbb::create();
 
-        BOOST_TEST(((void)sut, true));
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_action_header));
     }
 
     BOOST_AUTO_TEST_SUITE(equality)

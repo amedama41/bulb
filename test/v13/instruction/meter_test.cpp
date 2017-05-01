@@ -34,8 +34,6 @@ BOOST_AUTO_TEST_SUITE(meter_test)
         using sut = instructions::meter;
 
         BOOST_TEST(sut::type() == v13::protocol::OFPIT_METER);
-        BOOST_TEST(sut::length()
-                == sizeof(v13::protocol::ofp_instruction_meter));
     }
 
     BOOST_AUTO_TEST_CASE(construct_from_meter_id_test)
@@ -44,6 +42,8 @@ BOOST_AUTO_TEST_SUITE(meter_test)
 
         auto const sut = instructions::meter{meter_id};
 
+        BOOST_TEST(sut.length()
+                == sizeof(v13::protocol::ofp_instruction_meter));
         BOOST_TEST(sut.meter_id() == meter_id);
     }
 

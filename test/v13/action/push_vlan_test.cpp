@@ -35,7 +35,6 @@ BOOST_AUTO_TEST_SUITE(push_vlan_test)
         using sut = actions::push_vlan;
 
         BOOST_TEST(sut::type() == protocol::OFPAT_PUSH_VLAN);
-        BOOST_TEST(sut::length() == sizeof(protocol::ofp_action_push));
     }
 
     BOOST_DATA_TEST_CASE(
@@ -45,6 +44,7 @@ BOOST_AUTO_TEST_SUITE(push_vlan_test)
     {
         auto const sut = actions::push_vlan{ethertype};
 
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_action_push));
         BOOST_TEST(sut.ethertype() == ethertype);
     }
 

@@ -35,13 +35,13 @@ BOOST_AUTO_TEST_SUITE(push_pbb_test)
         using sut = actions::push_pbb;
 
         BOOST_TEST(sut::type() == protocol::OFPAT_PUSH_PBB);
-        BOOST_TEST(sut::length() == sizeof(protocol::ofp_action_push));
     }
 
     BOOST_AUTO_TEST_CASE(construct_test)
     {
         auto const sut = actions::push_pbb{};
 
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_action_push));
         BOOST_TEST(sut.ethertype() == 0x88e7);
     }
 

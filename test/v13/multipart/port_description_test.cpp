@@ -177,7 +177,7 @@ BOOST_AUTO_TEST_SUITE(port_description_reply)
       BOOST_TEST(sut.version() == protocol::OFP_VERSION);
       BOOST_TEST(sut.type() == protocol::OFPT_MULTIPART_REPLY);
       BOOST_TEST(sut.length() == sizeof(protocol::ofp_multipart_reply)
-          + v13::port::length() * ports.size());
+          + sizeof(protocol::ofp_port) * ports.size());
       BOOST_TEST(sut.multipart_type() == protocol::OFPMP_PORT_DESC);
       BOOST_TEST(sut.flags() == 0);
       BOOST_TEST((sut.body() == ports));

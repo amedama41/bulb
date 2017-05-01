@@ -35,7 +35,6 @@ BOOST_AUTO_TEST_SUITE(set_mpls_ttl_test)
         using sut = actions::set_mpls_ttl;
 
         BOOST_TEST(sut::type() == protocol::OFPAT_SET_MPLS_TTL);
-        BOOST_TEST(sut::length() == sizeof(protocol::ofp_action_mpls_ttl));
     }
 
     BOOST_AUTO_TEST_CASE(construct_test)
@@ -44,6 +43,7 @@ BOOST_AUTO_TEST_SUITE(set_mpls_ttl_test)
 
         auto const sut = actions::set_mpls_ttl{ttl};
 
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_action_mpls_ttl));
         BOOST_TEST(sut.ttl() == ttl);
     }
 

@@ -31,14 +31,6 @@ BOOST_AUTO_TEST_SUITE(dscp_remark)
 
       BOOST_TEST(type == v13::protocol::OFPMBT_DSCP_REMARK);
     }
-    BOOST_AUTO_TEST_CASE(length)
-    {
-      using sut = bands::dscp_remark;
-
-      constexpr auto length = sut::length();
-
-      BOOST_TEST(length == sizeof(v13::protocol::ofp_meter_band_dscp_remark));
-    }
   BOOST_AUTO_TEST_SUITE_END() // type_definition_test
 
   BOOST_AUTO_TEST_SUITE(constructor)
@@ -49,6 +41,8 @@ BOOST_AUTO_TEST_SUITE(dscp_remark)
 
       bands::dscp_remark const sut{prec_level, rate};
 
+      BOOST_TEST(
+          sut.length() == sizeof(v13::protocol::ofp_meter_band_dscp_remark));
       BOOST_TEST(sut.precedence_level() == prec_level);
       BOOST_TEST(sut.rate() == rate);
       BOOST_TEST(sut.burst_size() == 0);

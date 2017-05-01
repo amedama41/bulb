@@ -35,7 +35,6 @@ BOOST_AUTO_TEST_SUITE(group_test)
         using sut = actions::group;
 
         BOOST_TEST(sut::type() == protocol::OFPAT_GROUP);
-        BOOST_TEST(sut::length() == sizeof(protocol::ofp_action_group));
     }
 
     BOOST_AUTO_TEST_CASE(construct_test)
@@ -44,6 +43,7 @@ BOOST_AUTO_TEST_SUITE(group_test)
 
         auto const sut = actions::group{group_id};
 
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_action_group));
         BOOST_TEST(sut.group_id() == group_id);
     }
 

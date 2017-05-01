@@ -37,7 +37,6 @@ BOOST_AUTO_TEST_SUITE(output_test)
         using sut = actions::output;
 
         BOOST_TEST(sut::type() == protocol::OFPAT_OUTPUT);
-        BOOST_TEST(sut::length() == sizeof(protocol::ofp_action_output));
     }
 
     BOOST_AUTO_TEST_CASE(construct_from_port_test)
@@ -46,6 +45,7 @@ BOOST_AUTO_TEST_SUITE(output_test)
 
         auto const sut = actions::output{port};
 
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_action_output));
         BOOST_TEST(sut.port_no() == port);
         BOOST_TEST(sut.max_length() == protocol::OFPCML_NO_BUFFER);
     }

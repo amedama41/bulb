@@ -35,21 +35,20 @@ BOOST_AUTO_TEST_SUITE(copy_ttl_out_test)
         using sut = actions::copy_ttl_out;
 
         BOOST_TEST(sut::type() == protocol::OFPAT_COPY_TTL_OUT);
-        BOOST_TEST(sut::length() == sizeof(protocol::ofp_action_header));
     }
 
     BOOST_AUTO_TEST_CASE(construct_test)
     {
         auto const sut = actions::copy_ttl_out{};
 
-        BOOST_TEST(((void)sut, true));
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_action_header));
     }
 
     BOOST_AUTO_TEST_CASE(create_test)
     {
         auto const sut = actions::copy_ttl_out::create();
 
-        BOOST_TEST(((void)sut, true));
+        BOOST_TEST(sut.length() == sizeof(protocol::ofp_action_header));
     }
 
     BOOST_AUTO_TEST_SUITE(equality)

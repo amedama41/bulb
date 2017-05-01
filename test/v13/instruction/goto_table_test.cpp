@@ -35,8 +35,6 @@ BOOST_AUTO_TEST_SUITE(goto_table_test)
         using sut = instructions::goto_table;
 
         BOOST_TEST(sut::type() == v13::protocol::OFPIT_GOTO_TABLE);
-        BOOST_TEST(sut::length()
-                == sizeof(v13::protocol::ofp_instruction_goto_table));
     }
 
     BOOST_AUTO_TEST_CASE(construct_from_table_id_test)
@@ -45,6 +43,8 @@ BOOST_AUTO_TEST_SUITE(goto_table_test)
 
         auto const sut = instructions::goto_table{table_id};
 
+        BOOST_TEST(sut.length()
+                == sizeof(v13::protocol::ofp_instruction_goto_table));
         BOOST_TEST(sut.table_id() == table_id);
     }
 
