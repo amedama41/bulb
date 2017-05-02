@@ -113,6 +113,13 @@ namespace detail {
           length, does_length_exclude_padding_length<T>{});
     }
 
+    template <class T, class... Args>
+    auto public_construct(Args&&... args)
+      -> T
+    {
+      return T(std::forward<Args>(args)...);
+    }
+
   } // namespace bpt_detail
 
   template <class T>
@@ -176,7 +183,9 @@ namespace detail {
     static auto create(Args&&... args)
       -> T
     {
-      return validation::validate(T(std::forward<Args>(args)...));
+      // construct through non-member function not to use private constructors
+      return validation::validate(
+          bpt_detail::public_construct<T>(std::forward<Args>(args)...));
     }
 
     friend auto operator==(
