@@ -50,7 +50,7 @@ namespace v13 {
     , messages::multipart::port_stats_reply
     , messages::multipart::queue_stats_reply
     // , messages::group_stats_reply
-    // , messages::group_description_reply
+    , messages::multipart::group_description_reply
     // , messages::gruop_features_reply
     // , messages::meter_stats_reply
     // , messages::meter_config_reply
