@@ -30,7 +30,7 @@ namespace multipart {
     using buckets_type = ofp::list<v13::bucket>;
 
     group_description(
-        std::uint32_t const group_id
+          std::uint32_t const group_id
         , std::uint8_t const group_type
         , buckets_type buckets)
       : group_desc_{
@@ -185,7 +185,7 @@ namespace multipart {
 
   class group_description_reply
     : public multipart_detail::basic_multipart_reply<
-      group_description_reply, group_description[]
+        group_description_reply, group_description[]
       >
   {
   public:
