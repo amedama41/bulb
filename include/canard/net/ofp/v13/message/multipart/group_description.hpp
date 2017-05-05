@@ -12,7 +12,6 @@
 #include <canard/net/ofp/list.hpp>
 #include <canard/net/ofp/v13/common/bucket.hpp>
 #include <canard/net/ofp/v13/detail/basic_multipart.hpp>
-#include <canard/net/ofp/v13/detail/byteorder.hpp>
 #include <canard/net/ofp/v13/exception.hpp>
 #include <canard/net/ofp/v13/openflow.hpp>
 
