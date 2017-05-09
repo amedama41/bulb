@@ -7,6 +7,7 @@
 #include <canard/net/ofp/v13/message/multipart/table_stats.hpp>
 #include <canard/net/ofp/v13/message/multipart/port_stats.hpp>
 #include <canard/net/ofp/v13/message/multipart/queue_stats.hpp>
+#include <canard/net/ofp/v13/message/multipart/group_stats.hpp>
 #include <canard/net/ofp/v13/message/multipart/group_description.hpp>
 #include <canard/net/ofp/v13/message/multipart/group_features.hpp>
 #include <canard/net/ofp/v13/message/multipart/table_features.hpp>

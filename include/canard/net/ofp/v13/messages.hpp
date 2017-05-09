@@ -49,7 +49,7 @@ namespace v13 {
     , messages::multipart::table_stats_reply
     , messages::multipart::port_stats_reply
     , messages::multipart::queue_stats_reply
-    // , messages::group_stats_reply
+    , messages::multipart::group_stats_reply
     , messages::multipart::group_description_reply
     , messages::multipart::group_features_reply
     // , messages::meter_stats_reply
