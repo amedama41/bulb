@@ -54,7 +54,7 @@ namespace v13 {
     , messages::multipart::group_features_reply
     // , messages::meter_stats_reply
     // , messages::meter_config_reply
-    // , messages::meter_features_reply
+    , messages::multipart::meter_features_reply
     , messages::multipart::table_features_reply
     , messages::multipart::port_description_reply
   >;
