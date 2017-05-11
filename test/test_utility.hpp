@@ -71,4 +71,11 @@ inline auto random()
   return rand_holder<>::rnd();
 }
 
+template <class T>
+auto add_const(T const& t) noexcept
+  -> T const&
+{
+  return t;
+}
+
 #endif // CANARD_NET_OFP_TEST_UTILITY_HPP

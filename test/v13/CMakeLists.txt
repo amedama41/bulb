@@ -76,6 +76,7 @@ set(multipart_srcs
     multipart/table_stats_test.cpp
     multipart/port_stats_test.cpp
     multipart/queue_stats_test.cpp
+    multipart/group_stats_test.cpp
     multipart/group_description_test.cpp
     multipart/group_features_test.cpp
     multipart/table_features_test.cpp
