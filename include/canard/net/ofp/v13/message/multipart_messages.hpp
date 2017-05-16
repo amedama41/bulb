@@ -13,6 +13,7 @@
 #include <canard/net/ofp/v13/message/multipart/table_features.hpp>
 #include <canard/net/ofp/v13/message/multipart/port_description.hpp>
 #include <canard/net/ofp/v13/message/multipart/meter_stats.hpp>
+#include <canard/net/ofp/v13/message/multipart/meter_config.hpp>
 #include <canard/net/ofp/v13/message/multipart/meter_features.hpp>
 
 #endif // CANARD_NET_OFP_V13_MULTIPART_MESSAGES_HPP
