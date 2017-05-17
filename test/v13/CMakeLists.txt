@@ -82,6 +82,7 @@ set(multipart_srcs
     multipart/table_features_test.cpp
     multipart/port_description_test.cpp
     multipart/meter_stats_test.cpp
+    multipart/meter_config_test.cpp
     multipart/meter_features_test.cpp
     multipart/validate_header_test.cpp)
 set(oxm_match_srcs
