@@ -16,7 +16,13 @@ using fixed_length_multipart_request_types = std::tuple<
   , multipart::table_stats_request
   , multipart::port_stats_request
   , multipart::queue_stats_request
+  , multipart::group_stats_request
+  , multipart::group_description_request
+  , multipart::group_features_request
   , multipart::port_description_request
+  , multipart::meter_stats_request
+  , multipart::meter_config_request
+  , multipart::meter_features_request
 >;
 using variable_length_multipart_request_types = std::tuple<
     multipart::flow_stats_request
@@ -30,16 +36,28 @@ using all_multipart_request_types = std::tuple<
   , multipart::table_stats_request
   , multipart::port_stats_request
   , multipart::queue_stats_request
+  , multipart::group_stats_request
+  , multipart::group_description_request
+  , multipart::group_features_request
   , multipart::table_features_request
   , multipart::port_description_request
+  , multipart::meter_stats_request
+  , multipart::meter_config_request
+  , multipart::meter_features_request
 >;
 using fixed_length_multipart_reply_types = std::tuple<
     multipart::description_reply
   , multipart::aggregate_stats_reply
+  , multipart::group_features_reply
+  , multipart::meter_features_reply
 >;
 using variable_length_multipart_reply_types = std::tuple<
     multipart::flow_stats_reply
+  , multipart::group_stats_reply
+  , multipart::group_description_reply
   , multipart::table_features_reply
+  , multipart::meter_stats_reply
+  , multipart::meter_config_reply
 >;
 using gradual_length_multipart_reply_types = std::tuple<
     multipart::table_stats_reply
@@ -54,8 +72,14 @@ using all_multipart_reply_types = std::tuple<
   , multipart::table_stats_reply
   , multipart::port_stats_reply
   , multipart::queue_stats_reply
+  , multipart::group_stats_reply
+  , multipart::group_description_reply
+  , multipart::group_features_reply
   , multipart::table_features_reply
   , multipart::port_description_reply
+  , multipart::meter_stats_reply
+  , multipart::meter_config_reply
+  , multipart::meter_features_reply
 >;
 using all_multipart_types = std::tuple<
     multipart::description_request
@@ -70,10 +94,22 @@ using all_multipart_types = std::tuple<
   , multipart::port_stats_reply
   , multipart::queue_stats_request
   , multipart::queue_stats_reply
+  , multipart::group_stats_request
+  , multipart::group_stats_reply
+  , multipart::group_description_request
+  , multipart::group_description_reply
+  , multipart::group_features_request
+  , multipart::group_features_reply
   , multipart::table_features_request
   , multipart::table_features_reply
   , multipart::port_description_request
   , multipart::port_description_reply
+  , multipart::meter_stats_request
+  , multipart::meter_stats_reply
+  , multipart::meter_config_request
+  , multipart::meter_config_reply
+  , multipart::meter_features_request
+  , multipart::meter_features_reply
 >;
 
 static auto& random_xid = ::random<std::uint32_t>;
