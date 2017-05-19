@@ -189,17 +189,17 @@ namespace detail {
     }
 
     friend auto operator==(
-        T const& lhs, T const& rhs) noexcept(noexcept(lhs.equal_impl(rhs)))
+        T const& lhs, T const& rhs) noexcept(noexcept(lhs.is_equal(rhs)))
       -> bool
     {
-      return lhs.equal_impl(rhs);
+      return lhs.is_equal(rhs);
     }
 
     friend auto equivalent(
-        T const& lhs, T const& rhs) noexcept(noexcept(lhs.equivalent_impl(rhs)))
+        T const& lhs, T const& rhs) noexcept(noexcept(lhs.is_equivalent(rhs)))
       -> bool
     {
-      return lhs.equivalent_impl(rhs);
+      return lhs.is_equivalent(rhs);
     }
 
   private:
@@ -207,6 +207,20 @@ namespace detail {
       -> T const&
     {
       return static_cast<T const&>(*this);
+    }
+
+    auto is_equal(T const& rhs) const
+        noexcept(noexcept(derived().equal_impl(rhs)))
+      -> bool
+    {
+      return derived().equal_impl(rhs);
+    }
+
+    auto is_equivalent(T const& rhs) const
+        noexcept(noexcept(derived().equivalent_impl(rhs)))
+      -> bool
+    {
+      return derived().equivalent_impl(rhs);
     }
   };
 
