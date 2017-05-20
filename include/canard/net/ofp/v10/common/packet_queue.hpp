@@ -35,7 +35,7 @@ namespace v10 {
     {
     }
 
-    packet_queue(queue_id const& id, properties_type properties)
+    packet_queue(ofp::queue_id const& id, properties_type properties)
       : packet_queue{id.queue(), std::move(properties)}
     {
     }

@@ -42,7 +42,7 @@ namespace v13 {
     {
     }
 
-    packet_queue(queue_id const& id, properties_type properties)
+    packet_queue(ofp::queue_id const& id, properties_type properties)
       : packet_queue{id.queue(), id.port(), std::move(properties)}
     {
     }
