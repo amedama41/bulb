@@ -52,7 +52,7 @@ namespace canard {
     static auto broadcast()
       -> mac_address
     {
-      return mac_address({{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}});
+      return mac_address(bytes_type{{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}});
     }
 
     friend auto operator==(mac_address const& lhs, mac_address const& rhs)
