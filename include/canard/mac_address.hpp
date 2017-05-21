@@ -18,22 +18,22 @@ namespace canard {
   public:
     using bytes_type = std::array<std::uint8_t, 6>;
 
-    mac_address()
+    mac_address() noexcept
       : addr_{}
     {
     }
 
-    explicit mac_address(bytes_type const& bytes)
+    explicit mac_address(bytes_type const& bytes) noexcept
       : addr_(bytes)
     {
     }
 
-    explicit mac_address(std::uint8_t const (&array)[6])
+    explicit mac_address(std::uint8_t const (&array)[6]) noexcept
       : addr_{{array[0], array[1], array[2], array[3], array[4], array[5]}}
     {
     }
 
-    auto to_bytes() const
+    auto to_bytes() const noexcept
       -> bytes_type const&
     {
       return addr_;
@@ -51,19 +51,21 @@ namespace canard {
           % std::uint16_t{addr_[5]});
     }
 
-    static auto broadcast()
+    static auto broadcast() noexcept
       -> mac_address
     {
       return mac_address(bytes_type{{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}});
     }
 
-    friend auto operator==(mac_address const& lhs, mac_address const& rhs)
+    friend auto operator==(
+        mac_address const& lhs, mac_address const& rhs) noexcept
       -> bool
     {
       return lhs.addr_ == rhs.addr_;
     }
 
-    friend auto operator<(mac_address const& lhs, mac_address const& rhs)
+    friend auto operator<(
+        mac_address const& lhs, mac_address const& rhs) noexcept
       -> bool
     {
       return lhs.addr_ < rhs.addr_;
