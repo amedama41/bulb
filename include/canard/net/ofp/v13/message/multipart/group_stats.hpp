@@ -231,7 +231,8 @@ namespace multipart {
           , "too small group_stats length"
         } << CANARD_NET_OFP_ERROR_INFO();
       }
-      auto const bucket_stats_length = stats.length - sizeof(ofp_type);
+      auto const bucket_stats_length
+        = std::uint16_t(stats.length - sizeof(ofp_type));
       if (std::distance(first, last) < bucket_stats_length) {
         throw v13::exception{
             protocol::bad_request_code::bad_len

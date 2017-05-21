@@ -188,7 +188,7 @@ namespace multipart {
           , "too small flow_stats length"
         } << CANARD_NET_OFP_ERROR_INFO();
       }
-      auto const rest_length = stats.length - sizeof(ofp_type);
+      auto const rest_length = std::uint16_t(stats.length - sizeof(ofp_type));
       if (std::distance(first, last) < rest_length) {
         throw exception{
             protocol::bad_request_code::bad_len

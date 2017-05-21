@@ -132,7 +132,8 @@ namespace multipart {
           , "too small group_description length"
         } << CANARD_NET_OFP_ERROR_INFO();
       }
-      auto const buckets_length = group_desc.length - sizeof(ofp_type);
+      auto const buckets_length
+        = std::uint16_t(group_desc.length - sizeof(ofp_type));
       if (std::distance(first, last) < buckets_length) {
         throw v13::exception{
             protocol::bad_request_code::bad_len

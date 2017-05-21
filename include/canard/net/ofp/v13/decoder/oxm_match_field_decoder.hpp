@@ -35,7 +35,7 @@ namespace v13 {
         = v13::oxm_header::decode_without_consumption(first, last);
 
       if (std::distance(first, last)
-          < oxm_header.length() + oxm_header.oxm_length()) {
+          < std::uint16_t(oxm_header.length() + oxm_header.oxm_length())) {
         throw exception{
             protocol::bad_request_code::bad_len
           , "too small data size for oxm_match_field"

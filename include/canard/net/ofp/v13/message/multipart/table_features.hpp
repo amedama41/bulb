@@ -183,7 +183,8 @@ namespace multipart {
           , "too small table_features length"
         } << CANARD_NET_OFP_ERROR_INFO();
       }
-      auto const prop_length = features.length - sizeof(ofp_type);
+      auto const prop_length
+        = std::uint16_t(features.length - sizeof(ofp_type));
       if (std::distance(first, last) < prop_length) {
         throw exception{
             protocol::bad_request_code::bad_len

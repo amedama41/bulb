@@ -235,7 +235,8 @@ namespace multipart {
           , "too small meter_stats length"
         } << CANARD_NET_OFP_ERROR_INFO();
       }
-      auto const band_stats_length = stats.len - sizeof(ofp_type);
+      auto const band_stats_length
+        = std::uint16_t(stats.len - sizeof(ofp_type));
       if (std::distance(first, last) < band_stats_length) {
         throw v13::exception{
             protocol::bad_request_code::bad_len

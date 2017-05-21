@@ -207,7 +207,7 @@ namespace v13 {
         } << CANARD_NET_OFP_ERROR_INFO();
       }
 
-      auto const actions_length = bkt.len - sizeof(ofp_type);
+      auto const actions_length = std::uint16_t(bkt.len - sizeof(ofp_type));
       if (std::distance(first, last) < actions_length) {
         throw exception{
           protocol::bad_request_code::bad_len, "too small data size for bucket"

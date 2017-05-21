@@ -110,7 +110,8 @@ namespace v10 {
           , "packet_queue length is too small"
         } << CANARD_NET_OFP_ERROR_INFO();
       }
-      auto const properties_length = pkt_queue.len - sizeof(ofp_type);
+      auto const properties_length
+        = std::uint16_t(pkt_queue.len - sizeof(ofp_type));
       if (std::distance(first, last) < properties_length) {
         throw v10::exception{
           protocol::OFPBRC_BAD_LEN, "too small data size for packet_queue"

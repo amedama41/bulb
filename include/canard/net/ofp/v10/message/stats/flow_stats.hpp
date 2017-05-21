@@ -224,7 +224,8 @@ namespace statistics {
         } << CANARD_NET_OFP_ERROR_INFO();
       }
 
-      auto const actions_length = stats.length - sizeof(ofp_type);
+      auto const actions_length
+        = std::uint16_t(stats.length - sizeof(ofp_type));
       if (std::distance(first, last) < actions_length) {
         throw v10::exception{
           protocol::OFPBRC_BAD_LEN, "too small data size for flow_stats"

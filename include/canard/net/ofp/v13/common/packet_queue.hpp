@@ -132,7 +132,8 @@ namespace v13 {
         } << CANARD_NET_OFP_ERROR_INFO();
       }
 
-      auto const properties_length = pkt_queue.len - sizeof(ofp_type);
+      auto const properties_length
+        = std::uint16_t(pkt_queue.len - sizeof(ofp_type));
       if (std::distance(first, last) < properties_length) {
         throw exception{
             protocol::bad_request_code::bad_len
