@@ -29,7 +29,7 @@ namespace v13 {
       -> key_type
     {
       return instruction_order<Instruction>::value;
-    };
+    }
 
     template <class Instruction>
     static auto get_key_impl(Instruction const& instruction) noexcept

@@ -83,7 +83,7 @@ namespace v13 {
       -> key_type
     {
       return OXMMatchField::oxm_type();
-    };
+    }
 
     template <class OXMMatchField>
     static auto get_key_impl(OXMMatchField const& field) noexcept

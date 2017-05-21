@@ -24,7 +24,7 @@ namespace detail {
       -> std::uint16_t
     {
       return sizeof(typename T::ofp_type);
-    };
+    }
 
     constexpr auto exclude_padding(...) noexcept
       -> bool
