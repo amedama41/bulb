@@ -59,8 +59,8 @@ namespace detail {
       return detail::memcmp(derived().ofp_message(), rhs.ofp_message());
     }
 
-    auto equivalent_impl(T const& rhs) const noexcept(
-        derived().is_equivalent_message(rhs))
+    auto equivalent_impl(T const& rhs) const
+        noexcept(noexcept(derived().is_equivalent_message(rhs)))
       -> bool
     {
       return derived().is_equivalent_message(rhs);
