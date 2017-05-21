@@ -1,8 +1,9 @@
 #ifndef CANARD_MAC_ADDRESS_HPP
 #define CANARD_MAC_ADDRESS_HPP
 
-#include <cstring>
+#include <cstdint>
 #include <array>
+#include <string>
 #include <boost/format.hpp>
 #include <boost/operators.hpp>
 
