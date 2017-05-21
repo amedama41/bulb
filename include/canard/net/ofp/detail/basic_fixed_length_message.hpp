@@ -2,6 +2,7 @@
 #define CANARD_NET_OFP_DETAIL_BASIC_FIXED_LENGTH_MESSAGE_HPP
 
 #include <cstdint>
+#include <utility>
 #include <canard/net/ofp/detail/basic_message.hpp>
 #include <canard/net/ofp/detail/decode.hpp>
 #include <canard/net/ofp/detail/encode.hpp>
@@ -60,7 +61,7 @@ namespace detail {
     }
 
     auto equivalent_impl(T const& rhs) const
-        noexcept(noexcept(derived().is_equivalent_message(rhs)))
+        noexcept(noexcept(std::declval<T>().is_equivalent_message(rhs)))
       -> bool
     {
       return derived().is_equivalent_message(rhs);

@@ -210,14 +210,14 @@ namespace detail {
     }
 
     auto is_equal(T const& rhs) const
-        noexcept(noexcept(derived().equal_impl(rhs)))
+        noexcept(noexcept(std::declval<T>().equal_impl(rhs)))
       -> bool
     {
       return derived().equal_impl(rhs);
     }
 
     auto is_equivalent(T const& rhs) const
-        noexcept(noexcept(derived().equivalent_impl(rhs)))
+        noexcept(noexcept(std::declval<T>().equivalent_impl(rhs)))
       -> bool
     {
       return derived().equivalent_impl(rhs);
