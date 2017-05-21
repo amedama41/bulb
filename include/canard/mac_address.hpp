@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <array>
+#include <ostream>
 #include <string>
 #include <boost/format.hpp>
 #include <boost/operators.hpp>
@@ -72,9 +73,10 @@ namespace canard {
     bytes_type addr_;
   };
 
-  template <class OStream>
-  inline auto operator<<(OStream& os, mac_address const& mac)
-    -> OStream&
+  template <class CharT, class Traits>
+  inline auto operator<<(
+      std::basic_ostream<CharT, Traits>& os, mac_address const& mac)
+    -> std::basic_ostream<CharT, Traits>&
   {
     return os << mac.to_string();
   }
