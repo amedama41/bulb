@@ -295,7 +295,7 @@ namespace ofp {
     -> std::uint16_t
   {
     auto const max_length
-      = std::numeric_limits<std::uint16_t>::max() - base_length;
+      = std::uint16_t(std::numeric_limits<std::uint16_t>::max() - base_length);
     if (size() > (max_length / value_type::min_byte_length())) {
       throw std::runtime_error{"too many elements"};
     }

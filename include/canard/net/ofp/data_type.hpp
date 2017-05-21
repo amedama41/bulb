@@ -37,7 +37,7 @@ namespace ofp {
     -> std::uint16_t
   {
     auto const max_length
-      = std::numeric_limits<std::uint16_t>::max() - base_length;
+      = std::uint16_t(std::numeric_limits<std::uint16_t>::max() - base_length);
     if (data.size() > max_length) {
       throw std::runtime_error{"too large data length"};
     }
