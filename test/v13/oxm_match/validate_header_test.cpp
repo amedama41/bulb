@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_SUITE(oxm_match_field_test)
     {
       constexpr auto payload_length = T::min_length() - sizeof(std::uint32_t);
       auto const header
-        = std::uint32_t((T::oxm_type() << 9) | 0x0000 | payload_length - 1);
+        = std::uint32_t(((T::oxm_type() << 9) | 0x0000 | payload_length) - 1);
 
       auto const error_msg = T::validate_header(header);
 
@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_SUITE(oxm_match_field_test)
     {
       constexpr auto payload_length = T::min_length() - sizeof(std::uint32_t);
       auto const header
-        = std::uint32_t((T::oxm_type() << 9) | 0x0000 | payload_length + 1);
+        = std::uint32_t(((T::oxm_type() << 9) | 0x0000 | payload_length) + 1);
 
       auto const error_msg = T::validate_header(header);
 
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_SUITE(oxm_match_field_test)
     {
       constexpr auto payload_length = T::min_length() - sizeof(std::uint32_t);
       auto const header
-        = std::uint32_t((T::oxm_type() << 9) | 0x0100 | payload_length * 2 - 1);
+        = std::uint32_t(((T::oxm_type() << 9) | 0x0100 | payload_length * 2) - 1);
 
       auto const error_msg = T::validate_header(header);
 
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_SUITE(oxm_match_field_test)
     {
       constexpr auto payload_length = T::min_length() - sizeof(std::uint32_t);
       auto const header
-        = std::uint32_t((T::oxm_type() << 9) | 0x0100 | payload_length * 2 + 1);
+        = std::uint32_t(((T::oxm_type() << 9) | 0x0100 | payload_length * 2) + 1);
 
       auto const error_msg = T::validate_header(header);
 

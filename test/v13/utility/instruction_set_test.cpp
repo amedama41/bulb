@@ -77,7 +77,7 @@ struct instruction_set_fixture
     ""_bin;
 };
 
-};
+}
 
 BOOST_AUTO_TEST_SUITE(common_type_test)
 BOOST_AUTO_TEST_SUITE(instruction_set_test)
